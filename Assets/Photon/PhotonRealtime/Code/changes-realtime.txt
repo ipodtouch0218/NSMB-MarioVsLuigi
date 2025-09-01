@@ -3,15 +3,76 @@ Photon Realtime C# Client - Changelog
 www.photonengine.com  -  Join our Discord Server: https://dashboard.photonengine.com/account/profile
 
 
+Version 5.1.9
+
+Version 5.1.8 (25. August 2025 - rev8056)
+    Fixed: Potential NullReference of AuthValues in OnStatusChanged() case StatusCode.Disconnect / ClientState.ConnectWithFallbackProtocol.
+    Fixed: An issue in `MatchmakingExtensions.ReconnectToRoomAsync()` that used ReconnectAndRejoin when PlayerTTL < 0. To enable a fast reconnect, set a PlayerTTL.
+    Fixed: An issue in `MatchmakingExtensions.ReconnectToRoomAsync()` that left the connection in a non-reconnectable state (not offline and not master) by waiting for a disconnect before commencing.
+    Fixed: An issue in the `AsyncExtensions.ReconnectAndRejoinAsync()` that could cause an undesired timeout on error.
+    Added: Optional disabling fast reconnect completely with MatchmakingArguments.FastReconnectDisabled.
+    Changed: Log.ApplyPrefixes to re-use a StringBuilder.
+    Changed: Player NickName synchronization. On entering a room, the LocalPlayer sends an update for the NickName, if the received Custom Properties have it wrong.
+
+Version 5.1.7 (31. July 2025 - rev8015)
+    Removed: MatchmakingExtensions class Exception. Where this was thrown, now a OperationException is used instead. Handling code must be adjusted accordingly.
+    Note: In both cases where the Exception class was used, a OperationException is a good fit and with the naming, the MatchmakingExtensions.Exception was too easy to mess up.
+    Added: Obsolete RealtimeClient.LoadBalancingPeer to help with migration from v4 to v5.
+    Changed: ConnectUsingSettings so it can be called after getting the regions (to connect to a specific one) without needing to disconnect first.
+    Note: With this change, you can call ConnectUsingSettings in the callbacks for region-handling. Set your preferred region as FixedRegion and call ConnectUsingSettings to "continue".
+    Changed: Improved the response time of `ConnectToNameserverAndWaitForRegionsAsync()` by making pinging then region opt-out. Might break some places where it's used. Just define if you want pinging to be done. Otherwise it is the same.
+    Changed: RealtimeClient.LocalPlayer is now readonly.
+    Removed: RealtimeClient.CreatePlayer(). This removes the option to inherit the Player class for simplicity. It was not recommended to overload the RealtimeClient in v5 anymore.
+    Changed: Some calls for logging to include the log level and prefix of the client.
+
+Version 5.1.6 (01. July 2025 - rev7991)
+    Fixed: Async extensions now select random matchmaking on empty room names (instead only checking for null).
+    Changed: Logging level for the message when AuthOnceWss is done and switches back to the expected/configured protocol. This is now on debug level.
+    Removed: Surplus info logging for OnDisconnectedMsg. It gets logged (with info level and prefix) in Callbacks.OnDisconnected().
+    Changed: OpSettings() is now only sent, if the client requests the Lobby Stats. If it doesn't, the op isn't called.
+    Added: EventCode.CommandEvent code 220. Used with some first party plugins (e.g. Matchmaking Tickets and Voice Interest Management).
+    Added: OpCreateMatchmakingTicket() to request a party ticket for all or a range of players in the room.
+    Added: CommandEventSubcode enum for that event.
+    Fixed: Potential NullreferenceException inside CreateServiceTask(). If there is no completionSource, the switch could not rely on it.
+    Changed: Signature of ReconnectAndRejoinAsync. It has an optional ticket parameter (for Matchmaking Ticket). The previous parameter implementation is obsolete but working.
+    Removed: ReconnectAndRejoinAsync() overload without the ticket. It was not helpful keeping this around (as it was ambiguous).
+    Updated: Reference doc for ReconnectAndRejoin().
+    Fixed: RejoinRoomAsync will use a given "Ticket" as parameter for the internal call of OpRejoinRoom(). It was silently ignored so far.
+    Changed: ReconnectToRoomAsync() to attempt a ReconnectAndRejoinAsync() first of all. If that doesn't succeed, the client connects and does the old approach.
+    Changed: ConnectToRoomAsync() to try only configure the client, if it was not connected. It uses ConnectUsingSettingsAsync() to connect if needed.
+    Changed: ConnectUsingSettingsAsync() to continue immediately, if the client is already connected to the Master Server and able to call matchmaking operations.
+    Fixed: Reference doc summary for Player.IsInactive.
+    Changed: RealtimeFallback() calls StopFallbackSendAckThread() to end the fallback thread after the KeepAliveInBackground passed (Service() inactivity). This is a fix for non-Unity projects.
+    Changed: OnApplicationQuit() will set IsNetworkSimEnabled = false to avoid Unity 6 IL2CPP builds from getting stuck indefinitely. This is a workaround for a Unity issue. (https://issuetracker.unity3d.com/product/unity/issues/guid/UUM-104910)
+
+Version 5.1.5 (24. April 2025 - rev7920)
+    Fixed: DisconnectAsync() to run the client's Service method until OnDisconnectedMsg gets fired. This makes sure the OnDisconnected callback and message are dispatched.
+
+Version 5.1.4 (10. April 2025 - rev7900)
+    Fixed: Async extension ConnectToNameserverAndWaitForRegionsAsync() to use async config task scheduler for continuation during region ping.
+    Changed: ConfigUnitySockets() for WebGL. It no longer logs a warning if the SocketWebTcp is missing in the Editor but logs an error in WebGL builds if the JS lib for WebSockets is missing.
+    Changed: PingHttp will now use HTTPs if running in Unity 6 or newer. These versions require secure http connections. In previous Unity versions, we used http for Best Region selection, as that gave more reliable results (with more stable roundtrip times).
+
+Version 5.1.3 (06. March 2025 - rev7864)
+    Added: UTC timestamp when logging ConnectUsingSettings (info level).
+    Changed: Operations which may contain any UserId, will be sent encrypted if they do. This improves security on the network layer. This affects OpFindFriends, OpJoinRandomRoom, OpJoinRandomOrCreateRoom, OpJoinRoomIntern and OpCreateRoomIntern.
+    Added: Properties to overwrite the `RoomOptions` and set initial `IsVisible` or `IsOpen` using the Photon Realtime MatchmakingExtensions API.
+    Added: Setting CrcEnabled using matchmaking extensions.
+    Moved: DNS resolution is no longer done in RegionPinger.Start() but in RegionPingThreaded() / RegionPingCoroutine(), which is off the main thread, where possible.
+    Added: Log.Info() in case the DNS resolution took longer than 100ms to finish for any given address.
+    Changed: One of the LogStats() conditions from "LogStatsInterval != 0" to "LogStatsInterval > 0". This ignores accidental negative values.
+    Changed: OpLeaveRoom() to only change local state if the leave op can actually be queued.
+    Changed: Disconnect() to queue the resulting status-change callbacks. This makes sure they happen on the Main Thread. This avoids issues in Unity where a disconnect likely affects or destroys GameObjects, which can only happen on the Main Thread.
+
 Version 5.1.2 (19. November 2024 - rev7770)
     Changed: IConnectionCallbacks.OnConnected() and the related callback message OnConnectedMsg are now obsolete and no longer called. Both will be removed in a later version.
     Note: Use OnConnectedToMaster instead. To confirm the client connected in a debug scenario, check the debug log level output.
-	
-	Added: Warning log to RealtimeFallback() about lack of service calls.
-	Added: DisconnectCause.ClientServiceInactivity used after the KeepAliveInBackground.
-	Changed: ConnectionHandler.DisconnectAfterKeepAlive is now obsolete. After the KeepAliveInBackground, the client will disconnect with DisconnectCause.ClientServiceInactivity.
-	Changed: Protocol Fallback. Any fallback is only done towards WSS (when another protocol fails). Unlike before, a fallback is done when the initial connection to a Name Server or Master Server fails. 
-	Note: WSS is commonly used on the Name Server connection (due to AuthOnceWss), so the initial UDP connection attempt is on the Master Server. This can fallback now, too.
+
+    Added: Warning log to RealtimeFallback() about lack of service calls.
+    Added: DisconnectCause.ClientServiceInactivity used after the KeepAliveInBackground.
+    Changed: ConnectionHandler.DisconnectAfterKeepAlive is now obsolete. After the KeepAliveInBackground, the client will disconnect with DisconnectCause.ClientServiceInactivity.
+    Changed: Protocol Fallback. Any fallback is only done towards WSS (when another protocol fails). Unlike before, a fallback is done when the initial connection to a Name Server or Master Server fails.
+    Note: WSS is commonly used on the Name Server connection (due to AuthOnceWss), so the initial UDP connection attempt is on the Master Server. This can fallback now, too.
 
 Version 5.1.1 (22. Oktober 2024 - rev7739)
     Changed: Disconnect() is now separate from the internally used Disconnect(DisconnectCause cause). Simplifies the public API.
@@ -30,7 +91,7 @@ Version 5.1.0 (01. Oktober 2024 - rev7714)
     Changed: ReplacePortWithAlternative has a null check for the address and 0 check for the port. It is now the same in v4 and v5. Removed third parameter.
     Removed: Usage of NETFX_CORE define.
     Changed: The Authenticate response on the Name Server will first apply the expected protocol for the Master Server connection. Then read the address and maybe rewrite it.
-	Removed: Unity special cases of using SocketUdpAsync / SocketTcpAsync for .Net 4.x for Mono specifically. Recent Unity versions (2019 tested) no longer run into issues with receiving data in blocking mode.
+    Removed: Unity special cases of using SocketUdpAsync / SocketTcpAsync for .Net 4.x for Mono specifically. Recent Unity versions (2019 tested) no longer run into issues with receiving data in blocking mode.
 
 Version 5.0.11 (28. August 2024 - rev7655)
     No notable changes.

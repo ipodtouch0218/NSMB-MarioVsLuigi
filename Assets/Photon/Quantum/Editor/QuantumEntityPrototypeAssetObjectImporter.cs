@@ -5,7 +5,7 @@ namespace Quantum.Editor {
   using UnityEngine;
 
 
-  [ScriptedImporter(15, Extension, 100000)]
+  [ScriptedImporter(16, Extension, 100000)]
   public partial class QuantumEntityPrototypeAssetObjectImporter : ScriptedImporter {
     public const string Extension = "qprototype";
     public const string ExtensionWithDot = ".qprototype";
@@ -51,6 +51,8 @@ namespace Quantum.Editor {
       
       ctx.DependsOnSourceAsset(new GUID(prefabGuid));
       ctx.DependsOnSourceAsset(prefabPath);
+      ctx.DependsOnArtifact(new GUID(prefabGuid));
+      
       QuantumUnityDBUtilities.AddAssetGuidOverridesDependency(ctx);
       
       if (!prefab.TryGetComponent(out QuantumEntityPrototype component)) {

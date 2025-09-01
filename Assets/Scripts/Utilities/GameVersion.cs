@@ -1,5 +1,7 @@
+using JetBrains.Annotations;
 using System;
 using System.IO;
+using UnityEngine;
 
 public struct GameVersion : IEquatable<GameVersion>, IComparable<GameVersion> {
     public byte Major, Minor, Patch, Hotfix;
@@ -87,10 +89,13 @@ public struct GameVersion : IEquatable<GameVersion>, IComparable<GameVersion> {
         for (int i = 0; i < parsed.Length; i++) {
             int separator = version.IndexOf('.');
             if (separator == -1) {
-                break;
+                separator = version.Length;
             }
 
             byte.TryParse(version[..separator], out parsed[i]);
+            if (version.Length - separator <= 0) {
+                break;
+            }
             version = version[(separator + 1)..];
         }
 

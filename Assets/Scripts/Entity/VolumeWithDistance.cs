@@ -31,7 +31,7 @@ public class VolumeWithDistance : MonoBehaviour {
             originalVolumes[i] = audioSources[i].volume;
         }
 
-        stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindFirstObjectByType<QuantumMapData>().Asset.UserAsset);
+        stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindFirstObjectByType<QuantumMapData>().GetAsset(false).UserAsset);
     }
 
     public void LateUpdate() {

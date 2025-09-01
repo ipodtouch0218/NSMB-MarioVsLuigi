@@ -6,6 +6,7 @@
 // <author>developer@photonengine.com</author>
 // -----------------------------------------------------------------------------
 
+
 #if UNITY_2017_4_OR_NEWER
 #define SUPPORTED_UNITY
 #endif
@@ -90,7 +91,7 @@ namespace Photon.Realtime
         /// <param name="client">Client.</param>
         /// <param name="appSettings">App settings.</param>
         /// <param name="config">Optional AsyncConfig, otherwise AsyncConfig.Global is used.</param>
-        /// <returns>When connected to master server callback was called.</returns>
+        /// <returns>When connected to master server callback was called. Continues immediately if the client is connected to the Master Server (then no AppSettings are changed).</returns>
         /// <exception cref="DisconnectException">Is thrown when the connection is terminated.</exception>
         /// <exception cref="AuthenticationFailedException">Is thrown when the authentication failed.</exception>
         /// <exception cref="OperationStartException">Is thrown when the operation could not be started.</exception>
@@ -99,6 +100,11 @@ namespace Photon.Realtime
         /// <exception cref="OperationCanceledException">Is thrown when the operation have been canceled (AsyncConfig.CancellationSource).</exception>
         public static Task ConnectUsingSettingsAsync(this RealtimeClient client, AppSettings appSettings, AsyncConfig config = null)
         {
+            if (client.IsConnectedAndReady && client.Server == ServerConnection.MasterServer)
+            {
+                return Task.CompletedTask;
+            }
+
             return config.Resolve().TaskFactory.StartNew(() =>
             {
                 if (client.State != ClientState.Disconnected && client.State != ClientState.PeerCreated)
@@ -126,6 +132,7 @@ namespace Photon.Realtime
         /// Runs reconnect and rejoin.
         /// </summary>
         /// <param name="client">Client object should be in Disconnected state.</param>
+        /// <param name="ticket">Optional Matchmaking Ticket.</param>
         /// <param name="throwOnError">Set ErrorCode as result on RoomJoinFailed.</param>
         /// <param name="config">Optional AsyncConfig, otherwise AsyncConfig.Global is used.</param>
         /// <returns>Returns when inside the room or error</returns>
@@ -134,7 +141,7 @@ namespace Photon.Realtime
         /// <exception cref="OperationException">Is thrown when the operation completed unsuccessfully.</exception>
         /// <exception cref="OperationTimeoutException">Is thrown when the operation timed out.</exception>
         /// <exception cref="OperationCanceledException">Is thrown when the operation have been canceled (AsyncConfig.CancellationSource).</exception>
-        public static Task<short> ReconnectAndRejoinAsync(this RealtimeClient client, bool throwOnError = true, AsyncConfig config = null)
+        public static Task<short> ReconnectAndRejoinAsync(this RealtimeClient client, object ticket = null, bool throwOnError = true, AsyncConfig config = null)
         {
             return config.Resolve().TaskFactory.StartNew(() =>
             {
@@ -143,7 +150,7 @@ namespace Photon.Realtime
                     return Task.FromException<short>(new OperationStartException("Client still connected"));
                 }
 
-                if (client.ReconnectAndRejoin() == false)
+                if (client.ReconnectAndRejoin(ticket) == false)
                 {
                     return Task.FromException<short>(new OperationStartException("Failed to start reconnecting"));
                 }
@@ -154,6 +161,13 @@ namespace Photon.Realtime
 #endif
                 handler.Disposables.Enqueue(client.CallbackMessage.ListenManual<OnDisconnectedMsg>(m => handler.SetException(new DisconnectException(m.cause))));
                 handler.Disposables.Enqueue(client.CallbackMessage.ListenManual<OnJoinedRoomMsg>(m => handler.SetResult(ErrorCode.Ok)));
+                handler.Disposables.Enqueue(client.CallbackMessage.ListenManual<OnJoinRoomFailedMsg>(m => {
+                    if (throwOnError) {
+                        handler.SetException(new OperationException(m.returnCode, m.message));
+                    }
+                    else {
+                        handler.SetResult(m.returnCode);
+                    }}));
                 handler.Disposables.Enqueue(client.CallbackMessage.ListenManual<OnJoinRandomFailedMsg>(m => {
                     if (throwOnError) {
                         handler.SetException(new OperationException(m.returnCode, m.message));
@@ -163,6 +177,13 @@ namespace Photon.Realtime
                     }}));
                 return handler.Task;
             }).Unwrap();
+        }
+
+        /// <inheritdoc cref="ReconnectAndRejoinAsync(RealtimeClient, object, bool, AsyncConfig)"/>
+        [Obsolete("Use ReconnectAndRejoinAsync(this RealtimeClient client, object ticket, bool throwOnError, AsyncConfig config) instead")]
+        public static Task<short> ReconnectAndRejoinAsync(this RealtimeClient client, bool throwOnError = true, AsyncConfig config = null)
+        {
+            return ReconnectAndRejoinAsync(client, null, throwOnError, config);
         }
 
         /// <summary>
@@ -220,7 +241,7 @@ namespace Photon.Realtime
                     return Task.CompletedTask;
                 }
 
-                if (client.State == ClientState.Disconnected || client.State == ClientState.Disconnecting || client.State == ClientState.PeerCreated)
+                if (client.State == ClientState.Disconnected || client.State == ClientState.PeerCreated)
                 {
                     return Task.CompletedTask;
                 }
@@ -232,10 +253,10 @@ namespace Photon.Realtime
                 var logLevel = client.LogLevel;
 
                 handler.Disposables.Enqueue(client.CallbackMessage.ListenManual<OnDisconnectedMsg>(m => {
-                    if (logLevel >= LogLevel.Info)
-                    {
-                        Log.Info($"Disconnected: {m.cause}");
-                    }
+                    //if (logLevel >= LogLevel.Info)
+                    //{
+                    //    Log.Info($"Disconnected: {m.cause}");
+                    //}
                     handler.SetResult(ErrorCode.Ok);
                 }));
 
@@ -256,6 +277,7 @@ namespace Photon.Realtime
         /// </summary>
         /// <param name="client">Client object.</param>
         /// <param name="appSettings">Photon AppSettings, only uses AppId.</param>
+        /// <param name="pingRegions">Ping each region, takes longer to complete.</param>
         /// <param name="config">Async config.</param>
         /// <returns>RegionHandler with filled out EnabledRegions</returns>
         /// <exception cref="DisconnectException">Is thrown when the connection terminated.</exception>
@@ -263,9 +285,10 @@ namespace Photon.Realtime
         /// <exception cref="OperationException">Is thrown when the operation completed unsuccessfully.</exception>
         /// <exception cref="OperationTimeoutException">Is thrown when the operation timed out.</exception>
         /// <exception cref="OperationCanceledException">Is thrown when the operation have been canceled (AsyncConfig.CancellationSource).</exception>
-        public static Task<RegionHandler> ConnectToNameserverAndWaitForRegionsAsync(this RealtimeClient client, AppSettings appSettings, AsyncConfig config = null)
+        public static Task<RegionHandler> ConnectToNameserverAndWaitForRegionsAsync(this RealtimeClient client, AppSettings appSettings, bool pingRegions = true, AsyncConfig config = null)
         {
-            return config.Resolve().TaskFactory.StartNew(() =>
+            var asyncConfig = config.Resolve();
+            return asyncConfig.TaskFactory.StartNew(() =>
             {
                 // connected // connecting
                 if (client.State == ClientState.ConnectedToNameServer || client.State == ClientState.ConnectingToNameServer)
@@ -279,11 +302,7 @@ namespace Photon.Realtime
                     var appSettingsCopy = new AppSettings(appSettings);
                     appSettingsCopy.FixedRegion = null;
 
-                    // TODO: Implement FetchRegions() instead
-                    if (client.ConnectUsingSettings(appSettingsCopy) == false)
-                    {
-                        return Task.FromException<RegionHandler>(new OperationStartException("Failed to start connection to nameserver"));
-                    }
+                    client.GetRegions(appSettingsCopy, ping: pingRegions);
                 }
                 // everything else
                 else
@@ -298,9 +317,18 @@ namespace Photon.Realtime
                     handler.Name = "ConnectToNameserverAndWaitForRegions";
 #endif
                     // Because we set PingAvailableRegions ourselves the connection logic started by ConnectUsingSettings is canceled.
-                    client.CallbackMessage.ListenManual<OnRegionListReceivedMsg>(m => m.regionHandler.PingAvailableRegions(r => handler.SetResult(ErrorCode.Ok)));
-                    var result = handler.Task.ContinueWith(c => client.RegionHandler);
-                    result.ContinueWith(c => client.DisconnectAsync());
+                    client.CallbackMessage.ListenManual<OnRegionListReceivedMsg>(m => {
+                        if (pingRegions)
+                        {
+                            m.regionHandler.PingAvailableRegions(r => handler.SetResult(ErrorCode.Ok));
+                        }
+                        else
+                        {
+                            handler.SetResult(ErrorCode.Ok);
+                        }
+                    });
+                    var result = handler.Task.ContinueWith(c => client.RegionHandler, asyncConfig.TaskScheduler);
+                    result.ContinueWith(c => client.DisconnectAsync(), asyncConfig.TaskScheduler);
                     return result;
                 }
                 return Task.FromResult(client.RegionHandler);
@@ -425,7 +453,7 @@ namespace Photon.Realtime
                     return Task.FromException<short>(new OperationStartException("Must be connected to master server"));
                 }
 
-                if (client.OpRejoinRoom(roomName) == false)
+                if (client.OpRejoinRoom(roomName, ticket) == false)
                 {
                     return Task.FromException<short>(new OperationStartException("Failed to send RejoinRoom operation"));
                 }
@@ -713,7 +741,7 @@ namespace Photon.Realtime
         /// <param name="client">Client.</param>
         /// <param name="throwOnErrors">The default implementation will throw an exception on every unexpected result, set this to false to return a result ErrorCode instead.</param>
         /// <param name="config">Optional AsyncConfig, otherwise AsyncConfig.Global is used.</param>
-        /// <returns>Phtoon Connection Handler object</returns>
+        /// <returns>Photon Connection Handler object</returns>
         public static AsyncOperationHandler CreateConnectionHandler(this RealtimeClient client, bool throwOnErrors = true, AsyncConfig config = null)
         {
             var handler = new AsyncOperationHandler(config.Resolve().OperationTimeoutSec);
@@ -724,7 +752,7 @@ namespace Photon.Realtime
             //    client.RemoveCallbackTarget(handler);
             //}, config.Resolve().TaskScheduler);
 
-            CreateServiceTask(client, handler.Token, handler.CompletionSource, handler, config);
+            CreateServiceTask(client, handler.Token, handler.CompletionSource, handler, config.Resolve());
 
             return handler;
         }
@@ -804,7 +832,7 @@ namespace Photon.Realtime
                 }
 
                 // if the (handler) token did not signal, and the task is still running, mark it as cancelled
-                if (token.IsCancellationRequested == false)
+                if (token.IsCancellationRequested == false && completionSource != null)
                 {
                     switch (completionSource.Task.Status)
                     {
@@ -812,7 +840,7 @@ namespace Photon.Realtime
                         case TaskStatus.Faulted: break;
                         case TaskStatus.Canceled: break;
                         default:
-                            completionSource?.TrySetException(new OperationCanceledException("Operation canceled"));
+                            completionSource.TrySetException(new OperationCanceledException("Operation canceled"));
                             break;
                     }
                 }
@@ -1079,7 +1107,7 @@ namespace Photon.Realtime
         public ConnectionServiceScope(RealtimeClient client, AsyncConfig config = null)
         {
             cancellationTokenSource = new CancellationTokenSource();
-            client.CreateServiceTask(cancellationTokenSource.Token, config: config ?? AsyncConfig.Global);
+            client.CreateServiceTask(cancellationTokenSource.Token, config: config.Resolve());
         }
 
         /// <summary>

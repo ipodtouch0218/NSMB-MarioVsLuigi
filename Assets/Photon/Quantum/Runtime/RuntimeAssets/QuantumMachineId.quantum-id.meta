@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 498c2ba40c34da841b0bbfab91cfd57f
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: e8ec9051dbb44694b9eb5949b28b5e7f, type: 3}
+  ReadableCharacters: ABCDEFGHIJKLMNPQRSTUVWXYZ123456789
+  RandomDataLength: 64

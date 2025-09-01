@@ -8,7 +8,7 @@ namespace NSMB.Quantum {
         [NonSerialized] public VersusStageData Stage;
 
         public void Awake() {
-            Stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(MapData.Asset.UserAsset);
+            Stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(MapData.GetAsset(false).UserAsset);
         }
     }
 }

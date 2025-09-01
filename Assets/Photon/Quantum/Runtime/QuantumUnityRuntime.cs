@@ -11,6 +11,24 @@ namespace Quantum {
   using UnityEngine;
   using UnityEngine.Serialization;
 
+  /// <summary>
+  /// The Quantum's representation for the capsule shape 3D world axis direction. 
+  /// </summary>
+  // Warning: Unity represents the capsule axis in 3D as an integer, where the X-axis is assigned the number 0.
+  // In Quantum, the Y-axis is assigned the value 0 to ensure it is the default axis in serialization process.
+  public enum CapsuleDirection3D {
+    /// <summary>
+    /// The Y axis has the 
+    /// </summary>
+    Y = 0,
+    /// <summary>
+    /// </summary>
+    X = 1,
+    /// <summary>
+    /// </summary>
+    Z = 2
+  }
+
   public partial class QPrototypeNavMeshPathfinder {
     [LocalReference]
     [DrawIf("Prototype.InitialTargetNavMesh.Id.Value", 0)]
@@ -49,28 +67,28 @@ namespace Quantum {
     }
 
     public static bool TrySetShapeConfigFromSourceCollider(Shape2DConfig config, Transform reference, Component collider, out bool isTrigger) {
+      QuantumEntityPrototype.SourceShapeGenericSettings settings = default;
+      return TrySetShapeConfigFromSourceCollider(config, ref settings, reference, collider, out isTrigger);
+    }
+
+    public static bool TrySetShapeConfigFromSourceCollider(Shape2DConfig config, ref QuantumEntityPrototype.SourceShapeGenericSettings settings, Transform reference, Component collider, out bool isTrigger) {
       if (collider == null) {
         isTrigger = false;
+        settings = default;
         return false;
       }
 
       // if the source collider is child (same object, immediate- or deep-child),
-      // avoid using the source's scale in order to not scale the settings twice
-      Vector2 sourceScale2D;
-      Vector3 sourceScale3D;
-      if (collider.transform.IsChildOf(reference)) {
-        sourceScale2D = Vector2.one;
-        sourceScale3D = Vector3.one;
-      } else {
-        sourceScale2D = collider.transform.lossyScale.ToFPVector2().ToUnityVector2();
-        sourceScale3D = collider.transform.lossyScale;
-      }
+      // pre-scale settings and avoid scaling it twice
+      settings.IsScaledBySource = collider.transform.IsChildOf(reference);
+      var sourceScale = collider.transform.lossyScale;
+      var sourceScale2D = collider.transform.lossyScale.ToFPVector2().ToUnityVector2();
 
       switch (collider) {
 #if QUANTUM_ENABLE_PHYSICS3D && !QUANTUM_DISABLE_PHYSICS3D
         case BoxCollider box:
           config.ShapeType      = Shape2DType.Box;
-          config.BoxExtents     = Vector3.Scale(box.size / 2, sourceScale3D).ToFPVector2();
+          config.BoxExtents     = Vector3.Scale(box.size / 2, sourceScale).ToFPVector2();
           config.PositionOffset = reference.transform.InverseTransformPoint(box.transform.TransformPoint(box.center)).ToFPVector2();
           config.RotationOffset = (Quaternion.Inverse(reference.transform.rotation) * box.transform.rotation).ToFPRotation2DDegrees();
           isTrigger             = box.isTrigger;
@@ -78,7 +96,11 @@ namespace Quantum {
 
         case SphereCollider sphere:
           config.ShapeType      = Shape2DType.Circle;
-          config.CircleRadius   = (Math.Max(Math.Max(Math.Abs(sourceScale3D.x), Math.Abs(sourceScale3D.y)), Math.Abs(sourceScale3D.z)) * sphere.radius).ToFP();
+          if (settings.IsScaledBySource) {
+            config.CircleRadius = ((Math.Max(Math.Abs(sourceScale2D.x), Math.Abs(sourceScale2D.y))) * sphere.radius).ToFP();
+          } else {
+            config.CircleRadius = (Math.Max(Math.Max(Math.Abs(sourceScale.x), Math.Abs(sourceScale.y)), Math.Abs(sourceScale.z)) * sphere.radius).ToFP();
+          }
           config.PositionOffset = reference.transform.InverseTransformPoint(sphere.transform.TransformPoint(sphere.center)).ToFPVector2();
           config.RotationOffset = (Quaternion.Inverse(reference.transform.rotation) * sphere.transform.rotation).ToFPRotation2DDegrees();
           isTrigger             = sphere.isTrigger;
@@ -110,13 +132,22 @@ namespace Quantum {
 
         case CapsuleCollider2D capsule:
           config.ShapeType      = Shape2DType.Capsule;
-          config.CapsuleSize.X   = (Math.Abs(sourceScale2D.x) * capsule.size.x).ToFP();
-          config.CapsuleSize.Y   = (Math.Abs(sourceScale2D.y) * capsule.size.y).ToFP();
+          settings.CapsuleDirection2D = capsule.direction;
+          FP upRotation = default;
+          if (capsule.direction == CapsuleDirection2D.Horizontal) {
+            config.CapsuleSize.X = (Math.Abs(sourceScale2D.y) * capsule.size.y).ToFP();
+            config.CapsuleSize.Y = (Math.Abs(sourceScale2D.x) * capsule.size.x).ToFP();
+            upRotation = 90;
+          } else {
+            config.CapsuleSize.X = (Math.Abs(sourceScale2D.x) * capsule.size.x).ToFP();
+            config.CapsuleSize.Y = (Math.Abs(sourceScale2D.y) * capsule.size.y).ToFP();
+            upRotation = default;
+          }
+          
           config.PositionOffset = reference.transform.InverseTransformPoint(capsule.transform.TransformPoint(capsule.offset.ToFPVector2().ToUnityVector3())).ToFPVector2();
-
           var refCapsuleTransform2D = Transform2D.Create(reference.transform.position.ToFPVector2(), reference.transform.rotation.ToFPRotation2D());
           var capsuleTransform2D    = Transform2D.Create(capsule.transform.position.ToFPVector2(), capsule.transform.rotation.ToFPRotation2D());
-          config.RotationOffset = (capsuleTransform2D.Rotation - refCapsuleTransform2D.Rotation) * FP.Rad2Deg;
+          config.RotationOffset = upRotation + (capsuleTransform2D.Rotation - refCapsuleTransform2D.Rotation) * FP.Rad2Deg;
           isTrigger             = capsule.isTrigger;
           break;
 #endif
@@ -158,14 +189,21 @@ namespace Quantum {
 #endif
     
     public static bool TrySetShapeConfigFromSourceCollider(Shape3DConfig config, Transform reference, Component collider, out bool isTrigger) {
+      QuantumEntityPrototype.SourceShapeGenericSettings settings = default;
+      return TrySetShapeConfigFromSourceCollider(config, ref settings, reference, collider, out isTrigger);
+    }
+
+    public static bool TrySetShapeConfigFromSourceCollider(Shape3DConfig config, ref QuantumEntityPrototype.SourceShapeGenericSettings settings, Transform reference, Component collider, out bool isTrigger) {
       if (collider == null) {
         isTrigger = false;
+        settings = default;
         return false;
       }
 
       // if the source collider is child (same object, immediate- or deep-child),
-      // avoid using the source's scale in order to not scale the settings twice
-      var sourceScale = collider.transform.IsChildOf(reference) ? Vector3.one : collider.transform.lossyScale;
+      // pre-scale settings and avoid scaling it twice
+      settings.IsScaledBySource = collider.transform.IsChildOf(reference);
+      Vector3 sourceScale = collider.transform.lossyScale;
 
       switch (collider) {
 #if QUANTUM_ENABLE_PHYSICS3D && !QUANTUM_DISABLE_PHYSICS3D
@@ -186,11 +224,35 @@ namespace Quantum {
           break;
 
         case CapsuleCollider capsule:
+          FPVector3 upRotation = default;
+          float capsuleRadiusScale = 1;
+          float capsuleHeightScale = 1;
+          switch (capsule.direction) {
+            case 0: // x-axis
+              settings.CapsuleDirection3D = CapsuleDirection3D.X;
+              upRotation = new FPVector3(0, 0, 90);
+              capsuleRadiusScale *= Math.Max(sourceScale.y, sourceScale.z);
+              capsuleHeightScale *= Math.Abs(sourceScale.x);
+              break;
+            case 1: // y-axis
+              settings.CapsuleDirection3D = CapsuleDirection3D.Y;
+              upRotation = default;
+              capsuleRadiusScale *= Math.Max(sourceScale.x, sourceScale.z);
+              capsuleHeightScale *= Math.Abs(sourceScale.y);
+              break;
+            case 2: // z-axis
+              settings.CapsuleDirection3D = CapsuleDirection3D.Z;
+              upRotation = new FPVector3(90, 0, 0);
+              capsuleRadiusScale *= Math.Max(sourceScale.x, sourceScale.y);
+              capsuleHeightScale *= Math.Abs(sourceScale.z);
+              break;
+          }
+
           config.ShapeType      = Shape3DType.Capsule;
-          config.CapsuleRadius   = (Math.Max(Math.Max(Math.Abs(sourceScale.x), Math.Abs(sourceScale.y)), Math.Abs(sourceScale.z)) * capsule.radius).ToFP();
-          config.CapsuleHeight  =  (Math.Abs(sourceScale.y) * capsule.height).ToFP();
+          config.CapsuleRadius  = Math.Abs(capsuleRadiusScale * capsule.radius).ToFP();
+          config.CapsuleHeight  = Math.Abs(capsuleHeightScale * capsule.height).ToFP();
           config.PositionOffset = reference.transform.InverseTransformPoint(capsule.transform.TransformPoint(capsule.center)).ToFPVector3();
-          config.RotationOffset = (Quaternion.Inverse(reference.transform.rotation) * capsule.transform.rotation).eulerAngles.ToFPVector3();
+          config.RotationOffset = upRotation + (Quaternion.Inverse(reference.transform.rotation) * capsule.transform.rotation).eulerAngles.ToFPVector3();
           isTrigger             = capsule.isTrigger;
           break;
 #endif
@@ -1041,7 +1103,7 @@ namespace Quantum {
 
 #region Assets/Photon/Quantum/Runtime/Dispatcher/QuantumCallbackHandler_UnityCallbacks.cs
 
-//#define QUANTUM_UNITY_CALLBACKS_VERBOSE_LOG
+// #define QUANTUM_UNITY_CALLBACKS_VERBOSE_LOG
 
 namespace Quantum {
   using System;
@@ -1049,6 +1111,15 @@ namespace Quantum {
   using System.Diagnostics;
   using UnityEngine;
   using UnityEngine.SceneManagement;
+#if QUANTUM_ENABLE_ADDRESSABLES && !QUANTUM_DISABLE_ADDRESSABLES
+  using System.Collections.Generic;
+  using System.IO;
+  using System.Linq;
+  using System.Threading.Tasks;
+  using UnityEngine.AddressableAssets;
+  using UnityEngine.ResourceManagement.AsyncOperations;
+  using UnityEngine.ResourceManagement.ResourceProviders;
+#endif
   using Debug = UnityEngine.Debug;
 
   /// <summary>
@@ -1111,7 +1182,7 @@ namespace Quantum {
       }
 
       if (_currentMap != null && _currentSceneNeedsCleanup) {
-        _coroutine  = QuantumMapLoader.Instance?.StartCoroutine(UnloadScene(_currentMap.Scene));
+        _coroutine  = QuantumMapLoader.Instance != null ? QuantumMapLoader.Instance.StartCoroutine(UnloadScene(_currentMap.Scene)) : null;
         _currentMap = null;
       }
     }
@@ -1120,6 +1191,33 @@ namespace Quantum {
       VerboseLog($"Publishing callback {typeof(T)} with {sceneName}");
       callback.SceneName = sceneName;
       QuantumCallback.Dispatcher.Publish(callback);
+    }
+
+    private object UnloadSceneAsync(string sceneName) {
+#if QUANTUM_ENABLE_ADDRESSABLES && !QUANTUM_DISABLE_ADDRESSABLES
+      if (_addressableOperations.TryGetValue(sceneName, out var asyncOp)) {
+        VerboseLog($"Unloading addressable scene {sceneName}");
+        return Addressables.UnloadSceneAsync(asyncOp);
+      } else
+#endif
+      return SceneManager.UnloadSceneAsync(sceneName);
+    }
+
+    private object LoadSceneAsync(string sceneName, LoadSceneMode loadSceneMode) {
+#if QUANTUM_ENABLE_ADDRESSABLES && !QUANTUM_DISABLE_ADDRESSABLES
+      var buildIndex = QuantumUnitySceneManagerUtils.GetSceneBuildIndex(sceneName);
+      if (buildIndex < 0) {
+        if (TryGetAddressableScenes(out var addressableScenes)) {
+          foreach (var (name, path) in addressableScenes) {
+            if (string.Equals(name, sceneName, StringComparison.OrdinalIgnoreCase)) {
+              VerboseLog($"Loading addressable scene {sceneName} ({path})");
+              return Addressables.LoadSceneAsync(path, loadSceneMode);
+            }
+          }
+        }
+      }
+#endif
+      return SceneManager.LoadSceneAsync(sceneName, loadSceneMode);
     }
 
     private IEnumerator SwitchScene(string previousSceneName, string newSceneName, bool unloadFirst) {
@@ -1146,12 +1244,12 @@ namespace Quantum {
           }
 
           PublishCallback(_callbackUnitySceneUnloadBegin, previousSceneName);
-          yield return SceneManager.UnloadSceneAsync(previousSceneName);
+          yield return UnloadSceneAsync(previousSceneName);
           PublishCallback(_callbackUnitySceneUnloadDone, previousSceneName);
         }
 
         PublishCallback(_callbackUnitySceneLoadBegin, newSceneName);
-        yield return SceneManager.LoadSceneAsync(newSceneName, loadSceneMode);
+        yield return LoadSceneAsync(newSceneName, loadSceneMode);
         var newScene = SceneManager.GetSceneByName(newSceneName);
         if (newScene.IsValid()) {
           SceneManager.SetActiveScene(newScene);
@@ -1161,7 +1259,7 @@ namespace Quantum {
 
         if (!unloadFirst) {
           PublishCallback(_callbackUnitySceneUnloadBegin, previousSceneName);
-          yield return SceneManager.UnloadSceneAsync(previousSceneName);
+          yield return UnloadSceneAsync(previousSceneName);
           PublishCallback(_callbackUnitySceneUnloadDone, previousSceneName);
         }
       } finally {
@@ -1175,7 +1273,7 @@ namespace Quantum {
           yield break;
         }
         PublishCallback(_callbackUnitySceneLoadBegin, sceneName);
-        yield return SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+        yield return LoadSceneAsync(sceneName, LoadSceneMode.Additive);
         SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName));
         PublishCallback(_callbackUnitySceneLoadDone, sceneName);
       } finally {
@@ -1189,7 +1287,7 @@ namespace Quantum {
           yield break;
         }
         PublishCallback(_callbackUnitySceneUnloadBegin, sceneName);
-        yield return SceneManager.UnloadSceneAsync(sceneName);
+        yield return UnloadSceneAsync(sceneName);
         PublishCallback(_callbackUnitySceneUnloadDone, sceneName);
       } finally {
         _coroutine = null;
@@ -1222,7 +1320,7 @@ namespace Quantum {
       var coroHost = QuantumMapLoader.Instance;
       Debug.Assert(coroHost != null);
 
-      string previousScene = _currentMap?.Scene ?? string.Empty;
+      string previousScene = (_currentMap != null ? _currentMap.Scene : null) ?? string.Empty;
       string newScene      = map.Scene;
 
       _currentMap               = map;
@@ -1253,6 +1351,105 @@ namespace Quantum {
     private static void VerboseLog(string msg) {
       Debug.LogFormat("QuantumUnityCallbacks: {0}", msg);
     }
+    
+#if QUANTUM_ENABLE_ADDRESSABLES && !QUANTUM_DISABLE_ADDRESSABLES
+    /// <summary>
+    /// A label by which addressable scenes can be discovered.
+    /// </summary>
+    const string AddressableScenesLabel = "QuantumScenes";
+    
+    public System.Threading.Tasks.Task LoadAddressableScenePathsAsync() {
+      return _addressableScenesTask.Value.Task;
+    }
+    
+    /// <summary>
+    /// Creates a task that resolves addressable scene paths. By default, this method locates all the addressable scenes with
+    /// <see cref="AddressableScenesLabel"/> label. Override this method to provide a custom implementation. For example, user
+    /// might want to have a pre-defined set of addressable scenes to avoid the wait:
+    /// <example><code>
+    /// protected override GetAddressableScenesResult GetAddressableScenes() {
+    ///   return Task.FromResult(new string[] {
+    ///     "Assets/Scenes/AddressableScene1.unity",
+    ///     "Assets/Scenes/AddressableScene2.unity",
+    ///   });
+    /// }
+    /// </code></example>
+    /// </summary>
+    /// <returns>A task representing resolve operation and optionally a delegate to be invoked before the task is going to be
+    /// awaited synchronously</returns>
+    protected static GetAddressableScenesResult GetAddressableScenes() {
+      VerboseLog($"Locating addressable scenes with label: {AddressableScenesLabel}");
+      
+      var tcs    = new TaskCompletionSource<(string, string)[]>();
+      var result = Addressables.LoadResourceLocationsAsync(AddressableScenesLabel, typeof(SceneInstance));
+        
+      result.Completed += op => {
+        try {
+          if (op.Status == AsyncOperationStatus.Failed) {
+            tcs.SetException(op.OperationException);
+          } else {
+            var paths = op.Result.Select(x => (Path.GetFileNameWithoutExtension(x.PrimaryKey), x.PrimaryKey)).ToArray();
+            VerboseLog($"Found {paths.Length} addressable scenes: {string.Join(", ", paths)}");
+            tcs.SetResult(paths);
+          }
+        } finally {
+          Addressables.Release(op);
+        }
+      };
+      
+      return new GetAddressableScenesResult {
+        Task = tcs.Task,
+        
+        // awaiting tasks synchronously does not play well with addressables; simply waiting will block the main thread and that's it.
+        // addressables *need* to have WaitForCompletion called
+        BeforeWaitForCompletion = () => {
+          if (result.IsValid()) {
+            result.WaitForCompletion();
+          }
+        },
+      };
+    }
+
+    /// <summary>
+    /// Returns the timeout for addressable scene paths to be resolved. By default, this method returns 10 seconds.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual TimeSpan GetAddressableScenePathsTimeout() {
+      return TimeSpan.FromSeconds(10);
+    }
+    
+    private bool TryGetAddressableScenes(out (string name, string path)[] addressableScenes) {
+      if (!_addressableScenesTask.IsValueCreated) {
+        Log.Warn($"Going to block the thread in wait for addressable scene paths being resolved, call and await {nameof(LoadAddressableScenePathsAsync)} to avoid this.");
+      }
+
+      var t = _addressableScenesTask.Value;
+      if (!t.Task.IsCompleted) {
+        t.BeforeWaitForCompletion?.Invoke();
+        
+        if (!t.Task.Wait(GetAddressableScenePathsTimeout())) {
+          addressableScenes = null;
+          return false;
+        }
+      }
+
+      addressableScenes = t.Task.Result;
+      return true;
+    }
+
+    protected struct GetAddressableScenesResult {
+      public Task<(string, string)[]> Task;
+      public Action                   BeforeWaitForCompletion;
+      public static implicit operator GetAddressableScenesResult(Task<(string, string)[]> task) {
+        return new GetAddressableScenesResult {
+          Task = task,
+        };
+      }
+    }
+
+    Lazy<GetAddressableScenesResult>                        _addressableScenesTask = new(() => GetAddressableScenes());
+    Dictionary<string, AsyncOperationHandle<SceneInstance>> _addressableOperations = new();
+#endif
   }
 }
 
@@ -1704,6 +1901,33 @@ namespace Quantum {
 #endregion
 
 
+#region Assets/Photon/Quantum/Runtime/Entity/IQuantumEntityViewCulling.cs
+
+namespace Quantum {
+  using System.Collections.Generic;
+
+  /// <summary>
+  /// Interface to control entity view instantiation and to add custom culling.
+  /// </summary>
+  public interface IQuantumEntityViewCulling {
+    /// <summary>
+    /// Create an iterator for all dynamic entities.
+    /// </summary>
+    public IEnumerable<(EntityRef, View)> DynamicEntityIterator(QuantumGame game, Frame frame, QuantumEntityViewBindBehaviour createBehaviour);
+
+    /// <summary>
+    /// Create an iterator for all map entities.
+    /// By default all components that have a <see cref="MapEntityLink"/> are returned.
+    /// </summary>
+    public IEnumerable<(EntityRef, MapEntityLink)> MapEntityIterator(QuantumGame game, Frame frame, QuantumEntityViewBindBehaviour createBehaviour);
+
+  }
+}
+
+
+#endregion
+
+
 #region Assets/Photon/Quantum/Runtime/Entity/IQuantumEntityViewPool.cs
 
 namespace Quantum {
@@ -1952,23 +2176,22 @@ namespace Quantum {
     }
     
     public void Convert(QuantumUnityComponentPrototype prototype, out MapEntityId result) {
-      if (AssetPrototype != null && prototype != null) {
-        result = AssetPrototype == prototype.GetComponent<QuantumEntityPrototype>() ? MapEntityId.Create(0) : MapEntityId.Invalid;
+      if (prototype) {
+        Convert(prototype.GetComponent<QuantumEntityPrototype>(), out result);
       } else {
-        var index = Array.IndexOf(OrderedMapPrototypes, prototype);
-        result = index >= 0 ? MapEntityId.Create(index) : MapEntityId.Invalid;
+        result = MapEntityId.Invalid;
       }
     }
 
     public void Convert(QUnityEntityPrototypeRef unityEntityPrototype, out EntityPrototypeRef result) {
       var sceneReference = unityEntityPrototype.ScenePrototype;
       if (sceneReference != null && sceneReference.gameObject.scene.IsValid()) {
-        Debug.Assert(Map != null);
-        Debug.Assert(Map.gameObject.scene == sceneReference.gameObject.scene);
+        Assert.Check(Map != null);
+        Assert.Check(Map.gameObject.scene == sceneReference.gameObject.scene);
 
         var index = Array.IndexOf(OrderedMapPrototypes, sceneReference);
         if (index >= 0) {
-          result = EntityPrototypeRef.FromMasterAsset(Map.Asset, index);
+          result = EntityPrototypeRef.FromMasterAsset(Map.AssetRef, index);
         } else {
           result = EntityPrototypeRef.Invalid;
         }
@@ -2075,11 +2298,11 @@ namespace Quantum {
     /// The Game that the entity belongs to. This can change after the OnGameChanged() callback.
     /// Set before calling OnActivate(Frame).
     /// </summary>
-    public override QuantumGame Game => _entityView?.Game;
+    public override QuantumGame Game => _entityView != null ? _entityView.Game : null;
     /// <summary>
     /// The Quantum EntityRef that the underlying entity view is attached to.
     /// </summary>
-    public EntityRef EntityRef => _entityView.EntityRef;
+    public EntityRef EntityRef => _entityView != null ? _entityView.EntityRef : EntityRef.None;
     /// <summary>
     /// A reference to the parent class to access interesting game and entity data.
     /// </summary>
@@ -2193,6 +2416,10 @@ namespace Quantum {
     /// Turning this on only prepares the buffers and callbacks. Switching the interpolation mode is controlled with a separate toggle on the QuantumEntityView.
     /// </summary>
     EnableSnapshotInterpolation = 1 << 5,
+    /// <summary>
+    /// Disable searching the inactive entity view game object children for entity view components.
+    /// </summary>
+    DisableSearchInactiveForEntityViewComponents = 1 << 6,
   }
   
   /// <summary>
@@ -2270,14 +2497,18 @@ namespace Quantum {
         Updater = FindFirstObjectByType<QuantumEntityViewUpdater>();
       }
 
-      Updater?.AddViewComponent(this);
+      if (Updater != null) {
+        Updater.AddViewComponent(this);
+      }
     }
 
     /// <summary>
     /// Unity OnDisabled, will try to detach the script from the <see cref="Updater"/>.
     /// </summary>
     public virtual void OnDisable() {
-       Updater?.RemoveViewComponent(this);
+      if (Updater != null) {
+        Updater.RemoveViewComponent(this);
+      }
     }
   }
 
@@ -2772,6 +3003,11 @@ namespace Quantum {
     public QuantumGizmoEntry KinematicColliders = new PhysicsComponentGizmoEntry(QuantumGizmoColors.TransparentWhite);
 
     /// <summary>
+    /// Draw the shapes in Physics Bodies with inertia configuration mode set to <see cref="Prototypes.PhysicsBodyInertiaMode.ParametricShape"/>.
+    /// </summary>
+    public QuantumGizmoEntry ParametricInertiaShape = new PhysicsComponentGizmoEntry(QuantumGizmoColors.Yellow.Alpha(0.25f)) { Enabled = true, DisableFill = false, OnlyDrawSelected = true };
+
+    /// <summary>
     /// Draw the colliders that are asleep.
     /// </summary>
     public QuantumGizmoEntry AsleepColliders = new PhysicsComponentGizmoEntry(QuantumGizmoColors.TransparentLightPurple);
@@ -2780,6 +3016,11 @@ namespace Quantum {
     /// Draw the colliders that are disabled.
     /// </summary>
     public QuantumGizmoEntry DisabledColliders = new PhysicsComponentGizmoEntry(QuantumGizmoColors.TransparentGray);
+
+    /// <summary>
+    /// Draw the center of mass.
+    /// </summary>
+    public QuantumGizmoEntry CenterOfMass = new PhysicsComponentGizmoEntry(QuantumGizmoColors.Maroon) { Enabled = false, Scale = .1f };
 
     /// <summary>
     /// Draw the map's physics area.
@@ -2838,32 +3079,32 @@ namespace Quantum {
     /// <summary>
     /// Draw the NavMesh area. The QuantumMap game object will trigger DrawOnlySelected.
     /// </summary>
-    public QuantumGizmoEntry NavMeshArea = new QuantumGizmoEntry(QuantumGizmoColors.TransparentLightBlue) { OnlyDrawSelected = true };
+    public QuantumGizmoEntry NavMeshArea = new QuantumGizmoEntry(QuantumGizmoColors.TransparentLightBlue.Alpha(0.25f)) { OnlyDrawSelected = true, DisableFill = false };
 
     /// <summary>
     /// Draw the NavMesh grid. The QuantumMap game object will trigger DrawOnlySelected.
     /// </summary>
-    public QuantumGizmoEntry NavMeshGrid = new QuantumGizmoEntry(QuantumGizmoColors.TransparentLightGreen) { OnlyDrawSelected = true };
+    public QuantumGizmoEntry NavMeshGrid = new QuantumGizmoEntry(QuantumGizmoColors.TransparentLightGreen.Alpha(0.25f)) { OnlyDrawSelected = true, DisableFill = true };
 
     /// <summary>
     /// Draw the NavMesh links.
     /// </summary>
-    public QuantumGizmoEntry NavMeshLinks = new QuantumGizmoEntry(QuantumGizmoColors.Blue) { Enabled = true, OnlyDrawSelected = true };
+    public NavMeshLinkGizmoEntry NavMeshLinks = new NavMeshLinkGizmoEntry(QuantumGizmoColors.Blue, false) { Enabled = true, OnlyDrawSelected = true };
 
     /// <summary>
     /// Draw the vertex normals of the NavMesh.
     /// </summary>
-    public QuantumGizmoEntry NavMeshVertexNormals = new QuantumGizmoEntry(QuantumGizmoColors.Yellow) { OnlyDrawSelected = true };
+    public QuantumGizmoEntry NavMeshVertexNormals = new QuantumGizmoEntry(QuantumGizmoColors.Green) { OnlyDrawSelected = true };
 
     /// <summary>
     /// Draw the triangle ids of the NavMesh.
     /// </summary>
-    public QuantumGizmoEntry NavMeshTriangleIds = new QuantumGizmoEntry(QuantumGizmoColors.TransparentLightBlue) { OnlyDrawSelected = true };
+    public QuantumGizmoEntry NavMeshTriangleIds = new QuantumGizmoEntry(QuantumGizmoColors.Yellow) { OnlyDrawSelected = true };
 
     /// <summary>
     /// Draw the region ids of the NavMesh.
     /// </summary>
-    public QuantumGizmoEntry NavMeshRegionIds = new QuantumGizmoEntry(QuantumGizmoColors.TransparentMaroon) { OnlyDrawSelected = true };
+    public QuantumGizmoEntry NavMeshRegionIds = new QuantumGizmoEntry(QuantumGizmoColors.White) { OnlyDrawSelected = true };
 
     /// <summary>
     /// Draw the numerical vertex ids of the NavMesh.
@@ -3234,6 +3475,26 @@ namespace Quantum {
   }
 
   /// <summary>
+  /// Individual entry for specifically the border of the navmesh section of the gizmo overlay.
+  /// </summary>
+  [Serializable]
+  public class NavMeshLinkGizmoEntry : QuantumGizmoEntry {
+    /// <summary>
+    /// Draw the link target triangle id.
+    /// </summary>
+    public bool DrawTriangleId;
+
+    /// <summary>
+    /// Default constructor.
+    /// </summary>
+    /// <param name="color">Render color.</param>
+    /// <param name="drawTriangleId">Draw the triangle id number of the link target.</param>
+    public NavMeshLinkGizmoEntry(Color color, bool drawTriangleId) : base(color) {
+      DrawTriangleId = drawTriangleId;
+    }
+  }
+
+  /// <summary>
   /// Individual entry for specifically the navmesh section of the gizmo overlay.
   /// </summary>
   [Serializable]
@@ -3331,32 +3592,20 @@ namespace Quantum {
 
     [StaticField] private static Dictionary<string, GizmoNavmeshData> _navmeshGizmoMap;
 
-    [StaticField] private static readonly Dictionary<MonoBehaviour, StaticMeshColliderGizmoData> _meshGizmoData =
-      new Dictionary<MonoBehaviour, StaticMeshColliderGizmoData>();
+    [StaticField] private static readonly Dictionary<object, StaticMeshColliderGizmoData> _meshGizmoData =
+      new Dictionary<object, StaticMeshColliderGizmoData>();
 
     [StaticField] private static UserGizmoCallback[] _userCallbacks;
 
-    private static QuantumEntityViewUpdater _evu;
-    private static QuantumMapData _mapData;
-
     static QuantumGameGizmos() {
-      SceneManager.sceneLoaded += (arg0, mode) => {
-        InvalidatePhysicsGizmos();
-      };
-
-      EditorApplication.update += InvokeGizmoUser;
+      SceneManager.sceneLoaded += (arg0, mode) => InvalidateGizmos();      
+      SceneView.duringSceneGui += InvokeGizmoUser;
     }
-
-    [StaticFieldResetMethod]
-    private static void InvokeGizmoUser() {
+    
+    private static void InvokeGizmoUser(SceneView sceneView) {
       var callbacks = GetUserCallbacks();
-      var evu = GetEntityViewUpdater();
 
       var settings = QuantumGameGizmosSettingsScriptableObject.Global.Settings;
-
-      if (evu == null) {
-        return;
-      }
 
       foreach (var callback in callbacks) {
         bool runtimeOnly = callback.Attribute.RuntimeOnly;
@@ -3413,39 +3662,13 @@ namespace Quantum {
     /// Invalidates the navmesh gizmos.
     /// </summary>
     [StaticFieldResetMethod]
-    public static void InvalidateNavMeshGizmos() {
+    public static void InvalidateGizmos() {
       _navmeshGizmoMap?.Clear();
-    }
-
-    /// <summary>
-    /// Invalidates the physics gizmos.
-    /// </summary>
-    [StaticFieldResetMethod]
-    public static void InvalidatePhysicsGizmos() {
       _meshGizmoData.Clear();
-      _mapData = null;
+      GameContext.Clear();
     }
 
-    private static QuantumEntityViewUpdater GetEntityViewUpdater() {
-      if (_evu == null) {
-        _evu = FindFirstObjectByType<QuantumEntityViewUpdater>();
-      }
-
-      return _evu;
-    }
-
-    private static QuantumMapData GetMapData() {
-      if (_mapData == null) {
-        _mapData = FindFirstObjectByType<QuantumMapData>();
-      }
-
-      return _mapData;
-    }
-
-    private static bool ShouldDraw(
-      QuantumGizmoEntry entry,
-      bool selected,
-      bool hasStateDrawer = true) {
+    private static bool ShouldDraw(QuantumGizmoEntry entry, bool selected, bool hasStateDrawer = true) {
       if (entry.Enabled == false)
         return false;
 
@@ -3465,9 +3688,27 @@ namespace Quantum {
       return true;
     }
 
+    internal static void RegisterEntityViewUpdater(QuantumEntityViewUpdater entityViewUpdater) {
+      if (entityViewUpdater == null || entityViewUpdater.ObservedGame == null) {
+        return;
+      }
+
+      GameContext[entityViewUpdater.ObservedGame] = entityViewUpdater;
+    }
+
+    internal static void UnregisterEntityViewUpdater(QuantumEntityViewUpdater entityViewUpdater) {
+      if (entityViewUpdater == null || entityViewUpdater.ObservedGame == null) {
+        return;
+      }
+
+      GameContext.Remove(entityViewUpdater.ObservedGame);
+    }
+
+    static Dictionary<QuantumGame, QuantumEntityViewUpdater> GameContext = new Dictionary<QuantumGame, QuantumEntityViewUpdater>();
+
     [DrawGizmo(GizmoType.Selected | GizmoType.Active | GizmoType.NonSelected)]
     static void DrawGizmos(QuantumRunnerBehaviour behaviour, GizmoType gizmoType) {
-      if (behaviour.Runner?.Session == null) {
+      if (behaviour.Runner == null || behaviour.Runner.Session == null) {
         return;
       }
 
@@ -3479,24 +3720,27 @@ namespace Quantum {
         return;
       }
 
+      GameContext.TryGetValue(game, out var entityViewUpdater);
+
       OnDrawGizmosInternal(
         game,
         gizmoType,
-        behaviour.Runner.GizmoSettings ?? QuantumGameGizmosSettingsScriptableObject.Global.Settings
-      );
+        behaviour.Runner.GizmoSettings ?? QuantumGameGizmosSettingsScriptableObject.Global.Settings,
+        entityViewUpdater);      
     }
 
     static void OnDrawGizmosInternal(
       QuantumGame game,
       GizmoType type,
-      QuantumGameGizmosSettings gizmosSettings) {
+      QuantumGameGizmosSettings gizmosSettings, 
+      QuantumEntityViewUpdater entityViewUpdater) {
       var frame = game.Frames.Predicted;
 
       if (frame != null) {
-        DrawMapGizmos(frame.Map, frame);
+        DrawMapGizmos(frame.Map, frame, entityViewUpdater != null ? entityViewUpdater.MapData : null);
 
 #if QUANTUM_ENABLE_AI && !QUANTUM_DISABLE_AI
-        OnDrawGizmos_NavMesh(frame, gizmosSettings, type);
+        OnDrawGizmos_NavMesh(frame, entityViewUpdater, gizmosSettings, type);
 #endif
 
 #if QUANTUM_ENABLE_PHYSICS3D && !QUANTUM_DISABLE_PHYSICS3D
@@ -3515,6 +3759,7 @@ namespace Quantum {
     /// On BeforeBake override, empty.
     /// </summary>
     public override void OnBeforeBake(QuantumMapData data) {
+      _meshGizmoData.Clear();
     }
 
     /// <summary>
@@ -3728,6 +3973,8 @@ namespace Quantum {
 
       Shape2DConfig config2D = null;
       Shape3DConfig config3D = null;
+      Shape2DConfig parametricInertiaConfig2D = null;
+      Shape3DConfig parametricInertiaConfig3D = null;
       bool isDynamic2D = false;
       bool isDynamic3D = false;
       float height = 0.0f;
@@ -3748,23 +3995,32 @@ namespace Quantum {
 
       if (behaviour.PhysicsCollider.IsEnabled) {
         if (behaviour.TransformMode == QuantumEntityPrototypeTransformMode.Transform2D) {
-          config2D = behaviour.GetScaledShape2DConfig();
+          config2D = behaviour.GetScaledShape2DConfig(ref physicsCollider);
           isDynamic2D = physicsBody.IsEnabled && !physicsCollider.IsTrigger &&
                         (physicsBody.Config2D & PhysicsBody2D.ConfigFlags.IsKinematic) == default;
+          
+          parametricInertiaConfig2D = physicsBody.InertiaMode == Prototypes.PhysicsBodyInertiaMode.ParametricShape 
+            ? behaviour.GetScaledShape2DConfig(physicsBody.ParametricInertiaShape2D) 
+            : null;
+
         } else if (transformMode == QuantumEntityPrototypeTransformMode.Transform3D) {
-          config3D = behaviour.GetScaledShape3DConfig();
+          config3D = behaviour.GetScaledShape3DConfig(ref physicsCollider);
           isDynamic3D = physicsBody.IsEnabled && !physicsCollider.IsTrigger &&
                         (physicsBody.Config3D & PhysicsBody3D.ConfigFlags.IsKinematic) == default;
+
+          parametricInertiaConfig3D = physicsBody.InertiaMode == Prototypes.PhysicsBodyInertiaMode.ParametricShape 
+            ? behaviour.GetScaledShape3DConfig(physicsBody.ParametricInertiaShape3D) 
+            : null;
         }
       }
 
       if (behaviour.Transform2DVertical.IsEnabled) {
 #if QUANTUM_XY
-        var verticalScale = transform.lossyScale.z;
+        var verticalScale = Mathf.Abs(transform.lossyScale.z);
         height = -behaviour.Transform2DVertical.Height.AsFloat * verticalScale;
         position2D.z -= behaviour.Transform2DVertical.PositionOffset.AsFloat * verticalScale;
 #else
-        var verticalScale = transform.lossyScale.y;
+        var verticalScale = Mathf.Abs(transform.lossyScale.y);
         height = behaviour.Transform2DVertical.Height.AsFloat * verticalScale;
         position2D.y += behaviour.Transform2DVertical.PositionOffset.AsFloat * verticalScale;
 #endif
@@ -3795,6 +4051,7 @@ namespace Quantum {
           config2D = SafeGetPrototype<Quantum.Prototypes.PhysicsCollider2DPrototype>(behaviour)?.ShapeConfig ??
                      config2D;
           isDynamic2D |= behaviour.GetComponent<QPrototypePhysicsBody2D>();
+          parametricInertiaConfig2D = SafeGetPrototype<Quantum.Prototypes.PhysicsBody2DPrototype>(behaviour)?.ParametricInertiaShape ?? parametricInertiaConfig2D;
 
           var cc = SafeGetPrototype<Quantum.Prototypes.CharacterController2DPrototype>(behaviour);
           if (cc != null) {
@@ -3812,6 +4069,7 @@ namespace Quantum {
           config3D = SafeGetPrototype<Quantum.Prototypes.PhysicsCollider3DPrototype>(behaviour)?.ShapeConfig ??
                      config3D;
           isDynamic3D |= behaviour.GetComponent<QPrototypePhysicsBody3D>();
+          parametricInertiaConfig3D = SafeGetPrototype<Quantum.Prototypes.PhysicsBody3DPrototype>(behaviour)?.ParametricInertiaShape ?? parametricInertiaConfig3D;
 
           var cc = SafeGetPrototype<Quantum.Prototypes.CharacterController3DPrototype>(behaviour);
           if (cc != null) {
@@ -3821,73 +4079,19 @@ namespace Quantum {
       }
       
       bool shouldDrawCharacterController = ShouldDraw(_settings.CharacterController, selected);
-      
+      bool shouldDrawCenterOfMass = ShouldDraw(_settings.CenterOfMass, selected, true);
+
 #if QUANTUM_ENABLE_PHYSICS2D && !QUANTUM_DISABLE_PHYSICS2D
-      bool shouldDraw = isDynamic2D
-        ? ShouldDraw(_settings.DynamicColliders, selected)
-        : ShouldDraw(_settings.KinematicColliders, selected);
-
-      if (config2D != null && shouldDraw) {
-        var color = isDynamic2D
-          ? _settings.DynamicColliders.Color
-          : _settings.KinematicColliders.Color;
-
-        var disableFill = behaviour.PhysicsBody.Config2D.HasFlag(PhysicsBody2D.ConfigFlags.IsKinematic)
-          ? _settings.KinematicColliders.DisableFill
-          : _settings.DynamicColliders.DisableFill;
-
-        var style = disableFill is { HasValue: true, Value: true }
-          ? QuantumGizmoStyle.FillDisabled
-          : default;
-        
-        if (config2D.ShapeType == Shape2DType.Polygon) {
-          if (QuantumUnityDB.TryGetGlobalAsset(config2D.PolygonCollider, out Quantum.PolygonCollider collider)) {
-            DrawShape2DGizmo(
-              Shape2D.CreatePolygon(collider, config2D.PositionOffset,
-                FP.FromRaw((config2D.RotationOffset.RawValue * FP.Raw.Deg2Rad) >> FPLut.PRECISION)),
-              position2D,
-              rotation2DDeg.ToUnityQuaternionDegrees(),
-              color, height, null, style: style);
-          }
-        } else if (config2D.ShapeType == Shape2DType.Compound) {
-          foreach (var shape in config2D.CompoundShapes) {
-            // nested compound shapes are not supported on the editor yet
-            if (shape.ShapeType == Shape2DType.Compound) {
-              continue;
-            }
-
-            if (shape.ShapeType == Shape2DType.Polygon) {
-              if (QuantumUnityDB.TryGetGlobalAsset(shape.PolygonCollider, out Quantum.PolygonCollider collider)) {
-                DrawShape2DGizmo(
-                  Shape2D.CreatePolygon(collider, shape.PositionOffset,
-                    FP.FromRaw((shape.RotationOffset.RawValue * FP.Raw.Deg2Rad) >> FPLut.PRECISION)),
-                  position2D,
-                  rotation2DDeg.ToUnityQuaternionDegrees(),
-                  color, height, null, style: style
-                );
-              }
-            } else {
-              DrawShape2DGizmo(
-                shape.CreateShape(null),
-                position2D,
-                rotation2DDeg.ToUnityQuaternionDegrees(),
-                color,
-                height,
-                null,
-                style: style
-              );
-            }
-          }
-        } else {
-          DrawShape2DGizmo(
-            config2D.CreateShape(null),
-            position2D,
-            rotation2DDeg.ToUnityQuaternionDegrees(),
-            color,
-            height,
-            null,
-            style: style);
-        }
+      if (shouldDrawCenterOfMass && physicsBody.IsEnabled) {
+        var com = behaviour.PhysicsBody.CenterOfMass2D.ToUnityVector3();
+        var point = behaviour.transform.TransformPoint(com);
+      
+        GizmoUtils.DrawGizmosSphere(point, _settings.CenterOfMass.Scale, _settings.CenterOfMass.Color);
+      }
+      
+      var settingsCollider2D = isDynamic2D ? _settings.DynamicColliders : _settings.KinematicColliders;
+      if (config2D != null && ShouldDraw(settingsCollider2D, selected)) {
+        DrawShape2DConfigGizmo(config2D, position2D, rotation2DDeg, height, settingsCollider2D);
       }
 
       if (configCC2D != null && shouldDrawCharacterController) {
@@ -3899,32 +4103,23 @@ namespace Quantum {
           disableFill: _settings.CharacterController.DisableFill
         );
       }
+
+      var settingsParametricInertiaShape2D = _settings.ParametricInertiaShape;
+      if (parametricInertiaConfig2D != null && ShouldDraw(settingsParametricInertiaShape2D, selected)) {
+        DrawShape2DConfigGizmo(parametricInertiaConfig2D, position2D, rotation2DDeg, height, settingsParametricInertiaShape2D);
+      }
 #endif
 #if QUANTUM_ENABLE_PHYSICS3D && !QUANTUM_DISABLE_PHYSICS3D
-      bool shouldDraw3D = isDynamic3D
-        ? ShouldDraw(_settings.DynamicColliders, selected)
-        : ShouldDraw(_settings.KinematicColliders, selected);
-
-      if (config3D != null && shouldDraw3D) {
-        var style = behaviour.PhysicsBody.Config3D.HasFlag(PhysicsBody3D.ConfigFlags.IsKinematic)
-          ? _settings.KinematicColliders.Style
-          : _settings.DynamicColliders.Style;
-
-        var color = isDynamic3D
-          ? _settings.DynamicColliders.Color
-          : _settings.KinematicColliders.Color;
-        if (config3D.ShapeType == Shape3DType.Compound) {
-          foreach (var shape in config3D.CompoundShapes) {
-            // nested compound shapes are not supported on the editor yet
-            if (shape.ShapeType == Shape3DType.Compound) {
-              continue;
-            }
-
-            DrawShape3DGizmo(shape.CreateShape(null), position3D, rotation3D, color, style: style);
-          }
-        } else {
-          DrawShape3DGizmo(config3D.CreateShape(null), position3D, rotation3D, color, style: style);
-        }
+      if (shouldDrawCenterOfMass && physicsBody.IsEnabled) {
+        var com = behaviour.PhysicsBody.CenterOfMass3D.ToUnityVector3();
+        var point = behaviour.transform.TransformPoint(com);
+      
+        GizmoUtils.DrawGizmosSphere(point, _settings.CenterOfMass.Scale, _settings.CenterOfMass.Color);
+      }
+      
+      var settingsCollider3D = isDynamic3D ? _settings.DynamicColliders : _settings.KinematicColliders;
+      if (config3D != null && ShouldDraw(settingsCollider3D, selected)) {
+        DrawShape3DConfigGizmo(config3D, position3D, rotation3D, settingsCollider3D);
       }
 
       if (configCC3D != null && shouldDrawCharacterController) {
@@ -3936,8 +4131,84 @@ namespace Quantum {
           _settings.CharacterController.DisableFill
         );
       }
+
+      var settingsParametricInertiaShape3D = _settings.ParametricInertiaShape;
+      if (parametricInertiaConfig3D != null && ShouldDraw(settingsParametricInertiaShape3D, selected)) {
+        DrawShape3DConfigGizmo(parametricInertiaConfig3D, position3D, rotation3D, settingsParametricInertiaShape3D);
+      }
 #endif
     }
+    
+#if QUANTUM_ENABLE_PHYSICS2D && !QUANTUM_DISABLE_PHYSICS2D
+
+    public static void DrawShape2DConfigGizmo(Shape2DConfig config2D, Vector3 position2D, FP rotation2DDeg, float height, QuantumGizmoEntry entrySettings) {
+      if (config2D.ShapeType == Shape2DType.Polygon) {
+        if (QuantumUnityDB.TryGetGlobalAsset(config2D.PolygonCollider, out Quantum.PolygonCollider collider)) {
+          DrawShape2DGizmo(
+            Shape2D.CreatePolygon(collider, config2D.PositionOffset,
+              FP.FromRaw((config2D.RotationOffset.RawValue * FP.Raw.Deg2Rad) >> FPLut.PRECISION)),
+            position2D,
+            rotation2DDeg.ToUnityQuaternionDegrees(),
+            entrySettings.Color, height, null, style: entrySettings.Style);
+        }
+      } else if (config2D.ShapeType == Shape2DType.Compound) {
+        foreach (var shape in config2D.CompoundShapes) {
+          // nested compound shapes are not supported on the editor yet
+          if (shape.ShapeType == Shape2DType.Compound) {
+            continue;
+          }
+
+          if (shape.ShapeType == Shape2DType.Polygon) {
+            if (QuantumUnityDB.TryGetGlobalAsset(shape.PolygonCollider, out Quantum.PolygonCollider collider)) {
+              DrawShape2DGizmo(
+                Shape2D.CreatePolygon(collider, shape.PositionOffset,
+                  FP.FromRaw((shape.RotationOffset.RawValue * FP.Raw.Deg2Rad) >> FPLut.PRECISION)),
+                position2D,
+                rotation2DDeg.ToUnityQuaternionDegrees(),
+                entrySettings.Color, height, null, style: entrySettings.Style
+              );
+            }
+          } else {
+            DrawShape2DGizmo(
+              shape.CreateShape(null),
+              position2D,
+              rotation2DDeg.ToUnityQuaternionDegrees(),
+              entrySettings.Color,
+              height,
+              null,
+              style: entrySettings.Style
+            );
+          }
+        }
+      } else {
+        DrawShape2DGizmo(
+          config2D.CreateShape(null),
+          position2D,
+          rotation2DDeg.ToUnityQuaternionDegrees(),
+          entrySettings.Color,
+          height,
+          null,
+          style: entrySettings.Style);
+      }
+    }
+#endif
+    
+#if QUANTUM_ENABLE_PHYSICS3D && !QUANTUM_DISABLE_PHYSICS3D
+    public static void DrawShape3DConfigGizmo(Shape3DConfig config3D, Vector3 position3D, Quaternion rotation3D, QuantumGizmoEntry entrySettings) {
+      if (config3D.ShapeType == Shape3DType.Compound) {
+        foreach (var shape in config3D.CompoundShapes) {
+          // nested compound shapes are not supported on the editor yet
+          if (shape.ShapeType == Shape3DType.Compound) {
+            continue;
+          }
+
+          DrawShape3DGizmo(shape.CreateShape(null), position3D, rotation3D, entrySettings.Color, style: entrySettings.Style);
+        }
+      } else {
+        DrawShape3DGizmo(config3D.CreateShape(null), position3D, rotation3D, entrySettings.Color, style: entrySettings.Style);
+      }
+    }
+#endif
 
     private static T SafeGetPrototype<T>(Behaviour behaviour) where T : ComponentPrototype, new() {
       var component = behaviour.GetComponent<QuantumUnityComponentPrototype<T>>();
@@ -3971,26 +4242,112 @@ namespace Quantum {
         return;
       }
 
-      if (behaviour.Asset == null) {
+      if (behaviour.AssetRef == default) {
         return;
       }
 
       FPMathUtils.LoadLookupTables();
-      DrawMapGizmos(behaviour.Asset, null);
+
+      var map = behaviour.GetAsset(false);
+      if (!map) {
+        return;
+      }
+      
+      DrawMapGizmos(map, null, behaviour);
 
       var navmeshList = new List<NavMesh>();
 
-      foreach (var navmeshLink in behaviour.Asset.NavMeshLinks) {
+      foreach (var navmeshLink in map.NavMeshLinks) {
         if (navmeshLink.IsValid) {
           navmeshList.Add(QuantumUnityDB.GetGlobalAsset(navmeshLink));
         }
       }
 
-      DrawMapNavMesh(behaviour.Asset, navmeshList, NavMeshRegionMask.Default, _settings);
+      DrawMapNavMesh(map, navmeshList, NavMeshRegionMask.Default, _settings, behaviour);
     }
 
-    private static unsafe void DrawMapGizmos(Map map, Frame frame) {
+    private static void DrawManyNonDynamicMapColliders(List<MonoBehaviour> list) {
+      for (int i = 0; i < list.Count; i++) {
+        DrawNonDynamicMapCollider((QuantumMonoBehaviour)list[i], Selection.activeObject == list[i].gameObject);
+      }
+    }
+
+    private static void DrawNonDynamicMapCollider(QuantumMonoBehaviour qmb, bool isSelected) {
+      if (qmb is QuantumStaticMeshCollider3D or QuantumStaticTerrainCollider3D) {
+        bool shouldDraw = ShouldDraw(_settings.StaticMeshTriangles, isSelected, false);
+
+#if QUANTUM_ENABLE_PHYSICS3D && !QUANTUM_DISABLE_PHYSICS3D          
+#if !QUANTUM_ENABLE_TERRAIN || QUANTUM_DISABLE_TERRAIN
+        if (qmb is QuantumStaticTerrainCollider3D) {
+          shouldDraw = false;
+        }
+#endif
+        if (shouldDraw) {
+          DrawStaticMeshCollider(qmb, isSelected ? GizmoType.Selected : GizmoType.Active);
+        }
+#endif
+
+        return;
+      }
+      
+      if (ShouldDraw(_settings.StaticColliders, isSelected, false)) {
+        switch (qmb) {
+#if QUANTUM_ENABLE_PHYSICS3D && !QUANTUM_DISABLE_PHYSICS3D
+          case QuantumStaticSphereCollider3D sphereCollider3D:
+            if (Application.isPlaying == false) {
+              sphereCollider3D.UpdateFromSourceCollider();
+            }
+
+            var worldPos = sphereCollider3D.transform
+              .TransformPoint(sphereCollider3D.PositionOffset.ToUnityVector3());
+
+            DrawStaticSphereCollider3D(isSelected, worldPos, sphereCollider3D.transform.lossyScale, sphereCollider3D.Radius.AsFloat);
+            break;
+          case QuantumStaticBoxCollider3D bc3d:
+            if (Application.isPlaying == false) {
+              bc3d.UpdateFromSourceCollider();
+            }
+
+            var boxWorldPos = bc3d.transform
+              .TransformPoint(bc3d.PositionOffset.ToUnityVector3());
+
+            var boxRotation = bc3d.transform.rotation * Quaternion.Euler(bc3d.RotationOffset.ToUnityVector3());
+
+            DrawStaticBoxCollider3D(isSelected, boxWorldPos, boxRotation, bc3d.transform.lossyScale, bc3d.Size.ToUnityVector3());
+            break;
+          case QuantumStaticCapsuleCollider3D cc3d:
+            DrawStaticCapsuleCollider3D(cc3d, isSelected);
+            break;
+#endif
+#if QUANTUM_ENABLE_PHYSICS2D && !QUANTUM_DISABLE_PHYSICS2D
+          case QuantumStaticBoxCollider2D box2d:
+            DrawBoxStaticCollider2D(box2d, isSelected);
+            break;
+
+          case QuantumStaticCircleCollider2D circle2d:
+            DrawCircleStaticCollider2D(circle2d, isSelected);
+            break;
+
+          case QuantumStaticCapsuleCollider2D capsule2d:
+            DrawCapsuleStaticCollider2D(capsule2d, isSelected);
+            break;
+
+          case QuantumStaticEdgeCollider2D edge2d:
+            DrawEdgeStaticCollider2D(edge2d, isSelected);
+            break;
+
+          case QuantumStaticPolygonCollider2D polygon2d:
+            DrawPolygonStaticCollider2D(polygon2d, isSelected);
+            break;
+#endif
+        }
+      }
+    }
+
+    private static unsafe void DrawMapGizmos(Map map, Frame frame, QuantumMapData mapData) {
       if (map) {
+        bool mapIsDynamic = map is DynamicMap;
+
         FPMathUtils.LoadLookupTables();
 
         var center = FPVector3.Zero;
@@ -4041,30 +4398,136 @@ namespace Quantum {
             );
           }
         }
-        
+
         bool selected = false;
-        
-        var mapData = GetMapData();
-        
+
         if (mapData) {
           selected = Selection.activeGameObject == mapData.gameObject;
         }
 
-        if (ShouldDraw(_settings.NavMeshGrid, selected, false)) {
-          GizmoUtils.DrawGizmosBox(
-            center.ToUnityVector3(),
-            new FPVector2(map.WorldSizeX, map.WorldSizeY).ToUnityVector3(),
-            _settings.NavMeshGrid.Color
-          );
-          
-          var bottomLeft = center.ToUnityVector3() - (-map.WorldOffset).ToUnityVector3();
-          GizmoUtils.DrawGizmoGrid(
-            bottomLeft,
-            map.GridSizeX,
-            map.GridSizeY,
-            map.GridNodeSize,
-            _settings.NavMeshGrid.Color
-          );
+        if (mapIsDynamic == false) {
+          if (Application.isPlaying && mapData != null) {
+            DrawManyNonDynamicMapColliders(mapData.StaticCollider3DReferences);
+            DrawManyNonDynamicMapColliders(mapData.StaticCollider2DReferences);
+          } else {
+            // draw normally, from mb
+            // we don't draw here because the map could have not been baked yet
+          }
+        } else {
+          var dynamicMeshes = map.CollidersRuntimeTriangles;
+
+          // dynamic map colliders have no gameobject, so just use map data selected
+          if (ShouldDraw(_settings.StaticMeshTriangles, selected, false)) {
+            foreach (var kvp in dynamicMeshes) {
+#if QUANTUM_ENABLE_PHYSICS3D && !QUANTUM_DISABLE_PHYSICS3D    
+              DrawStaticMeshCollider(kvp.Value, GizmoType.Active);
+#endif
+            }
+          }
+
+          if (ShouldDraw(_settings.StaticColliders, selected, false)) {
+            foreach (var dc3d in map.StaticColliders3D) {
+              switch (dc3d.ShapeType) {
+                case Shape3DType.Sphere:
+#if QUANTUM_ENABLE_PHYSICS3D && !QUANTUM_DISABLE_PHYSICS3D    
+                  DrawStaticSphereCollider3D(
+                    selected,
+                    dc3d.Position.ToUnityVector3(),
+                    Vector3.one,
+                    dc3d.SphereRadius.AsFloat
+                  );
+#endif
+                  break;
+                case Shape3DType.Box:
+#if QUANTUM_ENABLE_PHYSICS3D && !QUANTUM_DISABLE_PHYSICS3D    
+                  DrawStaticBoxCollider3D(
+                    selected,
+                    dc3d.Position.ToUnityVector3(),
+                    dc3d.Rotation.ToUnityQuaternion(),
+                    Vector3.one,
+                    dc3d.BoxExtents.ToUnityVector3() * 2.0f
+                  );
+#endif
+                  break;
+                case Shape3DType.Capsule:
+                  var matrix = Matrix4x4.TRS(
+                    dc3d.Position.ToUnityVector3(),
+                    dc3d.Rotation.ToUnityQuaternion(),
+                    Vector3.one);
+                  GizmoUtils.DrawGizmosCapsule(
+                    matrix,
+                    dc3d.CapsuleRadius.AsFloat,
+                    dc3d.CapsuleHeight.AsFloat,
+                    _settings.GetSelectedColor(_settings.StaticColliders.Color, selected),
+                    style: _settings.StaticColliders.DisableFill ? QuantumGizmoStyle.FillDisabled : default
+                  );
+                  break;
+                case Shape3DType.None:
+                case Shape3DType.Compound:
+                case Shape3DType.Mesh: // handled separately
+                case Shape3DType.Terrain: // handled as meshes ^
+                  break;
+              }
+            }
+
+            foreach (var dc2d in map.StaticColliders2D) {
+              switch (dc2d.ShapeType) {
+                case Shape2DType.Capsule:
+                  GizmoUtils.DrawGizmosCapsule2D(
+                    dc2d.Position.ToUnityVector3(),
+                    dc2d.CapsuleRadius.AsFloat,
+                    dc2d.CapsuleExtent.AsFloat,
+                    dc2d.Height.AsFloat,
+                    _settings.GetSelectedColor(_settings.StaticColliders.Color, selected),
+                    rotation: dc2d.Rotation.ToUnityQuaternion(),
+                    style: _settings.StaticColliders.DisableFill ? QuantumGizmoStyle.FillDisabled : default
+                  );
+                  break;
+                case Shape2DType.Circle:
+                  GizmoUtils.DrawGizmosCircle(
+                    dc2d.Position.ToUnityVector3(),
+                    dc2d.CircleRadius.AsFloat,
+                    _settings.GetSelectedColor(_settings.StaticColliders.Color, selected),
+                    style: _settings.StaticColliders.DisableFill ? QuantumGizmoStyle.FillDisabled : default
+                  );
+                  break;
+                case Shape2DType.Box:
+                  var size = dc2d.BoxExtents.ToUnityVector3() * 2.0f;
+                  GizmoUtils.DrawGizmosBox(
+                    dc2d.Position.ToUnityVector3(),
+                    size,
+                    _settings.GetSelectedColor(_settings.StaticColliders.Color, selected),
+                    rotation: dc2d.Rotation.ToUnityQuaternion(),
+                    style: _settings.StaticColliders.DisableFill ? QuantumGizmoStyle.FillDisabled : default
+                  );
+                  break;
+                case Shape2DType.Edge:
+                  var extent = dc2d.Rotation.ToUnityQuaternion() * Vector3.right * dc2d.EdgeExtent.AsFloat;
+                  GizmoUtils.DrawGizmosEdge(
+                    dc2d.Position.ToUnityVector3() - extent,
+                    dc2d.Position.ToUnityVector3() + extent,
+                    dc2d.Height.AsFloat,
+                    _settings.StaticColliders.Color
+                  );
+                  break;
+                case Shape2DType.Polygon:
+                  if (dc2d.PolygonCollider != null) {
+                    GizmoUtils.DrawGizmoPolygon2D(
+                      dc2d.Position.ToUnityVector3(),
+                      dc2d.Rotation.ToUnityQuaternion(),
+                      dc2d.PolygonCollider.Vertices,
+                      0,
+                      _settings.GetSelectedColor(_settings.StaticColliders.Color, selected),
+                      style: _settings.StaticColliders.DisableFill ? QuantumGizmoStyle.FillDisabled : default
+                    );
+                  }
+                  break;
+                case Shape2DType.None:
+                case Shape2DType.Compound:
+                  break;
+              }
+            }
+          }
         }
 
         if (frame is { Physics3D: { SceneMesh: not null } }) {
@@ -4102,35 +4565,322 @@ namespace Quantum {
       }
     }
 
+    [DrawGizmo(GizmoType.Selected | GizmoType.Active | GizmoType.NonSelected)]
+    static void DrawGizmos_QuantumMonoBehaviour(QuantumMonoBehaviour qmb, GizmoType gizmoType) {
+      if (Application.isPlaying) {
+        // If the game is running, static colliders are drawn from the map.
+        return;
+      }
+
+      DrawNonDynamicMapCollider(qmb, gizmoType.HasFlag(GizmoType.Selected));
+    }
+
+#if QUANTUM_ENABLE_PHYSICS3D && !QUANTUM_DISABLE_PHYSICS3D    
+    private static void DrawStaticCapsuleCollider3D(QuantumStaticCapsuleCollider3D cc3d, bool isSelected) {
+      if (Application.isPlaying == false) {
+        cc3d.UpdateFromSourceCollider();
+      }
+
+      var t = cc3d.transform;
+      var absScale = t.lossyScale;
+      absScale.x = Math.Abs(absScale.x);
+      absScale.y = Math.Abs(absScale.y);
+      absScale.z = Math.Abs(absScale.z);
+      var radiusScale = Mathf.Max(absScale.x, absScale.z);
+      var extentScale = 0.0f;
+      var axisRotation = Vector3.zero;
+
+      switch (cc3d.Direction) {
+        case CapsuleDirection3D.X: // X
+          axisRotation = new Vector3(0, 0, 90);
+          extentScale = absScale.x;
+          radiusScale = Mathf.Max(absScale.y, absScale.z);
+          break;
+        case CapsuleDirection3D.Y: // Y
+          axisRotation = new Vector3(0, 0, 0);
+          extentScale = absScale.y;
+          radiusScale = Mathf.Max(absScale.x, absScale.z);
+          break;
+        case CapsuleDirection3D.Z: // Z
+          axisRotation = new Vector3(90, 0, 0);
+          extentScale = absScale.z;
+          radiusScale = Mathf.Max(absScale.x, absScale.y);
+          break;
+      }
+
+      var matrix = Matrix4x4.TRS(
+        t.TransformPoint(cc3d.PositionOffset.ToUnityVector3()),
+        Quaternion.Euler(t.rotation.eulerAngles + cc3d.RotationOffset.ToUnityVector3() + axisRotation),
+        Vector3.one);
+
+      var radius = Math.Max(cc3d.Radius.AsFloat * radiusScale, 0);
+      var extent = Math.Max((cc3d.Height.AsFloat * extentScale / 2.0f) - radius, 0);
+
+      GizmoUtils.DrawGizmosCapsule(
+        matrix,
+        radius,
+        extent,
+        _settings.GetSelectedColor(_settings.StaticColliders.Color, isSelected),
+        style: _settings.StaticColliders.DisableFill ? QuantumGizmoStyle.FillDisabled : default
+      );
+    }
+#endif
+
+#if QUANTUM_ENABLE_PHYSICS2D && !QUANTUM_DISABLE_PHYSICS2D
+    private static void DrawBoxStaticCollider2D(QuantumStaticBoxCollider2D box2d, bool isSelected) {
+      if (Application.isPlaying == false) {
+        box2d.UpdateFromSourceCollider();
+      }
+
+      var size = box2d.Size.ToUnityVector3();
+      var height = box2d.Height;
+      var offset = Vector3.zero;
+
+#if QUANTUM_XY
+      size.z = -height.AsFloat;
+      offset.z = size.z / 2.0f;
+#else
+      size.y = height.AsFloat;
+      offset.y = size.y / 2.0f;
+#endif
+
+      var tBox = box2d.transform;
+      var absScale = tBox.lossyScale;
+      absScale.x = Mathf.Abs(tBox.lossyScale.x);
+      absScale.y = Mathf.Abs(tBox.lossyScale.y);
+      absScale.z = Mathf.Abs(tBox.lossyScale.z);
+
+      var rotation = tBox.rotation * box2d.RotationOffset.FlipRotation().ToUnityQuaternionDegrees();
+
+      rotation = rotation.ToFPRotation2DDegrees().ToUnityQuaternionDegrees();
+
+      var boxMatrix = Matrix4x4.TRS(
+        tBox.TransformPoint(box2d.PositionOffset.ToUnityVector3()),
+        rotation,
+        absScale) * Matrix4x4.Translate(offset);
+
+      GizmoUtils.DrawGizmosBox(
+        boxMatrix,
+        size,
+        _settings.GetSelectedColor(_settings.StaticColliders.Color, isSelected),
+        style: _settings.StaticColliders.DisableFill ? QuantumGizmoStyle.FillDisabled : default
+      );
+    }
+
+    private static void DrawCircleStaticCollider2D(QuantumStaticCircleCollider2D circle2d, bool isSelected) {
+      if (Application.isPlaying == false) {
+        circle2d.UpdateFromSourceCollider();
+      }
+
+      var circleTransform = circle2d.transform;
+      var lossyScale = circleTransform.lossyScale;
+      var lossyScale2D = lossyScale.ToFPVector2();
+
+#if QUANTUM_XY
+      var heightScale = -Mathf.Abs(lossyScale.z);
+#else
+      var heightScale = Mathf.Abs(lossyScale.y);
+#endif
+
+      var heightScaled = circle2d.Height.AsFloat * heightScale;
+      var radiusScaled = (circle2d.Radius * FPMath.Max(FPMath.Abs(lossyScale2D.X), FPMath.Abs(lossyScale2D.Y))).AsFloat;
+
+      GizmoUtils.DrawGizmosCircle(
+        circleTransform.TransformPoint(circle2d.PositionOffset.ToUnityVector3()),
+        radiusScaled,
+        _settings.GetSelectedColor(_settings.StaticColliders.Color, isSelected),
+        heightScaled,
+        style: _settings.StaticColliders.DisableFill ? QuantumGizmoStyle.FillDisabled : default
+      );
+    }
+
+    private static void DrawCapsuleStaticCollider2D(QuantumStaticCapsuleCollider2D capsule2d, bool isSelected) {
+      if (Application.isPlaying == false) {
+        capsule2d.UpdateFromSourceCollider();
+      }
+
+      var capsTransform = capsule2d.transform;
+      var capsScale = capsTransform.lossyScale;
+      var rotationAxis = Quaternion.identity;
+      var capsuleSize = capsule2d.Size;
+
+      if (capsule2d.Direction == CapsuleDirection2D.Horizontal) {
+        capsuleSize.Y = capsule2d.Size.X;
+        capsuleSize.X = capsule2d.Size.Y;
+
+#if QUANTUM_XY
+        rotationAxis = Quaternion.Euler(0, 0, 90);
+        var tempY = capsScale.y;
+        capsScale.y = capsScale.x;
+        capsScale.x = tempY;
+#else
+        rotationAxis = Quaternion.Euler(0, 90, 0);
+        var tempZ = capsScale.z;
+        capsScale.z = capsScale.x;
+        capsScale.x = tempZ;
+#endif
+      }
+
+      var radius = capsuleSize.X.AsFloat * capsScale.x / 2;
+      radius = Mathf.Abs(radius);
+
+#if QUANTUM_XY
+      var height = Math.Abs(capsuleSize.Y.AsFloat * capsScale.y /2) - radius;
+      var transformHeight = capsule2d.Height.AsFloat * capsScale.z;
+#else
+      var height = Math.Abs(capsuleSize.Y.AsFloat * capsScale.z /2) - radius;
+      var transformHeight = capsule2d.Height.AsFloat * capsScale.y;
+#endif
+
+      height = Mathf.Clamp(height, 0, height);
+      transformHeight = Mathf.Abs(transformHeight);
+
+      var rot = capsule2d.transform.rotation * capsule2d.RotationOffset.FlipRotation().ToUnityQuaternionDegrees();
+      rot *= rotationAxis;
+      rot = rot.ToFPRotation2DDegrees().ToUnityQuaternionDegrees();
+
+      GizmoUtils.DrawGizmosCapsule2D(
+        capsTransform.TransformPoint(capsule2d.PositionOffset.ToUnityVector3()),
+        radius,
+        height,
+        transformHeight,
+        _settings.GetSelectedColor(_settings.StaticColliders.Color, isSelected),
+        rotation: rot,
+        style: _settings.StaticColliders.DisableFill ? QuantumGizmoStyle.FillDisabled : default
+      );
+    }
+
+    private static void DrawPolygonStaticCollider2D(QuantumStaticPolygonCollider2D polygon2d, bool isSelected) {
+      if (Application.isPlaying == false) {
+        polygon2d.UpdateFromSourceCollider(updateVertices: false);
+      }
+
+      if (polygon2d.BakeAsStaticEdges2D) {
+        for (var j = 0; j < polygon2d.Vertices.Length; j++) {
+          var vertex = polygon2d.Vertices[j];
+          var localEnd = polygon2d.Vertices[(j + 1) % polygon2d.Vertices.Length];
+
+          QuantumStaticEdgeCollider2D.GetEdgeGizmosSettings(
+            polygon2d.transform,
+            polygon2d.PositionOffset,
+            polygon2d.RotationOffset,
+            vertex,
+            localEnd,
+            polygon2d.Height,
+            out var polyStart,
+            out var polyEnd,
+            out var polyHeight
+          );
+
+          GizmoUtils.DrawGizmosEdge(
+            polyStart,
+            polyEnd,
+            polyHeight,
+            _settings.GetSelectedColor(_settings.StaticColliders.Color, isSelected),
+            style: _settings.StaticColliders.Style
+          );
+        }
+      } else {
+        var polyTransform = polygon2d.transform;
+
+        var polyAbsScaled = polyTransform.lossyScale;
+
+#if QUANTUM_XY
+        polyAbsScaled.z = Mathf.Abs(polyAbsScaled.z);
+        var polyVerticalScale = -polyAbsScaled.z;
+#else
+        polyAbsScaled.y = Mathf.Abs(polyAbsScaled.y);
+        var polyVerticalScale = polyAbsScaled.y;
+#endif
+
+        var rotation = polyTransform.rotation * polygon2d.RotationOffset.FlipRotation().ToUnityQuaternionDegrees();
+        
+
+        rotation = rotation.ToFPRotation2DDegrees().ToUnityQuaternionDegrees();
+
+        var polyHeightScaled = polygon2d.Height.AsFloat * polyVerticalScale;
+        var polyMatrix = Matrix4x4.TRS(
+          polyTransform.TransformPoint(polygon2d.PositionOffset.ToUnityVector3()),
+          rotation,
+          polyAbsScaled);
+
+        GizmoUtils.DrawGizmoPolygon2D(
+          polyMatrix,
+          polygon2d.Vertices,
+          polyHeightScaled,
+          isSelected,
+          _settings.GetSelectedColor(_settings.StaticColliders.Color, isSelected),
+          _settings.StaticColliders.Style);
+      }
+    }
+
+    private static void DrawEdgeStaticCollider2D(QuantumStaticEdgeCollider2D edge2d, bool isSelected) {
+      if (Application.isPlaying == false) {
+        edge2d.UpdateFromSourceCollider();
+      }
+
+      QuantumStaticEdgeCollider2D.GetEdgeGizmosSettings(
+        edge2d.transform,
+        edge2d.PositionOffset,
+        edge2d.RotationOffset,
+        edge2d.VertexA,
+        edge2d.VertexB,
+        edge2d.Height,
+        out var edgeStart,
+        out var edgeEnd,
+        out var edgeHeight
+      );
+
+      GizmoUtils.DrawGizmosEdge(
+        edgeStart,
+        edgeEnd,
+        edgeHeight,
+        _settings.GetSelectedColor(_settings.StaticColliders.Color, isSelected),
+        style: _settings.StaticColliders.DisableFill ? QuantumGizmoStyle.FillDisabled : default
+      );
+    }
+#endif
+
     static void DrawMapNavMesh(
       Map map,
       List<NavMesh> navmeshList,
       NavMeshRegionMask mask,
-      QuantumGameGizmosSettings gizmosSettings) {
+      QuantumGameGizmosSettings gizmosSettings, 
+      QuantumMapData mapData) {
 #if QUANTUM_ENABLE_AI && !QUANTUM_DISABLE_AI
-      
-      var navMeshRegionMask = mask;
 
-      bool selected = false;
+      var navMeshRegionMask = mask;
       
-      var mapData = GetMapData();
-      
-      if (mapData) {
-        selected = Selection.activeGameObject == mapData.gameObject;
+      var handlesColorStyleMiddle = new GUIStyle() { alignment = TextAnchor.MiddleCenter };
+      var handlesColorStyleLeft = new GUIStyle() { alignment = TextAnchor.MiddleLeft };
+      var handlesColorStyleRight = new GUIStyle() { alignment = TextAnchor.MiddleRight };
+
+      bool mapSelected = false;
+      if (mapData != null) {
+        mapSelected = Selection.activeGameObject == mapData.gameObject;
       }
-      
-      if (ShouldDraw(_settings.NavMeshArea, selected, false)) {
-        GizmoUtils.DrawGizmosBox(
-          Vector3.zero,
-          new FPVector2(map.WorldSizeX, map.WorldSizeY).ToUnityVector3(),
-          _settings.NavMeshArea.Color
-        );
+
+      if (Application.isPlaying == false) {
+        // Case Grid 1: draw from map on edit mode
+        DrawNavMeshAreaAndGrid(mapSelected || IsNavMeshScriptSelected(mapData), navmesh: null, map, _settings);
       }
 
       foreach (var navmesh in navmeshList) {
-        if (_settings.NavMesh.Enabled) {
-          CreateAndDrawNavMeshGizmo(navmesh, navMeshRegionMask);
+        var navmeshSelected = mapSelected;
+
+        // Use the selected QuantumMapNavMeshUnity to only draw the selected navmesh
+        navmeshSelected = mapSelected || IsNavMeshSelected(mapData, navmesh);
+
+        if (Application.isPlaying) {
+          // Case Grid 2: draw from for each navmesh during runtime
+          DrawNavMeshAreaAndGrid(navmeshSelected, navmesh, map, _settings);
         }
+
+        if (_settings.NavMesh.Enabled) {
+          CreateAndDrawNavMeshGizmo(navmeshSelected, navmesh, in navMeshRegionMask);
+        }
+
+        // TODO: check camera frustum
 
         if (_settings.NavMeshRegionIds.Enabled ||
             _settings.NavMeshTriangleIds.Enabled) {
@@ -4139,26 +4889,29 @@ namespace Quantum {
 
             // ################## NavMesh Triangle Ids ##################
 
-            if (ShouldDraw(_settings.NavMeshTriangleIds, selected, false)) {
-              Handles.color = _settings.NavMeshTriangleIds.Color;
-              Handles.Label(t.Center.ToUnityVector3(true), i.ToString());
+            var drawTriangleIds = ShouldDraw(_settings.NavMeshTriangleIds, navmeshSelected, false);
+            var drawRegionIds = ShouldDraw(_settings.NavMeshRegionIds, navmeshSelected, false);
+
+            if (drawTriangleIds) {
+              var style = drawRegionIds ? handlesColorStyleRight : handlesColorStyleMiddle;
+              style.normal.textColor = _settings.NavMeshTriangleIds.Color;
+              Handles.Label(t.Center.ToUnityVector3(true), i.ToString(), style);
             }
 
             // ################## NavMesh Triangle Region Ids ##################
 
-            if (ShouldDraw(_settings.NavMeshRegionIds, selected, false)) {
+            if (drawRegionIds) {
               if (t.Regions.HasValidRegions) {
                 var s = string.Empty;
                 for (int r = 0; r < map.Regions.Length; r++) {
                   if (t.Regions.IsRegionEnabled(r)) {
-                    s += $"{map.Regions[r]} ({r})";
+                    s += $" {map.Regions[r]} ({r})";
                   }
                 }
 
-                var vertex0 = navmesh.Vertices[t.Vertex0].Point.ToUnityVector3(true);
-                var vertex1 = navmesh.Vertices[t.Vertex1].Point.ToUnityVector3(true);
-                var vertex2 = navmesh.Vertices[t.Vertex2].Point.ToUnityVector3(true);
-                Handles.Label((vertex0 + vertex1 + vertex2) / 3.0f, s);
+                var style = drawTriangleIds ? handlesColorStyleLeft : handlesColorStyleMiddle;
+                style.normal.textColor = _settings.NavMeshRegionIds.Color;
+                Handles.Label(t.Center.ToUnityVector3(true), s, style);
               }
             }
           }
@@ -4167,59 +4920,70 @@ namespace Quantum {
         if (_settings.NavMeshVertexNormals.Enabled ||
             _settings.NavMeshVertexIds.Enabled) {
           for (Int32 v = 0; v < navmesh.Vertices.Length; ++v) {
-            // ################## NavMesh Vertex Ids ##################
-
-            if (ShouldDraw(_settings.NavMeshVertexIds, selected, false)) {
-              Handles.color = _settings.NavMeshVertexIds.Color;
-              Handles.Label(navmesh.Vertices[v].Point.ToUnityVector3(true), v.ToString());
-            }
-
             // ################## NavMesh Vertex Normals ##################
 
-            if (ShouldDraw(_settings.NavMeshVertexNormals, selected, false)) {
+            var arrowDirection = Vector3.zero;
+
+            if (ShouldDraw(_settings.NavMeshVertexNormals, navmeshSelected, false)) {
               if (navmesh.Vertices[v].Borders.Length >= 2) {
-                var normal = NavMeshVertex.CalculateNormal(v, navmesh, navMeshRegionMask);
+                var normal = NavMeshVertex.CalculateNormal(v, navmesh, in navMeshRegionMask);
                 if (normal != FPVector3.Zero) {
                   Gizmos.color = _settings.NavMeshVertexNormals.Color;
                   GizmoUtils.DrawGizmoVector(
                     navmesh.Vertices[v].Point.ToUnityVector3(true),
                     navmesh.Vertices[v].Point.ToUnityVector3(true) +
-                    normal.ToUnityVector3(true) * gizmosSettings.IconScale * 0.33f,
-                    GizmoUtils.DefaultArrowHeadLength * gizmosSettings.IconScale * 0.33f);
+                    gizmosSettings.IconScale * 0.33f * normal.ToUnityVector3(true),
+                    GizmoUtils.DefaultArrowHeadLength * gizmosSettings.IconScale * 0.33f,
+                    GizmoUtils.DefaultArrowHeadAngle,
+                    out arrowDirection);
                 }
               }
+            }
+
+            // ################## NavMesh Vertex Ids ##################
+
+            if (ShouldDraw(_settings.NavMeshVertexIds, navmeshSelected, false)) {
+              handlesColorStyleMiddle.normal.textColor = _settings.NavMeshVertexIds.Color;
+              Handles.Label(navmesh.Vertices[v].Point.ToUnityVector3(true) + 0.02f * gizmosSettings.IconScale * arrowDirection, v.ToString(), handlesColorStyleMiddle);
             }
           }
         }
 
         // ################## NavMesh Links ##################
 
-        if (ShouldDraw(_settings.NavMeshLinks, selected, false)) {
+        if (ShouldDraw(_settings.NavMeshLinks, navmeshSelected, false)) {
           for (Int32 i = 0; i < navmesh.Links.Length; i++) {
             var color = _settings.NavMeshLinks.Color;
-            if (navmesh.Links[i].Region.IsSubset(navMeshRegionMask) == false) {
+            if (navmesh.Links[i].Region.Overlaps(in navMeshRegionMask) == false) {
               color = Color.gray;
             }
 
             Gizmos.color = color;
             GizmoUtils.DrawGizmoVector(
-              navmesh.Links[i].Start.ToUnityVector3(),
-              navmesh.Links[i].End.ToUnityVector3(),
-              GizmoUtils.DefaultArrowHeadLength * gizmosSettings.IconScale);
-            GizmoUtils.DrawGizmosCircle(navmesh.Links[i].Start.ToUnityVector3(), 0.1f * gizmosSettings.IconScale, color,
+              navmesh.Links[i].Start.ToUnityVector3(true),
+              navmesh.Links[i].End.ToUnityVector3(true),
+              GizmoUtils.DefaultArrowHeadLength * gizmosSettings.IconScale,
+              GizmoUtils.DefaultArrowHeadAngle, 
+              out var direction);
+            GizmoUtils.DrawGizmosCircle(navmesh.Links[i].Start.ToUnityVector3(true), 0.1f * gizmosSettings.IconScale, color,
               style: _settings.NavMeshLinks.Style);
-            GizmoUtils.DrawGizmosCircle(navmesh.Links[i].End.ToUnityVector3(), 0.1f * gizmosSettings.IconScale, color,
+            GizmoUtils.DrawGizmosCircle(navmesh.Links[i].End.ToUnityVector3(true), 0.1f * gizmosSettings.IconScale, color,
               style: _settings.NavMeshLinks.Style);
+
+            if (_settings.NavMeshLinks.DrawTriangleId) {
+              handlesColorStyleMiddle.normal.textColor = color;
+              Handles.Label(navmesh.Links[i].End.ToUnityVector3(true) - 0.02f * gizmosSettings.IconScale * direction, navmesh.Links[i].Triangle.ToString(), handlesColorStyleMiddle);
+            }
           }
         }
 
         // ################## NavMesh Borders ##################
 
-        if (ShouldDraw(_settings.NavMeshBorders, selected, false)) {
+        if (ShouldDraw(_settings.NavMeshBorders, navmeshSelected, false)) {
           for (Int32 i = 0; i < navmesh.Borders.Length; i++) {
             Gizmos.color = _settings.NavMeshBorders.Color;
             var b = navmesh.Borders[i];
-            if (navmesh.IsBorderActive(i, navMeshRegionMask) == false) {
+            if (navmesh.IsBorderActive(i, in navMeshRegionMask) == false) {
               // grayed out?
               continue;
             }
@@ -4231,19 +4995,19 @@ namespace Quantum {
 
             if (_settings.NavMeshBorders.Enabled && _settings.NavMeshBorders.DrawNormals) {
               var normal = b.Normal;
-              
+
               Gizmos.color = _settings.NavMeshBorders.BorderNormalColor;
               var middle = (v0.ToUnityVector3(true) + v1.ToUnityVector3(true)) * 0.5f;
               GizmoUtils.DrawGizmoVector(middle,
-                middle + normal.ToUnityVector3(true) * gizmosSettings.IconScale * 0.33f,
+                middle + gizmosSettings.IconScale * 0.33f * normal.ToUnityVector3(true),
                 gizmosSettings.IconScale * 0.33f * GizmoUtils.DefaultArrowHeadLength);
             }
           }
         }
       }
 #endif
-    }
-  }
+        }
+      }
 #endif
 }
 
@@ -4262,19 +5026,21 @@ namespace Quantum {
   using UnityEngine;
 
   public partial class QuantumGameGizmos {
-    static unsafe void OnDrawGizmos_NavMesh(Frame frame, QuantumGameGizmosSettings gizmosSettings, GizmoType type) {
+    static List<NavMesh> _cachedNavMeshes = new List<NavMesh>();
+
+    static unsafe void OnDrawGizmos_NavMesh(Frame frame, QuantumEntityViewUpdater entityViewUpdater, QuantumGameGizmosSettings gizmosSettings, GizmoType type) {
       if (frame.MapAssetRef == default) {
         return;
       }
-      
-      var navmeshList = new List<NavMesh>();
-      navmeshList.AddRange(frame.Map.NavMeshes.Values);
+
+      _cachedNavMeshes.Clear();
+      _cachedNavMeshes.AddRange(frame.Map.NavMeshes.Values);
 
       if (frame.DynamicAssetDB.IsEmpty == false) {
-        navmeshList.AddRange(frame.DynamicAssetDB.Assets.OfType<NavMesh>().ToList());
+        _cachedNavMeshes.AddRange(frame.DynamicAssetDB.Assets.OfType<NavMesh>().ToList());
       }
 
-      DrawMapNavMesh(frame.Map, navmeshList, *frame.NavMeshRegionMask, gizmosSettings);
+      DrawMapNavMesh(frame.Map, _cachedNavMeshes, *frame.NavMeshRegionMask, gizmosSettings, entityViewUpdater != null ? entityViewUpdater.MapData : null);
       DrawNavigationPaths(frame, gizmosSettings);
 
       bool tryDrawComponents = _settings.NavMeshPathfinder.Enabled ||
@@ -4282,7 +5048,7 @@ namespace Quantum {
                                _settings.NavMeshAvoidanceAgent.Enabled;
 
       if (tryDrawComponents) {
-        DrawRuntimeNavMeshComponents(frame, gizmosSettings);
+        DrawRuntimeNavMeshComponents(frame, entityViewUpdater, gizmosSettings);
       }
 
       if (_settings.NavMeshAvoidanceObstacles.Enabled) {
@@ -4463,16 +5229,18 @@ namespace Quantum {
     ///   manually.
     ///   New meshes are created when the region mask changed.
     /// </summary>
-    public static void CreateAndDrawNavMeshGizmo(NavMesh navmesh, NavMeshRegionMask regionMask) {
-      var mesh = CreateGizmoMesh(navmesh, regionMask);
+    private static void CreateAndDrawNavMeshGizmo(bool selected, NavMesh navmesh, in NavMeshRegionMask regionMask) {
+      var mesh = CreateGizmoMesh(navmesh, in regionMask);
 
-      DrawNavMeshGizmoMesh(mesh,
+      DrawNavMeshGizmoMesh(
+        selected,
+        mesh,
         _settings.NavMesh.Color,
         _settings.NavMesh.RegionColor
       );
     }
 
-    private static Mesh CreateGizmoMesh(NavMesh navmesh, NavMeshRegionMask regionMask) {
+    private static Mesh CreateGizmoMesh(NavMesh navmesh, in NavMeshRegionMask regionMask) {
       _navmeshGizmoMap ??= new Dictionary<string, GizmoNavmeshData>();
 
       if (!_navmeshGizmoMap.TryGetValue(navmesh.Name, out GizmoNavmeshData gizmoNavmeshData) ||
@@ -4486,19 +5254,21 @@ namespace Quantum {
         mesh.vertices = navmesh.Vertices.Select(x => x.Point.ToUnityVector3()).ToArray();
 #endif
 
+        var regionMaskCopy = regionMask;
+
         mesh.SetTriangles(
           navmesh.Triangles.SelectMany(x =>
-            x.Regions.IsMainArea && x.Regions.IsSubset(regionMask)
+            x.Regions.IsMainArea && x.Regions.Overlaps(in regionMaskCopy)
               ? new int[] { x.Vertex0, x.Vertex1, x.Vertex2 }
               : Array.Empty<int>()).ToArray(), 0);
         mesh.SetTriangles(
           navmesh.Triangles.SelectMany(x =>
-            x.Regions.HasValidNoneMainRegion && x.Regions.IsSubset(regionMask)
+            x.Regions.HasValidNoneMainRegion && x.Regions.Overlaps(in regionMaskCopy)
               ? new int[] { x.Vertex0, x.Vertex1, x.Vertex2 }
               : Array.Empty<int>()).ToArray(), 1);
         mesh.SetTriangles(
           navmesh.Triangles.SelectMany(x =>
-              !x.Regions.IsSubset(regionMask) ? new int[] { x.Vertex0, x.Vertex1, x.Vertex2 } : Array.Empty<int>())
+              !x.Regions.Overlaps(in regionMaskCopy) ? new int[] { x.Vertex0, x.Vertex1, x.Vertex2 } : Array.Empty<int>())
             .ToArray(), 2);
         mesh.RecalculateNormals();
 
@@ -4509,16 +5279,8 @@ namespace Quantum {
       return gizmoNavmeshData.GizmoMesh;
     }
 
-    private static void DrawNavMeshGizmoMesh(Mesh mesh, Color color, Color regionColor) {
+    private static void DrawNavMeshGizmoMesh(bool selected, Mesh mesh, Color color, Color regionColor) {
       var originalColor = Gizmos.color;
-
-      bool selected = false;
-
-      var mapData = GetMapData();
-
-      if (mapData != null) {
-        selected = Selection.activeGameObject == _mapData.gameObject;
-      }
 
       bool shouldDraw = ShouldDraw(_settings.NavMesh, selected, false);
 
@@ -4551,10 +5313,9 @@ namespace Quantum {
 
     private static unsafe void DrawRuntimeNavMeshComponents(
       Frame frame,
+      QuantumEntityViewUpdater entityViewUpdater,
       QuantumGameGizmosSettings gizmosSettings) {
       NavMesh current = null;
-
-      var evu = GetEntityViewUpdater();
 
       foreach (var (entity, agent) in frame.GetComponentIterator<NavMeshPathfinder>()) {
         var position = Vector3.zero;
@@ -4578,8 +5339,8 @@ namespace Quantum {
 
         bool selected = false;
 
-        if (evu != null) {
-          var view = evu.GetView(entity);
+        if (entityViewUpdater != null) {
+          var view = entityViewUpdater.GetView(entity);
 
           if (view != null) {
             selected = Selection.activeGameObject == view.gameObject;
@@ -4639,7 +5400,7 @@ namespace Quantum {
               style: _settings.NavMeshAvoidanceAgent.Style
             );
 
-            var avoidanceRange = frame.SimulationConfig.Navigation.AvoidanceRange;
+            var avoidanceRange = frame.SimulationConfig.Navigation.AvoidanceRange + config.AvoidanceRadius;
 
             GizmoUtils.DrawGizmosCircle(
               position,
@@ -4649,6 +5410,52 @@ namespace Quantum {
             );
           }
         }
+      }
+    }
+
+    private static int GetNavMeshGridSizeX(Map map, NavMesh navmesh) => navmesh != null ? navmesh.GridSizeX : map.GridSizeX;
+    private static int GetNavMeshGridSizeY(Map map, NavMesh navmesh) => navmesh != null ? navmesh.GridSizeY : map.GridSizeY;
+    private static int GetNavMeshGridNodeSize(Map map, NavMesh navmesh) => navmesh != null ? navmesh.GridNodeSize : map.GridNodeSize;
+    private static FPVector2 GetNavMeshWorldOffset(Map map, NavMesh navmesh) => navmesh != null ? navmesh.WorldOffset : map.WorldOffset;
+    private static FPVector2 GetNavMeshWorldSize(Map map, NavMesh navmesh) => navmesh != null ? navmesh.WorldOffset * 2: new FPVector2(map.WorldSizeX, map.WorldSizeY);
+
+    // Return is any navmesh script child of map is selected.
+    private static bool IsNavMeshScriptSelected(QuantumMapData mapData) {
+      return mapData != null
+        && Selection.activeGameObject != null
+        && Selection.activeGameObject.GetComponent<QuantumMapNavMeshUnity>() != null
+        && Selection.activeGameObject.transform.parent == mapData.gameObject.transform;
+    }
+
+    // Return is a matching navmesh script is selected.
+    private static bool IsNavMeshSelected(QuantumMapData mapData, NavMesh navmesh) {
+      return IsNavMeshScriptSelected(mapData) && string.Equals(Selection.activeGameObject.name, navmesh.Name, StringComparison.Ordinal);
+    }
+
+    // Draw the navmesh area box and grid lines
+    private static void DrawNavMeshAreaAndGrid(bool selected, NavMesh navmesh, Map map, QuantumGameGizmosSettings gizmosSettings) {
+      if (ShouldDraw(_settings.NavMeshArea, selected, false)) {
+        GizmoUtils.DrawGizmosBox(
+          Vector3.zero,
+          GetNavMeshWorldSize(map, navmesh).ToUnityVector3(),
+          _settings.NavMeshArea.Color,
+          style: _settings.NavMeshArea.Style);
+      }
+
+      if (ShouldDraw(_settings.NavMeshGrid, selected, false)) {
+        GizmoUtils.DrawGizmosBox(
+          Vector3.zero,
+          GetNavMeshWorldSize(map, navmesh).ToUnityVector3(),
+          _settings.NavMeshGrid.Color, 
+          style: _settings.NavMeshGrid.Style);
+
+        GizmoUtils.DrawGizmoGrid(
+          GetNavMeshWorldOffset(map, navmesh).ToUnityVector3(),
+          GetNavMeshGridSizeX(map, navmesh),
+          GetNavMeshGridSizeY(map, navmesh),
+          GetNavMeshGridNodeSize(map, navmesh),
+          _settings.NavMeshGrid.Color
+        );
       }
     }
   }
@@ -4671,6 +5478,17 @@ namespace Quantum {
 
   public partial class QuantumGameGizmos {
     private static unsafe void DrawRuntimePhysicsComponents_2D(QuantumGameGizmosSettings settings, Frame frame) {
+      // ################## Components: PhysicsBody2D ##################
+      foreach (var (handle, body) in frame.GetComponentIterator<PhysicsBody2D>()) {
+        var entry = _settings.CenterOfMass;
+        if (ShouldDraw(entry, false, false)) {
+          var t = frame.Get<Transform2D>(handle);
+          var com = t.TransformPoint(body.CenterOfMass).ToUnityVector3();
+
+          GizmoUtils.DrawGizmosSphere(com, _settings.CenterOfMass.Scale, _settings.CenterOfMass.Color);
+        }
+      }
+      
       // ################## Components: PhysicsCollider2D ##################
       foreach (var (handle, collider) in frame.GetComponentIterator<PhysicsCollider2D>()) {
         var entry = _settings.GetEntryForPhysicsEntity2D(frame, handle);
@@ -4804,7 +5622,7 @@ namespace Quantum {
 
         //TODO: check for the height
         case Shape2DType.Capsule:
-          GizmoUtils.DrawGizmosCapsule2D(pos, s.Capsule.Radius.AsFloat, s.Capsule.Extent.AsFloat, color, rotation: rot,
+          GizmoUtils.DrawGizmosCapsule2D(pos, s.Capsule.Radius.AsFloat, s.Capsule.Extent.AsFloat, height, color, rotation: rot,
             style: style);
           break;
 
@@ -4916,215 +5734,6 @@ namespace Quantum {
     }
 
     [DrawGizmo(GizmoType.Selected | GizmoType.Active | GizmoType.NonSelected)]
-    static void DrawGizmos_QuantumStaticPolygonCollider2D(QuantumStaticPolygonCollider2D behaviour,
-      GizmoType gizmoType) {
-      bool selected = gizmoType.HasFlag(GizmoType.Selected);
-
-      if (Application.isPlaying == false) {
-        behaviour.UpdateFromSourceCollider(updateVertices: false);
-      }
-
-      var gs = QuantumGameGizmosSettingsScriptableObject.Global.Settings;
-
-      if (!ShouldDraw(_settings.StaticColliders, selected, false)) {
-        return;
-      }
-
-      if (behaviour.BakeAsStaticEdges2D) {
-        for (var i = 0; i < behaviour.Vertices.Length; i++) {
-          var vertex = behaviour.Vertices[i];
-          var localEnd = behaviour.Vertices[(i + 1) % behaviour.Vertices.Length];
-
-          QuantumStaticEdgeCollider2D.GetEdgeGizmosSettings(
-            behaviour.transform,
-            behaviour.PositionOffset,
-            behaviour.RotationOffset,
-            vertex,
-            localEnd,
-            behaviour.Height,
-            out var start,
-            out var end,
-            out var edgeHeight
-          );
-
-          GizmoUtils.DrawGizmosEdge(
-            start,
-            end,
-            edgeHeight,
-            gs.GetSelectedColor(_settings.StaticColliders.Color, selected),
-            style: _settings.StaticColliders.Style
-          );
-        }
-
-        return;
-      }
-
-      var t = behaviour.transform;
-
-#if QUANTUM_XY
-      var verticalScale = -t.lossyScale.z;
-#else
-      var verticalScale = t.lossyScale.y;
-#endif
-
-      var heightScaled = behaviour.Height.AsFloat * verticalScale;
-      var matrix = Matrix4x4.TRS(
-        t.TransformPoint(behaviour.PositionOffset.ToUnityVector3()),
-        t.rotation * behaviour.RotationOffset.FlipRotation().ToUnityQuaternionDegrees(),
-        t.lossyScale);
-      GizmoUtils.DrawGizmoPolygon2D(matrix, behaviour.Vertices, heightScaled, selected,
-        gs.GetSelectedColor(_settings.StaticColliders.Color, selected),
-        _settings.StaticColliders.Style);
-    }
-
-    [DrawGizmo(GizmoType.Selected | GizmoType.Active | GizmoType.NonSelected)]
-    static void DrawGizmos_QuantumStaticCapsuleCollider2D(QuantumStaticCapsuleCollider2D behaviour,
-      GizmoType gizmoType) {
-      bool selected = gizmoType.HasFlag(GizmoType.Selected);
-      var transform = behaviour.transform;
-
-      if (Application.isPlaying == false) {
-        behaviour.UpdateFromSourceCollider();
-      }
-
-      if (!ShouldDraw(_settings.StaticColliders, selected, false)) {
-        return;
-      }
-
-      var scale = transform.lossyScale;
-      var size = behaviour.Size;
-
-#if QUANTUM_XY
-      var radius = (FPMath.Clamp(size.X,0,size.X) / FP._2).AsFloat * scale.x;
-      var height = (FPMath.Clamp(size.Y - (size.X / FP._2 * FP._2),FP._0, size.Y) / FP._2).AsFloat * scale.y;
-#else
-      var radius = (FPMath.Clamp(size.X, 0, size.X) / FP._2).AsFloat * scale.x;
-      var height = (FPMath.Clamp(size.Y - (size.X / FP._2 * FP._2), FP._0, size.Y) / FP._2).AsFloat * scale.z;
-#endif
-
-      GizmoUtils.DrawGizmosCapsule2D(
-        transform.TransformPoint(behaviour.PositionOffset.ToUnityVector2()),
-        radius,
-        height,
-        _settings.GetSelectedColor(_settings.StaticColliders.Color, selected),
-        style: _settings.StaticColliders.Style
-      );
-    }
-
-    [DrawGizmo(GizmoType.Selected | GizmoType.Active | GizmoType.NonSelected)]
-    static void DrawGizmos_QuantumStaticBoxCollider2D(QuantumStaticBoxCollider2D behaviour,
-      GizmoType gizmoType) {
-      bool selected = gizmoType.HasFlag(GizmoType.Selected);
-
-      if (Application.isPlaying == false) {
-        behaviour.UpdateFromSourceCollider();
-      }
-
-      if (!ShouldDraw(_settings.StaticColliders, selected, false)) {
-        return;
-      }
-
-      var size = behaviour.Size.ToUnityVector3();
-      var height = behaviour.Height;
-      var offset = Vector3.zero;
-
-#if QUANTUM_XY
-      size.z = -height.AsFloat;
-      offset.z = size.z / 2.0f;
-#else
-      size.y = height.AsFloat;
-      offset.y = size.y / 2.0f;
-#endif
-
-      var t = behaviour.transform;
-      var tLossyScale = t.lossyScale;
-
-      var matrix = Matrix4x4.TRS(
-        t.TransformPoint(behaviour.PositionOffset.ToUnityVector3()),
-        t.rotation * behaviour.RotationOffset.FlipRotation().ToUnityQuaternionDegrees(),
-        tLossyScale) * Matrix4x4.Translate(offset);
-
-      GizmoUtils.DrawGizmosBox(
-        matrix,
-        size,
-        _settings.GetSelectedColor(_settings.StaticColliders.Color, selected),
-        style: _settings.StaticColliders.Style
-      );
-    }
-
-    [DrawGizmo(GizmoType.Selected | GizmoType.Active | GizmoType.NonSelected)]
-    static void DrawGizmos_QuantumStaticEdgeCollider2D(QuantumStaticEdgeCollider2D behaviour,
-      GizmoType gizmoType) {
-      bool selected = gizmoType.HasFlag(GizmoType.Selected);
-
-      if (Application.isPlaying == false) {
-        behaviour.UpdateFromSourceCollider();
-      }
-
-      if (!ShouldDraw(_settings.StaticColliders, selected, false)) {
-        return;
-      }
-
-      var transform = behaviour.transform;
-
-      QuantumStaticEdgeCollider2D.GetEdgeGizmosSettings(
-        transform,
-        behaviour.PositionOffset,
-        behaviour.RotationOffset,
-        behaviour.VertexA,
-        behaviour.VertexB,
-        behaviour.Height,
-        out var start,
-        out var end,
-        out var height);
-
-      GizmoUtils.DrawGizmosEdge(
-        start,
-        end,
-        height,
-        _settings.GetSelectedColor(_settings.StaticColliders.Color, selected),
-        style: _settings.StaticColliders.Style
-      );
-    }
-
-    [DrawGizmo(GizmoType.Selected | GizmoType.Active | GizmoType.NonSelected)]
-    static void DrawGizmos_QuantumStaticCircleCollider2D(QuantumStaticCircleCollider2D behaviour,
-      GizmoType gizmoType) {
-      bool selected = gizmoType.HasFlag(GizmoType.Selected);
-      var transform = behaviour.transform;
-
-      if (Application.isPlaying == false) {
-        behaviour.UpdateFromSourceCollider();
-      }
-
-      if (!ShouldDraw(_settings.StaticColliders, selected, false)) {
-        return;
-      }
-
-      var lossyScale = transform.lossyScale;
-      var lossyScale2D = lossyScale.ToFPVector2();
-
-#if QUANTUM_XY
-      var heightScale = -lossyScale.z;
-#else
-      var heightScale = lossyScale.y;
-#endif
-
-      var heightScaled = behaviour.Height.AsFloat * heightScale;
-      var radiusScaled = (behaviour.Radius * FPMath.Max(lossyScale2D.X, lossyScale2D.Y)).AsFloat;
-
-      var t = transform;
-
-      GizmoUtils.DrawGizmosCircle(
-        t.TransformPoint(behaviour.PositionOffset.ToUnityVector3()),
-        radiusScaled,
-        _settings.GetSelectedColor(_settings.StaticColliders.Color, selected),
-        heightScaled,
-        style: _settings.StaticColliders.Style
-      );
-    }
-
-    [DrawGizmo(GizmoType.Selected | GizmoType.Active | GizmoType.NonSelected)]
     static void DrawGizmos_JointPrototype2D(QPrototypePhysicsJoints2D behaviour, GizmoType gizmoType) {
       bool selected = gizmoType.HasFlag(GizmoType.Selected);
 
@@ -5215,7 +5824,7 @@ namespace Quantum {
   using UnityEngine;
 
   public partial class QuantumGameGizmos {
-    private static StaticMeshColliderGizmoData GetOrCreateGizmoData(MonoBehaviour behaviour) {
+    private static StaticMeshColliderGizmoData GetOrCreateGizmoData(object behaviour) {
       if (!_meshGizmoData.TryGetValue(behaviour, out var data)) {
         data = new StaticMeshColliderGizmoData();
         CreateStaticMeshData(behaviour);
@@ -5224,25 +5833,21 @@ namespace Quantum {
       return data;
     }
 
-    private static void CreateStaticMeshData(MonoBehaviour behaviour) {
+    private static void CreateStaticMeshData(object obj) {
       var data = new StaticMeshColliderGizmoData();
 
       MeshTriangleVerticesCcw meshTriangles = null;
-      var mapData = GetMapData();
-
-      if (mapData.StaticCollider3DReferences.Contains(behaviour) == false) {
-        // don't draw gizmo if the collider has not been baked into the map
-        _meshGizmoData.Remove(behaviour);
-        return;
-      }
 
       // just read current mesh data, don't bake it
-      switch (behaviour) {
+      switch (obj) {
         case QuantumStaticMeshCollider3D collider3D:
           meshTriangles = collider3D.CreateMeshTriangles();
           break;
         case QuantumStaticTerrainCollider3D terrainCollider3D:
           meshTriangles = terrainCollider3D.Asset.CreateMeshTriangles();
+          break;
+        case MeshUnmanagedTrianglesRef unmanagedTrianglesRef:
+          meshTriangles = MeshUnmanagedTrianglesRef.ToManagedTriangles(unmanagedTrianglesRef);
           break;
       }
 
@@ -5253,7 +5858,7 @@ namespace Quantum {
       ComputeTriangleGizmos(meshTriangles, ref data.TrianglePoints, ref data.TriangleSegments);
       ComputeNormalGizmos(meshTriangles, ref data.NormalPoints);
 
-      _meshGizmoData[behaviour] = data;
+      _meshGizmoData[obj] = data;
     }
 
     private static void ComputeTriangleGizmos(
@@ -5312,6 +5917,17 @@ namespace Quantum {
     }
 
     private static unsafe void DrawRuntimePhysicsComponents_3D(QuantumGameGizmosSettings settings, Frame frame) {
+      // ################## Components: PhysicsBody3D ##################
+      foreach (var (handle, body) in frame.GetComponentIterator<PhysicsBody3D>()) {
+        var entry = _settings.CenterOfMass;
+        if (ShouldDraw(entry, false, false)) {
+          var t = frame.Get<Transform3D>(handle);
+          var com = t.TransformPoint(body.CenterOfMass).ToUnityVector3();
+
+          GizmoUtils.DrawGizmosSphere(com, _settings.CenterOfMass.Scale, _settings.CenterOfMass.Color);
+        }
+      }
+
       // ################## Components: PhysicsCollider3D ##################
       foreach (var (handle, collider) in frame.GetComponentIterator<PhysicsCollider3D>()) {
         var entry = _settings.GetEntryForPhysicsEntity3D(frame, handle);
@@ -5366,93 +5982,43 @@ namespace Quantum {
       }
     }
 
-    [DrawGizmo(GizmoType.Selected | GizmoType.Active | GizmoType.NonSelected)]
-    static void DrawGizmos_QuantumStaticSphereCollider3D(QuantumStaticSphereCollider3D behaviour, GizmoType gizmoType) {
-      bool selected = gizmoType.HasFlag(GizmoType.Selected);
-
-      if (Application.isPlaying == false) {
-        behaviour.UpdateFromSourceCollider();
-      }
-
+    static void DrawStaticSphereCollider3D(bool selected, Vector3 worldPos, Vector3 scale, float radius) {
       if (!ShouldDraw(_settings.StaticColliders, selected, false)) {
         return;
       }
-
-      var transform = behaviour.transform;
 
       // the radius with which the sphere with be baked into the map
-      var scale = transform.lossyScale;
+      scale.x = Mathf.Abs(scale.x);
+      scale.y = Mathf.Abs(scale.y);
+      scale.z = Mathf.Abs(scale.z);
       var radiusScale = Mathf.Max(Mathf.Max(scale.x, scale.y), scale.z);
-      var radius = behaviour.Radius.AsFloat * radiusScale;
+
+      radius *= radiusScale;
 
       GizmoUtils.DrawGizmosSphere(
-        transform.TransformPoint(behaviour.PositionOffset.ToUnityVector3()),
+        worldPos,
         radius,
         _settings.GetSelectedColor(_settings.StaticColliders.Color, selected),
         style: _settings.StaticColliders.DisableFill ? QuantumGizmoStyle.FillDisabled : default
       );
     }
 
-    [DrawGizmo(GizmoType.Selected | GizmoType.Active | GizmoType.NonSelected)]
-    static void DrawGizmos_QuantumStaticCapsuleCollider3D(QuantumStaticCapsuleCollider3D behaviour,
-      GizmoType gizmoType) {
-      bool selected = gizmoType.HasFlag(GizmoType.Selected);
-
-      if (Application.isPlaying == false) {
-        behaviour.UpdateFromSourceCollider();
-      }
-
-      if (!ShouldDraw(_settings.StaticColliders, selected, false)) {
-        return;
-      }
-
-      var t = behaviour.transform;
-      var scale = t.lossyScale;
-      var radiusScale = Mathf.Max(scale.x, scale.z);
-      var extentScale = scale.y;
-
+    static void DrawStaticBoxCollider3D(bool selected, Vector3 worldPos, Quaternion rotation, Vector3 scale, Vector3 size) {
       var matrix = Matrix4x4.TRS(
-        t.TransformPoint(behaviour.PositionOffset.ToUnityVector3()),
-        Quaternion.Euler(t.rotation.eulerAngles + behaviour.RotationOffset.ToUnityVector3()),
-        Vector3.one);
-
-      var radius = Math.Max(behaviour.Radius.AsFloat, 0) * radiusScale;
-      var extent = Math.Max((behaviour.Height.AsFloat / 2.0f) - radius, 0) * extentScale;
-
-      GizmoUtils.DrawGizmosCapsule(
-        matrix,
-        radius,
-        extent,
-        _settings.GetSelectedColor(_settings.StaticColliders.Color, selected),
-        style: _settings.StaticColliders.DisableFill ? QuantumGizmoStyle.FillDisabled : default
-      );
-    }
-
-    [DrawGizmo(GizmoType.Selected | GizmoType.Active | GizmoType.NonSelected)]
-    static void DrawGizmos_QuantumStaticBoxCollider3D(QuantumStaticBoxCollider3D behaviour, GizmoType gizmoType) {
-      bool selected = gizmoType.HasFlag(GizmoType.Selected);
-
-      if (Application.isPlaying == false) {
-        behaviour.UpdateFromSourceCollider();
-      }
-
-      if (!ShouldDraw(_settings.StaticColliders, selected, false)) {
-        return;
-      }
-
-      var t = behaviour.transform;
-
-      var matrix = Matrix4x4.TRS(
-        t.TransformPoint(behaviour.PositionOffset.ToUnityVector3()),
-        t.rotation * Quaternion.Euler(behaviour.RotationOffset.ToUnityVector3()),
-        t.lossyScale);
+        worldPos,
+        rotation,
+        scale);
 
       GizmoUtils.DrawGizmosBox(
         matrix,
-        behaviour.Size.ToUnityVector3(),
+        size,
         _settings.GetSelectedColor(_settings.StaticColliders.Color, selected),
         style: _settings.StaticColliders.DisableFill ? QuantumGizmoStyle.FillDisabled : default
       );
+    }
+
+    [DrawGizmo(GizmoType.Selected | GizmoType.Active | GizmoType.NonSelected)]
+    static void DrawGizmos_CenterOfMass3D(QPrototypePhysicsBody3D behaviour, GizmoType gizmoType) {
     }
 
     [DrawGizmo(GizmoType.Selected | GizmoType.Active | GizmoType.NonSelected)]
@@ -5571,8 +6137,7 @@ namespace Quantum {
     /// <summary>
     /// Draws a gizmo of a given shape at the specified position and rotation
     /// </summary>
-    public static unsafe void DrawShape3DGizmo(Shape3D s, Vector3 position, Quaternion rotation, Color color,
-      QuantumGizmoStyle style = default) {
+    public static unsafe void DrawShape3DGizmo(Shape3D s, Vector3 position, Quaternion rotation, Color color, QuantumGizmoStyle style = default) {
       var localOffset = s.LocalTransform.Position.ToUnityVector3();
       var localRotation = s.LocalTransform.Rotation.ToUnityQuaternion();
 
@@ -5639,19 +6204,14 @@ namespace Quantum {
       }
     }
 
-    [DrawGizmo(GizmoType.Selected | GizmoType.Active | GizmoType.NonSelected)]
-    static void DrawGizmos_QuantumStaticMeshCollider3D(QuantumStaticMeshCollider3D behaviour, GizmoType gizmoType) {
-      DrawStaticMeshCollider(behaviour, gizmoType);
-    }
-
-    private static void DrawStaticMeshCollider(MonoBehaviour behaviour, GizmoType gizmoType) {
+    private static void DrawStaticMeshCollider(object obj, GizmoType gizmoType) {
       bool selected = gizmoType.HasFlag(GizmoType.Selected);
 
       if (_settings.StaticMeshTriangles.Enabled == false && _settings.StaticMeshNormals.Enabled == false) {
         return;
       }
 
-      var meshData = GetOrCreateGizmoData(behaviour);
+      var meshData = GetOrCreateGizmoData(obj);
 
       if (_settings.StaticMeshTriangles.Enabled) {
         Handles.color = _settings.GetSelectedColor(_settings.StaticMeshTriangles.Color, selected);
@@ -5669,13 +6229,6 @@ namespace Quantum {
         Handles.color = Color.white;
       }
     }
-
-#if QUANTUM_ENABLE_TERRAIN && !QUANTUM_DISABLE_TERRAIN
-    [DrawGizmo(GizmoType.Selected | GizmoType.Active | GizmoType.NonSelected)]
-    static void DrawGizmos_StaticTerrainCollider3D(QuantumStaticTerrainCollider3D behaviour, GizmoType gizmoType) {
-      DrawStaticMeshCollider(behaviour, gizmoType);
-    }
-#endif
   }
 #endif
 }
@@ -6322,6 +6875,7 @@ namespace Quantum.Prototypes.Unity {
   [Quantum.Prototypes.PrototypeAttribute(typeof(Quantum.PhysicsJoints2D))]
   public class PhysicsJoints2DPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.PhysicsJoints2DPrototype> {
     [Quantum.DynamicCollectionAttribute()]
+    [Quantum.Core.FreeOnComponentRemovedAttribute()]
     public Joint2DConfig[] JointConfigs = System.Array.Empty<Joint2DConfig>();
 
     public sealed override Quantum.Prototypes.PhysicsJoints2DPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
@@ -6427,6 +6981,7 @@ namespace Quantum.Prototypes.Unity {
   [Quantum.Prototypes.PrototypeAttribute(typeof(Quantum.PhysicsJoints3D))]
   public class PhysicsJoints3DPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.PhysicsJoints3DPrototype> {
     [Quantum.DynamicCollectionAttribute()]
+    [Quantum.Core.FreeOnComponentRemovedAttribute()]
     public Joint3DConfig[] JointConfigs = System.Array.Empty<Joint3DConfig>();
 
     public sealed override Quantum.Prototypes.PhysicsJoints3DPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
@@ -6891,7 +7446,7 @@ namespace Quantum {
     public T Object;
     
     /// <see cref="Object"/>
-    [Obsolete("Use Asset instead")]
+    [Obsolete("Use Object instead")]
     public T Prefab {
       get => Object;
       set => Object = value;
@@ -7038,6 +7593,7 @@ namespace Quantum {
 
 namespace Quantum {
   using System;
+  using System.Threading.Tasks;
   using UnityEngine.Scripting;
 #if (QUANTUM_ADDRESSABLES || QUANTUM_ENABLE_ADDRESSABLES) && !QUANTUM_DISABLE_ADDRESSABLES 
   using UnityEngine.AddressableAssets;
@@ -7084,6 +7640,31 @@ namespace Quantum {
       return default;
 #endif
     }
+
+    /// <summary>
+    /// Loads the asset from the <see cref="Address"/>.
+    /// </summary>
+    public override Task<QuantumGlobalScriptableObjectLoadResult> LoadAsync(Type type) {
+#if (QUANTUM_ADDRESSABLES || QUANTUM_ENABLE_ADDRESSABLES) && !QUANTUM_DISABLE_ADDRESSABLES
+      Assert.Check(!string.IsNullOrEmpty(Address));
+      
+      var tcs = new TaskCompletionSource<QuantumGlobalScriptableObjectLoadResult>();
+      
+      var op = Addressables.LoadAssetAsync<QuantumGlobalScriptableObject>(Address);
+      op.Completed += _op => {
+        if (_op.Status == AsyncOperationStatus.Succeeded) {
+          tcs.SetResult(new(_op.Result, _ => Addressables.Release(_op)));
+        } else {
+          LogTrace?.Log($"Failed to load addressable at address {Address} for type {type.FullName}: {op.OperationException}");
+          tcs.SetException(_op.OperationException);
+        }
+      };
+      return tcs.Task;
+#else
+      LogTrace?.Log($"Addressables are not enabled. Unable to load addressable for {type.FullName}");
+      return default;
+#endif
+    }
   }
 }
 
@@ -7096,6 +7677,7 @@ namespace Quantum {
   using System;
   using System.IO;
   using System.Reflection;
+  using System.Threading.Tasks;
   using UnityEngine;
   using UnityEngine.Scripting;
   using Object = UnityEngine.Object;
@@ -7132,24 +7714,9 @@ namespace Quantum {
       var attribute = type.GetCustomAttribute<QuantumGlobalScriptableObjectAttribute>();
       Assert.Check(attribute != null);
 
-      string resourcePath;
-      if (string.IsNullOrEmpty(ResourcePath)) {
-        string defaultAssetPath = attribute.DefaultPath;
-        var indexOfResources = defaultAssetPath.LastIndexOf("/Resources/", StringComparison.OrdinalIgnoreCase);
-        if (indexOfResources < 0) {
-          LogTrace?.Log($"The default path {defaultAssetPath} does not contain a /Resources/ folder. Unable to load resource for {type.FullName}.");
-          return default;
-        }
-
-        // try to load from resources, maybe?
-        resourcePath = defaultAssetPath.Substring(indexOfResources + "/Resources/".Length);
-
-        // drop the extension
-        if (Path.HasExtension(resourcePath)) {
-          resourcePath = resourcePath.Substring(0, resourcePath.LastIndexOf('.'));
-        }
-      } else {
-        resourcePath = ResourcePath;
+      var resourcePath = GetResourcePath(type, attribute); 
+      if (resourcePath == null) {
+        return default;
       }
 
       var instance = UnityEngine.Resources.Load(resourcePath, type);
@@ -7158,11 +7725,71 @@ namespace Quantum {
         return default;
       }
 
+      return HandleInstance(instance);
+    }
+
+    /// <summary>
+    /// Loads the asset from Resources asynchronously.
+    /// </summary>
+    public override System.Threading.Tasks.Task<QuantumGlobalScriptableObjectLoadResult> LoadAsync(Type type) {
+      var attribute = type.GetCustomAttribute<QuantumGlobalScriptableObjectAttribute>();
+      Assert.Check(attribute != null);
+
+      var tcs = new TaskCompletionSource<QuantumGlobalScriptableObjectLoadResult>();
+      
+      var resourcePath = GetResourcePath(type, attribute); 
+      if (resourcePath == null) {
+        tcs.SetResult(default);
+      } else {
+        var request = UnityEngine.Resources.LoadAsync(resourcePath, type);
+        if (request == null) {
+          LogTrace?.Log($"Unable to load resource at path {resourcePath} for type {type.FullName}");
+          tcs.SetResult(default);
+        } else {
+          request.completed += op => {
+            var instance = ((ResourceRequest)op).asset;
+            if (instance) {
+              tcs.SetResult(HandleInstance(instance));  
+            } else {
+              LogTrace?.Log($"Unable to load resource at path {resourcePath} for type {type.FullName}");
+              tcs.SetResult(default);
+            }
+          };
+        }
+      }
+
+      return tcs.Task;
+    }
+
+    string GetResourcePath(Type type, QuantumGlobalScriptableObjectAttribute attribute) {
+      if (string.IsNullOrEmpty(ResourcePath)) {
+        string defaultAssetPath = attribute.DefaultPath;
+        var indexOfResources = defaultAssetPath.LastIndexOf("/Resources/", StringComparison.OrdinalIgnoreCase);
+        if (indexOfResources < 0) {
+          LogTrace?.Log($"The default path {defaultAssetPath} does not contain a /Resources/ folder. Unable to load resource for {type.FullName}.");
+          return null;
+        }
+
+        // try to load from resources, maybe?
+        var resourcePath = defaultAssetPath.Substring(indexOfResources + "/Resources/".Length);
+
+        // drop the extension
+        if (Path.HasExtension(resourcePath)) {
+          return resourcePath.Substring(0, resourcePath.LastIndexOf('.'));
+        } else {
+          return resourcePath;
+        }
+      } else {
+        return ResourcePath;
+      }
+    }
+    
+    QuantumGlobalScriptableObjectLoadResult HandleInstance(Object instance) {
       if (InstantiateIfLoadedInEditor && Application.isEditor) {
         var clone = Object.Instantiate(instance);
         return new((QuantumGlobalScriptableObject)clone, x => Object.Destroy(clone));
       } else {
-        return new((QuantumGlobalScriptableObject)instance, x => UnityEngine.Resources.UnloadAsset(instance));  
+        return new((QuantumGlobalScriptableObject)instance, x => UnityEngine.Resources.UnloadAsset(instance));
       }
     }
   }
@@ -7177,6 +7804,7 @@ namespace Quantum {
 
 #region Assets/Photon/Quantum/Runtime/QuantumAsyncOperationExtension.cs
 
+#if !UNITY_6000_0_OR_NEWER
 namespace Quantum {
   using System;
   using System.Runtime.CompilerServices;
@@ -7202,6 +7830,7 @@ namespace Quantum {
     }
   }
 }
+#endif
 
 #endregion
 
@@ -8418,7 +9047,7 @@ namespace Quantum {
     public void Dispose() {
       _rewindSnapshots?.Clear();
       _rewindSnapshots = null;
-      _replayRunner?.Shutdown();
+      if (_replayRunner) _replayRunner?.Shutdown();
       _replayRunner = null;
     }
 
@@ -8516,6 +9145,10089 @@ namespace Quantum {
     }
   }
 }
+
+#endregion
+
+
+#region Assets/Photon/Quantum/Runtime/QuantumLiteNetLib.cs
+
+// merged LiteNetLib
+#if QUANTUM_ENABLE_REMOTE_PROFILER && !QUANTUM_DISABLE_INTEGRATED_LITENETLIB
+
+#region LiteNetLibHeader.cs
+
+/*
+ * This file is a merger of LiteNetLib 1.3.1 .cs files
+ * Merged on: 2024-12-02
+ *
+ * Original MIT License remains in effect:
+ *
+ * MIT License
+ *
+ * Copyright (c) 2020 Ruslan Pyrch
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * Modifications:
+ * - Combined multiple source files into a single file
+ * - Usings moved to inside namespaces
+ * - Some defines/#ifdefs removed
+ * - Removing duplicated NetManager contructor to fix Unity warnings
+ */
+
+#endregion
+
+
+#region BaseChannel.cs
+
+namespace LiteNetLib
+{
+    using System.Collections.Generic;
+    using System.Threading;
+
+    internal abstract class BaseChannel
+    {
+        protected readonly NetPeer Peer;
+        protected readonly Queue<NetPacket> OutgoingQueue = new Queue<NetPacket>(NetConstants.DefaultWindowSize);
+        private int _isAddedToPeerChannelSendQueue;
+
+        public int PacketsInQueue => OutgoingQueue.Count;
+
+        protected BaseChannel(NetPeer peer)
+        {
+            Peer = peer;
+        }
+
+        public void AddToQueue(NetPacket packet)
+        {
+            lock (OutgoingQueue)
+            {
+                OutgoingQueue.Enqueue(packet);
+            }
+            AddToPeerChannelSendQueue();
+        }
+
+        protected void AddToPeerChannelSendQueue()
+        {
+            if (Interlocked.CompareExchange(ref _isAddedToPeerChannelSendQueue, 1, 0) == 0)
+            {
+                Peer.AddToReliableChannelSendQueue(this);
+            }
+        }
+
+        public bool SendAndCheckQueue()
+        {
+            bool hasPacketsToSend = SendNextPackets();
+            if (!hasPacketsToSend)
+                Interlocked.Exchange(ref _isAddedToPeerChannelSendQueue, 0);
+
+            return hasPacketsToSend;
+        }
+
+        protected abstract bool SendNextPackets();
+        public abstract bool ProcessPacket(NetPacket packet);
+    }
+}
+
+#endregion
+
+
+#region ConnectionRequest.cs
+
+namespace LiteNetLib
+{
+    using System.Net;
+    using System.Threading;
+    using Utils;
+
+    internal enum ConnectionRequestResult
+    {
+        None,
+        Accept,
+        Reject,
+        RejectForce
+    }
+
+    public class ConnectionRequest
+    {
+        private readonly NetManager _listener;
+        private int _used;
+
+        public NetDataReader Data => InternalPacket.Data;
+
+        internal ConnectionRequestResult Result { get; private set; }
+        internal NetConnectRequestPacket InternalPacket;
+
+        public readonly IPEndPoint RemoteEndPoint;
+
+        internal void UpdateRequest(NetConnectRequestPacket connectRequest)
+        {
+            //old request
+            if (connectRequest.ConnectionTime < InternalPacket.ConnectionTime)
+                return;
+
+            if (connectRequest.ConnectionTime == InternalPacket.ConnectionTime &&
+                connectRequest.ConnectionNumber == InternalPacket.ConnectionNumber)
+                return;
+
+            InternalPacket = connectRequest;
+        }
+
+        private bool TryActivate()
+        {
+            return Interlocked.CompareExchange(ref _used, 1, 0) == 0;
+        }
+
+        internal ConnectionRequest(IPEndPoint remoteEndPoint, NetConnectRequestPacket requestPacket, NetManager listener)
+        {
+            InternalPacket = requestPacket;
+            RemoteEndPoint = remoteEndPoint;
+            _listener = listener;
+        }
+
+        public NetPeer AcceptIfKey(string key)
+        {
+            if (!TryActivate())
+                return null;
+            try
+            {
+                if (Data.GetString() == key)
+                    Result = ConnectionRequestResult.Accept;
+            }
+            catch
+            {
+                NetDebug.WriteError("[AC] Invalid incoming data");
+            }
+            if (Result == ConnectionRequestResult.Accept)
+                return _listener.OnConnectionSolved(this, null, 0, 0);
+
+            Result = ConnectionRequestResult.Reject;
+            _listener.OnConnectionSolved(this, null, 0, 0);
+            return null;
+        }
+
+        /// <summary>
+        /// Accept connection and get new NetPeer as result
+        /// </summary>
+        /// <returns>Connected NetPeer</returns>
+        public NetPeer Accept()
+        {
+            if (!TryActivate())
+                return null;
+            Result = ConnectionRequestResult.Accept;
+            return _listener.OnConnectionSolved(this, null, 0, 0);
+        }
+
+        public void Reject(byte[] rejectData, int start, int length, bool force)
+        {
+            if (!TryActivate())
+                return;
+            Result = force ? ConnectionRequestResult.RejectForce : ConnectionRequestResult.Reject;
+            _listener.OnConnectionSolved(this, rejectData, start, length);
+        }
+
+        public void Reject(byte[] rejectData, int start, int length)
+        {
+            Reject(rejectData, start, length, false);
+        }
+
+
+        public void RejectForce(byte[] rejectData, int start, int length)
+        {
+            Reject(rejectData, start, length, true);
+        }
+
+        public void RejectForce()
+        {
+            Reject(null, 0, 0, true);
+        }
+
+        public void RejectForce(byte[] rejectData)
+        {
+            Reject(rejectData, 0, rejectData.Length, true);
+        }
+
+        public void RejectForce(NetDataWriter rejectData)
+        {
+            Reject(rejectData.Data, 0, rejectData.Length, true);
+        }
+
+        public void Reject()
+        {
+            Reject(null, 0, 0, false);
+        }
+
+        public void Reject(byte[] rejectData)
+        {
+            Reject(rejectData, 0, rejectData.Length, false);
+        }
+
+        public void Reject(NetDataWriter rejectData)
+        {
+            Reject(rejectData.Data, 0, rejectData.Length, false);
+        }
+    }
+}
+
+#endregion
+
+
+#region INetEventListener.cs
+
+namespace LiteNetLib
+{
+    using System.Net;
+    using System.Net.Sockets;
+    using Utils;
+
+    /// <summary>
+    /// Type of message that you receive in OnNetworkReceiveUnconnected event
+    /// </summary>
+    public enum UnconnectedMessageType
+    {
+        BasicMessage,
+        Broadcast
+    }
+
+    /// <summary>
+    /// Disconnect reason that you receive in OnPeerDisconnected event
+    /// </summary>
+    public enum DisconnectReason
+    {
+        ConnectionFailed,
+        Timeout,
+        HostUnreachable,
+        NetworkUnreachable,
+        RemoteConnectionClose,
+        DisconnectPeerCalled,
+        ConnectionRejected,
+        InvalidProtocol,
+        UnknownHost,
+        Reconnect,
+        PeerToPeerConnection,
+        PeerNotFound
+    }
+
+    /// <summary>
+    /// Additional information about disconnection
+    /// </summary>
+    public struct DisconnectInfo
+    {
+        /// <summary>
+        /// Additional info why peer disconnected
+        /// </summary>
+        public DisconnectReason Reason;
+
+        /// <summary>
+        /// Error code (if reason is SocketSendError or SocketReceiveError)
+        /// </summary>
+        public SocketError SocketErrorCode;
+
+        /// <summary>
+        /// Additional data that can be accessed (only if reason is RemoteConnectionClose)
+        /// </summary>
+        public NetPacketReader AdditionalData;
+    }
+
+    public interface INetEventListener
+    {
+        /// <summary>
+        /// New remote peer connected to host, or client connected to remote host
+        /// </summary>
+        /// <param name="peer">Connected peer object</param>
+        void OnPeerConnected(NetPeer peer);
+
+        /// <summary>
+        /// Peer disconnected
+        /// </summary>
+        /// <param name="peer">disconnected peer</param>
+        /// <param name="disconnectInfo">additional info about reason, errorCode or data received with disconnect message</param>
+        void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo);
+
+        /// <summary>
+        /// Network error (on send or receive)
+        /// </summary>
+        /// <param name="endPoint">From endPoint (can be null)</param>
+        /// <param name="socketError">Socket error</param>
+        void OnNetworkError(IPEndPoint endPoint, SocketError socketError);
+
+        /// <summary>
+        /// Received some data
+        /// </summary>
+        /// <param name="peer">From peer</param>
+        /// <param name="reader">DataReader containing all received data</param>
+        /// <param name="channelNumber">Number of channel at which packet arrived</param>
+        /// <param name="deliveryMethod">Type of received packet</param>
+        void OnNetworkReceive(NetPeer peer, NetPacketReader reader, byte channelNumber, DeliveryMethod deliveryMethod);
+
+        /// <summary>
+        /// Received unconnected message
+        /// </summary>
+        /// <param name="remoteEndPoint">From address (IP and Port)</param>
+        /// <param name="reader">Message data</param>
+        /// <param name="messageType">Message type (simple, discovery request or response)</param>
+        void OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType);
+
+        /// <summary>
+        /// Latency information updated
+        /// </summary>
+        /// <param name="peer">Peer with updated latency</param>
+        /// <param name="latency">latency value in milliseconds</param>
+        void OnNetworkLatencyUpdate(NetPeer peer, int latency);
+
+        /// <summary>
+        /// On peer connection requested
+        /// </summary>
+        /// <param name="request">Request information (EndPoint, internal id, additional data)</param>
+        void OnConnectionRequest(ConnectionRequest request);
+    }
+
+    public interface IDeliveryEventListener
+    {
+        /// <summary>
+        /// On reliable message delivered
+        /// </summary>
+        /// <param name="peer"></param>
+        /// <param name="userData"></param>
+        void OnMessageDelivered(NetPeer peer, object userData);
+    }
+
+    public interface INtpEventListener
+    {
+        /// <summary>
+        /// Ntp response
+        /// </summary>
+        /// <param name="packet"></param>
+        void OnNtpResponse(NtpPacket packet);
+    }
+
+    public interface IPeerAddressChangedListener
+    {
+        /// <summary>
+        /// Called when peer address changed (when AllowPeerAddressChange is enabled)
+        /// </summary>
+        /// <param name="peer">Peer that changed address (with new address)</param>
+        /// <param name="previousAddress">previous IP</param>
+        void OnPeerAddressChanged(NetPeer peer, IPEndPoint previousAddress);
+    }
+
+    public class EventBasedNetListener : INetEventListener, IDeliveryEventListener, INtpEventListener, IPeerAddressChangedListener
+    {
+        public delegate void OnPeerConnected(NetPeer peer);
+        public delegate void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo);
+        public delegate void OnNetworkError(IPEndPoint endPoint, SocketError socketError);
+        public delegate void OnNetworkReceive(NetPeer peer, NetPacketReader reader, byte channel, DeliveryMethod deliveryMethod);
+        public delegate void OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType);
+        public delegate void OnNetworkLatencyUpdate(NetPeer peer, int latency);
+        public delegate void OnConnectionRequest(ConnectionRequest request);
+        public delegate void OnDeliveryEvent(NetPeer peer, object userData);
+        public delegate void OnNtpResponseEvent(NtpPacket packet);
+        public delegate void OnPeerAddressChangedEvent(NetPeer peer, IPEndPoint previousAddress);
+
+        public event OnPeerConnected PeerConnectedEvent;
+        public event OnPeerDisconnected PeerDisconnectedEvent;
+        public event OnNetworkError NetworkErrorEvent;
+        public event OnNetworkReceive NetworkReceiveEvent;
+        public event OnNetworkReceiveUnconnected NetworkReceiveUnconnectedEvent;
+        public event OnNetworkLatencyUpdate NetworkLatencyUpdateEvent;
+        public event OnConnectionRequest ConnectionRequestEvent;
+        public event OnDeliveryEvent DeliveryEvent;
+        public event OnNtpResponseEvent NtpResponseEvent;
+        public event OnPeerAddressChangedEvent PeerAddressChangedEvent;
+
+        public void ClearPeerConnectedEvent()
+        {
+            PeerConnectedEvent = null;
+        }
+
+        public void ClearPeerDisconnectedEvent()
+        {
+            PeerDisconnectedEvent = null;
+        }
+
+        public void ClearNetworkErrorEvent()
+        {
+            NetworkErrorEvent = null;
+        }
+
+        public void ClearNetworkReceiveEvent()
+        {
+            NetworkReceiveEvent = null;
+        }
+
+        public void ClearNetworkReceiveUnconnectedEvent()
+        {
+            NetworkReceiveUnconnectedEvent = null;
+        }
+
+        public void ClearNetworkLatencyUpdateEvent()
+        {
+            NetworkLatencyUpdateEvent = null;
+        }
+
+        public void ClearConnectionRequestEvent()
+        {
+            ConnectionRequestEvent = null;
+        }
+
+        public void ClearDeliveryEvent()
+        {
+            DeliveryEvent = null;
+        }
+
+        public void ClearNtpResponseEvent()
+        {
+            NtpResponseEvent = null;
+        }
+
+        public void ClearPeerAddressChangedEvent()
+        {
+            PeerAddressChangedEvent = null;
+        }
+
+        void INetEventListener.OnPeerConnected(NetPeer peer)
+        {
+            if (PeerConnectedEvent != null)
+                PeerConnectedEvent(peer);
+        }
+
+        void INetEventListener.OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+        {
+            if (PeerDisconnectedEvent != null)
+                PeerDisconnectedEvent(peer, disconnectInfo);
+        }
+
+        void INetEventListener.OnNetworkError(IPEndPoint endPoint, SocketError socketErrorCode)
+        {
+            if (NetworkErrorEvent != null)
+                NetworkErrorEvent(endPoint, socketErrorCode);
+        }
+
+        void INetEventListener.OnNetworkReceive(NetPeer peer, NetPacketReader reader, byte channelNumber, DeliveryMethod deliveryMethod)
+        {
+            if (NetworkReceiveEvent != null)
+                NetworkReceiveEvent(peer, reader, channelNumber, deliveryMethod);
+        }
+
+        void INetEventListener.OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType)
+        {
+            if (NetworkReceiveUnconnectedEvent != null)
+                NetworkReceiveUnconnectedEvent(remoteEndPoint, reader, messageType);
+        }
+
+        void INetEventListener.OnNetworkLatencyUpdate(NetPeer peer, int latency)
+        {
+            if (NetworkLatencyUpdateEvent != null)
+                NetworkLatencyUpdateEvent(peer, latency);
+        }
+
+        void INetEventListener.OnConnectionRequest(ConnectionRequest request)
+        {
+            if (ConnectionRequestEvent != null)
+                ConnectionRequestEvent(request);
+        }
+
+        void IDeliveryEventListener.OnMessageDelivered(NetPeer peer, object userData)
+        {
+            if (DeliveryEvent != null)
+                DeliveryEvent(peer, userData);
+        }
+
+        void INtpEventListener.OnNtpResponse(NtpPacket packet)
+        {
+            if (NtpResponseEvent != null)
+                NtpResponseEvent(packet);
+        }
+
+        void IPeerAddressChangedListener.OnPeerAddressChanged(NetPeer peer, IPEndPoint previousAddress)
+        {
+            if (PeerAddressChangedEvent != null)
+                PeerAddressChangedEvent(peer, previousAddress);
+        }
+    }
+}
+
+#endregion
+
+
+#region InternalPackets.cs
+
+namespace LiteNetLib
+{
+    using System;
+    using System.Net;
+    using Utils;
+
+    internal sealed class NetConnectRequestPacket
+    {
+        public const int HeaderSize = 18;
+        public readonly long ConnectionTime;
+        public byte ConnectionNumber;
+        public readonly byte[] TargetAddress;
+        public readonly NetDataReader Data;
+        public readonly int PeerId;
+
+        private NetConnectRequestPacket(long connectionTime, byte connectionNumber, int localId, byte[] targetAddress, NetDataReader data)
+        {
+            ConnectionTime = connectionTime;
+            ConnectionNumber = connectionNumber;
+            TargetAddress = targetAddress;
+            Data = data;
+            PeerId = localId;
+        }
+
+        public static int GetProtocolId(NetPacket packet)
+        {
+            return BitConverter.ToInt32(packet.RawData, 1);
+        }
+
+        public static NetConnectRequestPacket FromData(NetPacket packet)
+        {
+            if (packet.ConnectionNumber >= NetConstants.MaxConnectionNumber)
+                return null;
+
+            //Getting connection time for peer
+            long connectionTime = BitConverter.ToInt64(packet.RawData, 5);
+
+            //Get peer id
+            int peerId = BitConverter.ToInt32(packet.RawData, 13);
+
+            //Get target address
+            int addrSize = packet.RawData[HeaderSize-1];
+            if (addrSize != 16 && addrSize != 28)
+                return null;
+            byte[] addressBytes = new byte[addrSize];
+            Buffer.BlockCopy(packet.RawData, HeaderSize, addressBytes, 0, addrSize);
+
+            // Read data and create request
+            var reader = new NetDataReader(null, 0, 0);
+            if (packet.Size > HeaderSize+addrSize)
+                reader.SetSource(packet.RawData, HeaderSize + addrSize, packet.Size);
+
+            return new NetConnectRequestPacket(connectionTime, packet.ConnectionNumber, peerId, addressBytes, reader);
+        }
+
+        public static NetPacket Make(NetDataWriter connectData, SocketAddress addressBytes, long connectTime, int localId)
+        {
+            //Make initial packet
+            var packet = new NetPacket(PacketProperty.ConnectRequest, connectData.Length+addressBytes.Size);
+
+            //Add data
+            FastBitConverter.GetBytes(packet.RawData, 1, NetConstants.ProtocolId);
+            FastBitConverter.GetBytes(packet.RawData, 5, connectTime);
+            FastBitConverter.GetBytes(packet.RawData, 13, localId);
+            packet.RawData[HeaderSize-1] = (byte)addressBytes.Size;
+            for (int i = 0; i < addressBytes.Size; i++)
+                packet.RawData[HeaderSize + i] = addressBytes[i];
+            Buffer.BlockCopy(connectData.Data, 0, packet.RawData, HeaderSize + addressBytes.Size, connectData.Length);
+            return packet;
+        }
+    }
+
+    internal sealed class NetConnectAcceptPacket
+    {
+        public const int Size = 15;
+        public readonly long ConnectionTime;
+        public readonly byte ConnectionNumber;
+        public readonly int PeerId;
+        public readonly bool PeerNetworkChanged;
+
+        private NetConnectAcceptPacket(long connectionTime, byte connectionNumber, int peerId, bool peerNetworkChanged)
+        {
+            ConnectionTime = connectionTime;
+            ConnectionNumber = connectionNumber;
+            PeerId = peerId;
+            PeerNetworkChanged = peerNetworkChanged;
+        }
+
+        public static NetConnectAcceptPacket FromData(NetPacket packet)
+        {
+            if (packet.Size != Size)
+                return null;
+
+            long connectionId = BitConverter.ToInt64(packet.RawData, 1);
+
+            //check connect num
+            byte connectionNumber = packet.RawData[9];
+            if (connectionNumber >= NetConstants.MaxConnectionNumber)
+                return null;
+
+            //check reused flag
+            byte isReused = packet.RawData[10];
+            if (isReused > 1)
+                return null;
+
+            //get remote peer id
+            int peerId = BitConverter.ToInt32(packet.RawData, 11);
+            if (peerId < 0)
+                return null;
+
+            return new NetConnectAcceptPacket(connectionId, connectionNumber, peerId, isReused == 1);
+        }
+
+        public static NetPacket Make(long connectTime, byte connectNum, int localPeerId)
+        {
+            var packet = new NetPacket(PacketProperty.ConnectAccept, 0);
+            FastBitConverter.GetBytes(packet.RawData, 1, connectTime);
+            packet.RawData[9] = connectNum;
+            FastBitConverter.GetBytes(packet.RawData, 11, localPeerId);
+            return packet;
+        }
+        
+        public static NetPacket MakeNetworkChanged(NetPeer peer)
+        {
+            var packet = new NetPacket(PacketProperty.PeerNotFound, Size-1);
+            FastBitConverter.GetBytes(packet.RawData, 1, peer.ConnectTime);
+            packet.RawData[9] = peer.ConnectionNum;
+            packet.RawData[10] = 1;
+            FastBitConverter.GetBytes(packet.RawData, 11, peer.RemoteId);
+            return packet;
+        }
+    }
+}
+
+#endregion
+
+
+#region Crc32cLayer.cs
+
+namespace LiteNetLib.Layers
+{
+    using System;
+    using System.Net;
+    using Utils;
+
+    public sealed class Crc32cLayer : PacketLayerBase
+    {
+        public Crc32cLayer() : base(CRC32C.ChecksumSize)
+        {
+
+        }
+
+        public override void ProcessInboundPacket(ref IPEndPoint endPoint, ref byte[] data, ref int length)
+        {
+            if (length < NetConstants.HeaderSize + CRC32C.ChecksumSize)
+            {
+                NetDebug.WriteError("[NM] DataReceived size: bad!");
+                //Set length to 0 to have netManager drop the packet.
+                length = 0;
+                return;
+            }
+
+            int checksumPoint = length - CRC32C.ChecksumSize;
+            if (CRC32C.Compute(data, 0, checksumPoint) != BitConverter.ToUInt32(data, checksumPoint))
+            {
+                NetDebug.Write("[NM] DataReceived checksum: bad!");
+                //Set length to 0 to have netManager drop the packet.
+                length = 0;
+                return;
+            }
+            length -= CRC32C.ChecksumSize;
+        }
+
+        public override void ProcessOutBoundPacket(ref IPEndPoint endPoint, ref byte[] data, ref int offset, ref int length)
+        {
+            FastBitConverter.GetBytes(data, length, CRC32C.Compute(data, offset, length));
+            length += CRC32C.ChecksumSize;
+        }
+    }
+}
+
+#endregion
+
+
+#region PacketLayerBase.cs
+
+namespace LiteNetLib.Layers
+{
+    using System.Net;
+
+    public abstract class PacketLayerBase
+    {
+        public readonly int ExtraPacketSizeForLayer;
+
+        protected PacketLayerBase(int extraPacketSizeForLayer)
+        {
+            ExtraPacketSizeForLayer = extraPacketSizeForLayer;
+        }
+
+        public abstract void ProcessInboundPacket(ref IPEndPoint endPoint, ref byte[] data, ref int length);
+        public abstract void ProcessOutBoundPacket(ref IPEndPoint endPoint, ref byte[] data, ref int offset, ref int length);
+    }
+}
+
+#endregion
+
+
+#region XorEncryptLayer.cs
+
+namespace LiteNetLib.Layers
+{
+    using System;
+    using System.Net;
+    using System.Text;
+
+    public class XorEncryptLayer : PacketLayerBase
+    {
+        private byte[] _byteKey;
+
+        public XorEncryptLayer() : base(0)
+        {
+
+        }
+
+        public XorEncryptLayer(byte[] key) : this()
+        {
+            SetKey(key);
+        }
+
+        public XorEncryptLayer(string key) : this()
+        {
+            SetKey(key);
+        }
+
+        public void SetKey(string key)
+        {
+            _byteKey = Encoding.UTF8.GetBytes(key);
+        }
+
+        public void SetKey(byte[] key)
+        {
+            if (_byteKey == null || _byteKey.Length != key.Length)
+                _byteKey = new byte[key.Length];
+            Buffer.BlockCopy(key, 0, _byteKey, 0, key.Length);
+        }
+
+        public override void ProcessInboundPacket(ref IPEndPoint endPoint, ref byte[] data, ref int length)
+        {
+            if (_byteKey == null)
+                return;
+            for (int i = 0; i < length; i++)
+            {
+                data[i] = (byte)(data[i] ^ _byteKey[i % _byteKey.Length]);
+            }
+        }
+
+        public override void ProcessOutBoundPacket(ref IPEndPoint endPoint, ref byte[] data, ref int offset, ref int length)
+        {
+            if (_byteKey == null)
+                return;
+            int cur = offset;
+            for (int i = 0; i < length; i++, cur++)
+            {
+                data[cur] = (byte)(data[cur] ^ _byteKey[i % _byteKey.Length]);
+            }
+        }
+    }
+}
+
+#endregion
+
+
+#region NativeSocket.cs
+
+namespace LiteNetLib
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Runtime.CompilerServices;
+    using System.Runtime.InteropServices;
+
+    internal static class NativeSocket
+    {
+        static unsafe class WinSock
+        {
+            private const string LibName = "ws2_32.dll";
+
+            [DllImport(LibName, SetLastError = true)]
+            public static extern int recvfrom(
+                IntPtr socketHandle,
+                [In, Out] byte[] pinnedBuffer,
+                [In] int len,
+                [In] SocketFlags socketFlags,
+                [Out] byte[] socketAddress,
+                [In, Out] ref int socketAddressSize);
+
+            [DllImport(LibName, SetLastError = true)]
+            internal static extern int sendto(
+                IntPtr socketHandle,
+                byte* pinnedBuffer,
+                [In] int len,
+                [In] SocketFlags socketFlags,
+                [In] byte[] socketAddress,
+                [In] int socketAddressSize);
+        }
+
+        static unsafe class UnixSock
+        {
+            private const string LibName = "libc";
+
+            [DllImport(LibName, SetLastError = true)]
+            public static extern int recvfrom(
+                IntPtr socketHandle,
+                [In, Out] byte[] pinnedBuffer,
+                [In] int len,
+                [In] SocketFlags socketFlags,
+                [Out] byte[] socketAddress,
+                [In, Out] ref int socketAddressSize);
+
+            [DllImport(LibName, SetLastError = true)]
+            internal static extern int sendto(
+                IntPtr socketHandle,
+                byte* pinnedBuffer,
+                [In] int len,
+                [In] SocketFlags socketFlags,
+                [In] byte[] socketAddress,
+                [In] int socketAddressSize);
+        }
+
+        public static readonly bool IsSupported = false;
+        public static readonly bool UnixMode = false;
+
+        public const int IPv4AddrSize = 16;
+        public const int IPv6AddrSize = 28;
+        public const int AF_INET = 2;
+        public const int AF_INET6 = 10;
+
+        private static readonly Dictionary<int, SocketError> NativeErrorToSocketError = new Dictionary<int, SocketError>
+        {
+            { 13, SocketError.AccessDenied },               //EACCES
+            { 98, SocketError.AddressAlreadyInUse },        //EADDRINUSE
+            { 99, SocketError.AddressNotAvailable },        //EADDRNOTAVAIL
+            { 97, SocketError.AddressFamilyNotSupported },  //EAFNOSUPPORT
+            { 11, SocketError.WouldBlock },                 //EAGAIN
+            { 114, SocketError.AlreadyInProgress },         //EALREADY
+            { 9, SocketError.OperationAborted },            //EBADF
+            { 125, SocketError.OperationAborted },          //ECANCELED
+            { 103, SocketError.ConnectionAborted },         //ECONNABORTED
+            { 111, SocketError.ConnectionRefused },         //ECONNREFUSED
+            { 104, SocketError.ConnectionReset },           //ECONNRESET
+            { 89, SocketError.DestinationAddressRequired }, //EDESTADDRREQ
+            { 14, SocketError.Fault },                      //EFAULT
+            { 112, SocketError.HostDown },                  //EHOSTDOWN
+            { 6, SocketError.HostNotFound },                //ENXIO
+            { 113, SocketError.HostUnreachable },           //EHOSTUNREACH
+            { 115, SocketError.InProgress },                //EINPROGRESS
+            { 4, SocketError.Interrupted },                 //EINTR
+            { 22, SocketError.InvalidArgument },            //EINVAL
+            { 106, SocketError.IsConnected },               //EISCONN
+            { 24, SocketError.TooManyOpenSockets },         //EMFILE
+            { 90, SocketError.MessageSize },                //EMSGSIZE
+            { 100, SocketError.NetworkDown },               //ENETDOWN
+            { 102, SocketError.NetworkReset },              //ENETRESET
+            { 101, SocketError.NetworkUnreachable },        //ENETUNREACH
+            { 23, SocketError.TooManyOpenSockets },         //ENFILE
+            { 105, SocketError.NoBufferSpaceAvailable },    //ENOBUFS
+            { 61, SocketError.NoData },                     //ENODATA
+            { 2, SocketError.AddressNotAvailable },         //ENOENT
+            { 92, SocketError.ProtocolOption },             //ENOPROTOOPT
+            { 107, SocketError.NotConnected },              //ENOTCONN
+            { 88, SocketError.NotSocket },                  //ENOTSOCK
+            { 3440, SocketError.OperationNotSupported },    //ENOTSUP
+            { 1, SocketError.AccessDenied },                //EPERM
+            { 32, SocketError.Shutdown },                   //EPIPE
+            { 96, SocketError.ProtocolFamilyNotSupported }, //EPFNOSUPPORT
+            { 93, SocketError.ProtocolNotSupported },       //EPROTONOSUPPORT
+            { 91, SocketError.ProtocolType },               //EPROTOTYPE
+            { 94, SocketError.SocketNotSupported },         //ESOCKTNOSUPPORT
+            { 108, SocketError.Disconnecting },             //ESHUTDOWN
+            { 110, SocketError.TimedOut },                  //ETIMEDOUT
+            { 0, SocketError.Success }
+        };
+
+        static NativeSocket()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                IsSupported = true;
+                UnixMode = true;
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                IsSupported = true;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int RecvFrom(
+            IntPtr socketHandle,
+            byte[] pinnedBuffer,
+            int len,
+            byte[] socketAddress,
+            ref int socketAddressSize)
+        {
+            return UnixMode
+                ? UnixSock.recvfrom(socketHandle, pinnedBuffer, len, 0, socketAddress, ref socketAddressSize)
+                : WinSock.recvfrom(socketHandle, pinnedBuffer, len, 0, socketAddress, ref socketAddressSize);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe int SendTo(
+            IntPtr socketHandle,
+            byte* pinnedBuffer,
+            int len,
+            byte[] socketAddress,
+            int socketAddressSize)
+        {
+            return UnixMode
+                ? UnixSock.sendto(socketHandle, pinnedBuffer, len, 0, socketAddress, socketAddressSize)
+                : WinSock.sendto(socketHandle, pinnedBuffer, len, 0, socketAddress, socketAddressSize);
+        }
+
+        public static SocketError GetSocketError()
+        {
+            int error = Marshal.GetLastWin32Error();
+            if (UnixMode)
+                return NativeErrorToSocketError.TryGetValue(error, out var err)
+                    ? err
+                    : SocketError.SocketError;
+            return (SocketError)error;
+        }
+
+        public static SocketException GetSocketException()
+        {
+            int error = Marshal.GetLastWin32Error();
+            if (UnixMode)
+                return NativeErrorToSocketError.TryGetValue(error, out var err)
+                    ? new SocketException((int)err)
+                    : new SocketException((int)SocketError.SocketError);
+            return new SocketException(error);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static short GetNativeAddressFamily(IPEndPoint remoteEndPoint)
+        {
+            return UnixMode
+                ? (short)(remoteEndPoint.AddressFamily == AddressFamily.InterNetwork ? AF_INET : AF_INET6)
+                : (short)remoteEndPoint.AddressFamily;
+        }
+    }
+}
+
+#endregion
+
+
+#region NatPunchModule.cs
+
+namespace LiteNetLib
+{
+    using System.Collections.Concurrent;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Net;
+    using System.Net.Sockets;
+    using Utils;
+
+    public enum NatAddressType
+    {
+        Internal,
+        External
+    }
+
+    public interface INatPunchListener
+    {
+        void OnNatIntroductionRequest(IPEndPoint localEndPoint, IPEndPoint remoteEndPoint, string token);
+        void OnNatIntroductionSuccess(IPEndPoint targetEndPoint, NatAddressType type, string token);
+    }
+
+    public class EventBasedNatPunchListener : INatPunchListener
+    {
+        public delegate void OnNatIntroductionRequest(IPEndPoint localEndPoint, IPEndPoint remoteEndPoint, string token);
+        public delegate void OnNatIntroductionSuccess(IPEndPoint targetEndPoint, NatAddressType type, string token);
+
+        public event OnNatIntroductionRequest NatIntroductionRequest;
+        public event OnNatIntroductionSuccess NatIntroductionSuccess;
+
+        void INatPunchListener.OnNatIntroductionRequest(IPEndPoint localEndPoint, IPEndPoint remoteEndPoint, string token)
+        {
+            if(NatIntroductionRequest != null)
+                NatIntroductionRequest(localEndPoint, remoteEndPoint, token);
+        }
+
+        void INatPunchListener.OnNatIntroductionSuccess(IPEndPoint targetEndPoint, NatAddressType type, string token)
+        {
+            if (NatIntroductionSuccess != null)
+                NatIntroductionSuccess(targetEndPoint, type, token);
+        }
+    }
+
+    /// <summary>
+    /// Module for UDP NAT Hole punching operations. Can be accessed from NetManager
+    /// </summary>
+    public sealed class NatPunchModule
+    {
+        struct RequestEventData
+        {
+            public IPEndPoint LocalEndPoint;
+            public IPEndPoint RemoteEndPoint;
+            public string Token;
+        }
+
+        struct SuccessEventData
+        {
+            public IPEndPoint TargetEndPoint;
+            public NatAddressType Type;
+            public string Token;
+        }
+
+        class NatIntroduceRequestPacket
+        {
+            public IPEndPoint Internal { [Preserve] get; [Preserve] set; }
+            public string Token { [Preserve] get; [Preserve] set; }
+        }
+
+        class NatIntroduceResponsePacket
+        {
+            public IPEndPoint Internal { [Preserve] get; [Preserve] set; }
+            public IPEndPoint External { [Preserve] get; [Preserve] set; }
+            public string Token { [Preserve] get; [Preserve] set; }
+        }
+
+        class NatPunchPacket
+        {
+            public string Token { [Preserve] get; [Preserve] set; }
+            public bool IsExternal { [Preserve] get; [Preserve] set; }
+        }
+
+        private readonly NetManager _socket;
+        private readonly ConcurrentQueue<RequestEventData> _requestEvents = new ConcurrentQueue<RequestEventData>();
+        private readonly ConcurrentQueue<SuccessEventData> _successEvents = new ConcurrentQueue<SuccessEventData>();
+        private readonly NetDataReader _cacheReader = new NetDataReader();
+        private readonly NetDataWriter _cacheWriter = new NetDataWriter();
+        private readonly NetPacketProcessor _netPacketProcessor = new NetPacketProcessor(MaxTokenLength);
+        private INatPunchListener _natPunchListener;
+        public const int MaxTokenLength = 256;
+
+        /// <summary>
+        /// Events automatically will be called without PollEvents method from another thread
+        /// </summary>
+        public bool UnsyncedEvents = false;
+
+        internal NatPunchModule(NetManager socket)
+        {
+            _socket = socket;
+            _netPacketProcessor.SubscribeReusable<NatIntroduceResponsePacket>(OnNatIntroductionResponse);
+            _netPacketProcessor.SubscribeReusable<NatIntroduceRequestPacket, IPEndPoint>(OnNatIntroductionRequest);
+            _netPacketProcessor.SubscribeReusable<NatPunchPacket, IPEndPoint>(OnNatPunch);
+        }
+
+        internal void ProcessMessage(IPEndPoint senderEndPoint, NetPacket packet)
+        {
+            lock (_cacheReader)
+            {
+                _cacheReader.SetSource(packet.RawData, NetConstants.HeaderSize, packet.Size);
+                _netPacketProcessor.ReadAllPackets(_cacheReader, senderEndPoint);
+            }
+        }
+
+        public void Init(INatPunchListener listener)
+        {
+            _natPunchListener = listener;
+        }
+
+        private void Send<
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(Trimming.SerializerMemberTypes)]
+#endif
+        T>(T packet, IPEndPoint target) where T : class, new()
+        {
+            _cacheWriter.Reset();
+            _cacheWriter.Put((byte)PacketProperty.NatMessage);
+            _netPacketProcessor.Write(_cacheWriter, packet);
+            _socket.SendRaw(_cacheWriter.Data, 0, _cacheWriter.Length, target);
+        }
+
+        public void NatIntroduce(
+            IPEndPoint hostInternal,
+            IPEndPoint hostExternal,
+            IPEndPoint clientInternal,
+            IPEndPoint clientExternal,
+            string additionalInfo)
+        {
+            var req = new NatIntroduceResponsePacket
+            {
+                Token = additionalInfo
+            };
+
+            //First packet (server) send to client
+            req.Internal = hostInternal;
+            req.External = hostExternal;
+            Send(req, clientExternal);
+
+            //Second packet (client) send to server
+            req.Internal = clientInternal;
+            req.External = clientExternal;
+            Send(req, hostExternal);
+        }
+
+        public void PollEvents()
+        {
+            if (UnsyncedEvents)
+                return;
+
+            if (_natPunchListener == null || (_successEvents.IsEmpty && _requestEvents.IsEmpty))
+                return;
+
+            while (_successEvents.TryDequeue(out var evt))
+            {
+                _natPunchListener.OnNatIntroductionSuccess(
+                    evt.TargetEndPoint,
+                    evt.Type,
+                    evt.Token);
+            }
+
+            while (_requestEvents.TryDequeue(out var evt))
+            {
+                _natPunchListener.OnNatIntroductionRequest(evt.LocalEndPoint, evt.RemoteEndPoint, evt.Token);
+            }
+        }
+
+        public void SendNatIntroduceRequest(string host, int port, string additionalInfo)
+        {
+            SendNatIntroduceRequest(NetUtils.MakeEndPoint(host, port), additionalInfo);
+        }
+
+        public void SendNatIntroduceRequest(IPEndPoint masterServerEndPoint, string additionalInfo)
+        {
+            //prepare outgoing data
+            string networkIp = NetUtils.GetLocalIp(LocalAddrType.IPv4);
+            if (string.IsNullOrEmpty(networkIp) || masterServerEndPoint.AddressFamily == AddressFamily.InterNetworkV6)
+            {
+                networkIp = NetUtils.GetLocalIp(LocalAddrType.IPv6);
+            }
+
+            Send(
+                new NatIntroduceRequestPacket
+                {
+                    Internal = NetUtils.MakeEndPoint(networkIp, _socket.LocalPort),
+                    Token = additionalInfo
+                },
+                masterServerEndPoint);
+        }
+
+        //We got request and must introduce
+        private void OnNatIntroductionRequest(NatIntroduceRequestPacket req, IPEndPoint senderEndPoint)
+        {
+            if (UnsyncedEvents)
+            {
+                _natPunchListener.OnNatIntroductionRequest(
+                    req.Internal,
+                    senderEndPoint,
+                    req.Token);
+            }
+            else
+            {
+                _requestEvents.Enqueue(new RequestEventData
+                {
+                    LocalEndPoint = req.Internal,
+                    RemoteEndPoint = senderEndPoint,
+                    Token = req.Token
+                });
+            }
+        }
+
+        //We got introduce and must punch
+        private void OnNatIntroductionResponse(NatIntroduceResponsePacket req)
+        {
+            NetDebug.Write(NetLogLevel.Trace, "[NAT] introduction received");
+
+            // send internal punch
+            var punchPacket = new NatPunchPacket {Token = req.Token};
+            Send(punchPacket, req.Internal);
+            NetDebug.Write(NetLogLevel.Trace, $"[NAT] internal punch sent to {req.Internal}");
+
+            // hack for some routers
+            _socket.Ttl = 2;
+            _socket.SendRaw(new[] { (byte)PacketProperty.Empty }, 0, 1, req.External);
+
+            // send external punch
+            _socket.Ttl = NetConstants.SocketTTL;
+            punchPacket.IsExternal = true;
+            Send(punchPacket, req.External);
+            NetDebug.Write(NetLogLevel.Trace, $"[NAT] external punch sent to {req.External}");
+        }
+
+        //We got punch and can connect
+        private void OnNatPunch(NatPunchPacket req, IPEndPoint senderEndPoint)
+        {
+            //Read info
+            NetDebug.Write(NetLogLevel.Trace, $"[NAT] punch received from {senderEndPoint} - additional info: {req.Token}");
+
+            //Release punch success to client; enabling him to Connect() to Sender if token is ok
+            if(UnsyncedEvents)
+            {
+                _natPunchListener.OnNatIntroductionSuccess(
+                    senderEndPoint,
+                    req.IsExternal ? NatAddressType.External : NatAddressType.Internal,
+                    req.Token
+                    );
+            }
+            else
+            {
+                _successEvents.Enqueue(new SuccessEventData
+                {
+                    TargetEndPoint = senderEndPoint,
+                    Type = req.IsExternal ? NatAddressType.External : NatAddressType.Internal,
+                    Token = req.Token
+                });
+            }
+        }
+    }
+}
+
+#endregion
+
+
+#region NetConstants.cs
+
+namespace LiteNetLib
+{
+    /// <summary>
+    /// Sending method type
+    /// </summary>
+    public enum DeliveryMethod : byte
+    {
+        /// <summary>
+        /// Unreliable. Packets can be dropped, can be duplicated, can arrive without order.
+        /// </summary>
+        Unreliable = 4,
+
+        /// <summary>
+        /// Reliable. Packets won't be dropped, won't be duplicated, can arrive without order.
+        /// </summary>
+        ReliableUnordered = 0,
+
+        /// <summary>
+        /// Unreliable. Packets can be dropped, won't be duplicated, will arrive in order.
+        /// </summary>
+        Sequenced = 1,
+
+        /// <summary>
+        /// Reliable and ordered. Packets won't be dropped, won't be duplicated, will arrive in order.
+        /// </summary>
+        ReliableOrdered = 2,
+
+        /// <summary>
+        /// Reliable only last packet. Packets can be dropped (except the last one), won't be duplicated, will arrive in order.
+        /// Cannot be fragmented
+        /// </summary>
+        ReliableSequenced = 3
+    }
+
+    /// <summary>
+    /// Network constants. Can be tuned from sources for your purposes.
+    /// </summary>
+    public static class NetConstants
+    {
+        //can be tuned
+        public const int DefaultWindowSize = 64;
+        public const int SocketBufferSize = 1024 * 1024; //1mb
+        public const int SocketTTL = 255;
+
+        public const int HeaderSize = 1;
+        public const int ChanneledHeaderSize = 4;
+        public const int FragmentHeaderSize = 6;
+        public const int FragmentedHeaderTotalSize = ChanneledHeaderSize + FragmentHeaderSize;
+        public const ushort MaxSequence = 32768;
+        public const ushort HalfMaxSequence = MaxSequence / 2;
+
+        //protocol
+        internal const int ProtocolId = 13;
+        internal const int MaxUdpHeaderSize = 68;
+        internal const int ChannelTypeCount = 4;
+
+        internal static readonly int[] PossibleMtu =
+        {
+            //576  - MaxUdpHeaderSize minimal (RFC 1191)
+            1024,                    //most games standard
+            1232 - MaxUdpHeaderSize,
+            1460 - MaxUdpHeaderSize, //google cloud
+            1472 - MaxUdpHeaderSize, //VPN
+            1492 - MaxUdpHeaderSize, //Ethernet with LLC and SNAP, PPPoE (RFC 1042)
+            1500 - MaxUdpHeaderSize  //Ethernet II (RFC 1191)
+        };
+
+        //Max possible single packet size
+        public static readonly int InitialMtu = PossibleMtu[0];
+        public static readonly int MaxPacketSize = PossibleMtu[PossibleMtu.Length - 1];
+        public static readonly int MaxUnreliableDataSize = MaxPacketSize - HeaderSize;
+
+        //peer specific
+        public const byte MaxConnectionNumber = 4;
+    }
+}
+
+#endregion
+
+
+#region NetDebug.cs
+
+namespace LiteNetLib
+{
+    using System;
+    using System.Diagnostics;
+
+    public class InvalidPacketException : ArgumentException
+    {
+        public InvalidPacketException(string message) : base(message)
+        {
+        }
+    }
+
+    public class TooBigPacketException : InvalidPacketException
+    {
+        public TooBigPacketException(string message) : base(message)
+        {
+        }
+    }
+
+    public enum NetLogLevel
+    {
+        Warning,
+        Error,
+        Trace,
+        Info
+    }
+
+    /// <summary>
+    /// Interface to implement for your own logger
+    /// </summary>
+    public interface INetLogger
+    {
+        void WriteNet(NetLogLevel level, string str, params object[] args);
+    }
+
+    /// <summary>
+    /// Static class for defining your own LiteNetLib logger instead of Console.WriteLine
+    /// or Debug.Log if compiled with UNITY flag
+    /// </summary>
+    public static class NetDebug
+    {
+        public static INetLogger Logger = null;
+        private static readonly object DebugLogLock = new object();
+        private static void WriteLogic(NetLogLevel logLevel, string str, params object[] args)
+        {
+            lock (DebugLogLock)
+            {
+                if (Logger == null)
+                {
+#if UNITY_5_3_OR_NEWER
+                    UnityEngine.Debug.Log(string.Format(str, args));
+#else
+                    Console.WriteLine(str, args);
+#endif
+                }
+                else
+                {
+                    Logger.WriteNet(logLevel, str, args);
+                }
+            }
+        }
+
+        [Conditional("DEBUG_MESSAGES")]
+        internal static void Write(string str)
+        {
+            WriteLogic(NetLogLevel.Trace, str);
+        }
+
+        [Conditional("DEBUG_MESSAGES")]
+        internal static void Write(NetLogLevel level, string str)
+        {
+            WriteLogic(level, str);
+        }
+
+        [Conditional("DEBUG_MESSAGES"), Conditional("DEBUG")]
+        internal static void WriteForce(string str)
+        {
+            WriteLogic(NetLogLevel.Trace, str);
+        }
+
+        [Conditional("DEBUG_MESSAGES"), Conditional("DEBUG")]
+        internal static void WriteForce(NetLogLevel level, string str)
+        {
+            WriteLogic(level, str);
+        }
+
+        internal static void WriteError(string str)
+        {
+            WriteLogic(NetLogLevel.Error, str);
+        }
+    }
+}
+
+#endregion
+
+
+#region NetManager.cs
+
+namespace LiteNetLib
+{
+    using System;
+    using System.Collections;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Threading;
+    using Layers;
+    using Utils;
+
+    public sealed class NetPacketReader : NetDataReader
+    {
+        private NetPacket _packet;
+        private readonly NetManager _manager;
+        private readonly NetEvent _evt;
+
+        internal NetPacketReader(NetManager manager, NetEvent evt)
+        {
+            _manager = manager;
+            _evt = evt;
+        }
+
+        internal void SetSource(NetPacket packet, int headerSize)
+        {
+            if (packet == null)
+                return;
+            _packet = packet;
+            SetSource(packet.RawData, headerSize, packet.Size);
+        }
+
+        internal void RecycleInternal()
+        {
+            Clear();
+            if (_packet != null)
+                _manager.PoolRecycle(_packet);
+            _packet = null;
+            _manager.RecycleEvent(_evt);
+        }
+
+        public void Recycle()
+        {
+            if (_manager.AutoRecycle)
+                return;
+            RecycleInternal();
+        }
+    }
+
+    internal sealed class NetEvent
+    {
+        public NetEvent Next;
+
+        public enum EType
+        {
+            Connect,
+            Disconnect,
+            Receive,
+            ReceiveUnconnected,
+            Error,
+            ConnectionLatencyUpdated,
+            Broadcast,
+            ConnectionRequest,
+            MessageDelivered,
+            PeerAddressChanged
+        }
+        public EType Type;
+
+        public NetPeer Peer;
+        public IPEndPoint RemoteEndPoint;
+        public object UserData;
+        public int Latency;
+        public SocketError ErrorCode;
+        public DisconnectReason DisconnectReason;
+        public ConnectionRequest ConnectionRequest;
+        public DeliveryMethod DeliveryMethod;
+        public byte ChannelNumber;
+        public readonly NetPacketReader DataReader;
+
+        public NetEvent(NetManager manager)
+        {
+            DataReader = new NetPacketReader(manager, this);
+        }
+    }
+
+    /// <summary>
+    /// Main class for all network operations. Can be used as client and/or server.
+    /// </summary>
+    public partial class NetManager : IEnumerable<NetPeer>
+    {
+        public struct NetPeerEnumerator : IEnumerator<NetPeer>
+        {
+            private readonly NetPeer _initialPeer;
+            private NetPeer _p;
+
+            public NetPeerEnumerator(NetPeer p)
+            {
+                _initialPeer = p;
+                _p = null;
+            }
+
+            public void Dispose()
+            {
+
+            }
+
+            public bool MoveNext()
+            {
+                _p = _p == null ? _initialPeer : _p.NextPeer;
+                return _p != null;
+            }
+
+            public void Reset()
+            {
+                throw new NotSupportedException();
+            }
+
+            public NetPeer Current => _p;
+            object IEnumerator.Current => _p;
+        }
+
+        private struct IncomingData
+        {
+            public NetPacket Data;
+            public IPEndPoint EndPoint;
+            public DateTime TimeWhenGet;
+        }
+        private readonly List<IncomingData> _pingSimulationList = new List<IncomingData>();
+        private readonly Random _randomGenerator = new Random();
+        private const int MinLatencyThreshold = 5;
+
+        private Thread _logicThread;
+        private bool _manualMode;
+        private readonly AutoResetEvent _updateTriggerEvent = new AutoResetEvent(true);
+
+        private NetEvent _pendingEventHead;
+        private NetEvent _pendingEventTail;
+
+        private NetEvent _netEventPoolHead;
+        private readonly INetEventListener _netEventListener;
+        private readonly IDeliveryEventListener _deliveryEventListener;
+        private readonly INtpEventListener _ntpEventListener;
+        private readonly IPeerAddressChangedListener _peerAddressChangedListener;
+
+        private readonly Dictionary<IPEndPoint, ConnectionRequest> _requestsDict = new Dictionary<IPEndPoint, ConnectionRequest>();
+        private readonly ConcurrentDictionary<IPEndPoint, NtpRequest> _ntpRequests = new ConcurrentDictionary<IPEndPoint, NtpRequest>();
+        private long _connectedPeersCount;
+        private readonly List<NetPeer> _connectedPeerListCache = new List<NetPeer>();
+        private readonly PacketLayerBase _extraPacketLayer;
+        private int _lastPeerId;
+        private ConcurrentQueue<int> _peerIds = new ConcurrentQueue<int>();
+        private byte _channelsCount = 1;
+        private readonly object _eventLock = new object();
+
+        /// <summary>
+        ///     Used with <see cref="SimulateLatency"/> and <see cref="SimulatePacketLoss"/> to tag packets that
+        ///     need to be dropped. Only relevant when <c>DEBUG</c> is defined.
+        /// </summary>
+        private bool _dropPacket;
+
+        //config section
+        /// <summary>
+        /// Enable messages receiving without connection. (with SendUnconnectedMessage method)
+        /// </summary>
+        public bool UnconnectedMessagesEnabled = false;
+
+        /// <summary>
+        /// Enable nat punch messages
+        /// </summary>
+        public bool NatPunchEnabled = false;
+
+        /// <summary>
+        /// Library logic update and send period in milliseconds
+        /// Lowest values in Windows doesn't change much because of Thread.Sleep precision
+        /// To more frequent sends (or sends tied to your game logic) use <see cref="TriggerUpdate"/>
+        /// </summary>
+        public int UpdateTime = 15;
+
+        /// <summary>
+        /// Interval for latency detection and checking connection (in milliseconds)
+        /// </summary>
+        public int PingInterval = 1000;
+
+        /// <summary>
+        /// If NetManager doesn't receive any packet from remote peer during this time (in milliseconds) then connection will be closed
+        /// (including library internal keepalive packets)
+        /// </summary>
+        public int DisconnectTimeout = 5000;
+
+        /// <summary>
+        /// Simulate packet loss by dropping random amount of packets. (Works only in DEBUG mode)
+        /// </summary>
+        public bool SimulatePacketLoss = false;
+
+        /// <summary>
+        /// Simulate latency by holding packets for random time. (Works only in DEBUG mode)
+        /// </summary>
+        public bool SimulateLatency = false;
+
+        /// <summary>
+        /// Chance of packet loss when simulation enabled. value in percents (1 - 100).
+        /// </summary>
+        public int SimulationPacketLossChance = 10;
+
+        /// <summary>
+        /// Minimum simulated latency (in milliseconds)
+        /// </summary>
+        public int SimulationMinLatency = 30;
+
+        /// <summary>
+        /// Maximum simulated latency (in milliseconds)
+        /// </summary>
+        public int SimulationMaxLatency = 100;
+
+        /// <summary>
+        /// Events automatically will be called without PollEvents method from another thread
+        /// </summary>
+        public bool UnsyncedEvents = false;
+
+        /// <summary>
+        /// If true - receive event will be called from "receive" thread immediately otherwise on PollEvents call
+        /// </summary>
+        public bool UnsyncedReceiveEvent = false;
+
+        /// <summary>
+        /// If true - delivery event will be called from "receive" thread immediately otherwise on PollEvents call
+        /// </summary>
+        public bool UnsyncedDeliveryEvent = false;
+
+        /// <summary>
+        /// Allows receive broadcast packets
+        /// </summary>
+        public bool BroadcastReceiveEnabled = false;
+
+        /// <summary>
+        /// Delay between initial connection attempts (in milliseconds)
+        /// </summary>
+        public int ReconnectDelay = 500;
+
+        /// <summary>
+        /// Maximum connection attempts before client stops and call disconnect event.
+        /// </summary>
+        public int MaxConnectAttempts = 10;
+
+        /// <summary>
+        /// Enables socket option "ReuseAddress" for specific purposes
+        /// </summary>
+        public bool ReuseAddress = false;
+
+        /// <summary>
+        /// UDP Only Socket Option
+        /// Normally IP sockets send packets of data through routers and gateways until they reach the final destination.
+        /// If the DontRoute flag is set to True, then data will be delivered on the local subnet only.
+        /// </summary>
+        public bool DontRoute = false;
+
+        /// <summary>
+        /// Statistics of all connections
+        /// </summary>
+        public readonly NetStatistics Statistics = new NetStatistics();
+
+        /// <summary>
+        /// Toggles the collection of network statistics for the instance and all known peers
+        /// </summary>
+        public bool EnableStatistics = false;
+
+        /// <summary>
+        /// NatPunchModule for NAT hole punching operations
+        /// </summary>
+        public readonly NatPunchModule NatPunchModule;
+
+        /// <summary>
+        /// Returns true if socket listening and update thread is running
+        /// </summary>
+        public bool IsRunning { get; private set; }
+
+        /// <summary>
+        /// Local EndPoint (host and port)
+        /// </summary>
+        public int LocalPort { get; private set; }
+
+        /// <summary>
+        /// Automatically recycle NetPacketReader after OnReceive event
+        /// </summary>
+        public bool AutoRecycle;
+
+        /// <summary>
+        /// IPv6 support
+        /// </summary>
+        public bool IPv6Enabled = true;
+
+        /// <summary>
+        /// Override MTU for all new peers registered in this NetManager, will ignores MTU Discovery!
+        /// </summary>
+        public int MtuOverride = 0;
+
+        /// <summary>
+        /// Automatically discovery mtu starting from. Use at own risk because some routers can break MTU detection
+        /// and connection in result
+        /// </summary>
+        public bool MtuDiscovery = false;
+
+        /// <summary>
+        /// First peer. Useful for Client mode
+        /// </summary>
+        public NetPeer FirstPeer => _headPeer;
+
+        /// <summary>
+        /// Experimental feature mostly for servers. Only for Windows/Linux
+        /// use direct socket calls for send/receive to drastically increase speed and reduce GC pressure
+        /// </summary>
+        public bool UseNativeSockets = false;
+
+        /// <summary>
+        /// Disconnect peers if HostUnreachable or NetworkUnreachable spawned (old behaviour 0.9.x was true)
+        /// </summary>
+        public bool DisconnectOnUnreachable = false;
+
+        /// <summary>
+        /// Allows peer change it's ip (lte to wifi, wifi to lte, etc). Use only on server
+        /// </summary>
+        public bool AllowPeerAddressChange = false;
+
+        /// <summary>
+        /// QoS channel count per message type (value must be between 1 and 64 channels)
+        /// </summary>
+        public byte ChannelsCount
+        {
+            get => _channelsCount;
+            set
+            {
+                if (value < 1 || value > 64)
+                    throw new ArgumentException("Channels count must be between 1 and 64");
+                _channelsCount = value;
+            }
+        }
+
+        /// <summary>
+        /// Returns connected peers list (with internal cached list)
+        /// </summary>
+        public List<NetPeer> ConnectedPeerList
+        {
+            get
+            {
+                GetPeersNonAlloc(_connectedPeerListCache, ConnectionState.Connected);
+                return _connectedPeerListCache;
+            }
+        }
+
+        /// <summary>
+        /// Returns connected peers count
+        /// </summary>
+        public int ConnectedPeersCount => (int)Interlocked.Read(ref _connectedPeersCount);
+
+        public int ExtraPacketSizeForLayer => _extraPacketLayer?.ExtraPacketSizeForLayer ?? 0;
+
+        /// <summary>
+        /// NetManager constructor
+        /// </summary>
+        /// <param name="listener">Network events listener (also can implement IDeliveryEventListener)</param>
+        /// <param name="extraPacketLayer">Extra processing of packages, like CRC checksum or encryption. All connected NetManagers must have same layer.</param>
+        public NetManager(INetEventListener listener, PacketLayerBase extraPacketLayer = null, bool useSocketFix = true)
+        {
+#if UNITY_2018_3_OR_NEWER
+            _useSocketFix = useSocketFix;
+#endif
+            _netEventListener = listener;
+            _deliveryEventListener = listener as IDeliveryEventListener;
+            _ntpEventListener = listener as INtpEventListener;
+            _peerAddressChangedListener = listener as IPeerAddressChangedListener;
+            NatPunchModule = new NatPunchModule(this);
+            _extraPacketLayer = extraPacketLayer;
+        }
+
+        internal void ConnectionLatencyUpdated(NetPeer fromPeer, int latency)
+        {
+            CreateEvent(NetEvent.EType.ConnectionLatencyUpdated, fromPeer, latency: latency);
+        }
+
+        internal void MessageDelivered(NetPeer fromPeer, object userData)
+        {
+            if (_deliveryEventListener != null)
+                CreateEvent(NetEvent.EType.MessageDelivered, fromPeer, userData: userData);
+        }
+
+        internal void DisconnectPeerForce(NetPeer peer,
+            DisconnectReason reason,
+            SocketError socketErrorCode,
+            NetPacket eventData)
+        {
+            DisconnectPeer(peer, reason, socketErrorCode, true, null, 0, 0, eventData);
+        }
+
+        private void DisconnectPeer(
+            NetPeer peer,
+            DisconnectReason reason,
+            SocketError socketErrorCode,
+            bool force,
+            byte[] data,
+            int start,
+            int count,
+            NetPacket eventData)
+        {
+            var shutdownResult = peer.Shutdown(data, start, count, force);
+            if (shutdownResult == ShutdownResult.None)
+                return;
+            if (shutdownResult == ShutdownResult.WasConnected)
+                Interlocked.Decrement(ref _connectedPeersCount);
+            CreateEvent(
+                NetEvent.EType.Disconnect,
+                peer,
+                errorCode: socketErrorCode,
+                disconnectReason: reason,
+                readerSource: eventData);
+        }
+
+        private void CreateEvent(
+            NetEvent.EType type,
+            NetPeer peer = null,
+            IPEndPoint remoteEndPoint = null,
+            SocketError errorCode = 0,
+            int latency = 0,
+            DisconnectReason disconnectReason = DisconnectReason.ConnectionFailed,
+            ConnectionRequest connectionRequest = null,
+            DeliveryMethod deliveryMethod = DeliveryMethod.Unreliable,
+            byte channelNumber = 0,
+            NetPacket readerSource = null,
+            object userData = null)
+        {
+            NetEvent evt;
+            bool unsyncEvent = UnsyncedEvents;
+
+            if (type == NetEvent.EType.Connect)
+                Interlocked.Increment(ref _connectedPeersCount);
+            else if (type == NetEvent.EType.MessageDelivered)
+                unsyncEvent = UnsyncedDeliveryEvent;
+
+            lock (_eventLock)
+            {
+                evt = _netEventPoolHead;
+                if (evt == null)
+                    evt = new NetEvent(this);
+                else
+                    _netEventPoolHead = evt.Next;
+            }
+
+            evt.Next = null;
+            evt.Type = type;
+            evt.DataReader.SetSource(readerSource, readerSource?.GetHeaderSize() ?? 0);
+            evt.Peer = peer;
+            evt.RemoteEndPoint = remoteEndPoint;
+            evt.Latency = latency;
+            evt.ErrorCode = errorCode;
+            evt.DisconnectReason = disconnectReason;
+            evt.ConnectionRequest = connectionRequest;
+            evt.DeliveryMethod = deliveryMethod;
+            evt.ChannelNumber = channelNumber;
+            evt.UserData = userData;
+
+            if (unsyncEvent || _manualMode)
+            {
+                ProcessEvent(evt);
+            }
+            else
+            {
+                lock (_eventLock)
+                {
+                    if (_pendingEventTail == null)
+                        _pendingEventHead = evt;
+                    else
+                        _pendingEventTail.Next = evt;
+                    _pendingEventTail = evt;
+                }
+            }
+        }
+
+        private void ProcessEvent(NetEvent evt)
+        {
+            NetDebug.Write("[NM] Processing event: " + evt.Type);
+            bool emptyData = evt.DataReader.IsNull;
+            switch (evt.Type)
+            {
+                case NetEvent.EType.Connect:
+                    _netEventListener.OnPeerConnected(evt.Peer);
+                    break;
+                case NetEvent.EType.Disconnect:
+                    var info = new DisconnectInfo
+                    {
+                        Reason = evt.DisconnectReason,
+                        AdditionalData = evt.DataReader,
+                        SocketErrorCode = evt.ErrorCode
+                    };
+                    _netEventListener.OnPeerDisconnected(evt.Peer, info);
+                    break;
+                case NetEvent.EType.Receive:
+                    _netEventListener.OnNetworkReceive(evt.Peer, evt.DataReader, evt.ChannelNumber, evt.DeliveryMethod);
+                    break;
+                case NetEvent.EType.ReceiveUnconnected:
+                    _netEventListener.OnNetworkReceiveUnconnected(evt.RemoteEndPoint, evt.DataReader, UnconnectedMessageType.BasicMessage);
+                    break;
+                case NetEvent.EType.Broadcast:
+                    _netEventListener.OnNetworkReceiveUnconnected(evt.RemoteEndPoint, evt.DataReader, UnconnectedMessageType.Broadcast);
+                    break;
+                case NetEvent.EType.Error:
+                    _netEventListener.OnNetworkError(evt.RemoteEndPoint, evt.ErrorCode);
+                    break;
+                case NetEvent.EType.ConnectionLatencyUpdated:
+                    _netEventListener.OnNetworkLatencyUpdate(evt.Peer, evt.Latency);
+                    break;
+                case NetEvent.EType.ConnectionRequest:
+                    _netEventListener.OnConnectionRequest(evt.ConnectionRequest);
+                    break;
+                case NetEvent.EType.MessageDelivered:
+                    _deliveryEventListener.OnMessageDelivered(evt.Peer, evt.UserData);
+                    break;
+                case NetEvent.EType.PeerAddressChanged:
+                    _peersLock.EnterUpgradeableReadLock();
+                    IPEndPoint previousAddress = null;
+                    if (ContainsPeer(evt.Peer))
+                    {
+                        _peersLock.EnterWriteLock();
+                        RemovePeerFromSet(evt.Peer);
+                        previousAddress = new IPEndPoint(evt.Peer.Address, evt.Peer.Port);
+                        evt.Peer.FinishEndPointChange(evt.RemoteEndPoint);
+                        AddPeerToSet(evt.Peer);
+                        _peersLock.ExitWriteLock();
+                    }
+                    _peersLock.ExitUpgradeableReadLock();
+                    if (previousAddress != null && _peerAddressChangedListener != null)
+                        _peerAddressChangedListener.OnPeerAddressChanged(evt.Peer, previousAddress);
+                    break;
+            }
+            //Recycle if not message
+            if (emptyData)
+                RecycleEvent(evt);
+            else if (AutoRecycle)
+                evt.DataReader.RecycleInternal();
+        }
+
+        internal void RecycleEvent(NetEvent evt)
+        {
+            evt.Peer = null;
+            evt.ErrorCode = 0;
+            evt.RemoteEndPoint = null;
+            evt.ConnectionRequest = null;
+            lock (_eventLock)
+            {
+                evt.Next = _netEventPoolHead;
+                _netEventPoolHead = evt;
+            }
+        }
+
+        //Update function
+        private void UpdateLogic()
+        {
+            var peersToRemove = new List<NetPeer>();
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            while (IsRunning)
+            {
+                try
+                {
+                    ProcessDelayedPackets();
+                    float elapsed = (float)(stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0);
+                    elapsed = elapsed <= 0.0f ? 0.001f : elapsed;
+                    stopwatch.Restart();
+
+                    for (var netPeer = _headPeer; netPeer != null; netPeer = netPeer.NextPeer)
+                    {
+                        if (netPeer.ConnectionState == ConnectionState.Disconnected &&
+                            netPeer.TimeSinceLastPacket > DisconnectTimeout)
+                        {
+                            peersToRemove.Add(netPeer);
+                        }
+                        else
+                        {
+                            netPeer.Update(elapsed);
+                        }
+                    }
+
+                    if (peersToRemove.Count > 0)
+                    {
+                        _peersLock.EnterWriteLock();
+                        for (int i = 0; i < peersToRemove.Count; i++)
+                            RemovePeer(peersToRemove[i], false);
+                        _peersLock.ExitWriteLock();
+                        peersToRemove.Clear();
+                    }
+
+                    ProcessNtpRequests(elapsed);
+
+                    int sleepTime = UpdateTime - (int)stopwatch.ElapsedMilliseconds;
+                    if (sleepTime > 0)
+                        _updateTriggerEvent.WaitOne(sleepTime);
+                }
+                catch (ThreadAbortException)
+                {
+                    return;
+                }
+                catch (Exception e)
+                {
+                    NetDebug.WriteError("[NM] LogicThread error: " + e);
+                }
+            }
+            stopwatch.Stop();
+        }
+
+        [Conditional("DEBUG")]
+        private void ProcessDelayedPackets()
+        {
+            if (!SimulateLatency)
+                return;
+
+            var time = DateTime.UtcNow;
+            lock (_pingSimulationList)
+            {
+                for (int i = 0; i < _pingSimulationList.Count; i++)
+                {
+                    var incomingData = _pingSimulationList[i];
+                    if (incomingData.TimeWhenGet <= time)
+                    {
+                        HandleMessageReceived(incomingData.Data, incomingData.EndPoint);
+                        _pingSimulationList.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+        }
+
+        private void ProcessNtpRequests(float elapsedMilliseconds)
+        {
+            List<IPEndPoint> requestsToRemove = null;
+            foreach (var ntpRequest in _ntpRequests)
+            {
+                ntpRequest.Value.Send(_udpSocketv4, elapsedMilliseconds);
+                if (ntpRequest.Value.NeedToKill)
+                {
+                    if (requestsToRemove == null)
+                        requestsToRemove = new List<IPEndPoint>();
+                    requestsToRemove.Add(ntpRequest.Key);
+                }
+            }
+
+            if (requestsToRemove != null)
+            {
+                foreach (var ipEndPoint in requestsToRemove)
+                {
+                    _ntpRequests.TryRemove(ipEndPoint, out _);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Update and send logic. Use this only when NetManager started in manual mode
+        /// </summary>
+        /// <param name="elapsedMilliseconds">elapsed milliseconds since last update call</param>
+        public void ManualUpdate(float elapsedMilliseconds)
+        {
+            if (!_manualMode)
+                return;
+
+            for (var netPeer = _headPeer; netPeer != null; netPeer = netPeer.NextPeer)
+            {
+                if (netPeer.ConnectionState == ConnectionState.Disconnected && netPeer.TimeSinceLastPacket > DisconnectTimeout)
+                {
+                    RemovePeer(netPeer, false);
+                }
+                else
+                {
+                    netPeer.Update(elapsedMilliseconds);
+                }
+            }
+            ProcessNtpRequests(elapsedMilliseconds);
+        }
+
+        internal NetPeer OnConnectionSolved(ConnectionRequest request, byte[] rejectData, int start, int length)
+        {
+            NetPeer netPeer = null;
+
+            if (request.Result == ConnectionRequestResult.RejectForce)
+            {
+                NetDebug.Write(NetLogLevel.Trace, "[NM] Peer connect reject force.");
+                if (rejectData != null && length > 0)
+                {
+                    var shutdownPacket = PoolGetWithProperty(PacketProperty.Disconnect, length);
+                    shutdownPacket.ConnectionNumber = request.InternalPacket.ConnectionNumber;
+                    FastBitConverter.GetBytes(shutdownPacket.RawData, 1, request.InternalPacket.ConnectionTime);
+                    if (shutdownPacket.Size >= NetConstants.PossibleMtu[0])
+                        NetDebug.WriteError("[Peer] Disconnect additional data size more than MTU!");
+                    else
+                        Buffer.BlockCopy(rejectData, start, shutdownPacket.RawData, 9, length);
+                    SendRawAndRecycle(shutdownPacket, request.RemoteEndPoint);
+                }
+                lock (_requestsDict)
+                    _requestsDict.Remove(request.RemoteEndPoint);
+            }
+            else lock (_requestsDict)
+            {
+                if (TryGetPeer(request.RemoteEndPoint, out netPeer))
+                {
+                    //already have peer
+                }
+                else if (request.Result == ConnectionRequestResult.Reject)
+                {
+                    netPeer = new NetPeer(this, request.RemoteEndPoint, GetNextPeerId());
+                    netPeer.Reject(request.InternalPacket, rejectData, start, length);
+                    AddPeer(netPeer);
+                    NetDebug.Write(NetLogLevel.Trace, "[NM] Peer connect reject.");
+                }
+                else //Accept
+                {
+                    netPeer = new NetPeer(this, request, GetNextPeerId());
+                    AddPeer(netPeer);
+                    CreateEvent(NetEvent.EType.Connect, netPeer);
+                    NetDebug.Write(NetLogLevel.Trace, $"[NM] Received peer connection Id: {netPeer.ConnectTime}, EP: {netPeer}");
+                }
+                _requestsDict.Remove(request.RemoteEndPoint);
+            }
+
+            return netPeer;
+        }
+
+        private int GetNextPeerId()
+        {
+            return _peerIds.TryDequeue(out int id) ? id : _lastPeerId++;
+        }
+
+        private void ProcessConnectRequest(
+            IPEndPoint remoteEndPoint,
+            NetPeer netPeer,
+            NetConnectRequestPacket connRequest)
+        {
+            //if we have peer
+            if (netPeer != null)
+            {
+                var processResult = netPeer.ProcessConnectRequest(connRequest);
+                NetDebug.Write($"ConnectRequest LastId: {netPeer.ConnectTime}, NewId: {connRequest.ConnectionTime}, EP: {remoteEndPoint}, Result: {processResult}");
+
+                switch (processResult)
+                {
+                    case ConnectRequestResult.Reconnection:
+                        DisconnectPeerForce(netPeer, DisconnectReason.Reconnect, 0, null);
+                        RemovePeer(netPeer, true);
+                        //go to new connection
+                        break;
+                    case ConnectRequestResult.NewConnection:
+                        RemovePeer(netPeer, true);
+                        //go to new connection
+                        break;
+                    case ConnectRequestResult.P2PLose:
+                        DisconnectPeerForce(netPeer, DisconnectReason.PeerToPeerConnection, 0, null);
+                        RemovePeer(netPeer, true);
+                        //go to new connection
+                        break;
+                    default:
+                        //no operations needed
+                        return;
+                }
+                //ConnectRequestResult.NewConnection
+                //Set next connection number
+                if (processResult != ConnectRequestResult.P2PLose)
+                    connRequest.ConnectionNumber = (byte)((netPeer.ConnectionNum + 1) % NetConstants.MaxConnectionNumber);
+                //To reconnect peer
+            }
+            else
+            {
+                NetDebug.Write($"ConnectRequest Id: {connRequest.ConnectionTime}, EP: {remoteEndPoint}");
+            }
+
+            ConnectionRequest req;
+            lock (_requestsDict)
+            {
+                if (_requestsDict.TryGetValue(remoteEndPoint, out req))
+                {
+                    req.UpdateRequest(connRequest);
+                    return;
+                }
+                req = new ConnectionRequest(remoteEndPoint, connRequest, this);
+                _requestsDict.Add(remoteEndPoint, req);
+            }
+            NetDebug.Write($"[NM] Creating request event: {connRequest.ConnectionTime}");
+            CreateEvent(NetEvent.EType.ConnectionRequest, connectionRequest: req);
+        }
+
+        private void OnMessageReceived(NetPacket packet, IPEndPoint remoteEndPoint)
+        {
+            if (packet.Size == 0)
+            {
+                PoolRecycle(packet);
+                return;
+            }
+
+            _dropPacket = false;
+            HandleSimulateLatency(packet, remoteEndPoint);
+            HandleSimulatePacketLoss();
+            if (_dropPacket)
+            {
+                return;
+            }
+
+            // ProcessEvents
+            HandleMessageReceived(packet, remoteEndPoint);
+        }
+
+        [Conditional("DEBUG")]
+        private void HandleSimulateLatency(NetPacket packet, IPEndPoint remoteEndPoint)
+        {
+            if (!SimulateLatency)
+            {
+                return;
+            }
+
+            int latency = _randomGenerator.Next(SimulationMinLatency, SimulationMaxLatency);
+            if (latency > MinLatencyThreshold)
+            {
+                lock (_pingSimulationList)
+                {
+                    _pingSimulationList.Add(new IncomingData
+                    {
+                        Data = packet,
+                        EndPoint = remoteEndPoint,
+                        TimeWhenGet = DateTime.UtcNow.AddMilliseconds(latency)
+                    });
+                }
+                // hold packet
+                _dropPacket = true;
+            }
+        }
+
+        [Conditional("DEBUG")]
+        private void HandleSimulatePacketLoss()
+        {
+            if (SimulatePacketLoss && _randomGenerator.NextDouble() * 100 < SimulationPacketLossChance)
+            {
+                _dropPacket = true;
+            }
+        }
+
+        private void HandleMessageReceived(NetPacket packet, IPEndPoint remoteEndPoint)
+        {
+            var originalPacketSize = packet.Size;
+            if (EnableStatistics)
+            {
+                Statistics.IncrementPacketsReceived();
+                Statistics.AddBytesReceived(originalPacketSize);
+            }
+
+            if (_ntpRequests.Count > 0 && _ntpRequests.TryGetValue(remoteEndPoint, out var request))
+            {
+                if (packet.Size < 48)
+                {
+                    NetDebug.Write(NetLogLevel.Trace, $"NTP response too short: {packet.Size}");
+                    return;
+                }
+
+                byte[] copiedData = new byte[packet.Size];
+                Buffer.BlockCopy(packet.RawData, 0, copiedData, 0, packet.Size);
+                NtpPacket ntpPacket = NtpPacket.FromServerResponse(copiedData, DateTime.UtcNow);
+                try
+                {
+                    ntpPacket.ValidateReply();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    NetDebug.Write(NetLogLevel.Trace, $"NTP response error: {ex.Message}");
+                    ntpPacket = null;
+                }
+
+                if (ntpPacket != null)
+                {
+                    _ntpRequests.TryRemove(remoteEndPoint, out _);
+                    _ntpEventListener?.OnNtpResponse(ntpPacket);
+                }
+                return;
+            }
+
+            if (_extraPacketLayer != null)
+            {
+                _extraPacketLayer.ProcessInboundPacket(ref remoteEndPoint, ref packet.RawData, ref packet.Size);
+                if (packet.Size == 0)
+                    return;
+            }
+
+            if (!packet.Verify())
+            {
+                NetDebug.WriteError("[NM] DataReceived: bad!");
+                PoolRecycle(packet);
+                return;
+            }
+
+            switch (packet.Property)
+            {
+                //special case connect request
+                case PacketProperty.ConnectRequest:
+                    if (NetConnectRequestPacket.GetProtocolId(packet) != NetConstants.ProtocolId)
+                    {
+                        SendRawAndRecycle(PoolGetWithProperty(PacketProperty.InvalidProtocol), remoteEndPoint);
+                        return;
+                    }
+                    break;
+                //unconnected messages
+                case PacketProperty.Broadcast:
+                    if (!BroadcastReceiveEnabled)
+                        return;
+                    CreateEvent(NetEvent.EType.Broadcast, remoteEndPoint: remoteEndPoint, readerSource: packet);
+                    return;
+                case PacketProperty.UnconnectedMessage:
+                    if (!UnconnectedMessagesEnabled)
+                        return;
+                    CreateEvent(NetEvent.EType.ReceiveUnconnected, remoteEndPoint: remoteEndPoint, readerSource: packet);
+                    return;
+                case PacketProperty.NatMessage:
+                    if (NatPunchEnabled)
+                        NatPunchModule.ProcessMessage(remoteEndPoint, packet);
+                    return;
+            }
+
+            //Check normal packets
+            bool peerFound = remoteEndPoint is NetPeer netPeer || TryGetPeer(remoteEndPoint, out netPeer);
+
+            if (peerFound && EnableStatistics)
+            {
+                netPeer.Statistics.IncrementPacketsReceived();
+                netPeer.Statistics.AddBytesReceived(originalPacketSize);
+            }
+
+            switch (packet.Property)
+            {
+                case PacketProperty.ConnectRequest:
+                    var connRequest = NetConnectRequestPacket.FromData(packet);
+                    if (connRequest != null)
+                        ProcessConnectRequest(remoteEndPoint, netPeer, connRequest);
+                    break;
+                case PacketProperty.PeerNotFound:
+                    if (peerFound) //local
+                    {
+                        if (netPeer.ConnectionState != ConnectionState.Connected)
+                            return;
+                        if (packet.Size == 1)
+                        {
+                            //first reply
+                            //send NetworkChanged packet
+                            netPeer.ResetMtu();
+                            SendRaw(NetConnectAcceptPacket.MakeNetworkChanged(netPeer), remoteEndPoint);
+                            NetDebug.Write($"PeerNotFound sending connection info: {remoteEndPoint}");
+                        }
+                        else if (packet.Size == 2 && packet.RawData[1] == 1)
+                        {
+                            //second reply
+                            DisconnectPeerForce(netPeer, DisconnectReason.PeerNotFound, 0, null);
+                        }
+                    }
+                    else if (packet.Size > 1) //remote
+                    {
+                        //check if this is old peer
+                        bool isOldPeer = false;
+
+                        if (AllowPeerAddressChange)
+                        {
+                            NetDebug.Write($"[NM] Looks like address change: {packet.Size}");
+                            var remoteData = NetConnectAcceptPacket.FromData(packet);
+                            if (remoteData != null &&
+                                remoteData.PeerNetworkChanged &&
+                                remoteData.PeerId < _peersArray.Length)
+                            {
+                                _peersLock.EnterUpgradeableReadLock();
+                                var peer = _peersArray[remoteData.PeerId];
+                                _peersLock.ExitUpgradeableReadLock();
+                                if (peer != null &&
+                                    peer.ConnectTime == remoteData.ConnectionTime &&
+                                    peer.ConnectionNum == remoteData.ConnectionNumber)
+                                {
+                                    if (peer.ConnectionState == ConnectionState.Connected)
+                                    {
+                                        peer.InitiateEndPointChange();
+                                        CreateEvent(NetEvent.EType.PeerAddressChanged, peer, remoteEndPoint);
+                                        NetDebug.Write("[NM] PeerNotFound change address of remote peer");
+                                    }
+                                    isOldPeer = true;
+                                }
+                            }
+                        }
+
+                        PoolRecycle(packet);
+
+                        //else peer really not found
+                        if (!isOldPeer)
+                        {
+                            var secondResponse = PoolGetWithProperty(PacketProperty.PeerNotFound, 1);
+                            secondResponse.RawData[1] = 1;
+                            SendRawAndRecycle(secondResponse, remoteEndPoint);
+                        }
+                    }
+                    break;
+                case PacketProperty.InvalidProtocol:
+                    if (peerFound && netPeer.ConnectionState == ConnectionState.Outgoing)
+                        DisconnectPeerForce(netPeer, DisconnectReason.InvalidProtocol, 0, null);
+                    break;
+                case PacketProperty.Disconnect:
+                    if (peerFound)
+                    {
+                        var disconnectResult = netPeer.ProcessDisconnect(packet);
+                        if (disconnectResult == DisconnectResult.None)
+                        {
+                            PoolRecycle(packet);
+                            return;
+                        }
+                        DisconnectPeerForce(
+                            netPeer,
+                            disconnectResult == DisconnectResult.Disconnect
+                            ? DisconnectReason.RemoteConnectionClose
+                            : DisconnectReason.ConnectionRejected,
+                            0, packet);
+                    }
+                    else
+                    {
+                        PoolRecycle(packet);
+                    }
+                    //Send shutdown
+                    SendRawAndRecycle(PoolGetWithProperty(PacketProperty.ShutdownOk), remoteEndPoint);
+                    break;
+                case PacketProperty.ConnectAccept:
+                    if (!peerFound)
+                        return;
+                    var connAccept = NetConnectAcceptPacket.FromData(packet);
+                    if (connAccept != null && netPeer.ProcessConnectAccept(connAccept))
+                        CreateEvent(NetEvent.EType.Connect, netPeer);
+                    break;
+                default:
+                    if (peerFound)
+                        netPeer.ProcessPacket(packet);
+                    else
+                        SendRawAndRecycle(PoolGetWithProperty(PacketProperty.PeerNotFound), remoteEndPoint);
+                    break;
+            }
+        }
+
+        internal void CreateReceiveEvent(NetPacket packet, DeliveryMethod method, byte channelNumber, int headerSize, NetPeer fromPeer)
+        {
+            NetEvent evt;
+
+            if (UnsyncedEvents || UnsyncedReceiveEvent || _manualMode)
+            {
+                lock (_eventLock)
+                {
+                    evt = _netEventPoolHead;
+                    if (evt == null)
+                        evt = new NetEvent(this);
+                    else
+                        _netEventPoolHead = evt.Next;
+                }
+                evt.Next = null;
+                evt.Type = NetEvent.EType.Receive;
+                evt.DataReader.SetSource(packet, headerSize);
+                evt.Peer = fromPeer;
+                evt.DeliveryMethod = method;
+                evt.ChannelNumber = channelNumber;
+                ProcessEvent(evt);
+            }
+            else
+            {
+                lock (_eventLock)
+                {
+                    evt = _netEventPoolHead;
+                    if (evt == null)
+                        evt = new NetEvent(this);
+                    else
+                        _netEventPoolHead = evt.Next;
+
+                    evt.Next = null;
+                    evt.Type = NetEvent.EType.Receive;
+                    evt.DataReader.SetSource(packet, headerSize);
+                    evt.Peer = fromPeer;
+                    evt.DeliveryMethod = method;
+                    evt.ChannelNumber = channelNumber;
+
+                    if (_pendingEventTail == null)
+                        _pendingEventHead = evt;
+                    else
+                        _pendingEventTail.Next = evt;
+                    _pendingEventTail = evt;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Send data to all connected peers (channel - 0)
+        /// </summary>
+        /// <param name="writer">DataWriter with data</param>
+        /// <param name="options">Send options (reliable, unreliable, etc.)</param>
+        public void SendToAll(NetDataWriter writer, DeliveryMethod options)
+        {
+            SendToAll(writer.Data, 0, writer.Length, options);
+        }
+
+        /// <summary>
+        /// Send data to all connected peers (channel - 0)
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="options">Send options (reliable, unreliable, etc.)</param>
+        public void SendToAll(byte[] data, DeliveryMethod options)
+        {
+            SendToAll(data, 0, data.Length, options);
+        }
+
+        /// <summary>
+        /// Send data to all connected peers (channel - 0)
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="start">Start of data</param>
+        /// <param name="length">Length of data</param>
+        /// <param name="options">Send options (reliable, unreliable, etc.)</param>
+        public void SendToAll(byte[] data, int start, int length, DeliveryMethod options)
+        {
+            SendToAll(data, start, length, 0, options);
+        }
+
+        /// <summary>
+        /// Send data to all connected peers
+        /// </summary>
+        /// <param name="writer">DataWriter with data</param>
+        /// <param name="channelNumber">Number of channel (from 0 to channelsCount - 1)</param>
+        /// <param name="options">Send options (reliable, unreliable, etc.)</param>
+        public void SendToAll(NetDataWriter writer, byte channelNumber, DeliveryMethod options)
+        {
+            SendToAll(writer.Data, 0, writer.Length, channelNumber, options);
+        }
+
+        /// <summary>
+        /// Send data to all connected peers
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="channelNumber">Number of channel (from 0 to channelsCount - 1)</param>
+        /// <param name="options">Send options (reliable, unreliable, etc.)</param>
+        public void SendToAll(byte[] data, byte channelNumber, DeliveryMethod options)
+        {
+            SendToAll(data, 0, data.Length, channelNumber, options);
+        }
+
+        /// <summary>
+        /// Send data to all connected peers
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="start">Start of data</param>
+        /// <param name="length">Length of data</param>
+        /// <param name="channelNumber">Number of channel (from 0 to channelsCount - 1)</param>
+        /// <param name="options">Send options (reliable, unreliable, etc.)</param>
+        public void SendToAll(byte[] data, int start, int length, byte channelNumber, DeliveryMethod options)
+        {
+            try
+            {
+                _peersLock.EnterReadLock();
+                for (var netPeer = _headPeer; netPeer != null; netPeer = netPeer.NextPeer)
+                    netPeer.Send(data, start, length, channelNumber, options);
+            }
+            finally
+            {
+                _peersLock.ExitReadLock();
+            }
+        }
+
+        /// <summary>
+        /// Send data to all connected peers (channel - 0)
+        /// </summary>
+        /// <param name="writer">DataWriter with data</param>
+        /// <param name="options">Send options (reliable, unreliable, etc.)</param>
+        /// <param name="excludePeer">Excluded peer</param>
+        public void SendToAll(NetDataWriter writer, DeliveryMethod options, NetPeer excludePeer)
+        {
+            SendToAll(writer.Data, 0, writer.Length, 0, options, excludePeer);
+        }
+
+        /// <summary>
+        /// Send data to all connected peers (channel - 0)
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="options">Send options (reliable, unreliable, etc.)</param>
+        /// <param name="excludePeer">Excluded peer</param>
+        public void SendToAll(byte[] data, DeliveryMethod options, NetPeer excludePeer)
+        {
+            SendToAll(data, 0, data.Length, 0, options, excludePeer);
+        }
+
+        /// <summary>
+        /// Send data to all connected peers (channel - 0)
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="start">Start of data</param>
+        /// <param name="length">Length of data</param>
+        /// <param name="options">Send options (reliable, unreliable, etc.)</param>
+        /// <param name="excludePeer">Excluded peer</param>
+        public void SendToAll(byte[] data, int start, int length, DeliveryMethod options, NetPeer excludePeer)
+        {
+            SendToAll(data, start, length, 0, options, excludePeer);
+        }
+
+        /// <summary>
+        /// Send data to all connected peers
+        /// </summary>
+        /// <param name="writer">DataWriter with data</param>
+        /// <param name="channelNumber">Number of channel (from 0 to channelsCount - 1)</param>
+        /// <param name="options">Send options (reliable, unreliable, etc.)</param>
+        /// <param name="excludePeer">Excluded peer</param>
+        public void SendToAll(NetDataWriter writer, byte channelNumber, DeliveryMethod options, NetPeer excludePeer)
+        {
+            SendToAll(writer.Data, 0, writer.Length, channelNumber, options, excludePeer);
+        }
+
+        /// <summary>
+        /// Send data to all connected peers
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="channelNumber">Number of channel (from 0 to channelsCount - 1)</param>
+        /// <param name="options">Send options (reliable, unreliable, etc.)</param>
+        /// <param name="excludePeer">Excluded peer</param>
+        public void SendToAll(byte[] data, byte channelNumber, DeliveryMethod options, NetPeer excludePeer)
+        {
+            SendToAll(data, 0, data.Length, channelNumber, options, excludePeer);
+        }
+
+        /// <summary>
+        /// Send data to all connected peers
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="start">Start of data</param>
+        /// <param name="length">Length of data</param>
+        /// <param name="channelNumber">Number of channel (from 0 to channelsCount - 1)</param>
+        /// <param name="options">Send options (reliable, unreliable, etc.)</param>
+        /// <param name="excludePeer">Excluded peer</param>
+        public void SendToAll(byte[] data, int start, int length, byte channelNumber, DeliveryMethod options, NetPeer excludePeer)
+        {
+            try
+            {
+                _peersLock.EnterReadLock();
+                for (var netPeer = _headPeer; netPeer != null; netPeer = netPeer.NextPeer)
+                {
+                    if (netPeer != excludePeer)
+                        netPeer.Send(data, start, length, channelNumber, options);
+                }
+            }
+            finally
+            {
+                _peersLock.ExitReadLock();
+            }
+        }
+
+#if LITENETLIB_SPANS || NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1 || NETCOREAPP3_1 || NET5_0 || NETSTANDARD2_1
+        /// <summary>
+        /// Send data to all connected peers (channel - 0)
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="options">Send options (reliable, unreliable, etc.)</param>
+        public void SendToAll(ReadOnlySpan<byte> data, DeliveryMethod options)
+        {
+            SendToAll(data, 0, options, null);
+        }
+
+        /// <summary>
+        /// Send data to all connected peers (channel - 0)
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="options">Send options (reliable, unreliable, etc.)</param>
+        /// <param name="excludePeer">Excluded peer</param>
+        public void SendToAll(ReadOnlySpan<byte> data, DeliveryMethod options, NetPeer excludePeer)
+        {
+            SendToAll(data, 0, options, excludePeer);
+        }
+
+        /// <summary>
+        /// Send data to all connected peers
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="channelNumber">Number of channel (from 0 to channelsCount - 1)</param>
+        /// <param name="options">Send options (reliable, unreliable, etc.)</param>
+        /// <param name="excludePeer">Excluded peer</param>
+        public void SendToAll(ReadOnlySpan<byte> data, byte channelNumber, DeliveryMethod options, NetPeer excludePeer)
+        {
+            try
+            {
+                _peersLock.EnterReadLock();
+                for (var netPeer = _headPeer; netPeer != null; netPeer = netPeer.NextPeer)
+                {
+                    if (netPeer != excludePeer)
+                        netPeer.Send(data, channelNumber, options);
+                }
+            }
+            finally
+            {
+                _peersLock.ExitReadLock();
+            }
+        }
+
+        /// <summary>
+        /// Send message without connection
+        /// </summary>
+        /// <param name="message">Raw data</param>
+        /// <param name="remoteEndPoint">Packet destination</param>
+        /// <returns>Operation result</returns>
+        public bool SendUnconnectedMessage(ReadOnlySpan<byte> message, IPEndPoint remoteEndPoint)
+        {
+            int headerSize = NetPacket.GetHeaderSize(PacketProperty.UnconnectedMessage);
+            var packet = PoolGetPacket(message.Length + headerSize);
+            packet.Property = PacketProperty.UnconnectedMessage;
+            message.CopyTo(new Span<byte>(packet.RawData, headerSize, message.Length));
+            return SendRawAndRecycle(packet, remoteEndPoint) > 0;
+        }
+#endif
+
+        /// <summary>
+        /// Start logic thread and listening on available port
+        /// </summary>
+        public bool Start()
+        {
+            return Start(0);
+        }
+
+        /// <summary>
+        /// Start logic thread and listening on selected port
+        /// </summary>
+        /// <param name="addressIPv4">bind to specific ipv4 address</param>
+        /// <param name="addressIPv6">bind to specific ipv6 address</param>
+        /// <param name="port">port to listen</param>
+        public bool Start(IPAddress addressIPv4, IPAddress addressIPv6, int port)
+        {
+            return Start(addressIPv4, addressIPv6, port, false);
+        }
+
+        /// <summary>
+        /// Start logic thread and listening on selected port
+        /// </summary>
+        /// <param name="addressIPv4">bind to specific ipv4 address</param>
+        /// <param name="addressIPv6">bind to specific ipv6 address</param>
+        /// <param name="port">port to listen</param>
+        public bool Start(string addressIPv4, string addressIPv6, int port)
+        {
+            IPAddress ipv4 = NetUtils.ResolveAddress(addressIPv4);
+            IPAddress ipv6 = NetUtils.ResolveAddress(addressIPv6);
+            return Start(ipv4, ipv6, port);
+        }
+
+        /// <summary>
+        /// Start logic thread and listening on selected port
+        /// </summary>
+        /// <param name="port">port to listen</param>
+        public bool Start(int port)
+        {
+            return Start(IPAddress.Any, IPAddress.IPv6Any, port);
+        }
+
+        /// <summary>
+        /// Start in manual mode and listening on selected port
+        /// In this mode you should use ManualReceive (without PollEvents) for receive packets
+        /// and ManualUpdate(...) for update and send packets
+        /// This mode useful mostly for single-threaded servers
+        /// </summary>
+        /// <param name="addressIPv4">bind to specific ipv4 address</param>
+        /// <param name="addressIPv6">bind to specific ipv6 address</param>
+        /// <param name="port">port to listen</param>
+        public bool StartInManualMode(IPAddress addressIPv4, IPAddress addressIPv6, int port)
+        {
+            return Start(addressIPv4, addressIPv6, port, true);
+        }
+
+        /// <summary>
+        /// Start in manual mode and listening on selected port
+        /// In this mode you should use ManualReceive (without PollEvents) for receive packets
+        /// and ManualUpdate(...) for update and send packets
+        /// This mode useful mostly for single-threaded servers
+        /// </summary>
+        /// <param name="addressIPv4">bind to specific ipv4 address</param>
+        /// <param name="addressIPv6">bind to specific ipv6 address</param>
+        /// <param name="port">port to listen</param>
+        public bool StartInManualMode(string addressIPv4, string addressIPv6, int port)
+        {
+            IPAddress ipv4 = NetUtils.ResolveAddress(addressIPv4);
+            IPAddress ipv6 = NetUtils.ResolveAddress(addressIPv6);
+            return StartInManualMode(ipv4, ipv6, port);
+        }
+
+        /// <summary>
+        /// Start in manual mode and listening on selected port
+        /// In this mode you should use ManualReceive (without PollEvents) for receive packets
+        /// and ManualUpdate(...) for update and send packets
+        /// This mode useful mostly for single-threaded servers
+        /// </summary>
+        /// <param name="port">port to listen</param>
+        public bool StartInManualMode(int port)
+        {
+            return StartInManualMode(IPAddress.Any, IPAddress.IPv6Any, port);
+        }
+
+        /// <summary>
+        /// Send message without connection
+        /// </summary>
+        /// <param name="message">Raw data</param>
+        /// <param name="remoteEndPoint">Packet destination</param>
+        /// <returns>Operation result</returns>
+        public bool SendUnconnectedMessage(byte[] message, IPEndPoint remoteEndPoint)
+        {
+            return SendUnconnectedMessage(message, 0, message.Length, remoteEndPoint);
+        }
+
+        /// <summary>
+        /// Send message without connection. WARNING This method allocates a new IPEndPoint object and
+        /// synchronously makes a DNS request. If you're calling this method every frame it will be
+        /// much faster to just cache the IPEndPoint.
+        /// </summary>
+        /// <param name="writer">Data serializer</param>
+        /// <param name="address">Packet destination IP or hostname</param>
+        /// <param name="port">Packet destination port</param>
+        /// <returns>Operation result</returns>
+        public bool SendUnconnectedMessage(NetDataWriter writer, string address, int port)
+        {
+            IPEndPoint remoteEndPoint = NetUtils.MakeEndPoint(address, port);
+
+            return SendUnconnectedMessage(writer.Data, 0, writer.Length, remoteEndPoint);
+        }
+
+        /// <summary>
+        /// Send message without connection
+        /// </summary>
+        /// <param name="writer">Data serializer</param>
+        /// <param name="remoteEndPoint">Packet destination</param>
+        /// <returns>Operation result</returns>
+        public bool SendUnconnectedMessage(NetDataWriter writer, IPEndPoint remoteEndPoint)
+        {
+            return SendUnconnectedMessage(writer.Data, 0, writer.Length, remoteEndPoint);
+        }
+
+        /// <summary>
+        /// Send message without connection
+        /// </summary>
+        /// <param name="message">Raw data</param>
+        /// <param name="start">data start</param>
+        /// <param name="length">data length</param>
+        /// <param name="remoteEndPoint">Packet destination</param>
+        /// <returns>Operation result</returns>
+        public bool SendUnconnectedMessage(byte[] message, int start, int length, IPEndPoint remoteEndPoint)
+        {
+            //No need for CRC here, SendRaw does that
+            NetPacket packet = PoolGetWithData(PacketProperty.UnconnectedMessage, message, start, length);
+            return SendRawAndRecycle(packet, remoteEndPoint) > 0;
+        }
+
+        /// <summary>
+        /// Triggers update and send logic immediately (works asynchronously)
+        /// </summary>
+        public void TriggerUpdate()
+        {
+            _updateTriggerEvent.Set();
+        }
+
+        /// <summary>
+        /// Receive "maxProcessedEvents" pending events. Call this in game update code
+        /// In Manual mode it will call also socket Receive (which can be slow)
+        /// 0 - receive all events
+        /// </summary>
+        /// <param name="maxProcessedEvents">Max events that will be processed (called INetEventListener Connect/Receive/Etc), 0 - receive all events</param>
+        public void PollEvents(int maxProcessedEvents = 0)
+        {
+            if (_manualMode)
+            {
+                if (_udpSocketv4 != null)
+                    ManualReceive(_udpSocketv4, _bufferEndPointv4, maxProcessedEvents);
+                if (_udpSocketv6 != null && _udpSocketv6 != _udpSocketv4)
+                    ManualReceive(_udpSocketv6, _bufferEndPointv6, maxProcessedEvents);
+                ProcessDelayedPackets();
+                return;
+            }
+            if (UnsyncedEvents)
+                return;
+            NetEvent pendingEvent;
+            lock (_eventLock)
+            {
+                pendingEvent = _pendingEventHead;
+                _pendingEventHead = null;
+                _pendingEventTail = null;
+            }
+
+            int counter = 0;
+            while (pendingEvent != null)
+            {
+                var next = pendingEvent.Next;
+                ProcessEvent(pendingEvent);
+                pendingEvent = next;
+                counter++;
+                if (counter == maxProcessedEvents)
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Connect to remote host
+        /// </summary>
+        /// <param name="address">Server IP or hostname</param>
+        /// <param name="port">Server Port</param>
+        /// <param name="key">Connection key</param>
+        /// <returns>New NetPeer if new connection, Old NetPeer if already connected, null peer if there is ConnectionRequest awaiting</returns>
+        /// <exception cref="InvalidOperationException">Manager is not running. Call <see cref="Start()"/></exception>
+        public NetPeer Connect(string address, int port, string key)
+        {
+            return Connect(address, port, NetDataWriter.FromString(key));
+        }
+
+        /// <summary>
+        /// Connect to remote host
+        /// </summary>
+        /// <param name="address">Server IP or hostname</param>
+        /// <param name="port">Server Port</param>
+        /// <param name="connectionData">Additional data for remote peer</param>
+        /// <returns>New NetPeer if new connection, Old NetPeer if already connected, null peer if there is ConnectionRequest awaiting</returns>
+        /// <exception cref="InvalidOperationException">Manager is not running. Call <see cref="Start()"/></exception>
+        public NetPeer Connect(string address, int port, NetDataWriter connectionData)
+        {
+            IPEndPoint ep;
+            try
+            {
+                ep = NetUtils.MakeEndPoint(address, port);
+            }
+            catch
+            {
+                CreateEvent(NetEvent.EType.Disconnect, disconnectReason: DisconnectReason.UnknownHost);
+                return null;
+            }
+            return Connect(ep, connectionData);
+        }
+
+        /// <summary>
+        /// Connect to remote host
+        /// </summary>
+        /// <param name="target">Server end point (ip and port)</param>
+        /// <param name="key">Connection key</param>
+        /// <returns>New NetPeer if new connection, Old NetPeer if already connected, null peer if there is ConnectionRequest awaiting</returns>
+        /// <exception cref="InvalidOperationException">Manager is not running. Call <see cref="Start()"/></exception>
+        public NetPeer Connect(IPEndPoint target, string key)
+        {
+            return Connect(target, NetDataWriter.FromString(key));
+        }
+
+        /// <summary>
+        /// Connect to remote host
+        /// </summary>
+        /// <param name="target">Server end point (ip and port)</param>
+        /// <param name="connectionData">Additional data for remote peer</param>
+        /// <returns>New NetPeer if new connection, Old NetPeer if already connected, null peer if there is ConnectionRequest awaiting</returns>
+        /// <exception cref="InvalidOperationException">Manager is not running. Call <see cref="Start()"/></exception>
+        public NetPeer Connect(IPEndPoint target, NetDataWriter connectionData)
+        {
+            if (!IsRunning)
+                throw new InvalidOperationException("Client is not running");
+
+            lock (_requestsDict)
+            {
+                if (_requestsDict.ContainsKey(target))
+                    return null;
+
+                byte connectionNumber = 0;
+                if (TryGetPeer(target, out var peer))
+                {
+                    switch (peer.ConnectionState)
+                    {
+                        //just return already connected peer
+                        case ConnectionState.Connected:
+                        case ConnectionState.Outgoing:
+                            return peer;
+                    }
+                    //else reconnect
+                    connectionNumber = (byte)((peer.ConnectionNum + 1) % NetConstants.MaxConnectionNumber);
+                    RemovePeer(peer, true);
+                }
+
+                //Create reliable connection
+                //And send connection request
+                peer = new NetPeer(this, target, GetNextPeerId(), connectionNumber, connectionData);
+                AddPeer(peer);
+                return peer;
+            }
+        }
+
+        /// <summary>
+        /// Force closes connection and stop all threads.
+        /// </summary>
+        public void Stop()
+        {
+            Stop(true);
+        }
+
+        /// <summary>
+        /// Force closes connection and stop all threads.
+        /// </summary>
+        /// <param name="sendDisconnectMessages">Send disconnect messages</param>
+        public void Stop(bool sendDisconnectMessages)
+        {
+            if (!IsRunning)
+                return;
+            NetDebug.Write("[NM] Stop");
+
+            //Send last disconnect
+            for (var netPeer = _headPeer; netPeer != null; netPeer = netPeer.NextPeer)
+                netPeer.Shutdown(null, 0, 0, !sendDisconnectMessages);
+
+            //Stop
+            CloseSocket();
+
+#if UNITY_2018_3_OR_NEWER
+            if (_useSocketFix)
+            {
+                _pausedSocketFix.Deinitialize();
+                _pausedSocketFix = null;
+            }
+#endif
+
+            _updateTriggerEvent.Set();
+            if (!_manualMode)
+            {
+                _logicThread.Join();
+                _logicThread = null;
+            }
+
+            //clear peers
+            ClearPeerSet();
+            _peerIds = new ConcurrentQueue<int>();
+            _lastPeerId = 0;
+
+            ClearPingSimulationList();
+
+            _connectedPeersCount = 0;
+            _pendingEventHead = null;
+            _pendingEventTail = null;
+        }
+
+        [Conditional("DEBUG")]
+        private void ClearPingSimulationList()
+        {
+            lock (_pingSimulationList)
+                _pingSimulationList.Clear();
+        }
+
+        /// <summary>
+        /// Return peers count with connection state
+        /// </summary>
+        /// <param name="peerState">peer connection state (you can use as bit flags)</param>
+        /// <returns>peers count</returns>
+        public int GetPeersCount(ConnectionState peerState)
+        {
+            int count = 0;
+            _peersLock.EnterReadLock();
+            for (var netPeer = _headPeer; netPeer != null; netPeer = netPeer.NextPeer)
+            {
+                if ((netPeer.ConnectionState & peerState) != 0)
+                    count++;
+            }
+            _peersLock.ExitReadLock();
+            return count;
+        }
+
+        /// <summary>
+        /// Get copy of peers (without allocations)
+        /// </summary>
+        /// <param name="peers">List that will contain result</param>
+        /// <param name="peerState">State of peers</param>
+        public void GetPeersNonAlloc(List<NetPeer> peers, ConnectionState peerState)
+        {
+            peers.Clear();
+            _peersLock.EnterReadLock();
+            for (var netPeer = _headPeer; netPeer != null; netPeer = netPeer.NextPeer)
+            {
+                if ((netPeer.ConnectionState & peerState) != 0)
+                    peers.Add(netPeer);
+            }
+            _peersLock.ExitReadLock();
+        }
+
+        /// <summary>
+        /// Disconnect all peers without any additional data
+        /// </summary>
+        public void DisconnectAll()
+        {
+            DisconnectAll(null, 0, 0);
+        }
+
+        /// <summary>
+        /// Disconnect all peers with shutdown message
+        /// </summary>
+        /// <param name="data">Data to send (must be less or equal MTU)</param>
+        /// <param name="start">Data start</param>
+        /// <param name="count">Data count</param>
+        public void DisconnectAll(byte[] data, int start, int count)
+        {
+            //Send disconnect packets
+            _peersLock.EnterReadLock();
+            for (var netPeer = _headPeer; netPeer != null; netPeer = netPeer.NextPeer)
+            {
+                DisconnectPeer(
+                    netPeer,
+                    DisconnectReason.DisconnectPeerCalled,
+                    0,
+                    false,
+                    data,
+                    start,
+                    count,
+                    null);
+            }
+            _peersLock.ExitReadLock();
+        }
+
+        /// <summary>
+        /// Immediately disconnect peer from server without additional data
+        /// </summary>
+        /// <param name="peer">peer to disconnect</param>
+        public void DisconnectPeerForce(NetPeer peer)
+        {
+            DisconnectPeerForce(peer, DisconnectReason.DisconnectPeerCalled, 0, null);
+        }
+
+        /// <summary>
+        /// Disconnect peer from server
+        /// </summary>
+        /// <param name="peer">peer to disconnect</param>
+        public void DisconnectPeer(NetPeer peer)
+        {
+            DisconnectPeer(peer, null, 0, 0);
+        }
+
+        /// <summary>
+        /// Disconnect peer from server and send additional data (Size must be less or equal MTU - 8)
+        /// </summary>
+        /// <param name="peer">peer to disconnect</param>
+        /// <param name="data">additional data</param>
+        public void DisconnectPeer(NetPeer peer, byte[] data)
+        {
+            DisconnectPeer(peer, data, 0, data.Length);
+        }
+
+        /// <summary>
+        /// Disconnect peer from server and send additional data (Size must be less or equal MTU - 8)
+        /// </summary>
+        /// <param name="peer">peer to disconnect</param>
+        /// <param name="writer">additional data</param>
+        public void DisconnectPeer(NetPeer peer, NetDataWriter writer)
+        {
+            DisconnectPeer(peer, writer.Data, 0, writer.Length);
+        }
+
+        /// <summary>
+        /// Disconnect peer from server and send additional data (Size must be less or equal MTU - 8)
+        /// </summary>
+        /// <param name="peer">peer to disconnect</param>
+        /// <param name="data">additional data</param>
+        /// <param name="start">data start</param>
+        /// <param name="count">data length</param>
+        public void DisconnectPeer(NetPeer peer, byte[] data, int start, int count)
+        {
+            DisconnectPeer(
+                peer,
+                DisconnectReason.DisconnectPeerCalled,
+                0,
+                false,
+                data,
+                start,
+                count,
+                null);
+        }
+
+        /// <summary>
+        /// Create the requests for NTP server
+        /// </summary>
+        /// <param name="endPoint">NTP Server address.</param>
+        public void CreateNtpRequest(IPEndPoint endPoint)
+        {
+            _ntpRequests.TryAdd(endPoint, new NtpRequest(endPoint));
+        }
+
+        /// <summary>
+        /// Create the requests for NTP server
+        /// </summary>
+        /// <param name="ntpServerAddress">NTP Server address.</param>
+        /// <param name="port">port</param>
+        public void CreateNtpRequest(string ntpServerAddress, int port)
+        {
+            IPEndPoint endPoint = NetUtils.MakeEndPoint(ntpServerAddress, port);
+            _ntpRequests.TryAdd(endPoint, new NtpRequest(endPoint));
+        }
+
+        /// <summary>
+        /// Create the requests for NTP server (default port)
+        /// </summary>
+        /// <param name="ntpServerAddress">NTP Server address.</param>
+        public void CreateNtpRequest(string ntpServerAddress)
+        {
+            IPEndPoint endPoint = NetUtils.MakeEndPoint(ntpServerAddress, NtpRequest.DefaultPort);
+            _ntpRequests.TryAdd(endPoint, new NtpRequest(endPoint));
+        }
+
+        public NetPeerEnumerator GetEnumerator()
+        {
+            return new NetPeerEnumerator(_headPeer);
+        }
+
+        IEnumerator<NetPeer> IEnumerable<NetPeer>.GetEnumerator()
+        {
+            return new NetPeerEnumerator(_headPeer);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return new NetPeerEnumerator(_headPeer);
+        }
+    }
+}
+
+#endregion
+
+
+#region NetManager.HashSet.cs
+
+namespace LiteNetLib
+{
+    using System;
+    using System.Net;
+    using System.Threading;
+
+    //minimal hashset class from dotnet with some optimizations
+    public partial class NetManager
+    {
+        private const int MaxPrimeArrayLength = 0x7FFFFFC3;
+        private const int HashPrime = 101;
+        private const int Lower31BitMask = 0x7FFFFFFF;
+        private static readonly int[] Primes =
+        {
+            3, 7, 11, 17, 23, 29, 37, 47, 59, 71, 89, 107, 131, 163, 197, 239, 293, 353, 431, 521, 631, 761, 919,
+            1103, 1327, 1597, 1931, 2333, 2801, 3371, 4049, 4861, 5839, 7013, 8419, 10103, 12143, 14591,
+            17519, 21023, 25229, 30293, 36353, 43627, 52361, 62851, 75431, 90523, 108631, 130363, 156437,
+            187751, 225307, 270371, 324449, 389357, 467237, 560689, 672827, 807403, 968897, 1162687, 1395263,
+            1674319, 2009191, 2411033, 2893249, 3471899, 4166287, 4999559, 5999471, 7199369
+        };
+
+        private static int HashSetGetPrime(int min)
+        {
+            foreach (int prime in Primes)
+            {
+                if (prime >= min)
+                    return prime;
+            }
+
+            // Outside of our predefined table. Compute the hard way.
+            for (int i = (min | 1); i < int.MaxValue; i += 2)
+            {
+                if (IsPrime(i) && ((i - 1) % HashPrime != 0))
+                    return i;
+            }
+            return min;
+
+            bool IsPrime(int candidate)
+            {
+                if ((candidate & 1) != 0)
+                {
+                    int limit = (int)Math.Sqrt(candidate);
+                    for (int divisor = 3; divisor <= limit; divisor += 2)
+                    {
+                        if (candidate % divisor == 0)
+                            return false;
+                    }
+                    return true;
+                }
+                return candidate == 2;
+            }
+        }
+
+        private struct Slot
+        {
+            internal int HashCode;
+            internal int Next;
+            internal NetPeer Value;
+        }
+
+        private int[] _buckets;
+        private Slot[] _slots;
+        private int _count;
+        private int _lastIndex;
+        private int _freeList = -1;
+        private NetPeer[] _peersArray = new NetPeer[32];
+        private readonly ReaderWriterLockSlim _peersLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+        private volatile NetPeer _headPeer;
+
+        private void ClearPeerSet()
+        {
+            _peersLock.EnterWriteLock();
+            _headPeer = null;
+            if (_lastIndex > 0)
+            {
+                Array.Clear(_slots, 0, _lastIndex);
+                Array.Clear(_buckets, 0, _buckets.Length);
+                _lastIndex = 0;
+                _count = 0;
+                _freeList = -1;
+            }
+            _peersArray = new NetPeer[32];
+            _peersLock.ExitWriteLock();
+        }
+
+        private bool ContainsPeer(NetPeer item)
+        {
+            if (item == null)
+            {
+                NetDebug.WriteError($"Contains peer null: {item}");
+                return false;
+            }
+            if (_buckets != null)
+            {
+                int hashCode = item.GetHashCode() & Lower31BitMask;
+                for (int i = _buckets[hashCode % _buckets.Length] - 1; i >= 0; i = _slots[i].Next)
+                {
+                    if (_slots[i].HashCode == hashCode && _slots[i].Value.Equals(item))
+                        return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Gets peer by peer id
+        /// </summary>
+        /// <param name="id">id of peer</param>
+        /// <returns>Peer if peer with id exist, otherwise null</returns>
+        public NetPeer GetPeerById(int id)
+        {
+            return id >= 0 && id < _peersArray.Length ? _peersArray[id] : null;
+        }
+
+        /// <summary>
+        /// Gets peer by peer id
+        /// </summary>
+        /// <param name="id">id of peer</param>
+        /// <param name="peer">resulting peer</param>
+        /// <returns>True if peer with id exist, otherwise false</returns>
+        public bool TryGetPeerById(int id, out NetPeer peer)
+        {
+            peer = GetPeerById(id);
+            return peer != null;
+        }
+
+        private void AddPeer(NetPeer peer)
+        {
+            if (peer == null)
+            {
+                NetDebug.WriteError($"Add peer null: {peer}");
+                return;
+            }
+            _peersLock.EnterWriteLock();
+            if (_headPeer != null)
+            {
+                peer.NextPeer = _headPeer;
+                _headPeer.PrevPeer = peer;
+            }
+            _headPeer = peer;
+            AddPeerToSet(peer);
+            if (peer.Id >= _peersArray.Length)
+            {
+                int newSize = _peersArray.Length * 2;
+                while (peer.Id >= newSize)
+                    newSize *= 2;
+                Array.Resize(ref _peersArray, newSize);
+            }
+            _peersArray[peer.Id] = peer;
+            _peersLock.ExitWriteLock();
+        }
+
+        private void RemovePeer(NetPeer peer, bool enableWriteLock)
+        {
+            if(enableWriteLock)
+                _peersLock.EnterWriteLock();
+            if (!RemovePeerFromSet(peer))
+            {
+                if(enableWriteLock)
+                    _peersLock.ExitWriteLock();
+                return;
+            }
+            if (peer == _headPeer)
+                _headPeer = peer.NextPeer;
+
+            if (peer.PrevPeer != null)
+                peer.PrevPeer.NextPeer = peer.NextPeer;
+            if (peer.NextPeer != null)
+                peer.NextPeer.PrevPeer = peer.PrevPeer;
+            peer.PrevPeer = null;
+
+            _peersArray[peer.Id] = null;
+            _peerIds.Enqueue(peer.Id);
+
+            if(enableWriteLock)
+                _peersLock.ExitWriteLock();
+        }
+
+        private bool RemovePeerFromSet(NetPeer peer)
+        {
+            if (_buckets == null || peer == null)
+                return false;
+            int hashCode = peer.GetHashCode() & Lower31BitMask;
+            int bucket = hashCode % _buckets.Length;
+            int last = -1;
+            for (int i = _buckets[bucket] - 1; i >= 0; last = i, i = _slots[i].Next)
+            {
+                if (_slots[i].HashCode == hashCode && _slots[i].Value.Equals(peer))
+                {
+                    if (last < 0)
+                        _buckets[bucket] = _slots[i].Next + 1;
+                    else
+                        _slots[last].Next = _slots[i].Next;
+                    _slots[i].HashCode = -1;
+                    _slots[i].Value = null;
+                    _slots[i].Next = _freeList;
+
+                    _count--;
+                    if (_count == 0)
+                    {
+                        _lastIndex = 0;
+                        _freeList = -1;
+                    }
+                    else
+                    {
+                        _freeList = i;
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool TryGetPeer(IPEndPoint endPoint, out NetPeer actualValue)
+        {
+            if (_buckets != null)
+            {
+#if NET8_0_OR_GREATER
+                //can be NetPeer or IPEndPoint
+                int hashCode = (UseNativeSockets ? endPoint.GetHashCode() : endPoint.Serialize().GetHashCode()) & Lower31BitMask;
+#else
+                int hashCode = endPoint.GetHashCode() & Lower31BitMask;
+#endif
+                _peersLock.EnterReadLock();
+                for (int i = _buckets[hashCode % _buckets.Length] - 1; i >= 0; i = _slots[i].Next)
+                {
+                    if (_slots[i].HashCode == hashCode && _slots[i].Value.Equals(endPoint))
+                    {
+                        actualValue = _slots[i].Value;
+                        _peersLock.ExitReadLock();
+                        return true;
+                    }
+                }
+                _peersLock.ExitReadLock();
+            }
+            actualValue = null;
+            return false;
+        }
+
+        //only used for NET8
+        private bool TryGetPeer(SocketAddress saddr, out NetPeer actualValue)
+        {
+            if (_buckets != null)
+            {
+                int hashCode = saddr.GetHashCode() & Lower31BitMask;
+                _peersLock.EnterReadLock();
+                for (int i = _buckets[hashCode % _buckets.Length] - 1; i >= 0; i = _slots[i].Next)
+                {
+                    if (_slots[i].HashCode == hashCode && _slots[i].Value.Serialize().Equals(saddr))
+                    {
+                        actualValue = _slots[i].Value;
+                        _peersLock.ExitReadLock();
+                        return true;
+                    }
+                }
+                _peersLock.ExitReadLock();
+            }
+            actualValue = null;
+            return false;
+        }
+
+        private bool AddPeerToSet(NetPeer value)
+        {
+            if (_buckets == null)
+            {
+                int size = HashSetGetPrime(0);
+                _buckets = new int[size];
+                _slots = new Slot[size];
+            }
+
+            int hashCode = value.GetHashCode() & Lower31BitMask;
+            int bucket = hashCode % _buckets.Length;
+            for (int i = _buckets[hashCode % _buckets.Length] - 1; i >= 0; i = _slots[i].Next)
+            {
+                if (_slots[i].HashCode == hashCode && _slots[i].Value.Equals(value))
+                    return false;
+            }
+
+            int index;
+            if (_freeList >= 0)
+            {
+                index = _freeList;
+                _freeList = _slots[index].Next;
+            }
+            else
+            {
+                if (_lastIndex == _slots.Length)
+                {
+                    //increase capacity
+                    int newSize = 2 * _count;
+                    newSize = (uint)newSize > MaxPrimeArrayLength && MaxPrimeArrayLength > _count
+                        ? MaxPrimeArrayLength
+                        : HashSetGetPrime(newSize);
+
+                    // Able to increase capacity; copy elements to larger array and rehash
+                    Slot[] newSlots = new Slot[newSize];
+                    Array.Copy(_slots, 0, newSlots, 0, _lastIndex);
+                    _buckets = new int[newSize];
+                    for (int i = 0; i < _lastIndex; i++)
+                    {
+                        int b = newSlots[i].HashCode % newSize;
+                        newSlots[i].Next = _buckets[b] - 1;
+                        _buckets[b] = i + 1;
+                    }
+                    _slots = newSlots;
+                    // this will change during resize
+                    bucket = hashCode % _buckets.Length;
+                }
+                index = _lastIndex;
+                _lastIndex++;
+            }
+            _slots[index].HashCode = hashCode;
+            _slots[index].Value = value;
+            _slots[index].Next = _buckets[bucket] - 1;
+            _buckets[bucket] = index + 1;
+            _count++;
+
+            return true;
+        }
+    }
+
+}
+
+#endregion
+
+
+#region NetManager.PacketPool.cs
+
+namespace LiteNetLib
+{
+    using System;
+
+    public partial class NetManager
+    {
+        private NetPacket _poolHead;
+        private int _poolCount;
+        private readonly object _poolLock = new object();
+
+        /// <summary>
+        /// Maximum packet pool size (increase if you have tons of packets sending)
+        /// </summary>
+        public int PacketPoolSize = 1000;
+
+        public int PoolCount => _poolCount;
+        
+        private NetPacket PoolGetWithData(PacketProperty property, byte[] data, int start, int length)
+        {
+            int headerSize = NetPacket.GetHeaderSize(property);
+            NetPacket packet = PoolGetPacket(length + headerSize);
+            packet.Property = property;
+            Buffer.BlockCopy(data, start, packet.RawData, headerSize, length);
+            return packet;
+        }
+
+        //Get packet with size
+        private NetPacket PoolGetWithProperty(PacketProperty property, int size)
+        {
+            NetPacket packet = PoolGetPacket(size + NetPacket.GetHeaderSize(property));
+            packet.Property = property;
+            return packet;
+        }
+
+        private NetPacket PoolGetWithProperty(PacketProperty property)
+        {
+            NetPacket packet = PoolGetPacket(NetPacket.GetHeaderSize(property));
+            packet.Property = property;
+            return packet;
+        }
+
+        internal NetPacket PoolGetPacket(int size)
+        {
+            if (size > NetConstants.MaxPacketSize)
+                return new NetPacket(size);
+
+            NetPacket packet;
+            lock (_poolLock)
+            {
+                packet = _poolHead;
+                if (packet == null)
+                    return new NetPacket(size);
+                
+                _poolHead = _poolHead.Next;
+                _poolCount--;
+            }
+            
+            packet.Size = size;
+            if (packet.RawData.Length < size)
+                packet.RawData = new byte[size];
+            return packet;
+        }
+
+        internal void PoolRecycle(NetPacket packet)
+        {
+            if (packet.RawData.Length > NetConstants.MaxPacketSize || _poolCount >= PacketPoolSize)
+            {
+                //Don't pool big packets. Save memory
+                return;
+            }
+            
+            //Clean fragmented flag
+            packet.RawData[0] = 0;
+            lock (_poolLock)
+            {
+                packet.Next = _poolHead;
+                _poolHead = packet;
+                _poolCount++;
+            }
+        }
+    }
+}
+
+#endregion
+
+
+#region NetManager.Socket.cs
+
+namespace LiteNetLib
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Runtime.InteropServices;
+    using System.Threading;
+    using Utils;
+
+    public partial class NetManager
+    {
+        private const int ReceivePollingTime = 500000; //0.5 second
+
+        private Socket _udpSocketv4;
+        private Socket _udpSocketv6;
+        private Thread _receiveThread;
+        private IPEndPoint _bufferEndPointv4;
+        private IPEndPoint _bufferEndPointv6;
+#if UNITY_2018_3_OR_NEWER
+        private PausedSocketFix _pausedSocketFix;
+        private bool _useSocketFix;
+#endif
+
+#if NET8_0_OR_GREATER
+        private readonly SocketAddress _sockAddrCacheV4 = new SocketAddress(AddressFamily.InterNetwork);
+        private readonly SocketAddress _sockAddrCacheV6 = new SocketAddress(AddressFamily.InterNetworkV6);
+#endif
+
+        private const int SioUdpConnreset = -1744830452; //SIO_UDP_CONNRESET = IOC_IN | IOC_VENDOR | 12
+        private static readonly IPAddress MulticastAddressV6 = IPAddress.Parse("ff02::1");
+        public static readonly bool IPv6Support;
+
+        // special case in iOS (and possibly android that should be resolved in unity)
+        internal bool NotConnected;
+
+        public short Ttl
+        {
+            get
+            {
+#if UNITY_SWITCH
+                return 0;
+#else
+                return _udpSocketv4.Ttl;
+#endif
+            }
+            internal set
+            {
+#if !UNITY_SWITCH
+                _udpSocketv4.Ttl = value;
+#endif
+            }
+        }
+
+        static NetManager()
+        {
+#if DISABLE_IPV6
+            IPv6Support = false;
+#elif !UNITY_2019_1_OR_NEWER && !UNITY_2018_4_OR_NEWER && (!UNITY_EDITOR && ENABLE_IL2CPP)
+            string version = UnityEngine.Application.unityVersion;
+            IPv6Support = Socket.OSSupportsIPv6 && int.Parse(version.Remove(version.IndexOf('f')).Split('.')[2]) >= 6;
+#else
+            IPv6Support = Socket.OSSupportsIPv6;
+#endif
+        }
+
+        private bool ProcessError(SocketException ex)
+        {
+            switch (ex.SocketErrorCode)
+            {
+                case SocketError.NotConnected:
+                    NotConnected = true;
+                    return true;
+                case SocketError.Interrupted:
+                case SocketError.NotSocket:
+                case SocketError.OperationAborted:
+                    return true;
+                case SocketError.ConnectionReset:
+                case SocketError.MessageSize:
+                case SocketError.TimedOut:
+                case SocketError.NetworkReset:
+                case SocketError.WouldBlock:
+                    //NetDebug.Write($"[R]Ignored error: {(int)ex.SocketErrorCode} - {ex}");
+                    break;
+                default:
+                    NetDebug.WriteError($"[R]Error code: {(int)ex.SocketErrorCode} - {ex}");
+                    CreateEvent(NetEvent.EType.Error, errorCode: ex.SocketErrorCode);
+                    break;
+            }
+            return false;
+        }
+
+        private void ManualReceive(Socket socket, EndPoint bufferEndPoint, int maxReceive)
+        {
+            //Reading data
+            try
+            {
+                int packetsReceived = 0;
+                while (socket.Available > 0)
+                {
+                    ReceiveFrom(socket, ref bufferEndPoint);
+                    packetsReceived++;
+                    if (packetsReceived == maxReceive)
+                        break;
+                }
+            }
+            catch (SocketException ex)
+            {
+                ProcessError(ex);
+            }
+            catch (ObjectDisposedException)
+            {
+
+            }
+            catch (Exception e)
+            {
+                //protects socket receive thread
+                NetDebug.WriteError("[NM] SocketReceiveThread error: " + e);
+            }
+        }
+
+        private void NativeReceiveLogic()
+        {
+            IntPtr socketHandle4 = _udpSocketv4.Handle;
+            IntPtr socketHandle6 = _udpSocketv6?.Handle ?? IntPtr.Zero;
+            byte[] addrBuffer4 = new byte[NativeSocket.IPv4AddrSize];
+            byte[] addrBuffer6 = new byte[NativeSocket.IPv6AddrSize];
+            var tempEndPoint = new IPEndPoint(IPAddress.Any, 0);
+            var selectReadList = new List<Socket>(2);
+            var socketv4 = _udpSocketv4;
+            var socketV6 = _udpSocketv6;
+            var packet = PoolGetPacket(NetConstants.MaxPacketSize);
+
+            while (IsRunning)
+            {
+                try
+                {
+                    if (socketV6 == null)
+                    {
+                        if (NativeReceiveFrom(socketHandle4, addrBuffer4) == false)
+                            return;
+                        continue;
+                    }
+                    bool messageReceived = false;
+                    if (socketv4.Available != 0 || selectReadList.Contains(socketv4))
+                    {
+                        if (NativeReceiveFrom(socketHandle4, addrBuffer4) == false)
+                            return;
+                        messageReceived = true;
+                    }
+                    if (socketV6.Available != 0 || selectReadList.Contains(socketV6))
+                    {
+                        if (NativeReceiveFrom(socketHandle6, addrBuffer6) == false)
+                            return;
+                        messageReceived = true;
+                    }
+
+                    selectReadList.Clear();
+
+                    if (messageReceived)
+                        continue;
+
+                    selectReadList.Add(socketv4);
+                    selectReadList.Add(socketV6);
+
+                    Socket.Select(selectReadList, null, null, ReceivePollingTime);
+                }
+                catch (SocketException ex)
+                {
+                    if (ProcessError(ex))
+                        return;
+                }
+                catch (ObjectDisposedException)
+                {
+                    //socket closed
+                    return;
+                }
+                catch (ThreadAbortException)
+                {
+                    //thread closed
+                    return;
+                }
+                catch (Exception e)
+                {
+                    //protects socket receive thread
+                    NetDebug.WriteError("[NM] SocketReceiveThread error: " + e);
+                }
+            }
+
+            bool NativeReceiveFrom(IntPtr s, byte[] address)
+            {
+                int addrSize = address.Length;
+                packet.Size = NativeSocket.RecvFrom(s, packet.RawData, NetConstants.MaxPacketSize, address, ref addrSize);
+                if (packet.Size == 0)
+                    return true; //socket closed or empty packet
+
+                if (packet.Size == -1)
+                {
+                    //Linux timeout EAGAIN
+                    return ProcessError(new SocketException((int)NativeSocket.GetSocketError())) == false;
+                }
+
+                //NetDebug.WriteForce($"[R]Received data from {endPoint}, result: {packet.Size}");
+                //refresh temp Addr/Port
+                short family = (short)((address[1] << 8) | address[0]);
+                tempEndPoint.Port = (ushort)((address[2] << 8) | address[3]);
+                if ((NativeSocket.UnixMode && family == NativeSocket.AF_INET6) || (!NativeSocket.UnixMode && (AddressFamily)family == AddressFamily.InterNetworkV6))
+                {
+                    uint scope = unchecked((uint)(
+                        (address[27] << 24) +
+                        (address[26] << 16) +
+                        (address[25] << 8) +
+                        (address[24])));
+#if NETCOREAPP || NETSTANDARD2_1 || NETSTANDARD2_1_OR_GREATER
+                    tempEndPoint.Address = new IPAddress(new ReadOnlySpan<byte>(address, 8, 16), scope);
+#else
+                    byte[] addrBuffer = new byte[16];
+                    Buffer.BlockCopy(address, 8, addrBuffer, 0, 16);
+                    tempEndPoint.Address = new IPAddress(addrBuffer, scope);
+#endif
+                }
+                else //IPv4
+                {
+                    long ipv4Addr = unchecked((uint)((address[4] & 0x000000FF) |
+                                                     (address[5] << 8 & 0x0000FF00) |
+                                                     (address[6] << 16 & 0x00FF0000) |
+                                                     (address[7] << 24)));
+                    tempEndPoint.Address = new IPAddress(ipv4Addr);
+                }
+
+                if (TryGetPeer(tempEndPoint, out var peer))
+                {
+                    //use cached native ep
+                    OnMessageReceived(packet, peer);
+                }
+                else
+                {
+                    OnMessageReceived(packet, tempEndPoint);
+                    tempEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                }
+                packet = PoolGetPacket(NetConstants.MaxPacketSize);
+                return true;
+            }
+        }
+
+        private void ReceiveFrom(Socket s, ref EndPoint bufferEndPoint)
+        {
+            var packet = PoolGetPacket(NetConstants.MaxPacketSize);
+#if NET8_0_OR_GREATER
+            var sockAddr = s.AddressFamily == AddressFamily.InterNetwork ? _sockAddrCacheV4 : _sockAddrCacheV6;
+            packet.Size = s.ReceiveFrom(packet, SocketFlags.None, sockAddr);
+            OnMessageReceived(packet, TryGetPeer(sockAddr, out var peer) ? peer : (IPEndPoint)bufferEndPoint.Create(sockAddr));
+#else
+            packet.Size = s.ReceiveFrom(packet.RawData, 0, NetConstants.MaxPacketSize, SocketFlags.None, ref bufferEndPoint);
+            OnMessageReceived(packet, (IPEndPoint)bufferEndPoint);
+#endif
+        }
+
+        private void ReceiveLogic()
+        {
+            EndPoint bufferEndPoint4 = new IPEndPoint(IPAddress.Any, 0);
+            EndPoint bufferEndPoint6 = new IPEndPoint(IPAddress.IPv6Any, 0);
+            var selectReadList = new List<Socket>(2);
+            var socketv4 = _udpSocketv4;
+            var socketV6 = _udpSocketv6;
+
+            while (IsRunning)
+            {
+                //Reading data
+                try
+                {
+                    if (socketV6 == null)
+                    {
+                        if (socketv4.Available == 0 && !socketv4.Poll(ReceivePollingTime, SelectMode.SelectRead))
+                            continue;
+                        ReceiveFrom(socketv4, ref bufferEndPoint4);
+                    }
+                    else
+                    {
+                        bool messageReceived = false;
+                        if (socketv4.Available != 0 || selectReadList.Contains(socketv4))
+                        {
+                            ReceiveFrom(socketv4, ref bufferEndPoint4);
+                            messageReceived = true;
+                        }
+                        if (socketV6.Available != 0 || selectReadList.Contains(socketV6))
+                        {
+                            ReceiveFrom(socketV6, ref bufferEndPoint6);
+                            messageReceived = true;
+                        }
+
+                        selectReadList.Clear();
+
+                        if (messageReceived)
+                            continue;
+
+                        selectReadList.Add(socketv4);
+                        selectReadList.Add(socketV6);
+                        Socket.Select(selectReadList, null, null, ReceivePollingTime);
+                    }
+                    //NetDebug.Write(NetLogLevel.Trace, $"[R]Received data from {bufferEndPoint}, result: {packet.Size}");
+                }
+                catch (SocketException ex)
+                {
+                    if (ProcessError(ex))
+                        return;
+                }
+                catch (ObjectDisposedException)
+                {
+                    //socket closed
+                    return;
+                }
+                catch (ThreadAbortException)
+                {
+                    //thread closed
+                    return;
+                }
+                catch (Exception e)
+                {
+                    //protects socket receive thread
+                    NetDebug.WriteError("[NM] SocketReceiveThread error: " + e);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Start logic thread and listening on selected port
+        /// </summary>
+        /// <param name="addressIPv4">bind to specific ipv4 address</param>
+        /// <param name="addressIPv6">bind to specific ipv6 address</param>
+        /// <param name="port">port to listen</param>
+        /// <param name="manualMode">mode of library</param>
+        public bool Start(IPAddress addressIPv4, IPAddress addressIPv6, int port, bool manualMode)
+        {
+            if (IsRunning && NotConnected == false)
+                return false;
+
+            NotConnected = false;
+            _manualMode = manualMode;
+            UseNativeSockets = UseNativeSockets && NativeSocket.IsSupported;
+            _udpSocketv4 = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            if (!BindSocket(_udpSocketv4, new IPEndPoint(addressIPv4, port)))
+                return false;
+
+            LocalPort = ((IPEndPoint)_udpSocketv4.LocalEndPoint).Port;
+
+#if UNITY_2018_3_OR_NEWER
+            if (_useSocketFix && _pausedSocketFix == null)
+                _pausedSocketFix = new PausedSocketFix(this, addressIPv4, addressIPv6, port, manualMode);
+#endif
+
+            IsRunning = true;
+            if (_manualMode)
+            {
+                _bufferEndPointv4 = new IPEndPoint(IPAddress.Any, 0);
+            }
+
+            //Check IPv6 support
+            if (IPv6Support && IPv6Enabled)
+            {
+                _udpSocketv6 = new Socket(AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp);
+                //Use one port for two sockets
+                if (BindSocket(_udpSocketv6, new IPEndPoint(addressIPv6, LocalPort)))
+                {
+                    if (_manualMode)
+                        _bufferEndPointv6 = new IPEndPoint(IPAddress.IPv6Any, 0);
+                }
+                else
+                {
+                    _udpSocketv6 = null;
+                }
+            }
+
+            if (!manualMode)
+            {
+                ThreadStart ts = ReceiveLogic;
+                if (UseNativeSockets)
+                    ts = NativeReceiveLogic;
+                _receiveThread = new Thread(ts)
+                {
+                    Name = $"ReceiveThread({LocalPort})",
+                    IsBackground = true
+                };
+                _receiveThread.Start();
+                if (_logicThread == null)
+                {
+                    _logicThread = new Thread(UpdateLogic) { Name = "LogicThread", IsBackground = true };
+                    _logicThread.Start();
+                }
+            }
+
+            return true;
+        }
+
+        private bool BindSocket(Socket socket, IPEndPoint ep)
+        {
+            //Setup socket
+            socket.ReceiveTimeout = 500;
+            socket.SendTimeout = 500;
+            socket.ReceiveBufferSize = NetConstants.SocketBufferSize;
+            socket.SendBufferSize = NetConstants.SocketBufferSize;
+            socket.Blocking = true;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                try
+                {
+                    socket.IOControl(SioUdpConnreset, new byte[] { 0 }, null);
+                }
+                catch
+                {
+                    //ignored
+                }
+            }
+
+            try
+            {
+                socket.ExclusiveAddressUse = !ReuseAddress;
+                socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, ReuseAddress);
+                socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontRoute, DontRoute);
+            }
+            catch
+            {
+                //Unity with IL2CPP throws an exception here, it doesn't matter in most cases so just ignore it
+            }
+            if (ep.AddressFamily == AddressFamily.InterNetwork)
+            {
+                Ttl = NetConstants.SocketTTL;
+
+                try { socket.EnableBroadcast = true; }
+                catch (SocketException e)
+                {
+                    NetDebug.WriteError($"[B]Broadcast error: {e.SocketErrorCode}");
+                }
+
+                if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    try { socket.DontFragment = true; }
+                    catch (SocketException e)
+                    {
+                        NetDebug.WriteError($"[B]DontFragment error: {e.SocketErrorCode}");
+                    }
+                }
+            }
+            //Bind
+            try
+            {
+                socket.Bind(ep);
+                NetDebug.Write(NetLogLevel.Trace, $"[B]Successfully binded to port: {((IPEndPoint)socket.LocalEndPoint).Port}, AF: {socket.AddressFamily}");
+
+                //join multicast
+                if (ep.AddressFamily == AddressFamily.InterNetworkV6)
+                {
+                    try
+                    {
+#if !UNITY_2018_3_OR_NEWER
+                        socket.SetSocketOption(
+                            SocketOptionLevel.IPv6,
+                            SocketOptionName.AddMembership,
+                            new IPv6MulticastOption(MulticastAddressV6));
+#endif
+                    }
+                    catch (Exception)
+                    {
+                        // Unity3d throws exception - ignored
+                    }
+                }
+            }
+            catch (SocketException bindException)
+            {
+                switch (bindException.SocketErrorCode)
+                {
+                    //IPv6 bind fix
+                    case SocketError.AddressAlreadyInUse:
+                        if (socket.AddressFamily == AddressFamily.InterNetworkV6)
+                        {
+                            try
+                            {
+                                //Set IPv6Only
+                                socket.DualMode = false;
+                                socket.Bind(ep);
+                            }
+                            catch (SocketException ex)
+                            {
+                                //because its fixed in 2018_3
+                                NetDebug.WriteError($"[B]Bind exception: {ex}, errorCode: {ex.SocketErrorCode}");
+                                return false;
+                            }
+                            return true;
+                        }
+                        break;
+                    //hack for iOS (Unity3D)
+                    case SocketError.AddressFamilyNotSupported:
+                        return true;
+                }
+                NetDebug.WriteError($"[B]Bind exception: {bindException}, errorCode: {bindException.SocketErrorCode}");
+                return false;
+            }
+            return true;
+        }
+
+        internal int SendRawAndRecycle(NetPacket packet, IPEndPoint remoteEndPoint)
+        {
+            int result = SendRaw(packet.RawData, 0, packet.Size, remoteEndPoint);
+            PoolRecycle(packet);
+            return result;
+        }
+
+        internal int SendRaw(NetPacket packet, IPEndPoint remoteEndPoint)
+        {
+            return SendRaw(packet.RawData, 0, packet.Size, remoteEndPoint);
+        }
+
+        internal int SendRaw(byte[] message, int start, int length, IPEndPoint remoteEndPoint)
+        {
+            if (!IsRunning)
+                return 0;
+
+            NetPacket expandedPacket = null;
+            if (_extraPacketLayer != null)
+            {
+                expandedPacket = PoolGetPacket(length + _extraPacketLayer.ExtraPacketSizeForLayer);
+                Buffer.BlockCopy(message, start, expandedPacket.RawData, 0, length);
+                start = 0;
+                _extraPacketLayer.ProcessOutBoundPacket(ref remoteEndPoint, ref expandedPacket.RawData, ref start, ref length);
+                message = expandedPacket.RawData;
+            }
+
+            var socket = _udpSocketv4;
+            if (remoteEndPoint.AddressFamily == AddressFamily.InterNetworkV6 && IPv6Support)
+            {
+                socket = _udpSocketv6;
+                if (socket == null)
+                    return 0;
+            }
+
+            int result;
+            try
+            {
+                if (UseNativeSockets && remoteEndPoint is NetPeer peer)
+                {
+                    unsafe
+                    {
+                        fixed (byte* dataWithOffset = &message[start])
+                            result = NativeSocket.SendTo(socket.Handle, dataWithOffset, length, peer.NativeAddress, peer.NativeAddress.Length);
+                    }
+                    if (result == -1)
+                        throw NativeSocket.GetSocketException();
+                }
+                else
+                {
+#if NET8_0_OR_GREATER
+                    result = socket.SendTo(new ReadOnlySpan<byte>(message, start, length), SocketFlags.None, remoteEndPoint.Serialize());
+#else
+                    result = socket.SendTo(message, start, length, SocketFlags.None, remoteEndPoint);
+#endif
+                }
+                //NetDebug.WriteForce("[S]Send packet to {0}, result: {1}", remoteEndPoint, result);
+            }
+            catch (SocketException ex)
+            {
+                switch (ex.SocketErrorCode)
+                {
+                    case SocketError.NoBufferSpaceAvailable:
+                    case SocketError.Interrupted:
+                        return 0;
+                    case SocketError.MessageSize:
+                        NetDebug.Write(NetLogLevel.Trace, $"[SRD] 10040, datalen: {length}");
+                        return 0;
+
+                    case SocketError.HostUnreachable:
+                    case SocketError.NetworkUnreachable:
+                        if (DisconnectOnUnreachable && remoteEndPoint is NetPeer peer)
+                        {
+                            DisconnectPeerForce(
+                                peer,
+                                ex.SocketErrorCode == SocketError.HostUnreachable
+                                    ? DisconnectReason.HostUnreachable
+                                    : DisconnectReason.NetworkUnreachable,
+                                ex.SocketErrorCode,
+                                null);
+                        }
+
+                        CreateEvent(NetEvent.EType.Error, remoteEndPoint: remoteEndPoint, errorCode: ex.SocketErrorCode);
+                        return -1;
+
+                    case SocketError.Shutdown:
+                        CreateEvent(NetEvent.EType.Error, remoteEndPoint: remoteEndPoint, errorCode: ex.SocketErrorCode);
+                        return -1;
+
+                    default:
+                        NetDebug.WriteError($"[S] {ex}");
+                        return -1;
+                }
+            }
+            catch (Exception ex)
+            {
+                NetDebug.WriteError($"[S] {ex}");
+                return 0;
+            }
+            finally
+            {
+                if (expandedPacket != null)
+                    PoolRecycle(expandedPacket);
+            }
+
+            if (result <= 0)
+                return 0;
+
+            if (EnableStatistics)
+            {
+                Statistics.IncrementPacketsSent();
+                Statistics.AddBytesSent(length);
+            }
+
+            return result;
+        }
+
+        public bool SendBroadcast(NetDataWriter writer, int port)
+        {
+            return SendBroadcast(writer.Data, 0, writer.Length, port);
+        }
+
+        public bool SendBroadcast(byte[] data, int port)
+        {
+            return SendBroadcast(data, 0, data.Length, port);
+        }
+
+        public bool SendBroadcast(byte[] data, int start, int length, int port)
+        {
+            if (!IsRunning)
+                return false;
+
+            NetPacket packet;
+            if (_extraPacketLayer != null)
+            {
+                var headerSize = NetPacket.GetHeaderSize(PacketProperty.Broadcast);
+                packet = PoolGetPacket(headerSize + length + _extraPacketLayer.ExtraPacketSizeForLayer);
+                packet.Property = PacketProperty.Broadcast;
+                Buffer.BlockCopy(data, start, packet.RawData, headerSize, length);
+                var checksumComputeStart = 0;
+                int preCrcLength = length + headerSize;
+                IPEndPoint emptyEp = null;
+                _extraPacketLayer.ProcessOutBoundPacket(ref emptyEp, ref packet.RawData, ref checksumComputeStart, ref preCrcLength);
+            }
+            else
+            {
+                packet = PoolGetWithData(PacketProperty.Broadcast, data, start, length);
+            }
+
+            bool broadcastSuccess = false;
+            bool multicastSuccess = false;
+            try
+            {
+                broadcastSuccess = _udpSocketv4.SendTo(
+                    packet.RawData,
+                    0,
+                    packet.Size,
+                    SocketFlags.None,
+                    new IPEndPoint(IPAddress.Broadcast, port)) > 0;
+
+                if (_udpSocketv6 != null)
+                {
+                    multicastSuccess = _udpSocketv6.SendTo(
+                        packet.RawData,
+                        0,
+                        packet.Size,
+                        SocketFlags.None,
+                        new IPEndPoint(MulticastAddressV6, port)) > 0;
+                }
+            }
+            catch (SocketException ex)
+            {
+                if (ex.SocketErrorCode == SocketError.HostUnreachable)
+                    return broadcastSuccess;
+                NetDebug.WriteError($"[S][MCAST] {ex}");
+                return broadcastSuccess;
+            }
+            catch (Exception ex)
+            {
+                NetDebug.WriteError($"[S][MCAST] {ex}");
+                return broadcastSuccess;
+            }
+            finally
+            {
+                PoolRecycle(packet);
+            }
+
+            return broadcastSuccess || multicastSuccess;
+        }
+
+        private void CloseSocket()
+        {
+            IsRunning = false;
+            _udpSocketv4?.Close();
+            _udpSocketv6?.Close();
+            _udpSocketv4 = null;
+            _udpSocketv6 = null;
+            if (_receiveThread != null && _receiveThread != Thread.CurrentThread)
+                _receiveThread.Join();
+            _receiveThread = null;
+        }
+    }
+}
+
+#endregion
+
+
+#region NetPacket.cs
+
+namespace LiteNetLib
+{
+    using System;
+    using Utils;
+
+    internal enum PacketProperty : byte
+    {
+        Unreliable,
+        Channeled,
+        Ack,
+        Ping,
+        Pong,
+        ConnectRequest,
+        ConnectAccept,
+        Disconnect,
+        UnconnectedMessage,
+        MtuCheck,
+        MtuOk,
+        Broadcast,
+        Merged,
+        ShutdownOk,
+        PeerNotFound,
+        InvalidProtocol,
+        NatMessage,
+        Empty
+    }
+
+    internal sealed class NetPacket
+    {
+        private static readonly int PropertiesCount = Enum.GetValues(typeof(PacketProperty)).Length;
+        private static readonly int[] HeaderSizes;
+
+        static NetPacket()
+        {
+            HeaderSizes = NetUtils.AllocatePinnedUninitializedArray<int>(PropertiesCount);
+            for (int i = 0; i < HeaderSizes.Length; i++)
+            {
+                switch ((PacketProperty)i)
+                {
+                    case PacketProperty.Channeled:
+                    case PacketProperty.Ack:
+                        HeaderSizes[i] = NetConstants.ChanneledHeaderSize;
+                        break;
+                    case PacketProperty.Ping:
+                        HeaderSizes[i] = NetConstants.HeaderSize + 2;
+                        break;
+                    case PacketProperty.ConnectRequest:
+                        HeaderSizes[i] = NetConnectRequestPacket.HeaderSize;
+                        break;
+                    case PacketProperty.ConnectAccept:
+                        HeaderSizes[i] = NetConnectAcceptPacket.Size;
+                        break;
+                    case PacketProperty.Disconnect:
+                        HeaderSizes[i] = NetConstants.HeaderSize + 8;
+                        break;
+                    case PacketProperty.Pong:
+                        HeaderSizes[i] = NetConstants.HeaderSize + 10;
+                        break;
+                    default:
+                        HeaderSizes[i] = NetConstants.HeaderSize;
+                        break;
+                }
+            }
+        }
+
+        //Header
+        public PacketProperty Property
+        {
+            get => (PacketProperty)(RawData[0] & 0x1F);
+            set => RawData[0] = (byte)((RawData[0] & 0xE0) | (byte)value);
+        }
+
+        public byte ConnectionNumber
+        {
+            get => (byte)((RawData[0] & 0x60) >> 5);
+            set => RawData[0] = (byte) ((RawData[0] & 0x9F) | (value << 5));
+        }
+
+        public ushort Sequence
+        {
+            get => BitConverter.ToUInt16(RawData, 1);
+            set => FastBitConverter.GetBytes(RawData, 1, value);
+        }
+
+        public bool IsFragmented => (RawData[0] & 0x80) != 0;
+
+        public void MarkFragmented()
+        {
+            RawData[0] |= 0x80; //set first bit
+        }
+
+        public byte ChannelId
+        {
+            get => RawData[3];
+            set => RawData[3] = value;
+        }
+
+        public ushort FragmentId
+        {
+            get => BitConverter.ToUInt16(RawData, 4);
+            set => FastBitConverter.GetBytes(RawData, 4, value);
+        }
+
+        public ushort FragmentPart
+        {
+            get => BitConverter.ToUInt16(RawData, 6);
+            set => FastBitConverter.GetBytes(RawData, 6, value);
+        }
+
+        public ushort FragmentsTotal
+        {
+            get => BitConverter.ToUInt16(RawData, 8);
+            set => FastBitConverter.GetBytes(RawData, 8, value);
+        }
+
+        //Data
+        public byte[] RawData;
+        public int Size;
+
+        //Delivery
+        public object UserData;
+
+        //Pool node
+        public NetPacket Next;
+
+        public NetPacket(int size)
+        {
+            RawData = new byte[size];
+            Size = size;
+        }
+
+        public NetPacket(PacketProperty property, int size)
+        {
+            size += GetHeaderSize(property);
+            RawData = new byte[size];
+            Property = property;
+            Size = size;
+        }
+
+        public static int GetHeaderSize(PacketProperty property)
+        {
+            return HeaderSizes[(int)property];
+        }
+
+        public int GetHeaderSize()
+        {
+            return HeaderSizes[RawData[0] & 0x1F];
+        }
+
+        public bool Verify()
+        {
+            byte property = (byte)(RawData[0] & 0x1F);
+            if (property >= PropertiesCount)
+                return false;
+            int headerSize = HeaderSizes[property];
+            bool fragmented = (RawData[0] & 0x80) != 0;
+            return Size >= headerSize && (!fragmented || Size >= headerSize + NetConstants.FragmentHeaderSize);
+        }
+
+        #if LITENETLIB_SPANS || NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1 || NETCOREAPP3_1 || NET5_0 || NETSTANDARD2_1
+        public static implicit operator Span<byte>(NetPacket p) => new Span<byte>(p.RawData, 0, p.Size);
+        #endif
+    }
+}
+
+#endregion
+
+
+#region NetPeer.cs
+
+namespace LiteNetLib
+{
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Net;
+    using System.Runtime.CompilerServices;
+    using System.Threading;
+    using Utils;
+
+    /// <summary>
+    /// Peer connection state
+    /// </summary>
+    [Flags]
+    public enum ConnectionState : byte
+    {
+        Outgoing         = 1 << 1,
+        Connected         = 1 << 2,
+        ShutdownRequested = 1 << 3,
+        Disconnected      = 1 << 4,
+        EndPointChange    = 1 << 5,
+        Any = Outgoing | Connected | ShutdownRequested | EndPointChange
+    }
+
+    internal enum ConnectRequestResult
+    {
+        None,
+        P2PLose, //when peer connecting
+        Reconnection,  //when peer was connected
+        NewConnection  //when peer was disconnected
+    }
+
+    internal enum DisconnectResult
+    {
+        None,
+        Reject,
+        Disconnect
+    }
+
+    internal enum ShutdownResult
+    {
+        None,
+        Success,
+        WasConnected
+    }
+
+    /// <summary>
+    /// Network peer. Main purpose is sending messages to specific peer.
+    /// </summary>
+    public class NetPeer : IPEndPoint
+    {
+        //Ping and RTT
+        private int _rtt;
+        private int _avgRtt;
+        private int _rttCount;
+        private double _resendDelay = 27.0;
+        private float _pingSendTimer;
+        private float _rttResetTimer;
+        private readonly Stopwatch _pingTimer = new Stopwatch();
+        private volatile float _timeSinceLastPacket;
+        private long _remoteDelta;
+
+        //Common
+        private readonly object _shutdownLock = new object();
+
+        internal volatile NetPeer NextPeer;
+        internal NetPeer PrevPeer;
+
+        internal byte ConnectionNum
+        {
+            get => _connectNum;
+            private set
+            {
+                _connectNum = value;
+                _mergeData.ConnectionNumber = value;
+                _pingPacket.ConnectionNumber = value;
+                _pongPacket.ConnectionNumber = value;
+            }
+        }
+
+        //Channels
+        private NetPacket[] _unreliableSecondQueue;
+        private NetPacket[] _unreliableChannel;
+        private int _unreliablePendingCount;
+        private readonly object _unreliableChannelLock = new object();
+
+        private readonly ConcurrentQueue<BaseChannel> _channelSendQueue;
+        private readonly BaseChannel[] _channels;
+
+        //MTU
+        private int _mtu;
+        private int _mtuIdx;
+        private bool _finishMtu;
+        private float _mtuCheckTimer;
+        private int _mtuCheckAttempts;
+        private const int MtuCheckDelay = 1000;
+        private const int MaxMtuCheckAttempts = 4;
+        private readonly object _mtuMutex = new object();
+
+        //Fragment
+        private class IncomingFragments
+        {
+            public NetPacket[] Fragments;
+            public int ReceivedCount;
+            public int TotalSize;
+            public byte ChannelId;
+        }
+        private int _fragmentId;
+        private readonly Dictionary<ushort, IncomingFragments> _holdedFragments;
+        private readonly Dictionary<ushort, ushort> _deliveredFragments;
+
+        //Merging
+        private readonly NetPacket _mergeData;
+        private int _mergePos;
+        private int _mergeCount;
+
+        //Connection
+        private int _connectAttempts;
+        private float _connectTimer;
+        private long _connectTime;
+        private byte _connectNum;
+        private ConnectionState _connectionState;
+        private NetPacket _shutdownPacket;
+        private const int ShutdownDelay = 300;
+        private float _shutdownTimer;
+        private readonly NetPacket _pingPacket;
+        private readonly NetPacket _pongPacket;
+        private readonly NetPacket _connectRequestPacket;
+        private readonly NetPacket _connectAcceptPacket;
+
+        /// <summary>
+        /// Peer parent NetManager
+        /// </summary>
+        public readonly NetManager NetManager;
+
+        /// <summary>
+        /// Current connection state
+        /// </summary>
+        public ConnectionState ConnectionState => _connectionState;
+
+        /// <summary>
+        /// Connection time for internal purposes
+        /// </summary>
+        internal long ConnectTime => _connectTime;
+
+        /// <summary>
+        /// Peer id can be used as key in your dictionary of peers
+        /// </summary>
+        public readonly int Id;
+
+        /// <summary>
+        /// Id assigned from server
+        /// </summary>
+        public int RemoteId { get; private set; }
+
+        /// <summary>
+        /// Current one-way ping (RTT/2) in milliseconds
+        /// </summary>
+        public int Ping => _avgRtt/2;
+
+        /// <summary>
+        /// Round trip time in milliseconds
+        /// </summary>
+        public int RoundTripTime => _avgRtt;
+
+        /// <summary>
+        /// Current MTU - Maximum Transfer Unit ( maximum udp packet size without fragmentation )
+        /// </summary>
+        public int Mtu => _mtu;
+
+        /// <summary>
+        /// Delta with remote time in ticks (not accurate)
+        /// positive - remote time > our time
+        /// </summary>
+        public long RemoteTimeDelta => _remoteDelta;
+
+        /// <summary>
+        /// Remote UTC time (not accurate)
+        /// </summary>
+        public DateTime RemoteUtcTime => new DateTime(DateTime.UtcNow.Ticks + _remoteDelta);
+
+        /// <summary>
+        /// Time since last packet received (including internal library packets) in milliseconds
+        /// </summary>
+        public float TimeSinceLastPacket => _timeSinceLastPacket;
+
+        internal double ResendDelay => _resendDelay;
+
+        /// <summary>
+        /// Application defined object containing data about the connection
+        /// </summary>
+        public object Tag;
+
+        /// <summary>
+        /// Statistics of peer connection
+        /// </summary>
+        public readonly NetStatistics Statistics;
+
+        private SocketAddress _cachedSocketAddr;
+        private int _cachedHashCode;
+
+        internal byte[] NativeAddress;
+
+        /// <summary>
+        /// IPEndPoint serialize
+        /// </summary>
+        /// <returns>SocketAddress</returns>
+        public override SocketAddress Serialize()
+        {
+            return _cachedSocketAddr;
+        }
+
+        public override int GetHashCode()
+        {
+            //uses SocketAddress hash in NET8 and IPEndPoint hash for NativeSockets and previous NET versions
+            return _cachedHashCode;
+        }
+
+        //incoming connection constructor
+        internal NetPeer(NetManager netManager, IPEndPoint remoteEndPoint, int id) : base(remoteEndPoint.Address, remoteEndPoint.Port)
+        {
+            Id = id;
+            Statistics = new NetStatistics();
+            NetManager = netManager;
+
+            _cachedSocketAddr = base.Serialize();
+            if (NetManager.UseNativeSockets)
+            {
+                NativeAddress = new byte[_cachedSocketAddr.Size];
+                for (int i = 0; i < _cachedSocketAddr.Size; i++)
+                    NativeAddress[i] = _cachedSocketAddr[i];
+            }
+#if NET8_0_OR_GREATER
+            _cachedHashCode = NetManager.UseNativeSockets ? base.GetHashCode() : _cachedSocketAddr.GetHashCode();
+#else
+            _cachedHashCode = base.GetHashCode();
+#endif
+
+            ResetMtu();
+
+            _connectionState = ConnectionState.Connected;
+            _mergeData = new NetPacket(PacketProperty.Merged, NetConstants.MaxPacketSize);
+            _pongPacket = new NetPacket(PacketProperty.Pong, 0);
+            _pingPacket = new NetPacket(PacketProperty.Ping, 0) {Sequence = 1};
+
+            _unreliableSecondQueue = new NetPacket[8];
+            _unreliableChannel = new NetPacket[8];
+            _holdedFragments = new Dictionary<ushort, IncomingFragments>();
+            _deliveredFragments = new Dictionary<ushort, ushort>();
+
+            _channels = new BaseChannel[netManager.ChannelsCount * NetConstants.ChannelTypeCount];
+            _channelSendQueue = new ConcurrentQueue<BaseChannel>();
+        }
+
+        internal void InitiateEndPointChange()
+        {
+            ResetMtu();
+            _connectionState = ConnectionState.EndPointChange;
+        }
+
+        internal void FinishEndPointChange(IPEndPoint newEndPoint)
+        {
+            if (_connectionState != ConnectionState.EndPointChange)
+                return;
+            _connectionState = ConnectionState.Connected;
+
+            Address = newEndPoint.Address;
+            Port = newEndPoint.Port;
+
+            if (NetManager.UseNativeSockets)
+            {
+                NativeAddress = new byte[_cachedSocketAddr.Size];
+                for (int i = 0; i < _cachedSocketAddr.Size; i++)
+                    NativeAddress[i] = _cachedSocketAddr[i];
+            }
+            _cachedSocketAddr = base.Serialize();
+#if NET8_0_OR_GREATER
+            _cachedHashCode = NetManager.UseNativeSockets ? base.GetHashCode() : _cachedSocketAddr.GetHashCode();
+#else
+            _cachedHashCode = base.GetHashCode();
+#endif
+        }
+
+        internal void ResetMtu()
+        {
+            //finish if discovery disabled
+            _finishMtu = !NetManager.MtuDiscovery;
+            if (NetManager.MtuOverride > 0)
+                OverrideMtu(NetManager.MtuOverride);
+            else
+                SetMtu(0);
+        }
+
+        private void SetMtu(int mtuIdx)
+        {
+            _mtuIdx = mtuIdx;
+            _mtu = NetConstants.PossibleMtu[mtuIdx] - NetManager.ExtraPacketSizeForLayer;
+        }
+
+        private void OverrideMtu(int mtuValue)
+        {
+            _mtu = mtuValue;
+            _finishMtu = true;
+        }
+
+        /// <summary>
+        /// Returns packets count in queue for reliable channel
+        /// </summary>
+        /// <param name="channelNumber">number of channel 0-63</param>
+        /// <param name="ordered">type of channel ReliableOrdered or ReliableUnordered</param>
+        /// <returns>packets count in channel queue</returns>
+        public int GetPacketsCountInReliableQueue(byte channelNumber, bool ordered)
+        {
+            int idx = channelNumber * NetConstants.ChannelTypeCount +
+                       (byte) (ordered ? DeliveryMethod.ReliableOrdered : DeliveryMethod.ReliableUnordered);
+            var channel = _channels[idx];
+            return channel != null ? ((ReliableChannel)channel).PacketsInQueue : 0;
+        }
+
+        /// <summary>
+        /// Create temporary packet (maximum size MTU - headerSize) to send later without additional copies
+        /// </summary>
+        /// <param name="deliveryMethod">Delivery method (reliable, unreliable, etc.)</param>
+        /// <param name="channelNumber">Number of channel (from 0 to channelsCount - 1)</param>
+        /// <returns>PooledPacket that you can use to write data starting from UserDataOffset</returns>
+        public PooledPacket CreatePacketFromPool(DeliveryMethod deliveryMethod, byte channelNumber)
+        {
+            //multithreaded variable
+            int mtu = _mtu;
+            var packet = NetManager.PoolGetPacket(mtu);
+            if (deliveryMethod == DeliveryMethod.Unreliable)
+            {
+                packet.Property = PacketProperty.Unreliable;
+                return new PooledPacket(packet, mtu, 0);
+            }
+            else
+            {
+                packet.Property = PacketProperty.Channeled;
+                return new PooledPacket(packet, mtu, (byte)(channelNumber * NetConstants.ChannelTypeCount + (byte)deliveryMethod));
+            }
+        }
+
+        /// <summary>
+        /// Sends pooled packet without data copy
+        /// </summary>
+        /// <param name="packet">packet to send</param>
+        /// <param name="userDataSize">size of user data you want to send</param>
+        public void SendPooledPacket(PooledPacket packet, int userDataSize)
+        {
+            if (_connectionState != ConnectionState.Connected)
+                return;
+            packet._packet.Size = packet.UserDataOffset + userDataSize;
+            if (packet._packet.Property == PacketProperty.Channeled)
+            {
+                CreateChannel(packet._channelNumber).AddToQueue(packet._packet);
+            }
+            else
+                EnqueueUnreliable(packet._packet);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void EnqueueUnreliable(NetPacket packet)
+        {
+            lock (_unreliableChannelLock)
+            {
+                if (_unreliablePendingCount == _unreliableChannel.Length)
+                    Array.Resize(ref _unreliableChannel, _unreliablePendingCount*2);
+                _unreliableChannel[_unreliablePendingCount++] = packet;
+            }
+        }
+
+        private BaseChannel CreateChannel(byte idx)
+        {
+            BaseChannel newChannel = _channels[idx];
+            if (newChannel != null)
+                return newChannel;
+            switch ((DeliveryMethod)(idx % NetConstants.ChannelTypeCount))
+            {
+                case DeliveryMethod.ReliableUnordered:
+                    newChannel = new ReliableChannel(this, false, idx);
+                    break;
+                case DeliveryMethod.Sequenced:
+                    newChannel = new SequencedChannel(this, false, idx);
+                    break;
+                case DeliveryMethod.ReliableOrdered:
+                    newChannel = new ReliableChannel(this, true, idx);
+                    break;
+                case DeliveryMethod.ReliableSequenced:
+                    newChannel = new SequencedChannel(this, true, idx);
+                    break;
+            }
+            BaseChannel prevChannel = Interlocked.CompareExchange(ref _channels[idx], newChannel, null);
+            if (prevChannel != null)
+                return prevChannel;
+
+            return newChannel;
+        }
+
+        //"Connect to" constructor
+        internal NetPeer(NetManager netManager, IPEndPoint remoteEndPoint, int id, byte connectNum, NetDataWriter connectData)
+            : this(netManager, remoteEndPoint, id)
+        {
+            _connectTime = DateTime.UtcNow.Ticks;
+            _connectionState = ConnectionState.Outgoing;
+            ConnectionNum = connectNum;
+
+            //Make initial packet
+            _connectRequestPacket = NetConnectRequestPacket.Make(connectData, remoteEndPoint.Serialize(), _connectTime, id);
+            _connectRequestPacket.ConnectionNumber = connectNum;
+
+            //Send request
+            NetManager.SendRaw(_connectRequestPacket, this);
+
+            NetDebug.Write(NetLogLevel.Trace, $"[CC] ConnectId: {_connectTime}, ConnectNum: {connectNum}");
+        }
+
+        //"Accept" incoming constructor
+        internal NetPeer(NetManager netManager, ConnectionRequest request, int id)
+            : this(netManager, request.RemoteEndPoint, id)
+        {
+            _connectTime = request.InternalPacket.ConnectionTime;
+            ConnectionNum = request.InternalPacket.ConnectionNumber;
+            RemoteId = request.InternalPacket.PeerId;
+
+            //Make initial packet
+            _connectAcceptPacket = NetConnectAcceptPacket.Make(_connectTime, ConnectionNum, id);
+
+            //Make Connected
+            _connectionState = ConnectionState.Connected;
+
+            //Send
+            NetManager.SendRaw(_connectAcceptPacket, this);
+
+            NetDebug.Write(NetLogLevel.Trace, $"[CC] ConnectId: {_connectTime}");
+        }
+
+        //Reject
+        internal void Reject(NetConnectRequestPacket requestData, byte[] data, int start, int length)
+        {
+            _connectTime = requestData.ConnectionTime;
+            _connectNum = requestData.ConnectionNumber;
+            Shutdown(data, start, length, false);
+        }
+
+        internal bool ProcessConnectAccept(NetConnectAcceptPacket packet)
+        {
+            if (_connectionState != ConnectionState.Outgoing)
+                return false;
+
+            //check connection id
+            if (packet.ConnectionTime != _connectTime)
+            {
+                NetDebug.Write(NetLogLevel.Trace, $"[NC] Invalid connectId: {packet.ConnectionTime} != our({_connectTime})");
+                return false;
+            }
+            //check connect num
+            ConnectionNum = packet.ConnectionNumber;
+            RemoteId = packet.PeerId;
+
+            NetDebug.Write(NetLogLevel.Trace, "[NC] Received connection accept");
+            Interlocked.Exchange(ref _timeSinceLastPacket, 0);
+            _connectionState = ConnectionState.Connected;
+            return true;
+        }
+
+        /// <summary>
+        /// Gets maximum size of packet that will be not fragmented.
+        /// </summary>
+        /// <param name="options">Type of packet that you want send</param>
+        /// <returns>size in bytes</returns>
+        public int GetMaxSinglePacketSize(DeliveryMethod options)
+        {
+            return _mtu - NetPacket.GetHeaderSize(options == DeliveryMethod.Unreliable ? PacketProperty.Unreliable : PacketProperty.Channeled);
+        }
+
+        /// <summary>
+        /// Send data to peer with delivery event called
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="channelNumber">Number of channel (from 0 to channelsCount - 1)</param>
+        /// <param name="deliveryMethod">Delivery method (reliable, unreliable, etc.)</param>
+        /// <param name="userData">User data that will be received in DeliveryEvent</param>
+        /// <exception cref="ArgumentException">
+        ///     If you trying to send unreliable packet type<para/>
+        /// </exception>
+        public void SendWithDeliveryEvent(byte[] data, byte channelNumber, DeliveryMethod deliveryMethod, object userData)
+        {
+            if (deliveryMethod != DeliveryMethod.ReliableOrdered && deliveryMethod != DeliveryMethod.ReliableUnordered)
+                throw new ArgumentException("Delivery event will work only for ReliableOrdered/Unordered packets");
+            SendInternal(data, 0, data.Length, channelNumber, deliveryMethod, userData);
+        }
+
+        /// <summary>
+        /// Send data to peer with delivery event called
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="start">Start of data</param>
+        /// <param name="length">Length of data</param>
+        /// <param name="channelNumber">Number of channel (from 0 to channelsCount - 1)</param>
+        /// <param name="deliveryMethod">Delivery method (reliable, unreliable, etc.)</param>
+        /// <param name="userData">User data that will be received in DeliveryEvent</param>
+        /// <exception cref="ArgumentException">
+        ///     If you trying to send unreliable packet type<para/>
+        /// </exception>
+        public void SendWithDeliveryEvent(byte[] data, int start, int length, byte channelNumber, DeliveryMethod deliveryMethod, object userData)
+        {
+            if (deliveryMethod != DeliveryMethod.ReliableOrdered && deliveryMethod != DeliveryMethod.ReliableUnordered)
+                throw new ArgumentException("Delivery event will work only for ReliableOrdered/Unordered packets");
+            SendInternal(data, start, length, channelNumber, deliveryMethod, userData);
+        }
+
+        /// <summary>
+        /// Send data to peer with delivery event called
+        /// </summary>
+        /// <param name="dataWriter">Data</param>
+        /// <param name="channelNumber">Number of channel (from 0 to channelsCount - 1)</param>
+        /// <param name="deliveryMethod">Delivery method (reliable, unreliable, etc.)</param>
+        /// <param name="userData">User data that will be received in DeliveryEvent</param>
+        /// <exception cref="ArgumentException">
+        ///     If you trying to send unreliable packet type<para/>
+        /// </exception>
+        public void SendWithDeliveryEvent(NetDataWriter dataWriter, byte channelNumber, DeliveryMethod deliveryMethod, object userData)
+        {
+            if (deliveryMethod != DeliveryMethod.ReliableOrdered && deliveryMethod != DeliveryMethod.ReliableUnordered)
+                throw new ArgumentException("Delivery event will work only for ReliableOrdered/Unordered packets");
+            SendInternal(dataWriter.Data, 0, dataWriter.Length, channelNumber, deliveryMethod, userData);
+        }
+
+        /// <summary>
+        /// Send data to peer (channel - 0)
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="deliveryMethod">Send options (reliable, unreliable, etc.)</param>
+        /// <exception cref="TooBigPacketException">
+        ///     If size exceeds maximum limit:<para/>
+        ///     MTU - headerSize bytes for Unreliable<para/>
+        ///     Fragment count exceeded ushort.MaxValue<para/>
+        /// </exception>
+        public void Send(byte[] data, DeliveryMethod deliveryMethod)
+        {
+            SendInternal(data, 0, data.Length, 0, deliveryMethod, null);
+        }
+
+        /// <summary>
+        /// Send data to peer (channel - 0)
+        /// </summary>
+        /// <param name="dataWriter">DataWriter with data</param>
+        /// <param name="deliveryMethod">Send options (reliable, unreliable, etc.)</param>
+        /// <exception cref="TooBigPacketException">
+        ///     If size exceeds maximum limit:<para/>
+        ///     MTU - headerSize bytes for Unreliable<para/>
+        ///     Fragment count exceeded ushort.MaxValue<para/>
+        /// </exception>
+        public void Send(NetDataWriter dataWriter, DeliveryMethod deliveryMethod)
+        {
+            SendInternal(dataWriter.Data, 0, dataWriter.Length, 0, deliveryMethod, null);
+        }
+
+        /// <summary>
+        /// Send data to peer (channel - 0)
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="start">Start of data</param>
+        /// <param name="length">Length of data</param>
+        /// <param name="options">Send options (reliable, unreliable, etc.)</param>
+        /// <exception cref="TooBigPacketException">
+        ///     If size exceeds maximum limit:<para/>
+        ///     MTU - headerSize bytes for Unreliable<para/>
+        ///     Fragment count exceeded ushort.MaxValue<para/>
+        /// </exception>
+        public void Send(byte[] data, int start, int length, DeliveryMethod options)
+        {
+            SendInternal(data, start, length, 0, options, null);
+        }
+
+        /// <summary>
+        /// Send data to peer
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="channelNumber">Number of channel (from 0 to channelsCount - 1)</param>
+        /// <param name="deliveryMethod">Send options (reliable, unreliable, etc.)</param>
+        /// <exception cref="TooBigPacketException">
+        ///     If size exceeds maximum limit:<para/>
+        ///     MTU - headerSize bytes for Unreliable<para/>
+        ///     Fragment count exceeded ushort.MaxValue<para/>
+        /// </exception>
+        public void Send(byte[] data, byte channelNumber, DeliveryMethod deliveryMethod)
+        {
+            SendInternal(data, 0, data.Length, channelNumber, deliveryMethod, null);
+        }
+
+        /// <summary>
+        /// Send data to peer
+        /// </summary>
+        /// <param name="dataWriter">DataWriter with data</param>
+        /// <param name="channelNumber">Number of channel (from 0 to channelsCount - 1)</param>
+        /// <param name="deliveryMethod">Send options (reliable, unreliable, etc.)</param>
+        /// <exception cref="TooBigPacketException">
+        ///     If size exceeds maximum limit:<para/>
+        ///     MTU - headerSize bytes for Unreliable<para/>
+        ///     Fragment count exceeded ushort.MaxValue<para/>
+        /// </exception>
+        public void Send(NetDataWriter dataWriter, byte channelNumber, DeliveryMethod deliveryMethod)
+        {
+            SendInternal(dataWriter.Data, 0, dataWriter.Length, channelNumber, deliveryMethod, null);
+        }
+
+        /// <summary>
+        /// Send data to peer
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="start">Start of data</param>
+        /// <param name="length">Length of data</param>
+        /// <param name="channelNumber">Number of channel (from 0 to channelsCount - 1)</param>
+        /// <param name="deliveryMethod">Delivery method (reliable, unreliable, etc.)</param>
+        /// <exception cref="TooBigPacketException">
+        ///     If size exceeds maximum limit:<para/>
+        ///     MTU - headerSize bytes for Unreliable<para/>
+        ///     Fragment count exceeded ushort.MaxValue<para/>
+        /// </exception>
+        public void Send(byte[] data, int start, int length, byte channelNumber, DeliveryMethod deliveryMethod)
+        {
+            SendInternal(data, start, length, channelNumber, deliveryMethod, null);
+        }
+
+        private void SendInternal(
+            byte[] data,
+            int start,
+            int length,
+            byte channelNumber,
+            DeliveryMethod deliveryMethod,
+            object userData)
+        {
+            if (_connectionState != ConnectionState.Connected || channelNumber >= _channels.Length)
+                return;
+
+            //Select channel
+            PacketProperty property;
+            BaseChannel channel = null;
+
+            if (deliveryMethod == DeliveryMethod.Unreliable)
+            {
+                property = PacketProperty.Unreliable;
+            }
+            else
+            {
+                property = PacketProperty.Channeled;
+                channel = CreateChannel((byte)(channelNumber * NetConstants.ChannelTypeCount + (byte)deliveryMethod));
+            }
+
+            //Prepare
+            NetDebug.Write("[RS]Packet: " + property);
+
+            //Check fragmentation
+            int headerSize = NetPacket.GetHeaderSize(property);
+            //Save mtu for multithread
+            int mtu = _mtu;
+            if (length + headerSize > mtu)
+            {
+                //if cannot be fragmented
+                if (deliveryMethod != DeliveryMethod.ReliableOrdered && deliveryMethod != DeliveryMethod.ReliableUnordered)
+                    throw new TooBigPacketException("Unreliable or ReliableSequenced packet size exceeded maximum of " + (mtu - headerSize) + " bytes, Check allowed size by GetMaxSinglePacketSize()");
+
+                int packetFullSize = mtu - headerSize;
+                int packetDataSize = packetFullSize - NetConstants.FragmentHeaderSize;
+                int totalPackets = length / packetDataSize + (length % packetDataSize == 0 ? 0 : 1);
+
+                NetDebug.Write($@"FragmentSend:
+ MTU: {mtu}
+ headerSize: {headerSize}
+ packetFullSize: {packetFullSize}
+ packetDataSize: {packetDataSize}
+ totalPackets: {totalPackets}");
+
+                if (totalPackets > ushort.MaxValue)
+                    throw new TooBigPacketException("Data was split in " + totalPackets + " fragments, which exceeds " + ushort.MaxValue);
+
+                ushort currentFragmentId = (ushort)Interlocked.Increment(ref _fragmentId);
+
+                for(ushort partIdx = 0; partIdx < totalPackets; partIdx++)
+                {
+                    int sendLength = length > packetDataSize ? packetDataSize : length;
+
+                    NetPacket p = NetManager.PoolGetPacket(headerSize + sendLength + NetConstants.FragmentHeaderSize);
+                    p.Property = property;
+                    p.UserData = userData;
+                    p.FragmentId = currentFragmentId;
+                    p.FragmentPart = partIdx;
+                    p.FragmentsTotal = (ushort)totalPackets;
+                    p.MarkFragmented();
+
+                    Buffer.BlockCopy(data, start + partIdx * packetDataSize, p.RawData, NetConstants.FragmentedHeaderTotalSize, sendLength);
+                    channel.AddToQueue(p);
+
+                    length -= sendLength;
+                }
+                return;
+            }
+
+            //Else just send
+            NetPacket packet = NetManager.PoolGetPacket(headerSize + length);
+            packet.Property = property;
+            Buffer.BlockCopy(data, start, packet.RawData, headerSize, length);
+            packet.UserData = userData;
+
+            if (channel == null) //unreliable
+            {
+                EnqueueUnreliable(packet);
+            }
+            else
+            {
+                channel.AddToQueue(packet);
+            }
+        }
+
+#if LITENETLIB_SPANS || NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1 || NETCOREAPP3_1 || NET5_0 || NETSTANDARD2_1
+        /// <summary>
+        /// Send data to peer with delivery event called
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="channelNumber">Number of channel (from 0 to channelsCount - 1)</param>
+        /// <param name="deliveryMethod">Delivery method (reliable, unreliable, etc.)</param>
+        /// <param name="userData">User data that will be received in DeliveryEvent</param>
+        /// <exception cref="ArgumentException">
+        ///     If you trying to send unreliable packet type<para/>
+        /// </exception>
+        public void SendWithDeliveryEvent(ReadOnlySpan<byte> data, byte channelNumber, DeliveryMethod deliveryMethod, object userData)
+        {
+            if (deliveryMethod != DeliveryMethod.ReliableOrdered && deliveryMethod != DeliveryMethod.ReliableUnordered)
+                throw new ArgumentException("Delivery event will work only for ReliableOrdered/Unordered packets");
+            SendInternal(data, channelNumber, deliveryMethod, userData);
+        }
+
+        /// <summary>
+        /// Send data to peer (channel - 0)
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="deliveryMethod">Send options (reliable, unreliable, etc.)</param>
+        /// <exception cref="TooBigPacketException">
+        ///     If size exceeds maximum limit:<para/>
+        ///     MTU - headerSize bytes for Unreliable<para/>
+        ///     Fragment count exceeded ushort.MaxValue<para/>
+        /// </exception>
+        public void Send(ReadOnlySpan<byte> data, DeliveryMethod deliveryMethod)
+        {
+            SendInternal(data, 0, deliveryMethod, null);
+        }
+
+        /// <summary>
+        /// Send data to peer
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <param name="channelNumber">Number of channel (from 0 to channelsCount - 1)</param>
+        /// <param name="deliveryMethod">Send options (reliable, unreliable, etc.)</param>
+        /// <exception cref="TooBigPacketException">
+        ///     If size exceeds maximum limit:<para/>
+        ///     MTU - headerSize bytes for Unreliable<para/>
+        ///     Fragment count exceeded ushort.MaxValue<para/>
+        /// </exception>
+        public void Send(ReadOnlySpan<byte> data, byte channelNumber, DeliveryMethod deliveryMethod)
+        {
+            SendInternal(data, channelNumber, deliveryMethod, null);
+        }
+
+        private void SendInternal(
+            ReadOnlySpan<byte> data,
+            byte channelNumber,
+            DeliveryMethod deliveryMethod,
+            object userData)
+        {
+            if (_connectionState != ConnectionState.Connected || channelNumber >= _channels.Length)
+                return;
+
+            //Select channel
+            PacketProperty property;
+            BaseChannel channel = null;
+
+            if (deliveryMethod == DeliveryMethod.Unreliable)
+            {
+                property = PacketProperty.Unreliable;
+            }
+            else
+            {
+                property = PacketProperty.Channeled;
+                channel = CreateChannel((byte)(channelNumber * NetConstants.ChannelTypeCount + (byte)deliveryMethod));
+            }
+
+            //Prepare
+            NetDebug.Write("[RS]Packet: " + property);
+
+            //Check fragmentation
+            int headerSize = NetPacket.GetHeaderSize(property);
+            //Save mtu for multithread
+            int mtu = _mtu;
+            int length = data.Length;
+            if (length + headerSize > mtu)
+            {
+                //if cannot be fragmented
+                if (deliveryMethod != DeliveryMethod.ReliableOrdered && deliveryMethod != DeliveryMethod.ReliableUnordered)
+                    throw new TooBigPacketException("Unreliable or ReliableSequenced packet size exceeded maximum of " + (mtu - headerSize) + " bytes, Check allowed size by GetMaxSinglePacketSize()");
+
+                int packetFullSize = mtu - headerSize;
+                int packetDataSize = packetFullSize - NetConstants.FragmentHeaderSize;
+                int totalPackets = length / packetDataSize + (length % packetDataSize == 0 ? 0 : 1);
+
+                if (totalPackets > ushort.MaxValue)
+                    throw new TooBigPacketException("Data was split in " + totalPackets + " fragments, which exceeds " + ushort.MaxValue);
+
+                ushort currentFragmentId = (ushort)Interlocked.Increment(ref _fragmentId);
+
+                for (ushort partIdx = 0; partIdx < totalPackets; partIdx++)
+                {
+                    int sendLength = length > packetDataSize ? packetDataSize : length;
+
+                    NetPacket p = NetManager.PoolGetPacket(headerSize + sendLength + NetConstants.FragmentHeaderSize);
+                    p.Property = property;
+                    p.UserData = userData;
+                    p.FragmentId = currentFragmentId;
+                    p.FragmentPart = partIdx;
+                    p.FragmentsTotal = (ushort)totalPackets;
+                    p.MarkFragmented();
+
+                    data.Slice(partIdx * packetDataSize, sendLength).CopyTo(new Span<byte>(p.RawData, NetConstants.FragmentedHeaderTotalSize, sendLength));
+                    channel.AddToQueue(p);
+
+                    length -= sendLength;
+                }
+                return;
+            }
+
+            //Else just send
+            NetPacket packet = NetManager.PoolGetPacket(headerSize + length);
+            packet.Property = property;
+            data.CopyTo(new Span<byte>(packet.RawData, headerSize, length));
+            packet.UserData = userData;
+
+            if (channel == null) //unreliable
+            {
+                EnqueueUnreliable(packet);
+            }
+            else
+            {
+                channel.AddToQueue(packet);
+            }
+        }
+#endif
+
+        public void Disconnect(byte[] data)
+        {
+            NetManager.DisconnectPeer(this, data);
+        }
+
+        public void Disconnect(NetDataWriter writer)
+        {
+            NetManager.DisconnectPeer(this, writer);
+        }
+
+        public void Disconnect(byte[] data, int start, int count)
+        {
+            NetManager.DisconnectPeer(this, data, start, count);
+        }
+
+        public void Disconnect()
+        {
+            NetManager.DisconnectPeer(this);
+        }
+
+        internal DisconnectResult ProcessDisconnect(NetPacket packet)
+        {
+            if ((_connectionState == ConnectionState.Connected || _connectionState == ConnectionState.Outgoing) &&
+                packet.Size >= 9 &&
+                BitConverter.ToInt64(packet.RawData, 1) == _connectTime &&
+                packet.ConnectionNumber == _connectNum)
+            {
+                return _connectionState == ConnectionState.Connected
+                    ? DisconnectResult.Disconnect
+                    : DisconnectResult.Reject;
+            }
+            return DisconnectResult.None;
+        }
+
+        internal void AddToReliableChannelSendQueue(BaseChannel channel)
+        {
+            _channelSendQueue.Enqueue(channel);
+        }
+
+        internal ShutdownResult Shutdown(byte[] data, int start, int length, bool force)
+        {
+            lock (_shutdownLock)
+            {
+                //trying to shutdown already disconnected
+                if (_connectionState == ConnectionState.Disconnected ||
+                    _connectionState == ConnectionState.ShutdownRequested)
+                {
+                    return ShutdownResult.None;
+                }
+
+                var result = _connectionState == ConnectionState.Connected
+                    ? ShutdownResult.WasConnected
+                    : ShutdownResult.Success;
+
+                //don't send anything
+                if (force)
+                {
+                    _connectionState = ConnectionState.Disconnected;
+                    return result;
+                }
+
+                //reset time for reconnect protection
+                Interlocked.Exchange(ref _timeSinceLastPacket, 0);
+
+                //send shutdown packet
+                _shutdownPacket = new NetPacket(PacketProperty.Disconnect, length) {ConnectionNumber = _connectNum};
+                FastBitConverter.GetBytes(_shutdownPacket.RawData, 1, _connectTime);
+                if (_shutdownPacket.Size >= _mtu)
+                {
+                    //Drop additional data
+                    NetDebug.WriteError("[Peer] Disconnect additional data size more than MTU - 8!");
+                }
+                else if (data != null && length > 0)
+                {
+                    Buffer.BlockCopy(data, start, _shutdownPacket.RawData, 9, length);
+                }
+                _connectionState = ConnectionState.ShutdownRequested;
+                NetDebug.Write("[Peer] Send disconnect");
+                NetManager.SendRaw(_shutdownPacket, this);
+                return result;
+            }
+        }
+
+        private void UpdateRoundTripTime(int roundTripTime)
+        {
+            _rtt += roundTripTime;
+            _rttCount++;
+            _avgRtt = _rtt/_rttCount;
+            _resendDelay = 25.0 + _avgRtt * 2.1; // 25 ms + double rtt
+        }
+
+        internal void AddReliablePacket(DeliveryMethod method, NetPacket p)
+        {
+            if (p.IsFragmented)
+            {
+                NetDebug.Write($"Fragment. Id: {p.FragmentId}, Part: {p.FragmentPart}, Total: {p.FragmentsTotal}");
+                //Get needed array from dictionary
+                ushort packetFragId = p.FragmentId;
+                byte packetChannelId = p.ChannelId;
+                if (!_holdedFragments.TryGetValue(packetFragId, out var incomingFragments))
+                {
+                    incomingFragments = new IncomingFragments
+                    {
+                        Fragments = new NetPacket[p.FragmentsTotal],
+                        ChannelId = p.ChannelId
+                    };
+                    _holdedFragments.Add(packetFragId, incomingFragments);
+                }
+
+                //Cache
+                var fragments = incomingFragments.Fragments;
+
+                //Error check
+                if (p.FragmentPart >= fragments.Length ||
+                    fragments[p.FragmentPart] != null ||
+                    p.ChannelId != incomingFragments.ChannelId)
+                {
+                    NetManager.PoolRecycle(p);
+                    NetDebug.WriteError("Invalid fragment packet");
+                    return;
+                }
+                //Fill array
+                fragments[p.FragmentPart] = p;
+
+                //Increase received fragments count
+                incomingFragments.ReceivedCount++;
+
+                //Increase total size
+                incomingFragments.TotalSize += p.Size - NetConstants.FragmentedHeaderTotalSize;
+
+                //Check for finish
+                if (incomingFragments.ReceivedCount != fragments.Length)
+                    return;
+
+                //just simple packet
+                NetPacket resultingPacket = NetManager.PoolGetPacket(incomingFragments.TotalSize);
+
+                int pos = 0;
+                for (int i = 0; i < incomingFragments.ReceivedCount; i++)
+                {
+                    var fragment = fragments[i];
+                    int writtenSize = fragment.Size - NetConstants.FragmentedHeaderTotalSize;
+
+                    if (pos+writtenSize > resultingPacket.RawData.Length)
+                    {
+                        _holdedFragments.Remove(packetFragId);
+                        NetDebug.WriteError($"Fragment error pos: {pos + writtenSize} >= resultPacketSize: {resultingPacket.RawData.Length} , totalSize: {incomingFragments.TotalSize}");
+                        return;
+                    }
+                    if (fragment.Size > fragment.RawData.Length)
+                    {
+                        _holdedFragments.Remove(packetFragId);
+                        NetDebug.WriteError($"Fragment error size: {fragment.Size} > fragment.RawData.Length: {fragment.RawData.Length}");
+                        return;
+                    }
+
+                    //Create resulting big packet
+                    Buffer.BlockCopy(
+                        fragment.RawData,
+                        NetConstants.FragmentedHeaderTotalSize,
+                        resultingPacket.RawData,
+                        pos,
+                        writtenSize);
+                    pos += writtenSize;
+
+                    //Free memory
+                    NetManager.PoolRecycle(fragment);
+                    fragments[i] = null;
+                }
+
+                //Clear memory
+                _holdedFragments.Remove(packetFragId);
+
+                //Send to process
+                NetManager.CreateReceiveEvent(resultingPacket, method, (byte)(packetChannelId / NetConstants.ChannelTypeCount), 0, this);
+            }
+            else //Just simple packet
+            {
+                NetManager.CreateReceiveEvent(p, method, (byte)(p.ChannelId / NetConstants.ChannelTypeCount), NetConstants.ChanneledHeaderSize, this);
+            }
+        }
+
+        private void ProcessMtuPacket(NetPacket packet)
+        {
+            //header + int
+            if (packet.Size < NetConstants.PossibleMtu[0])
+                return;
+
+            //first stage check (mtu check and mtu ok)
+            int receivedMtu = BitConverter.ToInt32(packet.RawData, 1);
+            int endMtuCheck = BitConverter.ToInt32(packet.RawData, packet.Size - 4);
+            if (receivedMtu != packet.Size || receivedMtu != endMtuCheck || receivedMtu > NetConstants.MaxPacketSize)
+            {
+                NetDebug.WriteError($"[MTU] Broken packet. RMTU {receivedMtu}, EMTU {endMtuCheck}, PSIZE {packet.Size}");
+                return;
+            }
+
+            if (packet.Property == PacketProperty.MtuCheck)
+            {
+                _mtuCheckAttempts = 0;
+                NetDebug.Write("[MTU] check. send back: " + receivedMtu);
+                packet.Property = PacketProperty.MtuOk;
+                NetManager.SendRawAndRecycle(packet, this);
+            }
+            else if(receivedMtu > _mtu && !_finishMtu) //MtuOk
+            {
+                //invalid packet
+                if (receivedMtu != NetConstants.PossibleMtu[_mtuIdx + 1] - NetManager.ExtraPacketSizeForLayer)
+                    return;
+
+                lock (_mtuMutex)
+                {
+                    SetMtu(_mtuIdx+1);
+                }
+                //if maxed - finish.
+                if (_mtuIdx == NetConstants.PossibleMtu.Length - 1)
+                    _finishMtu = true;
+                NetManager.PoolRecycle(packet);
+                NetDebug.Write("[MTU] ok. Increase to: " + _mtu);
+            }
+        }
+
+        private void UpdateMtuLogic(float deltaTime)
+        {
+            if (_finishMtu)
+                return;
+
+            _mtuCheckTimer += deltaTime;
+            if (_mtuCheckTimer < MtuCheckDelay)
+                return;
+
+            _mtuCheckTimer = 0;
+            _mtuCheckAttempts++;
+            if (_mtuCheckAttempts >= MaxMtuCheckAttempts)
+            {
+                _finishMtu = true;
+                return;
+            }
+
+            lock (_mtuMutex)
+            {
+                if (_mtuIdx >= NetConstants.PossibleMtu.Length - 1)
+                    return;
+
+                //Send increased packet
+                int newMtu = NetConstants.PossibleMtu[_mtuIdx + 1] - NetManager.ExtraPacketSizeForLayer;
+                var p = NetManager.PoolGetPacket(newMtu);
+                p.Property = PacketProperty.MtuCheck;
+                FastBitConverter.GetBytes(p.RawData, 1, newMtu);         //place into start
+                FastBitConverter.GetBytes(p.RawData, p.Size - 4, newMtu);//and end of packet
+
+                //Must check result for MTU fix
+                if (NetManager.SendRawAndRecycle(p, this) <= 0)
+                    _finishMtu = true;
+            }
+        }
+
+        internal ConnectRequestResult ProcessConnectRequest(NetConnectRequestPacket connRequest)
+        {
+            //current or new request
+            switch (_connectionState)
+            {
+                //P2P case
+                case ConnectionState.Outgoing:
+                    //fast check
+                    if (connRequest.ConnectionTime < _connectTime)
+                    {
+                        return ConnectRequestResult.P2PLose;
+                    }
+                    //slow rare case check
+                    if (connRequest.ConnectionTime == _connectTime)
+                    {
+                        var localBytes = connRequest.TargetAddress;
+                        for (int i = _cachedSocketAddr.Size-1; i >= 0; i--)
+                        {
+                            byte rb = _cachedSocketAddr[i];
+                            if (rb == localBytes[i])
+                                continue;
+                            if (rb < localBytes[i])
+                                return ConnectRequestResult.P2PLose;
+                        }
+                    }
+                    break;
+
+                case ConnectionState.Connected:
+                    //Old connect request
+                    if (connRequest.ConnectionTime == _connectTime)
+                    {
+                        //just reply accept
+                        NetManager.SendRaw(_connectAcceptPacket, this);
+                    }
+                    //New connect request
+                    else if (connRequest.ConnectionTime > _connectTime)
+                    {
+                        return ConnectRequestResult.Reconnection;
+                    }
+                    break;
+
+                case ConnectionState.Disconnected:
+                case ConnectionState.ShutdownRequested:
+                    if (connRequest.ConnectionTime >= _connectTime)
+                        return ConnectRequestResult.NewConnection;
+                    break;
+            }
+            return ConnectRequestResult.None;
+        }
+
+        //Process incoming packet
+        internal void ProcessPacket(NetPacket packet)
+        {
+            //not initialized
+            if (_connectionState == ConnectionState.Outgoing || _connectionState == ConnectionState.Disconnected)
+            {
+                NetManager.PoolRecycle(packet);
+                return;
+            }
+            if (packet.Property == PacketProperty.ShutdownOk)
+            {
+                if (_connectionState == ConnectionState.ShutdownRequested)
+                    _connectionState = ConnectionState.Disconnected;
+                NetManager.PoolRecycle(packet);
+                return;
+            }
+            if (packet.ConnectionNumber != _connectNum)
+            {
+                NetDebug.Write(NetLogLevel.Trace, "[RR]Old packet");
+                NetManager.PoolRecycle(packet);
+                return;
+            }
+            Interlocked.Exchange(ref _timeSinceLastPacket, 0);
+
+            NetDebug.Write($"[RR]PacketProperty: {packet.Property}");
+            switch (packet.Property)
+            {
+                case PacketProperty.Merged:
+                    int pos = NetConstants.HeaderSize;
+                    while (pos < packet.Size)
+                    {
+                        ushort size = BitConverter.ToUInt16(packet.RawData, pos);
+                        if (size == 0)
+                            break;
+
+                        pos += 2;
+                        if (packet.RawData.Length - pos < size)
+                            break;
+
+                        NetPacket mergedPacket = NetManager.PoolGetPacket(size);
+                        Buffer.BlockCopy(packet.RawData, pos, mergedPacket.RawData, 0, size);
+                        mergedPacket.Size = size;
+
+                        if (!mergedPacket.Verify())
+                            break;
+
+                        pos += size;
+                        ProcessPacket(mergedPacket);
+                    }
+                    NetManager.PoolRecycle(packet);
+                    break;
+                //If we get ping, send pong
+                case PacketProperty.Ping:
+                    if (NetUtils.RelativeSequenceNumber(packet.Sequence, _pongPacket.Sequence) > 0)
+                    {
+                        NetDebug.Write("[PP]Ping receive, send pong");
+                        FastBitConverter.GetBytes(_pongPacket.RawData, 3, DateTime.UtcNow.Ticks);
+                        _pongPacket.Sequence = packet.Sequence;
+                        NetManager.SendRaw(_pongPacket, this);
+                    }
+                    NetManager.PoolRecycle(packet);
+                    break;
+
+                //If we get pong, calculate ping time and rtt
+                case PacketProperty.Pong:
+                    if (packet.Sequence == _pingPacket.Sequence)
+                    {
+                        _pingTimer.Stop();
+                        int elapsedMs = (int)_pingTimer.ElapsedMilliseconds;
+                        _remoteDelta = BitConverter.ToInt64(packet.RawData, 3) + (elapsedMs * TimeSpan.TicksPerMillisecond ) / 2 - DateTime.UtcNow.Ticks;
+                        UpdateRoundTripTime(elapsedMs);
+                        NetManager.ConnectionLatencyUpdated(this, elapsedMs / 2);
+                        NetDebug.Write($"[PP]Ping: {packet.Sequence} - {elapsedMs} - {_remoteDelta}");
+                    }
+                    NetManager.PoolRecycle(packet);
+                    break;
+
+                case PacketProperty.Ack:
+                case PacketProperty.Channeled:
+                    if (packet.ChannelId >= _channels.Length)
+                    {
+                        NetManager.PoolRecycle(packet);
+                        break;
+                    }
+                    var channel = _channels[packet.ChannelId] ?? (packet.Property == PacketProperty.Ack ? null : CreateChannel(packet.ChannelId));
+                    if (channel != null)
+                    {
+                        if (!channel.ProcessPacket(packet))
+                            NetManager.PoolRecycle(packet);
+                    }
+                    break;
+
+                //Simple packet without acks
+                case PacketProperty.Unreliable:
+                    NetManager.CreateReceiveEvent(packet, DeliveryMethod.Unreliable, 0, NetConstants.HeaderSize, this);
+                    return;
+
+                case PacketProperty.MtuCheck:
+                case PacketProperty.MtuOk:
+                    ProcessMtuPacket(packet);
+                    break;
+
+                default:
+                    NetDebug.WriteError("Error! Unexpected packet type: " + packet.Property);
+                    break;
+            }
+        }
+
+        private void SendMerged()
+        {
+            if (_mergeCount == 0)
+                return;
+            int bytesSent;
+            if (_mergeCount > 1)
+            {
+                NetDebug.Write("[P]Send merged: " + _mergePos + ", count: " + _mergeCount);
+                bytesSent = NetManager.SendRaw(_mergeData.RawData, 0, NetConstants.HeaderSize + _mergePos, this);
+            }
+            else
+            {
+                //Send without length information and merging
+                bytesSent = NetManager.SendRaw(_mergeData.RawData, NetConstants.HeaderSize + 2, _mergePos - 2, this);
+            }
+
+            if (NetManager.EnableStatistics)
+            {
+                Statistics.IncrementPacketsSent();
+                Statistics.AddBytesSent(bytesSent);
+            }
+
+            _mergePos = 0;
+            _mergeCount = 0;
+        }
+
+        internal void SendUserData(NetPacket packet)
+        {
+            packet.ConnectionNumber = _connectNum;
+            int mergedPacketSize = NetConstants.HeaderSize + packet.Size + 2;
+            const int sizeTreshold = 20;
+            if (mergedPacketSize + sizeTreshold >= _mtu)
+            {
+                NetDebug.Write(NetLogLevel.Trace, "[P]SendingPacket: " + packet.Property);
+                int bytesSent = NetManager.SendRaw(packet, this);
+
+                if (NetManager.EnableStatistics)
+                {
+                    Statistics.IncrementPacketsSent();
+                    Statistics.AddBytesSent(bytesSent);
+                }
+
+                return;
+            }
+            if (_mergePos + mergedPacketSize > _mtu)
+                SendMerged();
+
+            FastBitConverter.GetBytes(_mergeData.RawData, _mergePos + NetConstants.HeaderSize, (ushort)packet.Size);
+            Buffer.BlockCopy(packet.RawData, 0, _mergeData.RawData, _mergePos + NetConstants.HeaderSize + 2, packet.Size);
+            _mergePos += packet.Size + 2;
+            _mergeCount++;
+            //DebugWriteForce("Merged: " + _mergePos + "/" + (_mtu - 2) + ", count: " + _mergeCount);
+        }
+
+        internal void Update(float deltaTime)
+        {
+            _timeSinceLastPacket = _timeSinceLastPacket + deltaTime;
+            switch (_connectionState)
+            {
+                case ConnectionState.Connected:
+                    if (_timeSinceLastPacket > NetManager.DisconnectTimeout)
+                    {
+                        NetDebug.Write($"[UPDATE] Disconnect by timeout: {_timeSinceLastPacket} > {NetManager.DisconnectTimeout}");
+                        NetManager.DisconnectPeerForce(this, DisconnectReason.Timeout, 0, null);
+                        return;
+                    }
+                    break;
+
+                case ConnectionState.ShutdownRequested:
+                    if (_timeSinceLastPacket > NetManager.DisconnectTimeout)
+                    {
+                        _connectionState = ConnectionState.Disconnected;
+                    }
+                    else
+                    {
+                        _shutdownTimer += deltaTime;
+                        if (_shutdownTimer >= ShutdownDelay)
+                        {
+                            _shutdownTimer = 0;
+                            NetManager.SendRaw(_shutdownPacket, this);
+                        }
+                    }
+                    return;
+
+                case ConnectionState.Outgoing:
+                    _connectTimer += deltaTime;
+                    if (_connectTimer > NetManager.ReconnectDelay)
+                    {
+                        _connectTimer = 0;
+                        _connectAttempts++;
+                        if (_connectAttempts > NetManager.MaxConnectAttempts)
+                        {
+                            NetManager.DisconnectPeerForce(this, DisconnectReason.ConnectionFailed, 0, null);
+                            return;
+                        }
+
+                        //else send connect again
+                        NetManager.SendRaw(_connectRequestPacket, this);
+                    }
+                    return;
+
+                case ConnectionState.Disconnected:
+                    return;
+            }
+
+            //Send ping
+            _pingSendTimer += deltaTime;
+            if (_pingSendTimer >= NetManager.PingInterval)
+            {
+                NetDebug.Write("[PP] Send ping...");
+                //reset timer
+                _pingSendTimer = 0;
+                //send ping
+                _pingPacket.Sequence++;
+                //ping timeout
+                if (_pingTimer.IsRunning)
+                    UpdateRoundTripTime((int)_pingTimer.ElapsedMilliseconds);
+                _pingTimer.Restart();
+                NetManager.SendRaw(_pingPacket, this);
+            }
+
+            //RTT - round trip time
+            _rttResetTimer += deltaTime;
+            if (_rttResetTimer >= NetManager.PingInterval * 3)
+            {
+                _rttResetTimer = 0;
+                _rtt = _avgRtt;
+                _rttCount = 1;
+            }
+
+            UpdateMtuLogic(deltaTime);
+
+            //Pending send
+            int count = _channelSendQueue.Count;
+            while (count-- > 0)
+            {
+                if (!_channelSendQueue.TryDequeue(out var channel))
+                    break;
+                if (channel.SendAndCheckQueue())
+                {
+                    // still has something to send, re-add it to the send queue
+                    _channelSendQueue.Enqueue(channel);
+                }
+            }
+
+            if (_unreliablePendingCount > 0)
+            {
+                int unreliableCount;
+                lock (_unreliableChannelLock)
+                {
+                    (_unreliableChannel, _unreliableSecondQueue) = (_unreliableSecondQueue, _unreliableChannel);
+                    unreliableCount = _unreliablePendingCount;
+                    _unreliablePendingCount = 0;
+                }
+                for (int i = 0; i < unreliableCount; i++)
+                {
+                    var packet = _unreliableSecondQueue[i];
+                    SendUserData(packet);
+                    NetManager.PoolRecycle(packet);
+                }
+            }
+
+            SendMerged();
+        }
+
+        //For reliable channel
+        internal void RecycleAndDeliver(NetPacket packet)
+        {
+            if (packet.UserData != null)
+            {
+                if (packet.IsFragmented)
+                {
+                    _deliveredFragments.TryGetValue(packet.FragmentId, out ushort fragCount);
+                    fragCount++;
+                    if (fragCount == packet.FragmentsTotal)
+                    {
+                        NetManager.MessageDelivered(this, packet.UserData);
+                        _deliveredFragments.Remove(packet.FragmentId);
+                    }
+                    else
+                    {
+                        _deliveredFragments[packet.FragmentId] = fragCount;
+                    }
+                }
+                else
+                {
+                    NetManager.MessageDelivered(this, packet.UserData);
+                }
+                packet.UserData = null;
+            }
+            NetManager.PoolRecycle(packet);
+        }
+    }
+}
+
+#endregion
+
+
+#region NetStatistics.cs
+
+namespace LiteNetLib
+{
+    using System.Threading;
+
+    public sealed class NetStatistics
+    {
+        private long _packetsSent;
+        private long _packetsReceived;
+        private long _bytesSent;
+        private long _bytesReceived;
+        private long _packetLoss;
+
+        public long PacketsSent => Interlocked.Read(ref _packetsSent);
+        public long PacketsReceived => Interlocked.Read(ref _packetsReceived);
+        public long BytesSent => Interlocked.Read(ref _bytesSent);
+        public long BytesReceived => Interlocked.Read(ref _bytesReceived);
+        public long PacketLoss => Interlocked.Read(ref _packetLoss);
+
+        public long PacketLossPercent
+        {
+            get
+            {
+                long sent = PacketsSent, loss = PacketLoss;
+
+                return sent == 0 ? 0 : loss * 100 / sent;
+            }
+        }
+
+        public void Reset()
+        {
+            Interlocked.Exchange(ref _packetsSent, 0);
+            Interlocked.Exchange(ref _packetsReceived, 0);
+            Interlocked.Exchange(ref _bytesSent, 0);
+            Interlocked.Exchange(ref _bytesReceived, 0);
+            Interlocked.Exchange(ref _packetLoss, 0);
+        }
+
+        public void IncrementPacketsSent()
+        {
+            Interlocked.Increment(ref _packetsSent);
+        }
+
+        public void IncrementPacketsReceived()
+        {
+            Interlocked.Increment(ref _packetsReceived);
+        }
+
+        public void AddBytesSent(long bytesSent)
+        {
+            Interlocked.Add(ref _bytesSent, bytesSent);
+        }
+
+        public void AddBytesReceived(long bytesReceived)
+        {
+            Interlocked.Add(ref _bytesReceived, bytesReceived);
+        }
+
+        public void IncrementPacketLoss()
+        {
+            Interlocked.Increment(ref _packetLoss);
+        }
+
+        public void AddPacketLoss(long packetLoss)
+        {
+            Interlocked.Add(ref _packetLoss, packetLoss);
+        }
+
+        public override string ToString()
+        {
+            return
+                string.Format(
+                    "BytesReceived: {0}\nPacketsReceived: {1}\nBytesSent: {2}\nPacketsSent: {3}\nPacketLoss: {4}\nPacketLossPercent: {5}\n",
+                    BytesReceived,
+                    PacketsReceived,
+                    BytesSent,
+                    PacketsSent,
+                    PacketLoss,
+                    PacketLossPercent);
+        }
+    }
+}
+
+#endregion
+
+
+#region NetUtils.cs
+
+namespace LiteNetLib
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Net;
+    using System.Net.NetworkInformation;
+    using System.Net.Sockets;
+
+    /// <summary>
+    /// Address type that you want to receive from NetUtils.GetLocalIp method
+    /// </summary>
+    [Flags]
+    public enum LocalAddrType
+    {
+        IPv4 = 1,
+        IPv6 = 2,
+        All = IPv4 | IPv6
+    }
+
+    /// <summary>
+    /// Some specific network utilities
+    /// </summary>
+    public static class NetUtils
+    {
+        private static readonly NetworkSorter NetworkSorter = new NetworkSorter();
+
+        public static IPEndPoint MakeEndPoint(string hostStr, int port)
+        {
+            return new IPEndPoint(ResolveAddress(hostStr), port);
+        }
+
+        public static IPAddress ResolveAddress(string hostStr)
+        {
+            if(hostStr == "localhost")
+                return IPAddress.Loopback;
+
+            if (!IPAddress.TryParse(hostStr, out var ipAddress))
+            {
+                if (NetManager.IPv6Support)
+                    ipAddress = ResolveAddress(hostStr, AddressFamily.InterNetworkV6);
+                if (ipAddress == null)
+                    ipAddress = ResolveAddress(hostStr, AddressFamily.InterNetwork);
+            }
+            if (ipAddress == null)
+                throw new ArgumentException("Invalid address: " + hostStr);
+
+            return ipAddress;
+        }
+
+        public static IPAddress ResolveAddress(string hostStr, AddressFamily addressFamily)
+        {
+            IPAddress[] addresses = Dns.GetHostEntry(hostStr).AddressList;
+            foreach (IPAddress ip in addresses)
+            {
+                if (ip.AddressFamily == addressFamily)
+                {
+                    return ip;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Get all local ip addresses
+        /// </summary>
+        /// <param name="addrType">type of address (IPv4, IPv6 or both)</param>
+        /// <returns>List with all local ip addresses</returns>
+        public static List<string> GetLocalIpList(LocalAddrType addrType)
+        {
+            List<string> targetList = new List<string>();
+            GetLocalIpList(targetList, addrType);
+            return targetList;
+        }
+
+        /// <summary>
+        /// Get all local ip addresses (non alloc version)
+        /// </summary>
+        /// <param name="targetList">result list</param>
+        /// <param name="addrType">type of address (IPv4, IPv6 or both)</param>
+        public static void GetLocalIpList(IList<string> targetList, LocalAddrType addrType)
+        {
+            bool ipv4 = (addrType & LocalAddrType.IPv4) == LocalAddrType.IPv4;
+            bool ipv6 = (addrType & LocalAddrType.IPv6) == LocalAddrType.IPv6;
+            try
+            {
+                // Sort networks interfaces so it prefer Wifi over Cellular networks
+                // Most cellulars networks seems to be incompatible with NAT Punch
+                var networks = NetworkInterface.GetAllNetworkInterfaces();
+                Array.Sort(networks, NetworkSorter);
+
+                foreach (NetworkInterface ni in networks)
+                {
+                    //Skip loopback and disabled network interfaces
+                    if (ni.NetworkInterfaceType == NetworkInterfaceType.Loopback ||
+                        ni.OperationalStatus != OperationalStatus.Up)
+                        continue;
+
+                    var ipProps = ni.GetIPProperties();
+
+                    //Skip address without gateway
+                    if (ipProps.GatewayAddresses.Count == 0)
+                        continue;
+
+                    foreach (UnicastIPAddressInformation ip in ipProps.UnicastAddresses)
+                    {
+                        var address = ip.Address;
+                        if ((ipv4 && address.AddressFamily == AddressFamily.InterNetwork) ||
+                            (ipv6 && address.AddressFamily == AddressFamily.InterNetworkV6))
+                            targetList.Add(address.ToString());
+                    }
+                }
+
+	            //Fallback mode (unity android)
+	            if (targetList.Count == 0)
+	            {
+	                IPAddress[] addresses = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+	                foreach (IPAddress ip in addresses)
+	                {
+	                    if((ipv4 && ip.AddressFamily == AddressFamily.InterNetwork) ||
+	                       (ipv6 && ip.AddressFamily == AddressFamily.InterNetworkV6))
+	                        targetList.Add(ip.ToString());
+	                }
+	            }
+            }
+            catch
+            {
+                //ignored
+            }
+
+            if (targetList.Count == 0)
+            {
+                if(ipv4)
+                    targetList.Add("127.0.0.1");
+                if(ipv6)
+                    targetList.Add("::1");
+            }
+        }
+
+        private static readonly List<string> IpList = new List<string>();
+        /// <summary>
+        /// Get first detected local ip address
+        /// </summary>
+        /// <param name="addrType">type of address (IPv4, IPv6 or both)</param>
+        /// <returns>IP address if available. Else - string.Empty</returns>
+        public static string GetLocalIp(LocalAddrType addrType)
+        {
+            lock (IpList)
+            {
+                IpList.Clear();
+                GetLocalIpList(IpList, addrType);
+                return IpList.Count == 0 ? string.Empty : IpList[0];
+            }
+        }
+
+        // ===========================================
+        // Internal and debug log related stuff
+        // ===========================================
+        internal static void PrintInterfaceInfos()
+        {
+            NetDebug.WriteForce(NetLogLevel.Info, $"IPv6Support: { NetManager.IPv6Support}");
+            try
+            {
+                foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
+                {
+                    foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
+                    {
+                        if (ip.Address.AddressFamily == AddressFamily.InterNetwork ||
+                            ip.Address.AddressFamily == AddressFamily.InterNetworkV6)
+                        {
+                            NetDebug.WriteForce(
+                                NetLogLevel.Info,
+                                $"Interface: {ni.Name}, Type: {ni.NetworkInterfaceType}, Ip: {ip.Address}, OpStatus: {ni.OperationalStatus}");
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                NetDebug.WriteForce(NetLogLevel.Info, $"Error while getting interface infos: {e}");
+            }
+        }
+
+        internal static int RelativeSequenceNumber(int number, int expected)
+        {
+            return (number - expected + NetConstants.MaxSequence + NetConstants.HalfMaxSequence) % NetConstants.MaxSequence - NetConstants.HalfMaxSequence;
+        }
+
+        internal static T[] AllocatePinnedUninitializedArray<T>(int count) where T : unmanaged
+        {
+#if NET5_0_OR_GREATER || NET5_0
+            return GC.AllocateUninitializedArray<T>(count, true);
+#else
+            return new T[count];
+#endif
+        }
+    }
+
+    // Pick the most obvious choice for the local IP
+    // Ethernet > Wifi > Others > Cellular
+    internal class NetworkSorter : IComparer<NetworkInterface>
+    {
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
+        public int Compare(NetworkInterface a, NetworkInterface b)
+        {
+            var isCellularA = a.NetworkInterfaceType == NetworkInterfaceType.Wman ||
+                              a.NetworkInterfaceType == NetworkInterfaceType.Wwanpp ||
+                              a.NetworkInterfaceType == NetworkInterfaceType.Wwanpp2;
+
+            var isCellularB = b.NetworkInterfaceType == NetworkInterfaceType.Wman ||
+                              b.NetworkInterfaceType == NetworkInterfaceType.Wwanpp ||
+                              b.NetworkInterfaceType == NetworkInterfaceType.Wwanpp2;
+
+            var isWifiA     = a.NetworkInterfaceType == NetworkInterfaceType.Wireless80211;
+            var isWifiB     = b.NetworkInterfaceType == NetworkInterfaceType.Wireless80211;
+
+            var isEthernetA = a.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
+                              a.NetworkInterfaceType == NetworkInterfaceType.Ethernet3Megabit ||
+                              a.NetworkInterfaceType == NetworkInterfaceType.GigabitEthernet ||
+                              a.NetworkInterfaceType == NetworkInterfaceType.FastEthernetFx ||
+                              a.NetworkInterfaceType == NetworkInterfaceType.FastEthernetT;
+
+            var isEthernetB = b.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
+                              b.NetworkInterfaceType == NetworkInterfaceType.Ethernet3Megabit ||
+                              b.NetworkInterfaceType == NetworkInterfaceType.GigabitEthernet ||
+                              b.NetworkInterfaceType == NetworkInterfaceType.FastEthernetFx ||
+                              b.NetworkInterfaceType == NetworkInterfaceType.FastEthernetT;
+
+            var isOtherA    = !isCellularA && !isWifiA && !isEthernetA;
+            var isOtherB    = !isCellularB && !isWifiB && !isEthernetB;
+
+            var priorityA = isEthernetA ? 3 : isWifiA ? 2 : isOtherA ? 1 : 0;
+            var priorityB = isEthernetB ? 3 : isWifiB ? 2 : isOtherB ? 1 : 0;
+
+            return priorityA > priorityB ? -1 : priorityA < priorityB ? 1 : 0;
+        }
+    }
+}
+
+#endregion
+
+
+#region PausedSocketFix.cs
+
+#if UNITY_2018_3_OR_NEWER
+namespace LiteNetLib
+{
+    using System.Net;
+    using UnityEngine;
+
+    public class PausedSocketFix
+    {
+        private readonly NetManager _netManager;
+        private readonly IPAddress _ipv4;
+        private readonly IPAddress _ipv6;
+        private readonly int _port;
+        private readonly bool _manualMode;
+        private bool _initialized;
+
+        public PausedSocketFix(NetManager netManager, IPAddress ipv4, IPAddress ipv6, int port, bool manualMode)
+        {
+            _netManager = netManager;
+            _ipv4 = ipv4;
+            _ipv6 = ipv6;
+            _port = port;
+            _manualMode = manualMode;
+            Application.focusChanged += Application_focusChanged;
+            Application.quitting += Deinitialize;
+            _initialized = true;
+        }
+
+        public void Deinitialize()
+        {
+            if (_initialized)
+            {
+                Application.focusChanged -= Application_focusChanged;
+                Application.quitting -= Deinitialize;
+            }
+
+            if (_netManager.IsRunning)
+            {
+                _netManager.Stop();
+            }
+            _initialized = false;
+        }
+
+        private void Application_focusChanged(bool focused)
+        {
+            //If coming back into focus see if a reconnect is needed.
+            if (focused)
+            {
+                //try reconnect
+                if (!_initialized)
+                    return;
+                //Was intentionally disconnected at some point.
+                if (!_netManager.IsRunning)
+                    return;
+                //Socket is in working state.
+                if (_netManager.NotConnected == false)
+                    return;
+
+                //Socket isn't running but should be. Try to start again.
+                if (!_netManager.Start(_ipv4, _ipv6, _port, _manualMode))
+                {
+                    NetDebug.WriteError($"[S] Cannot restore connection. Ipv4 {_ipv4}, Ipv6 {_ipv6}, Port {_port}, ManualMode {_manualMode}");
+                }
+            }
+        }
+    }
+}
+#endif
+
+#endregion
+
+
+#region PooledPacket.cs
+
+namespace LiteNetLib
+{
+    public readonly ref struct PooledPacket
+    {
+        internal readonly NetPacket _packet;
+        internal readonly byte _channelNumber;
+
+        /// <summary>
+        /// Maximum data size that you can put into such packet
+        /// </summary>
+        public readonly int MaxUserDataSize;
+
+        /// <summary>
+        /// Offset for user data when writing to Data array
+        /// </summary>
+        public readonly int UserDataOffset;
+
+        /// <summary>
+        /// Raw packet data. Do not modify header! Use UserDataOffset as start point for your data
+        /// </summary>
+        public byte[] Data => _packet.RawData;
+
+        internal PooledPacket(NetPacket packet, int maxDataSize, byte channelNumber)
+        {
+            _packet = packet;
+            UserDataOffset = _packet.GetHeaderSize();
+            _packet.Size = UserDataOffset;
+            MaxUserDataSize = maxDataSize - UserDataOffset;
+            _channelNumber = channelNumber;
+        }
+    }
+}
+
+#endregion
+
+
+#region ReliableChannel.cs
+
+namespace LiteNetLib
+{
+    using System;
+
+    internal sealed class ReliableChannel : BaseChannel
+    {
+        private struct PendingPacket
+        {
+            private NetPacket _packet;
+            private long _timeStamp;
+            private bool _isSent;
+
+            public override string ToString()
+            {
+                return _packet == null ? "Empty" : _packet.Sequence.ToString();
+            }
+
+            public void Init(NetPacket packet)
+            {
+                _packet = packet;
+                _isSent = false;
+            }
+
+            //Returns true if there is a pending packet inside
+            public bool TrySend(long currentTime, NetPeer peer)
+            {
+                if (_packet == null)
+                    return false;
+
+                if (_isSent) //check send time
+                {
+                    double resendDelay = peer.ResendDelay * TimeSpan.TicksPerMillisecond;
+                    double packetHoldTime = currentTime - _timeStamp;
+                    if (packetHoldTime < resendDelay)
+                        return true;
+                    NetDebug.Write($"[RC]Resend: {packetHoldTime} > {resendDelay}");
+                }
+                _timeStamp = currentTime;
+                _isSent = true;
+                peer.SendUserData(_packet);
+                return true;
+            }
+
+            public bool Clear(NetPeer peer)
+            {
+                if (_packet != null)
+                {
+                    peer.RecycleAndDeliver(_packet);
+                    _packet = null;
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        private readonly NetPacket _outgoingAcks;            //for send acks
+        private readonly PendingPacket[] _pendingPackets;    //for unacked packets and duplicates
+        private readonly NetPacket[] _receivedPackets;       //for order
+        private readonly bool[] _earlyReceived;              //for unordered
+
+        private int _localSeqence;
+        private int _remoteSequence;
+        private int _localWindowStart;
+        private int _remoteWindowStart;
+
+        private bool _mustSendAcks;
+
+        private readonly DeliveryMethod _deliveryMethod;
+        private readonly bool _ordered;
+        private readonly int _windowSize;
+        private const int BitsInByte = 8;
+        private readonly byte _id;
+
+        public ReliableChannel(NetPeer peer, bool ordered, byte id) : base(peer)
+        {
+            _id = id;
+            _windowSize = NetConstants.DefaultWindowSize;
+            _ordered = ordered;
+            _pendingPackets = new PendingPacket[_windowSize];
+            for (int i = 0; i < _pendingPackets.Length; i++)
+                _pendingPackets[i] = new PendingPacket();
+
+            if (_ordered)
+            {
+                _deliveryMethod = DeliveryMethod.ReliableOrdered;
+                _receivedPackets = new NetPacket[_windowSize];
+            }
+            else
+            {
+                _deliveryMethod = DeliveryMethod.ReliableUnordered;
+                _earlyReceived = new bool[_windowSize];
+            }
+
+            _localWindowStart = 0;
+            _localSeqence = 0;
+            _remoteSequence = 0;
+            _remoteWindowStart = 0;
+            _outgoingAcks = new NetPacket(PacketProperty.Ack, (_windowSize - 1) / BitsInByte + 2) {ChannelId = id};
+        }
+
+        //ProcessAck in packet
+        private void ProcessAck(NetPacket packet)
+        {
+            if (packet.Size != _outgoingAcks.Size)
+            {
+                NetDebug.Write("[PA]Invalid acks packet size");
+                return;
+            }
+
+            ushort ackWindowStart = packet.Sequence;
+            int windowRel = NetUtils.RelativeSequenceNumber(_localWindowStart, ackWindowStart);
+            if (ackWindowStart >= NetConstants.MaxSequence || windowRel < 0)
+            {
+                NetDebug.Write("[PA]Bad window start");
+                return;
+            }
+
+            //check relevance
+            if (windowRel >= _windowSize)
+            {
+                NetDebug.Write("[PA]Old acks");
+                return;
+            }
+
+            byte[] acksData = packet.RawData;
+            lock (_pendingPackets)
+            {
+                for (int pendingSeq = _localWindowStart;
+                    pendingSeq != _localSeqence;
+                    pendingSeq = (pendingSeq + 1) % NetConstants.MaxSequence)
+                {
+                    int rel = NetUtils.RelativeSequenceNumber(pendingSeq, ackWindowStart);
+                    if (rel >= _windowSize)
+                    {
+                        NetDebug.Write("[PA]REL: " + rel);
+                        break;
+                    }
+
+                    int pendingIdx = pendingSeq % _windowSize;
+                    int currentByte = NetConstants.ChanneledHeaderSize + pendingIdx / BitsInByte;
+                    int currentBit = pendingIdx % BitsInByte;
+                    if ((acksData[currentByte] & (1 << currentBit)) == 0)
+                    {
+                        if (Peer.NetManager.EnableStatistics)
+                        {
+                            Peer.Statistics.IncrementPacketLoss();
+                            Peer.NetManager.Statistics.IncrementPacketLoss();
+                        }
+
+                        //Skip false ack
+                        NetDebug.Write($"[PA]False ack: {pendingSeq}");
+                        continue;
+                    }
+
+                    if (pendingSeq == _localWindowStart)
+                    {
+                        //Move window
+                        _localWindowStart = (_localWindowStart + 1) % NetConstants.MaxSequence;
+                    }
+
+                    //clear packet
+                    if (_pendingPackets[pendingIdx].Clear(Peer))
+                        NetDebug.Write($"[PA]Removing reliableInOrder ack: {pendingSeq} - true");
+                }
+            }
+        }
+
+        protected override bool SendNextPackets()
+        {
+            if (_mustSendAcks)
+            {
+                _mustSendAcks = false;
+                NetDebug.Write("[RR]SendAcks");
+                lock(_outgoingAcks)
+                    Peer.SendUserData(_outgoingAcks);
+            }
+
+            long currentTime = DateTime.UtcNow.Ticks;
+            bool hasPendingPackets = false;
+
+            lock (_pendingPackets)
+            {
+                //get packets from queue
+                lock (OutgoingQueue)
+                {
+                    while (OutgoingQueue.Count > 0)
+                    {
+                        int relate = NetUtils.RelativeSequenceNumber(_localSeqence, _localWindowStart);
+                        if (relate >= _windowSize)
+                            break;
+
+                        var netPacket = OutgoingQueue.Dequeue();
+                        netPacket.Sequence = (ushort) _localSeqence;
+                        netPacket.ChannelId = _id;
+                        _pendingPackets[_localSeqence % _windowSize].Init(netPacket);
+                        _localSeqence = (_localSeqence + 1) % NetConstants.MaxSequence;
+                    }
+                }
+
+                //send
+                for (int pendingSeq = _localWindowStart; pendingSeq != _localSeqence; pendingSeq = (pendingSeq + 1) % NetConstants.MaxSequence)
+                {
+                    // Please note: TrySend is invoked on a mutable struct, it's important to not extract it into a variable here
+                    if (_pendingPackets[pendingSeq % _windowSize].TrySend(currentTime, Peer))
+                        hasPendingPackets = true;
+                }
+            }
+
+            return hasPendingPackets || _mustSendAcks || OutgoingQueue.Count > 0;
+        }
+
+        //Process incoming packet
+        public override bool ProcessPacket(NetPacket packet)
+        {
+            if (packet.Property == PacketProperty.Ack)
+            {
+                ProcessAck(packet);
+                return false;
+            }
+            int seq = packet.Sequence;
+            if (seq >= NetConstants.MaxSequence)
+            {
+                NetDebug.Write("[RR]Bad sequence");
+                return false;
+            }
+
+            int relate = NetUtils.RelativeSequenceNumber(seq, _remoteWindowStart);
+            int relateSeq = NetUtils.RelativeSequenceNumber(seq, _remoteSequence);
+
+            if (relateSeq > _windowSize)
+            {
+                NetDebug.Write("[RR]Bad sequence");
+                return false;
+            }
+
+            //Drop bad packets
+            if (relate < 0)
+            {
+                //Too old packet doesn't ack
+                NetDebug.Write("[RR]ReliableInOrder too old");
+                return false;
+            }
+            if (relate >= _windowSize * 2)
+            {
+                //Some very new packet
+                NetDebug.Write("[RR]ReliableInOrder too new");
+                return false;
+            }
+
+            //If very new - move window
+            int ackIdx;
+            int ackByte;
+            int ackBit;
+            lock (_outgoingAcks)
+            {
+                if (relate >= _windowSize)
+                {
+                    //New window position
+                    int newWindowStart = (_remoteWindowStart + relate - _windowSize + 1) % NetConstants.MaxSequence;
+                    _outgoingAcks.Sequence = (ushort) newWindowStart;
+
+                    //Clean old data
+                    while (_remoteWindowStart != newWindowStart)
+                    {
+                        ackIdx = _remoteWindowStart % _windowSize;
+                        ackByte = NetConstants.ChanneledHeaderSize + ackIdx / BitsInByte;
+                        ackBit = ackIdx % BitsInByte;
+                        _outgoingAcks.RawData[ackByte] &= (byte) ~(1 << ackBit);
+                        _remoteWindowStart = (_remoteWindowStart + 1) % NetConstants.MaxSequence;
+                    }
+                }
+
+                //Final stage - process valid packet
+                //trigger acks send
+                _mustSendAcks = true;
+
+                ackIdx = seq % _windowSize;
+                ackByte = NetConstants.ChanneledHeaderSize + ackIdx / BitsInByte;
+                ackBit = ackIdx % BitsInByte;
+                if ((_outgoingAcks.RawData[ackByte] & (1 << ackBit)) != 0)
+                {
+                    NetDebug.Write("[RR]ReliableInOrder duplicate");
+                    //because _mustSendAcks == true
+                    AddToPeerChannelSendQueue();
+                    return false;
+                }
+
+                //save ack
+                _outgoingAcks.RawData[ackByte] |= (byte) (1 << ackBit);
+            }
+
+            AddToPeerChannelSendQueue();
+
+            //detailed check
+            if (seq == _remoteSequence)
+            {
+                NetDebug.Write("[RR]ReliableInOrder packet succes");
+                Peer.AddReliablePacket(_deliveryMethod, packet);
+                _remoteSequence = (_remoteSequence + 1) % NetConstants.MaxSequence;
+
+                if (_ordered)
+                {
+                    NetPacket p;
+                    while ((p = _receivedPackets[_remoteSequence % _windowSize]) != null)
+                    {
+                        //process holden packet
+                        _receivedPackets[_remoteSequence % _windowSize] = null;
+                        Peer.AddReliablePacket(_deliveryMethod, p);
+                        _remoteSequence = (_remoteSequence + 1) % NetConstants.MaxSequence;
+                    }
+                }
+                else
+                {
+                    while (_earlyReceived[_remoteSequence % _windowSize])
+                    {
+                        //process early packet
+                        _earlyReceived[_remoteSequence % _windowSize] = false;
+                        _remoteSequence = (_remoteSequence + 1) % NetConstants.MaxSequence;
+                    }
+                }
+                return true;
+            }
+
+            //holden packet
+            if (_ordered)
+            {
+                _receivedPackets[ackIdx] = packet;
+            }
+            else
+            {
+                _earlyReceived[ackIdx] = true;
+                Peer.AddReliablePacket(_deliveryMethod, packet);
+            }
+            return true;
+        }
+    }
+}
+
+#endregion
+
+
+#region SequencedChannel.cs
+
+namespace LiteNetLib
+{
+    using System;
+
+    internal sealed class SequencedChannel : BaseChannel
+    {
+        private int _localSequence;
+        private ushort _remoteSequence;
+        private readonly bool _reliable;
+        private NetPacket _lastPacket;
+        private readonly NetPacket _ackPacket;
+        private bool _mustSendAck;
+        private readonly byte _id;
+        private long _lastPacketSendTime;
+
+        public SequencedChannel(NetPeer peer, bool reliable, byte id) : base(peer)
+        {
+            _id = id;
+            _reliable = reliable;
+            if (_reliable)
+                _ackPacket = new NetPacket(PacketProperty.Ack, 0) {ChannelId = id};
+        }
+
+        protected override bool SendNextPackets()
+        {
+            if (_reliable && OutgoingQueue.Count == 0)
+            {
+                long currentTime = DateTime.UtcNow.Ticks;
+                long packetHoldTime = currentTime - _lastPacketSendTime;
+                if (packetHoldTime >= Peer.ResendDelay * TimeSpan.TicksPerMillisecond)
+                {
+                    var packet = _lastPacket;
+                    if (packet != null)
+                    {
+                        _lastPacketSendTime = currentTime;
+                        Peer.SendUserData(packet);
+                    }
+                }
+            }
+            else
+            {
+                lock (OutgoingQueue)
+                {
+                    while (OutgoingQueue.Count > 0)
+                    {
+                        NetPacket packet = OutgoingQueue.Dequeue();
+                        _localSequence = (_localSequence + 1) % NetConstants.MaxSequence;
+                        packet.Sequence = (ushort)_localSequence;
+                        packet.ChannelId = _id;
+                        Peer.SendUserData(packet);
+
+                        if (_reliable && OutgoingQueue.Count == 0)
+                        {
+                            _lastPacketSendTime = DateTime.UtcNow.Ticks;
+                            _lastPacket = packet;
+                        }
+                        else
+                        {
+                            Peer.NetManager.PoolRecycle(packet);
+                        }
+                    }
+                }
+            }
+
+            if (_reliable && _mustSendAck)
+            {
+                _mustSendAck = false;
+                _ackPacket.Sequence = _remoteSequence;
+                Peer.SendUserData(_ackPacket);
+            }
+
+            return _lastPacket != null;
+        }
+
+        public override bool ProcessPacket(NetPacket packet)
+        {
+            if (packet.IsFragmented)
+                return false;
+            if (packet.Property == PacketProperty.Ack)
+            {
+                if (_reliable && _lastPacket != null && packet.Sequence == _lastPacket.Sequence)
+                    _lastPacket = null;
+                return false;
+            }
+            int relative = NetUtils.RelativeSequenceNumber(packet.Sequence, _remoteSequence);
+            bool packetProcessed = false;
+            if (packet.Sequence < NetConstants.MaxSequence && relative > 0)
+            {
+                if (Peer.NetManager.EnableStatistics)
+                {
+                    Peer.Statistics.AddPacketLoss(relative - 1);
+                    Peer.NetManager.Statistics.AddPacketLoss(relative - 1);
+                }
+
+                _remoteSequence = packet.Sequence;
+                Peer.NetManager.CreateReceiveEvent(
+                    packet,
+                    _reliable ? DeliveryMethod.ReliableSequenced : DeliveryMethod.Sequenced,
+                    (byte)(packet.ChannelId / NetConstants.ChannelTypeCount),
+                    NetConstants.ChanneledHeaderSize,
+                    Peer);
+                packetProcessed = true;
+            }
+
+            if (_reliable)
+            {
+                _mustSendAck = true;
+                AddToPeerChannelSendQueue();
+            }
+
+            return packetProcessed;
+        }
+    }
+}
+
+#endregion
+
+
+#region Trimming.cs
+
+#if NET5_0_OR_GREATER
+namespace LiteNetLib
+{
+    using static System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes;
+    using System.Diagnostics.CodeAnalysis;
+
+    internal static class Trimming
+    {
+        internal const DynamicallyAccessedMemberTypes SerializerMemberTypes = PublicProperties | NonPublicProperties;
+    }
+}
+#endif
+
+#endregion
+
+
+#region CRC32C.cs
+
+namespace LiteNetLib.Utils
+{
+#if NETCOREAPP3_0_OR_GREATER || NETCOREAPP3_1 || NET5_0
+    using System;
+    using System.Runtime.InteropServices;
+    using System.Runtime.Intrinsics.X86;
+#endif
+#if NET5_0_OR_GREATER || NET5_0
+    using System.Runtime.Intrinsics.Arm;
+#endif
+
+    //Implementation from Crc32.NET
+    public static class CRC32C
+    {
+        public const int ChecksumSize = 4;
+        private const uint Poly = 0x82F63B78u;
+        private static readonly uint[] Table;
+
+        static CRC32C()
+        {
+#if NETCOREAPP3_0_OR_GREATER || NETCOREAPP3_1 || NET5_0
+            if (Sse42.IsSupported)
+                return;
+#endif
+#if NET5_0_OR_GREATER || NET5_0
+            if (Crc32.IsSupported)
+                return;
+#endif
+            Table = NetUtils.AllocatePinnedUninitializedArray<uint>(16 * 256);
+            for (uint i = 0; i < 256; i++)
+            {
+                uint res = i;
+                for (int t = 0; t < 16; t++)
+                {
+                    for (int k = 0; k < 8; k++)
+                        res = (res & 1) == 1 ? Poly ^ (res >> 1) : (res >> 1);
+                    Table[t * 256 + i] = res;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Compute CRC32C for data
+        /// </summary>
+        /// <param name="input">input data</param>
+        /// <param name="offset">offset</param>
+        /// <param name="length">length</param>
+        /// <returns>CRC32C checksum</returns>
+        public static uint Compute(byte[] input, int offset, int length)
+        {
+            uint crcLocal = uint.MaxValue;
+#if NETCOREAPP3_0_OR_GREATER || NETCOREAPP3_1 || NET5_0
+            if (Sse42.IsSupported)
+            {
+                var data = new ReadOnlySpan<byte>(input, offset, length);
+                int processed = 0;
+                if (Sse42.X64.IsSupported && data.Length > sizeof(ulong))
+                {
+                    processed = data.Length / sizeof(ulong) * sizeof(ulong);
+                    var ulongs = MemoryMarshal.Cast<byte, ulong>(data.Slice(0, processed));
+                    ulong crclong = crcLocal;
+                    for (int i = 0; i < ulongs.Length; i++)
+                    {
+                        crclong = Sse42.X64.Crc32(crclong, ulongs[i]);
+                    }
+
+                    crcLocal = (uint)crclong;
+                }
+                else if (data.Length > sizeof(uint))
+                {
+                    processed = data.Length / sizeof(uint) * sizeof(uint);
+                    var uints = MemoryMarshal.Cast<byte, uint>(data.Slice(0, processed));
+                    for (int i = 0; i < uints.Length; i++)
+                    {
+                        crcLocal = Sse42.Crc32(crcLocal, uints[i]);
+                    }
+                }
+
+                for (int i = processed; i < data.Length; i++)
+                {
+                    crcLocal = Sse42.Crc32(crcLocal, data[i]);
+                }
+
+                return crcLocal ^ uint.MaxValue;
+            }
+#endif
+#if NET5_0_OR_GREATER || NET5_0
+            if (Crc32.IsSupported)
+            {
+                var data = new ReadOnlySpan<byte>(input, offset, length);
+                int processed = 0;
+                if (Crc32.Arm64.IsSupported && data.Length > sizeof(ulong))
+                {
+                    processed = data.Length / sizeof(ulong) * sizeof(ulong);
+                    var ulongs = MemoryMarshal.Cast<byte, ulong>(data.Slice(0, processed));
+                    for (int i = 0; i < ulongs.Length; i++)
+                    {
+                        crcLocal = Crc32.Arm64.ComputeCrc32C(crcLocal, ulongs[i]);
+                    }
+                }
+                else if (data.Length > sizeof(uint))
+                {
+                    processed = data.Length / sizeof(uint) * sizeof(uint);
+                    var uints = MemoryMarshal.Cast<byte, uint>(data.Slice(0, processed));
+                    for (int i = 0; i < uints.Length; i++)
+                    {
+                        crcLocal = Crc32.ComputeCrc32C(crcLocal, uints[i]);
+                    }
+                }
+
+                for (int i = processed; i < data.Length; i++)
+                {
+                    crcLocal = Crc32.ComputeCrc32C(crcLocal, data[i]);
+                }
+
+                return crcLocal ^ uint.MaxValue;
+            }
+#endif
+            while (length >= 16)
+            {
+                var a = Table[(3 * 256) + input[offset + 12]]
+                        ^ Table[(2 * 256) + input[offset + 13]]
+                        ^ Table[(1 * 256) + input[offset + 14]]
+                        ^ Table[(0 * 256) + input[offset + 15]];
+
+                var b = Table[(7 * 256) + input[offset + 8]]
+                        ^ Table[(6 * 256) + input[offset + 9]]
+                        ^ Table[(5 * 256) + input[offset + 10]]
+                        ^ Table[(4 * 256) + input[offset + 11]];
+
+                var c = Table[(11 * 256) + input[offset + 4]]
+                        ^ Table[(10 * 256) + input[offset + 5]]
+                        ^ Table[(9 * 256) + input[offset + 6]]
+                        ^ Table[(8 * 256) + input[offset + 7]];
+
+                var d = Table[(15 * 256) + ((byte)crcLocal ^ input[offset])]
+                        ^ Table[(14 * 256) + ((byte)(crcLocal >> 8) ^ input[offset + 1])]
+                        ^ Table[(13 * 256) + ((byte)(crcLocal >> 16) ^ input[offset + 2])]
+                        ^ Table[(12 * 256) + ((crcLocal >> 24) ^ input[offset + 3])];
+
+                crcLocal = d ^ c ^ b ^ a;
+                offset += 16;
+                length -= 16;
+            }
+            while (--length >= 0)
+                crcLocal = Table[(byte)(crcLocal ^ input[offset++])] ^ crcLocal >> 8;
+            return crcLocal ^ uint.MaxValue;
+        }
+    }
+}
+
+#endregion
+
+
+#region FastBitConverter.cs
+
+namespace LiteNetLib.Utils
+{
+    using System;
+    using System.Runtime.CompilerServices;
+    using System.Runtime.InteropServices;
+
+    public static class FastBitConverter
+    {
+#if (LITENETLIB_UNSAFE || NETCOREAPP3_1 || NET5_0 || NETCOREAPP3_0_OR_GREATER) && !BIGENDIAN
+#if LITENETLIB_UNSAFE
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe void GetBytes<T>(byte[] bytes, int startIndex, T value) where T : unmanaged
+        {
+            int size = sizeof(T);
+            if (bytes.Length < startIndex + size)
+                ThrowIndexOutOfRangeException();
+#if NETCOREAPP3_1 || NET5_0 || NETCOREAPP3_0_OR_GREATER
+            Unsafe.As<byte, T>(ref bytes[startIndex]) = value;
+#else
+            fixed (byte* ptr = &bytes[startIndex])
+            {
+#if UNITY_ANDROID
+                // On some android systems, assigning *(T*)ptr throws a NRE if
+                // the ptr isn't aligned (i.e. if Position is 1,2,3,5, etc.).
+                // Here we have to use memcpy.
+                //
+                // => we can't get a pointer of a struct in C# without
+                //    marshalling allocations
+                // => instead, we stack allocate an array of type T and use that
+                // => stackalloc avoids GC and is very fast. it only works for
+                //    value types, but all blittable types are anyway.
+                T* valueBuffer = stackalloc T[1] { value };
+                UnsafeUtility.MemCpy(ptr, valueBuffer, size);
+#else
+                *(T*)ptr = value;
+#endif
+            }
+#endif
+        }
+#else
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void GetBytes<T>(byte[] bytes, int startIndex, T value) where T : unmanaged
+        {
+            if (bytes.Length < startIndex + Unsafe.SizeOf<T>())
+                ThrowIndexOutOfRangeException();
+            Unsafe.As<byte, T>(ref bytes[startIndex]) = value;
+        }
+#endif
+
+        private static void ThrowIndexOutOfRangeException() => throw new IndexOutOfRangeException();
+#else
+        [StructLayout(LayoutKind.Explicit)]
+        private struct ConverterHelperDouble
+        {
+            [FieldOffset(0)]
+            public ulong Along;
+
+            [FieldOffset(0)]
+            public double Adouble;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        private struct ConverterHelperFloat
+        {
+            [FieldOffset(0)]
+            public int Aint;
+
+            [FieldOffset(0)]
+            public float Afloat;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void WriteLittleEndian(byte[] buffer, int offset, ulong data)
+        {
+#if BIGENDIAN
+            buffer[offset + 7] = (byte)(data);
+            buffer[offset + 6] = (byte)(data >> 8);
+            buffer[offset + 5] = (byte)(data >> 16);
+            buffer[offset + 4] = (byte)(data >> 24);
+            buffer[offset + 3] = (byte)(data >> 32);
+            buffer[offset + 2] = (byte)(data >> 40);
+            buffer[offset + 1] = (byte)(data >> 48);
+            buffer[offset    ] = (byte)(data >> 56);
+#else
+            buffer[offset] = (byte)(data);
+            buffer[offset + 1] = (byte)(data >> 8);
+            buffer[offset + 2] = (byte)(data >> 16);
+            buffer[offset + 3] = (byte)(data >> 24);
+            buffer[offset + 4] = (byte)(data >> 32);
+            buffer[offset + 5] = (byte)(data >> 40);
+            buffer[offset + 6] = (byte)(data >> 48);
+            buffer[offset + 7] = (byte)(data >> 56);
+#endif
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void WriteLittleEndian(byte[] buffer, int offset, int data)
+        {
+#if BIGENDIAN
+            buffer[offset + 3] = (byte)(data);
+            buffer[offset + 2] = (byte)(data >> 8);
+            buffer[offset + 1] = (byte)(data >> 16);
+            buffer[offset    ] = (byte)(data >> 24);
+#else
+            buffer[offset] = (byte)(data);
+            buffer[offset + 1] = (byte)(data >> 8);
+            buffer[offset + 2] = (byte)(data >> 16);
+            buffer[offset + 3] = (byte)(data >> 24);
+#endif
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WriteLittleEndian(byte[] buffer, int offset, short data)
+        {
+#if BIGENDIAN
+            buffer[offset + 1] = (byte)(data);
+            buffer[offset    ] = (byte)(data >> 8);
+#else
+            buffer[offset] = (byte)(data);
+            buffer[offset + 1] = (byte)(data >> 8);
+#endif
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void GetBytes(byte[] bytes, int startIndex, double value)
+        {
+            ConverterHelperDouble ch = new ConverterHelperDouble { Adouble = value };
+            WriteLittleEndian(bytes, startIndex, ch.Along);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void GetBytes(byte[] bytes, int startIndex, float value)
+        {
+            ConverterHelperFloat ch = new ConverterHelperFloat { Afloat = value };
+            WriteLittleEndian(bytes, startIndex, ch.Aint);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void GetBytes(byte[] bytes, int startIndex, short value)
+        {
+            WriteLittleEndian(bytes, startIndex, value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void GetBytes(byte[] bytes, int startIndex, ushort value)
+        {
+            WriteLittleEndian(bytes, startIndex, (short)value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void GetBytes(byte[] bytes, int startIndex, int value)
+        {
+            WriteLittleEndian(bytes, startIndex, value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void GetBytes(byte[] bytes, int startIndex, uint value)
+        {
+            WriteLittleEndian(bytes, startIndex, (int)value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void GetBytes(byte[] bytes, int startIndex, long value)
+        {
+            WriteLittleEndian(bytes, startIndex, (ulong)value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void GetBytes(byte[] bytes, int startIndex, ulong value)
+        {
+            WriteLittleEndian(bytes, startIndex, value);
+        }
+#endif
+    }
+}
+
+#endregion
+
+
+#region INetSerializable.cs
+
+namespace LiteNetLib.Utils
+{
+    public interface INetSerializable
+    {
+        void Serialize(NetDataWriter writer);
+        void Deserialize(NetDataReader reader);
+    }
+}
+
+#endregion
+
+
+#region NetDataReader.cs
+
+namespace LiteNetLib.Utils
+{
+    using System;
+    using System.Net;
+    using System.Runtime.CompilerServices;
+
+    public class NetDataReader
+    {
+        protected byte[] _data;
+        protected int _position;
+        protected int _dataSize;
+        private int _offset;
+
+        public byte[] RawData
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _data;
+        }
+        public int RawDataSize
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _dataSize;
+        }
+        public int UserDataOffset
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _offset;
+        }
+        public int UserDataSize
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _dataSize - _offset;
+        }
+        public bool IsNull
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _data == null;
+        }
+        public int Position
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _position;
+        }
+        public bool EndOfData
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _position == _dataSize;
+        }
+        public int AvailableBytes
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _dataSize - _position;
+        }
+
+        public void SkipBytes(int count)
+        {
+            _position += count;
+        }
+
+        public void SetPosition(int position)
+        {
+            _position = position;
+        }
+
+        public void SetSource(NetDataWriter dataWriter)
+        {
+            _data = dataWriter.Data;
+            _position = 0;
+            _offset = 0;
+            _dataSize = dataWriter.Length;
+        }
+
+        public void SetSource(byte[] source)
+        {
+            _data = source;
+            _position = 0;
+            _offset = 0;
+            _dataSize = source.Length;
+        }
+
+        public void SetSource(byte[] source, int offset, int maxSize)
+        {
+            _data = source;
+            _position = offset;
+            _offset = offset;
+            _dataSize = maxSize;
+        }
+
+        public NetDataReader()
+        {
+
+        }
+
+        public NetDataReader(NetDataWriter writer)
+        {
+            SetSource(writer);
+        }
+
+        public NetDataReader(byte[] source)
+        {
+            SetSource(source);
+        }
+
+        public NetDataReader(byte[] source, int offset, int maxSize)
+        {
+            SetSource(source, offset, maxSize);
+        }
+
+        #region GetMethods
+
+        public void Get<T>(out T result) where T : struct, INetSerializable
+        {
+            result = default(T);
+            result.Deserialize(this);
+        }
+
+        public void Get<T>(out T result, Func<T> constructor) where T : class, INetSerializable
+        {
+            result = constructor();
+            result.Deserialize(this);
+        }
+
+        public void Get(out IPEndPoint result)
+        {
+            result = GetNetEndPoint();
+        }
+
+        public void Get(out byte result)
+        {
+            result = GetByte();
+        }
+
+        public void Get(out sbyte result)
+        {
+            result = (sbyte)GetByte();
+        }
+
+        public void Get(out bool result)
+        {
+            result = GetBool();
+        }
+
+        public void Get(out char result)
+        {
+            result = GetChar();
+        }
+
+        public void Get(out ushort result)
+        {
+            result = GetUShort();
+        }
+
+        public void Get(out short result)
+        {
+            result = GetShort();
+        }
+
+        public void Get(out ulong result)
+        {
+            result = GetULong();
+        }
+
+        public void Get(out long result)
+        {
+            result = GetLong();
+        }
+
+        public void Get(out uint result)
+        {
+            result = GetUInt();
+        }
+
+        public void Get(out int result)
+        {
+            result = GetInt();
+        }
+
+        public void Get(out double result)
+        {
+            result = GetDouble();
+        }
+
+        public void Get(out float result)
+        {
+            result = GetFloat();
+        }
+
+        public void Get(out string result)
+        {
+            result = GetString();
+        }
+
+        public void Get(out string result, int maxLength)
+        {
+            result = GetString(maxLength);
+        }
+        
+        public void Get(out Guid result)
+        {
+            result = GetGuid();
+        }
+
+        public IPEndPoint GetNetEndPoint()
+        {
+            string host = GetString(1000);
+            int port = GetInt();
+            return NetUtils.MakeEndPoint(host, port);
+        }
+
+        public byte GetByte()
+        {
+            byte res = _data[_position];
+            _position++;
+            return res;
+        }
+
+        public sbyte GetSByte()
+        {
+            return (sbyte)GetByte();
+        }
+
+        public T[] GetArray<T>(ushort size)
+        {
+            ushort length = BitConverter.ToUInt16(_data, _position);
+            _position += 2;
+            T[] result = new T[length];
+            length *= size;
+            Buffer.BlockCopy(_data, _position, result, 0, length);
+            _position += length;
+            return result;
+        }
+
+        public T[] GetArray<T>() where T : INetSerializable, new()
+        {
+            ushort length = BitConverter.ToUInt16(_data, _position);
+            _position += 2;
+            T[] result = new T[length];
+            for (int i = 0; i < length; i++)
+            {
+                var item = new T();
+                item.Deserialize(this);
+                result[i] = item;
+            }
+            return result;
+        }
+        
+        public T[] GetArray<T>(Func<T> constructor) where T : class, INetSerializable
+        {
+            ushort length = BitConverter.ToUInt16(_data, _position);
+            _position += 2;
+            T[] result = new T[length];
+            for (int i = 0; i < length; i++)
+                Get(out result[i], constructor);
+            return result;
+        }
+        
+        public bool[] GetBoolArray()
+        {
+            return GetArray<bool>(1);
+        }
+
+        public ushort[] GetUShortArray()
+        {
+            return GetArray<ushort>(2);
+        }
+
+        public short[] GetShortArray()
+        {
+            return GetArray<short>(2);
+        }
+
+        public int[] GetIntArray()
+        {
+            return GetArray<int>(4);
+        }
+
+        public uint[] GetUIntArray()
+        {
+            return GetArray<uint>(4);
+        }
+
+        public float[] GetFloatArray()
+        {
+            return GetArray<float>(4);
+        }
+
+        public double[] GetDoubleArray()
+        {
+            return GetArray<double>(8);
+        }
+
+        public long[] GetLongArray()
+        {
+            return GetArray<long>(8);
+        }
+
+        public ulong[] GetULongArray()
+        {
+            return GetArray<ulong>(8);
+        }
+
+        public string[] GetStringArray()
+        {
+            ushort length = GetUShort();
+            string[] arr = new string[length];
+            for (int i = 0; i < length; i++)
+            {
+                arr[i] = GetString();
+            }
+            return arr;
+        }
+
+        /// <summary>
+        /// Note that "maxStringLength" only limits the number of characters in a string, not its size in bytes.
+        /// Strings that exceed this parameter are returned as empty
+        /// </summary>
+        public string[] GetStringArray(int maxStringLength)
+        {
+            ushort length = GetUShort();
+            string[] arr = new string[length];
+            for (int i = 0; i < length; i++)
+            {
+                arr[i] = GetString(maxStringLength);
+            }
+            return arr;
+        }
+
+        public bool GetBool()
+        {
+            return GetByte() == 1;
+        }
+
+        public char GetChar()
+        {
+            return (char)GetUShort();
+        }
+
+        public ushort GetUShort()
+        {
+            ushort result = BitConverter.ToUInt16(_data, _position);
+            _position += 2;
+            return result;
+        }
+
+        public short GetShort()
+        {
+            short result = BitConverter.ToInt16(_data, _position);
+            _position += 2;
+            return result;
+        }
+
+        public long GetLong()
+        {
+            long result = BitConverter.ToInt64(_data, _position);
+            _position += 8;
+            return result;
+        }
+
+        public ulong GetULong()
+        {
+            ulong result = BitConverter.ToUInt64(_data, _position);
+            _position += 8;
+            return result;
+        }
+
+        public int GetInt()
+        {
+            int result = BitConverter.ToInt32(_data, _position);
+            _position += 4;
+            return result;
+        }
+
+        public uint GetUInt()
+        {
+            uint result = BitConverter.ToUInt32(_data, _position);
+            _position += 4;
+            return result;
+        }
+
+        public float GetFloat()
+        {
+            float result = BitConverter.ToSingle(_data, _position);
+            _position += 4;
+            return result;
+        }
+
+        public double GetDouble()
+        {
+            double result = BitConverter.ToDouble(_data, _position);
+            _position += 8;
+            return result;
+        }
+
+        /// <summary>
+        /// Note that "maxLength" only limits the number of characters in a string, not its size in bytes.
+        /// </summary>
+        /// <returns>"string.Empty" if value > "maxLength"</returns>
+        public string GetString(int maxLength)
+        {
+            ushort size = GetUShort();
+            if (size == 0)
+                return string.Empty;
+            
+            int actualSize = size - 1;
+            string result = maxLength > 0 && NetDataWriter.uTF8Encoding.Value.GetCharCount(_data, _position, actualSize) > maxLength ?
+                string.Empty :
+                NetDataWriter.uTF8Encoding.Value.GetString(_data, _position, actualSize);
+            _position += actualSize;
+            return result;
+        }
+
+        public string GetString()
+        {
+            ushort size = GetUShort();
+            if (size == 0)
+                return string.Empty;
+            
+            int actualSize = size - 1;
+            string result = NetDataWriter.uTF8Encoding.Value.GetString(_data, _position, actualSize);
+            _position += actualSize;
+            return result;
+        }
+
+        public string GetLargeString()
+        {
+            int size = GetInt();
+            if (size <= 0)
+                return string.Empty;
+            string result = NetDataWriter.uTF8Encoding.Value.GetString(_data, _position, size);
+            _position += size;
+            return result;
+        }
+        
+        public Guid GetGuid()
+        {
+#if LITENETLIB_SPANS || NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1 || NETCOREAPP3_1 || NET5_0 || NETSTANDARD2_1
+            var result =  new Guid(_data.AsSpan(_position, 16));
+            _position += 16;
+            return result;
+#else
+            return new Guid(GetBytesWithLength());
+#endif
+        }
+
+        public ArraySegment<byte> GetBytesSegment(int count)
+        {
+            ArraySegment<byte> segment = new ArraySegment<byte>(_data, _position, count);
+            _position += count;
+            return segment;
+        }
+
+        public ArraySegment<byte> GetRemainingBytesSegment()
+        {
+            ArraySegment<byte> segment = new ArraySegment<byte>(_data, _position, AvailableBytes);
+            _position = _data.Length;
+            return segment;
+        }
+
+        public T Get<T>() where T : struct, INetSerializable
+        {
+            var obj = default(T);
+            obj.Deserialize(this);
+            return obj;
+        }
+
+        public T Get<T>(Func<T> constructor) where T : class, INetSerializable
+        {
+            var obj = constructor();
+            obj.Deserialize(this);
+            return obj;
+        }
+
+#if LITENETLIB_SPANS || NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1 || NETCOREAPP3_1 || NET5_0 || NETSTANDARD2_1
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ReadOnlySpan<byte> GetRemainingBytesSpan()
+        {
+            return new ReadOnlySpan<byte>(_data, _position, _dataSize - _position);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ReadOnlyMemory<byte> GetRemainingBytesMemory()
+        {
+            return new ReadOnlyMemory<byte>(_data, _position, _dataSize - _position);
+        }
+#endif
+
+        public byte[] GetRemainingBytes()
+        {
+            byte[] outgoingData = new byte[AvailableBytes];
+            Buffer.BlockCopy(_data, _position, outgoingData, 0, AvailableBytes);
+            _position = _data.Length;
+            return outgoingData;
+        }
+
+        public void GetBytes(byte[] destination, int start, int count)
+        {
+            Buffer.BlockCopy(_data, _position, destination, start, count);
+            _position += count;
+        }
+
+        public void GetBytes(byte[] destination, int count)
+        {
+            Buffer.BlockCopy(_data, _position, destination, 0, count);
+            _position += count;
+        }
+
+        public sbyte[] GetSBytesWithLength()
+        {
+            return GetArray<sbyte>(1);
+        }
+
+        public byte[] GetBytesWithLength()
+        {
+            return GetArray<byte>(1);
+        }
+        #endregion
+
+        #region PeekMethods
+
+        public byte PeekByte()
+        {
+            return _data[_position];
+        }
+
+        public sbyte PeekSByte()
+        {
+            return (sbyte)_data[_position];
+        }
+
+        public bool PeekBool()
+        {
+            return _data[_position] == 1;
+        }
+
+        public char PeekChar()
+        {
+            return (char)PeekUShort();
+        }
+
+        public ushort PeekUShort()
+        {
+            return BitConverter.ToUInt16(_data, _position);
+        }
+
+        public short PeekShort()
+        {
+            return BitConverter.ToInt16(_data, _position);
+        }
+
+        public long PeekLong()
+        {
+            return BitConverter.ToInt64(_data, _position);
+        }
+
+        public ulong PeekULong()
+        {
+            return BitConverter.ToUInt64(_data, _position);
+        }
+
+        public int PeekInt()
+        {
+            return BitConverter.ToInt32(_data, _position);
+        }
+
+        public uint PeekUInt()
+        {
+            return BitConverter.ToUInt32(_data, _position);
+        }
+
+        public float PeekFloat()
+        {
+            return BitConverter.ToSingle(_data, _position);
+        }
+
+        public double PeekDouble()
+        {
+            return BitConverter.ToDouble(_data, _position);
+        }
+
+        /// <summary>
+        /// Note that "maxLength" only limits the number of characters in a string, not its size in bytes.
+        /// </summary>
+        public string PeekString(int maxLength)
+        {
+            ushort size = PeekUShort();
+            if (size == 0)
+                return string.Empty;
+            
+            int actualSize = size - 1;
+            return (maxLength > 0 && NetDataWriter.uTF8Encoding.Value.GetCharCount(_data, _position + 2, actualSize) > maxLength) ?
+                string.Empty :
+                NetDataWriter.uTF8Encoding.Value.GetString(_data, _position + 2, actualSize);
+        }
+
+        public string PeekString()
+        {
+            ushort size = PeekUShort();
+            if (size == 0)
+                return string.Empty;
+
+            int actualSize = size - 1;
+            return NetDataWriter.uTF8Encoding.Value.GetString(_data, _position + 2, actualSize);
+        }
+        #endregion
+
+        #region TryGetMethods
+        public bool TryGetByte(out byte result)
+        {
+            if (AvailableBytes >= 1)
+            {
+                result = GetByte();
+                return true;
+            }
+            result = 0;
+            return false;
+        }
+
+        public bool TryGetSByte(out sbyte result)
+        {
+            if (AvailableBytes >= 1)
+            {
+                result = GetSByte();
+                return true;
+            }
+            result = 0;
+            return false;
+        }
+
+        public bool TryGetBool(out bool result)
+        {
+            if (AvailableBytes >= 1)
+            {
+                result = GetBool();
+                return true;
+            }
+            result = false;
+            return false;
+        }
+
+        public bool TryGetChar(out char result)
+        {
+            if (!TryGetUShort(out ushort uShortValue))
+            {
+                result = '\0';
+                return false;
+            }
+            result = (char)uShortValue;
+            return true;
+        }
+
+        public bool TryGetShort(out short result)
+        {
+            if (AvailableBytes >= 2)
+            {
+                result = GetShort();
+                return true;
+            }
+            result = 0;
+            return false;
+        }
+
+        public bool TryGetUShort(out ushort result)
+        {
+            if (AvailableBytes >= 2)
+            {
+                result = GetUShort();
+                return true;
+            }
+            result = 0;
+            return false;
+        }
+
+        public bool TryGetInt(out int result)
+        {
+            if (AvailableBytes >= 4)
+            {
+                result = GetInt();
+                return true;
+            }
+            result = 0;
+            return false;
+        }
+
+        public bool TryGetUInt(out uint result)
+        {
+            if (AvailableBytes >= 4)
+            {
+                result = GetUInt();
+                return true;
+            }
+            result = 0;
+            return false;
+        }
+
+        public bool TryGetLong(out long result)
+        {
+            if (AvailableBytes >= 8)
+            {
+                result = GetLong();
+                return true;
+            }
+            result = 0;
+            return false;
+        }
+
+        public bool TryGetULong(out ulong result)
+        {
+            if (AvailableBytes >= 8)
+            {
+                result = GetULong();
+                return true;
+            }
+            result = 0;
+            return false;
+        }
+
+        public bool TryGetFloat(out float result)
+        {
+            if (AvailableBytes >= 4)
+            {
+                result = GetFloat();
+                return true;
+            }
+            result = 0;
+            return false;
+        }
+
+        public bool TryGetDouble(out double result)
+        {
+            if (AvailableBytes >= 8)
+            {
+                result = GetDouble();
+                return true;
+            }
+            result = 0;
+            return false;
+        }
+
+        public bool TryGetString(out string result)
+        {
+            if (AvailableBytes >= 2)
+            {
+                ushort strSize = PeekUShort();
+                if (AvailableBytes >= strSize + 1)
+                {
+                    result = GetString();
+                    return true;
+                }
+            }
+            result = null;
+            return false;
+        }
+
+        public bool TryGetStringArray(out string[] result)
+        {
+            if (!TryGetUShort(out ushort strArrayLength)) {
+                result = null;
+                return false;
+            }
+
+            result = new string[strArrayLength];
+            for (int i = 0; i < strArrayLength; i++)
+            {
+                if (!TryGetString(out result[i]))
+                {
+                    result = null;
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public bool TryGetBytesWithLength(out byte[] result)
+        {
+            if (AvailableBytes >= 2)
+            {
+                ushort length = PeekUShort();
+                if (length >= 0 && AvailableBytes >= 2 + length)
+                {
+                    result = GetBytesWithLength();
+                    return true;
+                }
+            }
+            result = null;
+            return false;
+        }
+        #endregion
+
+        public void Clear()
+        {
+            _position = 0;
+            _dataSize = 0;
+            _data = null;
+        }
+    }
+}
+
+#endregion
+
+
+#region NetDataWriter.cs
+
+namespace LiteNetLib.Utils
+{
+    using System;
+    using System.Net;
+    using System.Runtime.CompilerServices;
+    using System.Text;
+    using System.Threading;
+
+    public class NetDataWriter
+    {
+        protected byte[] _data;
+        protected int _position;
+        private const int InitialSize = 64;
+        private readonly bool _autoResize;
+
+        public int Capacity
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _data.Length;
+        }
+        public byte[] Data
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _data;
+        }
+        public int Length
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _position;
+        }
+
+#if LITENETLIB_SPANS || NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1 || NETCOREAPP3_1 || NET5_0 || NETSTANDARD2_1
+        public ReadOnlySpan<byte> AsReadOnlySpan()
+        {
+            return new ReadOnlySpan<byte>(_data, 0, _position);
+        }
+#endif
+
+        public static readonly ThreadLocal<UTF8Encoding> uTF8Encoding = new ThreadLocal<UTF8Encoding>(() => new UTF8Encoding(false, true));
+
+        public NetDataWriter() : this(true, InitialSize)
+        {
+        }
+
+        public NetDataWriter(bool autoResize) : this(autoResize, InitialSize)
+        {
+        }
+
+        public NetDataWriter(bool autoResize, int initialSize)
+        {
+            _data = new byte[initialSize];
+            _autoResize = autoResize;
+        }
+
+        /// <summary>
+        /// Creates NetDataWriter from existing ByteArray
+        /// </summary>
+        /// <param name="bytes">Source byte array</param>
+        /// <param name="copy">Copy array to new location or use existing</param>
+        public static NetDataWriter FromBytes(byte[] bytes, bool copy)
+        {
+            if (copy)
+            {
+                var netDataWriter = new NetDataWriter(true, bytes.Length);
+                netDataWriter.Put(bytes);
+                return netDataWriter;
+            }
+            return new NetDataWriter(true, 0) {_data = bytes, _position = bytes.Length};
+        }
+
+        /// <summary>
+        /// Creates NetDataWriter from existing ByteArray (always copied data)
+        /// </summary>
+        /// <param name="bytes">Source byte array</param>
+        /// <param name="offset">Offset of array</param>
+        /// <param name="length">Length of array</param>
+        public static NetDataWriter FromBytes(byte[] bytes, int offset, int length)
+        {
+            var netDataWriter = new NetDataWriter(true, bytes.Length);
+            netDataWriter.Put(bytes, offset, length);
+            return netDataWriter;
+        }
+
+        public static NetDataWriter FromString(string value)
+        {
+            var netDataWriter = new NetDataWriter();
+            netDataWriter.Put(value);
+            return netDataWriter;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ResizeIfNeed(int newSize)
+        {
+            if (_data.Length < newSize)
+            {
+                Array.Resize(ref _data, Math.Max(newSize, _data.Length * 2));
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void EnsureFit(int additionalSize)
+        {
+            if (_data.Length < _position + additionalSize)
+            {
+                Array.Resize(ref _data, Math.Max(_position + additionalSize, _data.Length * 2));
+            }
+        }
+
+        public void Reset(int size)
+        {
+            ResizeIfNeed(size);
+            _position = 0;
+        }
+
+        public void Reset()
+        {
+            _position = 0;
+        }
+
+        public byte[] CopyData()
+        {
+            byte[] resultData = new byte[_position];
+            Buffer.BlockCopy(_data, 0, resultData, 0, _position);
+            return resultData;
+        }
+
+        /// <summary>
+        /// Sets position of NetDataWriter to rewrite previous values
+        /// </summary>
+        /// <param name="position">new byte position</param>
+        /// <returns>previous position of data writer</returns>
+        public int SetPosition(int position)
+        {
+            int prevPosition = _position;
+            _position = position;
+            return prevPosition;
+        }
+
+        public void Put(float value)
+        {
+            if (_autoResize)
+                ResizeIfNeed(_position + 4);
+            FastBitConverter.GetBytes(_data, _position, value);
+            _position += 4;
+        }
+
+        public void Put(double value)
+        {
+            if (_autoResize)
+                ResizeIfNeed(_position + 8);
+            FastBitConverter.GetBytes(_data, _position, value);
+            _position += 8;
+        }
+
+        public void Put(long value)
+        {
+            if (_autoResize)
+                ResizeIfNeed(_position + 8);
+            FastBitConverter.GetBytes(_data, _position, value);
+            _position += 8;
+        }
+
+        public void Put(ulong value)
+        {
+            if (_autoResize)
+                ResizeIfNeed(_position + 8);
+            FastBitConverter.GetBytes(_data, _position, value);
+            _position += 8;
+        }
+
+        public void Put(int value)
+        {
+            if (_autoResize)
+                ResizeIfNeed(_position + 4);
+            FastBitConverter.GetBytes(_data, _position, value);
+            _position += 4;
+        }
+
+        public void Put(uint value)
+        {
+            if (_autoResize)
+                ResizeIfNeed(_position + 4);
+            FastBitConverter.GetBytes(_data, _position, value);
+            _position += 4;
+        }
+
+        public void Put(char value)
+        {
+            Put((ushort)value);
+        }
+
+        public void Put(ushort value)
+        {
+            if (_autoResize)
+                ResizeIfNeed(_position + 2);
+            FastBitConverter.GetBytes(_data, _position, value);
+            _position += 2;
+        }
+
+        public void Put(short value)
+        {
+            if (_autoResize)
+                ResizeIfNeed(_position + 2);
+            FastBitConverter.GetBytes(_data, _position, value);
+            _position += 2;
+        }
+
+        public void Put(sbyte value)
+        {
+            if (_autoResize)
+                ResizeIfNeed(_position + 1);
+            _data[_position] = (byte)value;
+            _position++;
+        }
+
+        public void Put(byte value)
+        {
+            if (_autoResize)
+                ResizeIfNeed(_position + 1);
+            _data[_position] = value;
+            _position++;
+        }
+
+        public void Put(Guid value)
+        {
+#if LITENETLIB_SPANS || NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1 || NETCOREAPP3_1 || NET5_0 || NETSTANDARD2_1
+            if (_autoResize)
+                ResizeIfNeed(_position + 16);
+            value.TryWriteBytes(_data.AsSpan(_position));
+            _position += 16;
+#else
+            PutBytesWithLength(value.ToByteArray());
+#endif
+        }
+
+        public void Put(byte[] data, int offset, int length)
+        {
+            if (_autoResize)
+                ResizeIfNeed(_position + length);
+            Buffer.BlockCopy(data, offset, _data, _position, length);
+            _position += length;
+        }
+
+        public void Put(byte[] data)
+        {
+            if (_autoResize)
+                ResizeIfNeed(_position + data.Length);
+            Buffer.BlockCopy(data, 0, _data, _position, data.Length);
+            _position += data.Length;
+        }
+
+        public void PutSBytesWithLength(sbyte[] data, int offset, ushort length)
+        {
+            if (_autoResize)
+                ResizeIfNeed(_position + 2 + length);
+            FastBitConverter.GetBytes(_data, _position, length);
+            Buffer.BlockCopy(data, offset, _data, _position + 2, length);
+            _position += 2 + length;
+        }
+
+        public void PutSBytesWithLength(sbyte[] data)
+        {
+            PutArray(data, 1);
+        }
+
+        public void PutBytesWithLength(byte[] data, int offset, ushort length)
+        {
+            if (_autoResize)
+                ResizeIfNeed(_position + 2 + length);
+            FastBitConverter.GetBytes(_data, _position, length);
+            Buffer.BlockCopy(data, offset, _data, _position + 2, length);
+            _position += 2 + length;
+        }
+
+        public void PutBytesWithLength(byte[] data)
+        {
+            PutArray(data, 1);
+        }
+
+        public void Put(bool value)
+        {
+            Put((byte)(value ? 1 : 0));
+        }
+
+        public void PutArray(Array arr, int sz)
+        {
+            ushort length = arr == null ? (ushort) 0 : (ushort)arr.Length;
+            sz *= length;
+            if (_autoResize)
+                ResizeIfNeed(_position + sz + 2);
+            FastBitConverter.GetBytes(_data, _position, length);
+            if (arr != null)
+                Buffer.BlockCopy(arr, 0, _data, _position + 2, sz);
+            _position += sz + 2;
+        }
+
+        public void PutArray(float[] value)
+        {
+            PutArray(value, 4);
+        }
+
+        public void PutArray(double[] value)
+        {
+            PutArray(value, 8);
+        }
+
+        public void PutArray(long[] value)
+        {
+            PutArray(value, 8);
+        }
+
+        public void PutArray(ulong[] value)
+        {
+            PutArray(value, 8);
+        }
+
+        public void PutArray(int[] value)
+        {
+            PutArray(value, 4);
+        }
+
+        public void PutArray(uint[] value)
+        {
+            PutArray(value, 4);
+        }
+
+        public void PutArray(ushort[] value)
+        {
+            PutArray(value, 2);
+        }
+
+        public void PutArray(short[] value)
+        {
+            PutArray(value, 2);
+        }
+
+        public void PutArray(bool[] value)
+        {
+            PutArray(value, 1);
+        }
+
+        public void PutArray(string[] value)
+        {
+            ushort strArrayLength = value == null ? (ushort)0 : (ushort)value.Length;
+            Put(strArrayLength);
+            for (int i = 0; i < strArrayLength; i++)
+                Put(value[i]);
+        }
+
+        public void PutArray(string[] value, int strMaxLength)
+        {
+            ushort strArrayLength = value == null ? (ushort)0 : (ushort)value.Length;
+            Put(strArrayLength);
+            for (int i = 0; i < strArrayLength; i++)
+                Put(value[i], strMaxLength);
+        }
+
+        public void PutArray<T>(T[] value) where T : INetSerializable, new()
+        {
+            ushort strArrayLength = (ushort)(value?.Length ?? 0);
+            Put(strArrayLength);
+            for (int i = 0; i < strArrayLength; i++)
+                value[i].Serialize(this);
+        }
+
+        public void Put(IPEndPoint endPoint)
+        {
+            Put(endPoint.Address.ToString());
+            Put(endPoint.Port);
+        }
+
+        public void PutLargeString(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                Put(0);
+                return;
+            }
+            int size = uTF8Encoding.Value.GetByteCount(value);
+            if (size == 0)
+            {
+                Put(0);
+                return;
+            }
+            Put(size);
+            if (_autoResize)
+                ResizeIfNeed(_position + size);
+            uTF8Encoding.Value.GetBytes(value, 0, size, _data, _position);
+            _position += size;
+        }
+
+        public void Put(string value)
+        {
+            Put(value, 0);
+        }
+
+        /// <summary>
+        /// Note that "maxLength" only limits the number of characters in a string, not its size in bytes.
+        /// </summary>
+        public void Put(string value, int maxLength)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                Put((ushort)0);
+                return;
+            }
+
+            int length = maxLength > 0 && value.Length > maxLength ? maxLength : value.Length;
+            int maxSize = uTF8Encoding.Value.GetMaxByteCount(length);
+            if (_autoResize)
+                ResizeIfNeed(_position + maxSize + sizeof(ushort));
+            int size = uTF8Encoding.Value.GetBytes(value, 0, length, _data, _position + sizeof(ushort));
+            if (size == 0)
+            {
+                Put((ushort)0);
+                return;
+            }
+            Put(checked((ushort)(size + 1)));
+            _position += size;
+        }
+
+        public void Put<T>(T obj) where T : INetSerializable
+        {
+            obj.Serialize(this);
+        }
+    }
+}
+
+#endregion
+
+
+#region NetPacketProcessor.cs
+
+namespace LiteNetLib.Utils
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+
+    public class NetPacketProcessor
+    {
+        private static class HashCache<T>
+        {
+            public static readonly ulong Id;
+
+            //FNV-1 64 bit hash
+            static HashCache()
+            {
+                ulong hash = 14695981039346656037UL; //offset
+                string typeName = typeof(T).ToString();
+                for (var i = 0; i < typeName.Length; i++)
+                {
+                    hash ^= typeName[i];
+                    hash *= 1099511628211UL; //prime
+                }
+                Id = hash;
+            }
+        }
+
+        protected delegate void SubscribeDelegate(NetDataReader reader, object userData);
+        private readonly NetSerializer _netSerializer;
+        private readonly Dictionary<ulong, SubscribeDelegate> _callbacks = new Dictionary<ulong, SubscribeDelegate>();
+
+        public NetPacketProcessor()
+        {
+            _netSerializer = new NetSerializer();
+        }
+
+        public NetPacketProcessor(int maxStringLength)
+        {
+            _netSerializer = new NetSerializer(maxStringLength);
+        }
+
+        protected virtual ulong GetHash<T>()
+        {
+            return HashCache<T>.Id;
+        }
+
+        protected virtual SubscribeDelegate GetCallbackFromData(NetDataReader reader)
+        {
+            ulong hash = reader.GetULong();
+            if (!_callbacks.TryGetValue(hash, out var action))
+            {
+                throw new ParseException("Undefined packet in NetDataReader");
+            }
+            return action;
+        }
+
+        protected virtual void WriteHash<T>(NetDataWriter writer)
+        {
+            writer.Put(GetHash<T>());
+        }
+
+        /// <summary>
+        /// Register nested property type
+        /// </summary>
+        /// <typeparam name="T">INetSerializable structure</typeparam>
+        public void RegisterNestedType<T>() where T : struct, INetSerializable
+        {
+            _netSerializer.RegisterNestedType<T>();
+        }
+
+        /// <summary>
+        /// Register nested property type
+        /// </summary>
+        /// <param name="writeDelegate"></param>
+        /// <param name="readDelegate"></param>
+        public void RegisterNestedType<T>(Action<NetDataWriter, T> writeDelegate, Func<NetDataReader, T> readDelegate)
+        {
+            _netSerializer.RegisterNestedType<T>(writeDelegate, readDelegate);
+        }
+
+        /// <summary>
+        /// Register nested property type
+        /// </summary>
+        /// <typeparam name="T">INetSerializable class</typeparam>
+        public void RegisterNestedType<T>(Func<T> constructor) where T : class, INetSerializable
+        {
+            _netSerializer.RegisterNestedType(constructor);
+        }
+
+        /// <summary>
+        /// Reads all available data from NetDataReader and calls OnReceive delegates
+        /// </summary>
+        /// <param name="reader">NetDataReader with packets data</param>
+        public void ReadAllPackets(NetDataReader reader)
+        {
+            while (reader.AvailableBytes > 0)
+                ReadPacket(reader);
+        }
+
+        /// <summary>
+        /// Reads all available data from NetDataReader and calls OnReceive delegates
+        /// </summary>
+        /// <param name="reader">NetDataReader with packets data</param>
+        /// <param name="userData">Argument that passed to OnReceivedEvent</param>
+        /// <exception cref="ParseException">Malformed packet</exception>
+        public void ReadAllPackets(NetDataReader reader, object userData)
+        {
+            while (reader.AvailableBytes > 0)
+                ReadPacket(reader, userData);
+        }
+
+        /// <summary>
+        /// Reads one packet from NetDataReader and calls OnReceive delegate
+        /// </summary>
+        /// <param name="reader">NetDataReader with packet</param>
+        /// <exception cref="ParseException">Malformed packet</exception>
+        public void ReadPacket(NetDataReader reader)
+        {
+            ReadPacket(reader, null);
+        }
+
+        public void Write<
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(Trimming.SerializerMemberTypes)]
+#endif
+        T>(NetDataWriter writer, T packet) where T : class, new()
+        {
+            WriteHash<T>(writer);
+            _netSerializer.Serialize(writer, packet);
+        }
+
+        public void WriteNetSerializable<T>(NetDataWriter writer, ref T packet) where T : INetSerializable
+        {
+            WriteHash<T>(writer);
+            packet.Serialize(writer);
+        }
+
+        /// <summary>
+        /// Reads one packet from NetDataReader and calls OnReceive delegate
+        /// </summary>
+        /// <param name="reader">NetDataReader with packet</param>
+        /// <param name="userData">Argument that passed to OnReceivedEvent</param>
+        /// <exception cref="ParseException">Malformed packet</exception>
+        public void ReadPacket(NetDataReader reader, object userData)
+        {
+            GetCallbackFromData(reader)(reader, userData);
+        }
+
+        /// <summary>
+        /// Register and subscribe to packet receive event
+        /// </summary>
+        /// <param name="onReceive">event that will be called when packet deserialized with ReadPacket method</param>
+        /// <param name="packetConstructor">Method that constructs packet instead of slow Activator.CreateInstance</param>
+        /// <exception cref="InvalidTypeException"><typeparamref name="T"/>'s fields are not supported, or it has no fields</exception>
+        public void Subscribe<
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(Trimming.SerializerMemberTypes)]
+#endif
+        T>(Action<T> onReceive, Func<T> packetConstructor) where T : class, new()
+        {
+            _netSerializer.Register<T>();
+            _callbacks[GetHash<T>()] = (reader, userData) =>
+            {
+                var reference = packetConstructor();
+                _netSerializer.Deserialize(reader, reference);
+                onReceive(reference);
+            };
+        }
+
+        /// <summary>
+        /// Register and subscribe to packet receive event (with userData)
+        /// </summary>
+        /// <param name="onReceive">event that will be called when packet deserialized with ReadPacket method</param>
+        /// <param name="packetConstructor">Method that constructs packet instead of slow Activator.CreateInstance</param>
+        /// <exception cref="InvalidTypeException"><typeparamref name="T"/>'s fields are not supported, or it has no fields</exception>
+        public void Subscribe<
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(Trimming.SerializerMemberTypes)]
+#endif
+        T, TUserData>(Action<T, TUserData> onReceive, Func<T> packetConstructor) where T : class, new()
+        {
+            _netSerializer.Register<T>();
+            _callbacks[GetHash<T>()] = (reader, userData) =>
+            {
+                var reference = packetConstructor();
+                _netSerializer.Deserialize(reader, reference);
+                onReceive(reference, (TUserData)userData);
+            };
+        }
+
+        /// <summary>
+        /// Register and subscribe to packet receive event
+        /// This method will overwrite last received packet class on receive (less garbage)
+        /// </summary>
+        /// <param name="onReceive">event that will be called when packet deserialized with ReadPacket method</param>
+        /// <exception cref="InvalidTypeException"><typeparamref name="T"/>'s fields are not supported, or it has no fields</exception>
+        public void SubscribeReusable<
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(Trimming.SerializerMemberTypes)]
+#endif
+        T>(Action<T> onReceive) where T : class, new()
+        {
+            _netSerializer.Register<T>();
+            var reference = new T();
+            _callbacks[GetHash<T>()] = (reader, userData) =>
+            {
+                _netSerializer.Deserialize(reader, reference);
+                onReceive(reference);
+            };
+        }
+
+        /// <summary>
+        /// Register and subscribe to packet receive event
+        /// This method will overwrite last received packet class on receive (less garbage)
+        /// </summary>
+        /// <param name="onReceive">event that will be called when packet deserialized with ReadPacket method</param>
+        /// <exception cref="InvalidTypeException"><typeparamref name="T"/>'s fields are not supported, or it has no fields</exception>
+        public void SubscribeReusable<
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(Trimming.SerializerMemberTypes)]
+#endif
+        T, TUserData>(Action<T, TUserData> onReceive) where T : class, new()
+        {
+            _netSerializer.Register<T>();
+            var reference = new T();
+            _callbacks[GetHash<T>()] = (reader, userData) =>
+            {
+                _netSerializer.Deserialize(reader, reference);
+                onReceive(reference, (TUserData)userData);
+            };
+        }
+
+        public void SubscribeNetSerializable<T, TUserData>(
+            Action<T, TUserData> onReceive,
+            Func<T> packetConstructor) where T : INetSerializable
+        {
+            _callbacks[GetHash<T>()] = (reader, userData) =>
+            {
+                var pkt = packetConstructor();
+                pkt.Deserialize(reader);
+                onReceive(pkt, (TUserData)userData);
+            };
+        }
+
+        public void SubscribeNetSerializable<T>(
+            Action<T> onReceive,
+            Func<T> packetConstructor) where T : INetSerializable
+        {
+            _callbacks[GetHash<T>()] = (reader, userData) =>
+            {
+                var pkt = packetConstructor();
+                pkt.Deserialize(reader);
+                onReceive(pkt);
+            };
+        }
+
+        public void SubscribeNetSerializable<T, TUserData>(
+            Action<T, TUserData> onReceive) where T : INetSerializable, new()
+        {
+            var reference = new T();
+            _callbacks[GetHash<T>()] = (reader, userData) =>
+            {
+                reference.Deserialize(reader);
+                onReceive(reference, (TUserData)userData);
+            };
+        }
+
+        public void SubscribeNetSerializable<T>(
+            Action<T> onReceive) where T : INetSerializable, new()
+        {
+            var reference = new T();
+            _callbacks[GetHash<T>()] = (reader, userData) =>
+            {
+                reference.Deserialize(reader);
+                onReceive(reference);
+            };
+        }
+
+        /// <summary>
+        /// Remove any subscriptions by type
+        /// </summary>
+        /// <typeparam name="T">Packet type</typeparam>
+        /// <returns>true if remove is success</returns>
+        public bool RemoveSubscription<T>()
+        {
+            return _callbacks.Remove(GetHash<T>());
+        }
+    }
+}
+
+#endregion
+
+
+#region NetSerializer.cs
+
+namespace LiteNetLib.Utils
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Net;
+    using System.Reflection;
+    using System.Runtime.Serialization;
+
+    public class InvalidTypeException : ArgumentException
+    {
+        public InvalidTypeException(string message) : base(message) { }
+    }
+
+    public class ParseException : Exception
+    {
+        public ParseException(string message) : base(message) { }
+    }
+
+    public class NetSerializer
+    {
+        private enum CallType
+        {
+            Basic,
+            Array,
+            List
+        }
+
+        private abstract class FastCall<T>
+        {
+            public CallType Type;
+            public virtual void Init(MethodInfo getMethod, MethodInfo setMethod, CallType type) { Type = type; }
+            public abstract void Read(T inf, NetDataReader r);
+            public abstract void Write(T inf, NetDataWriter w);
+            public abstract void ReadArray(T inf, NetDataReader r);
+            public abstract void WriteArray(T inf, NetDataWriter w);
+            public abstract void ReadList(T inf, NetDataReader r);
+            public abstract void WriteList(T inf, NetDataWriter w);
+        }
+
+        private abstract class FastCallSpecific<TClass, TProperty> : FastCall<TClass>
+        {
+            protected Func<TClass, TProperty> Getter;
+            protected Action<TClass, TProperty> Setter;
+            protected Func<TClass, TProperty[]> GetterArr;
+            protected Action<TClass, TProperty[]> SetterArr;
+            protected Func<TClass, List<TProperty>> GetterList;
+            protected Action<TClass, List<TProperty>> SetterList;
+
+            public override void ReadArray(TClass inf, NetDataReader r) { throw new InvalidTypeException("Unsupported type: " + typeof(TProperty) + "[]"); }
+            public override void WriteArray(TClass inf, NetDataWriter w) { throw new InvalidTypeException("Unsupported type: " + typeof(TProperty) + "[]"); }
+            public override void ReadList(TClass inf, NetDataReader r) { throw new InvalidTypeException("Unsupported type: List<" + typeof(TProperty) + ">"); }
+            public override void WriteList(TClass inf, NetDataWriter w) { throw new InvalidTypeException("Unsupported type: List<" + typeof(TProperty) + ">"); }
+
+            protected TProperty[] ReadArrayHelper(TClass inf, NetDataReader r)
+            {
+                ushort count = r.GetUShort();
+                var arr = GetterArr(inf);
+                arr = arr == null || arr.Length != count ? new TProperty[count] : arr;
+                SetterArr(inf, arr);
+                return arr;
+            }
+
+            protected TProperty[] WriteArrayHelper(TClass inf, NetDataWriter w)
+            {
+                var arr = GetterArr(inf);
+                w.Put((ushort)arr.Length);
+                return arr;
+            }
+
+            protected List<TProperty> ReadListHelper(TClass inf, NetDataReader r, out int len)
+            {
+                len = r.GetUShort();
+                var list = GetterList(inf);
+                if (list == null)
+                {
+                    list = new List<TProperty>(len);
+                    SetterList(inf, list);
+                }
+                return list;
+            }
+
+            protected List<TProperty> WriteListHelper(TClass inf, NetDataWriter w, out int len)
+            {
+                var list = GetterList(inf);
+                if (list == null)
+                {
+                    len = 0;
+                    w.Put(0);
+                    return null;
+                }
+                len = list.Count;
+                w.Put((ushort)len);
+                return list;
+            }
+
+            public override void Init(MethodInfo getMethod, MethodInfo setMethod, CallType type)
+            {
+                base.Init(getMethod, setMethod, type);
+                switch (type)
+                {
+                    case CallType.Array:
+                        GetterArr = (Func<TClass, TProperty[]>)Delegate.CreateDelegate(typeof(Func<TClass, TProperty[]>), getMethod);
+                        SetterArr = (Action<TClass, TProperty[]>)Delegate.CreateDelegate(typeof(Action<TClass, TProperty[]>), setMethod);
+                        break;
+                    case CallType.List:
+                        GetterList = (Func<TClass, List<TProperty>>)Delegate.CreateDelegate(typeof(Func<TClass, List<TProperty>>), getMethod);
+                        SetterList = (Action<TClass, List<TProperty>>)Delegate.CreateDelegate(typeof(Action<TClass, List<TProperty>>), setMethod);
+                        break;
+                    default:
+                        Getter = (Func<TClass, TProperty>)Delegate.CreateDelegate(typeof(Func<TClass, TProperty>), getMethod);
+                        Setter = (Action<TClass, TProperty>)Delegate.CreateDelegate(typeof(Action<TClass, TProperty>), setMethod);
+                        break;
+                }
+            }
+        }
+
+        private abstract class FastCallSpecificAuto<TClass, TProperty> : FastCallSpecific<TClass, TProperty>
+        {
+            protected abstract void ElementRead(NetDataReader r, out TProperty prop);
+            protected abstract void ElementWrite(NetDataWriter w, ref TProperty prop);
+
+            public override void Read(TClass inf, NetDataReader r)
+            {
+                ElementRead(r, out var elem);
+                Setter(inf, elem);
+            }
+
+            public override void Write(TClass inf, NetDataWriter w)
+            {
+                var elem = Getter(inf);
+                ElementWrite(w, ref elem);
+            }
+
+            public override void ReadArray(TClass inf, NetDataReader r)
+            {
+                var arr = ReadArrayHelper(inf, r);
+                for (int i = 0; i < arr.Length; i++)
+                    ElementRead(r, out arr[i]);
+            }
+
+            public override void WriteArray(TClass inf, NetDataWriter w)
+            {
+                var arr = WriteArrayHelper(inf, w);
+                for (int i = 0; i < arr.Length; i++)
+                    ElementWrite(w, ref arr[i]);
+            }
+        }
+
+        private sealed class FastCallStatic<TClass, TProperty> : FastCallSpecific<TClass, TProperty>
+        {
+            private readonly Action<NetDataWriter, TProperty> _writer;
+            private readonly Func<NetDataReader, TProperty> _reader;
+
+            public FastCallStatic(Action<NetDataWriter, TProperty> write, Func<NetDataReader, TProperty> read)
+            {
+                _writer = write;
+                _reader = read;
+            }
+
+            public override void Read(TClass inf, NetDataReader r) { Setter(inf, _reader(r)); }
+            public override void Write(TClass inf, NetDataWriter w) { _writer(w, Getter(inf)); }
+
+            public override void ReadList(TClass inf, NetDataReader r)
+            {
+                var list = ReadListHelper(inf, r, out int len);
+                int listCount = list.Count;
+                for (int i = 0; i < len; i++)
+                {
+                    if (i < listCount)
+                        list[i] = _reader(r);
+                    else
+                        list.Add(_reader(r));
+                }
+                if (len < listCount)
+                    list.RemoveRange(len, listCount - len);
+            }
+
+            public override void WriteList(TClass inf, NetDataWriter w)
+            {
+                var list = WriteListHelper(inf, w, out int len);
+                for (int i = 0; i < len; i++)
+                    _writer(w, list[i]);
+            }
+
+            public override void ReadArray(TClass inf, NetDataReader r)
+            {
+                var arr = ReadArrayHelper(inf, r);
+                int len = arr.Length;
+                for (int i = 0; i < len; i++)
+                    arr[i] = _reader(r);
+            }
+
+            public override void WriteArray(TClass inf, NetDataWriter w)
+            {
+                var arr = WriteArrayHelper(inf, w);
+                int len = arr.Length;
+                for (int i = 0; i < len; i++)
+                    _writer(w, arr[i]);
+            }
+        }
+
+        private sealed class FastCallStruct<TClass, TProperty> : FastCallSpecific<TClass, TProperty> where TProperty : struct, INetSerializable
+        {
+            private TProperty _p;
+
+            public override void Read(TClass inf, NetDataReader r)
+            {
+                _p.Deserialize(r);
+                Setter(inf, _p);
+            }
+
+            public override void Write(TClass inf, NetDataWriter w)
+            {
+                _p = Getter(inf);
+                _p.Serialize(w);
+            }
+
+            public override void ReadList(TClass inf, NetDataReader r)
+            {
+                var list = ReadListHelper(inf, r, out int len);
+                int listCount = list.Count;
+                for (int i = 0; i < len; i++)
+                {
+                    var itm = default(TProperty);
+                    itm.Deserialize(r);
+                    if(i < listCount)
+                        list[i] = itm;
+                    else
+                        list.Add(itm);
+                }
+                if (len < listCount)
+                    list.RemoveRange(len, listCount - len);
+            }
+
+            public override void WriteList(TClass inf, NetDataWriter w)
+            {
+                var list = WriteListHelper(inf, w, out int len);
+                for (int i = 0; i < len; i++)
+                    list[i].Serialize(w);
+            }
+
+            public override void ReadArray(TClass inf, NetDataReader r)
+            {
+                var arr = ReadArrayHelper(inf, r);
+                int len = arr.Length;
+                for (int i = 0; i < len; i++)
+                    arr[i].Deserialize(r);
+            }
+
+            public override void WriteArray(TClass inf, NetDataWriter w)
+            {
+                var arr = WriteArrayHelper(inf, w);
+                int len = arr.Length;
+                for (int i = 0; i < len; i++)
+                    arr[i].Serialize(w);
+            }
+        }
+
+        private sealed class FastCallClass<TClass, TProperty> : FastCallSpecific<TClass, TProperty> where TProperty : class, INetSerializable
+        {
+            private readonly Func<TProperty> _constructor;
+            public FastCallClass(Func<TProperty> constructor) { _constructor = constructor; }
+
+            public override void Read(TClass inf, NetDataReader r)
+            {
+                var p = _constructor();
+                p.Deserialize(r);
+                Setter(inf, p);
+            }
+
+            public override void Write(TClass inf, NetDataWriter w)
+            {
+                var p = Getter(inf);
+                p?.Serialize(w);
+            }
+
+            public override void ReadList(TClass inf, NetDataReader r)
+            {
+                var list = ReadListHelper(inf, r, out int len);
+                int listCount = list.Count;
+                for (int i = 0; i < len; i++)
+                {
+                    if (i < listCount)
+                    {
+                        list[i].Deserialize(r);
+                    }
+                    else
+                    {
+                        var itm = _constructor();
+                        itm.Deserialize(r);
+                        list.Add(itm);
+                    }
+                }
+                if (len < listCount)
+                    list.RemoveRange(len, listCount - len);
+            }
+
+            public override void WriteList(TClass inf, NetDataWriter w)
+            {
+                var list = WriteListHelper(inf, w, out int len);
+                for (int i = 0; i < len; i++)
+                    list[i].Serialize(w);
+            }
+
+            public override void ReadArray(TClass inf, NetDataReader r)
+            {
+                var arr = ReadArrayHelper(inf, r);
+                int len = arr.Length;
+                for (int i = 0; i < len; i++)
+                {
+                    arr[i] = _constructor();
+                    arr[i].Deserialize(r);
+                }
+            }
+
+            public override void WriteArray(TClass inf, NetDataWriter w)
+            {
+                var arr = WriteArrayHelper(inf, w);
+                int len = arr.Length;
+                for (int i = 0; i < len; i++)
+                    arr[i].Serialize(w);
+            }
+        }
+
+        private class IntSerializer<T> : FastCallSpecific<T, int>
+        {
+            public override void Read(T inf, NetDataReader r) { Setter(inf, r.GetInt()); }
+            public override void Write(T inf, NetDataWriter w) { w.Put(Getter(inf)); }
+            public override void ReadArray(T inf, NetDataReader r) { SetterArr(inf, r.GetIntArray()); }
+            public override void WriteArray(T inf, NetDataWriter w) { w.PutArray(GetterArr(inf)); }
+        }
+
+        private class UIntSerializer<T> : FastCallSpecific<T, uint>
+        {
+            public override void Read(T inf, NetDataReader r) { Setter(inf, r.GetUInt()); }
+            public override void Write(T inf, NetDataWriter w) { w.Put(Getter(inf)); }
+            public override void ReadArray(T inf, NetDataReader r) { SetterArr(inf, r.GetUIntArray()); }
+            public override void WriteArray(T inf, NetDataWriter w) { w.PutArray(GetterArr(inf)); }
+        }
+
+        private class ShortSerializer<T> : FastCallSpecific<T, short>
+        {
+            public override void Read(T inf, NetDataReader r) { Setter(inf, r.GetShort()); }
+            public override void Write(T inf, NetDataWriter w) { w.Put(Getter(inf)); }
+            public override void ReadArray(T inf, NetDataReader r) { SetterArr(inf, r.GetShortArray()); }
+            public override void WriteArray(T inf, NetDataWriter w) { w.PutArray(GetterArr(inf)); }
+        }
+
+        private class UShortSerializer<T> : FastCallSpecific<T, ushort>
+        {
+            public override void Read(T inf, NetDataReader r) { Setter(inf, r.GetUShort()); }
+            public override void Write(T inf, NetDataWriter w) { w.Put(Getter(inf)); }
+            public override void ReadArray(T inf, NetDataReader r) { SetterArr(inf, r.GetUShortArray()); }
+            public override void WriteArray(T inf, NetDataWriter w) { w.PutArray(GetterArr(inf)); }
+        }
+
+        private class LongSerializer<T> : FastCallSpecific<T, long>
+        {
+            public override void Read(T inf, NetDataReader r) { Setter(inf, r.GetLong()); }
+            public override void Write(T inf, NetDataWriter w) { w.Put(Getter(inf)); }
+            public override void ReadArray(T inf, NetDataReader r) { SetterArr(inf, r.GetLongArray()); }
+            public override void WriteArray(T inf, NetDataWriter w) { w.PutArray(GetterArr(inf)); }
+        }
+
+        private class ULongSerializer<T> : FastCallSpecific<T, ulong>
+        {
+            public override void Read(T inf, NetDataReader r) { Setter(inf, r.GetULong()); }
+            public override void Write(T inf, NetDataWriter w) { w.Put(Getter(inf)); }
+            public override void ReadArray(T inf, NetDataReader r) { SetterArr(inf, r.GetULongArray()); }
+            public override void WriteArray(T inf, NetDataWriter w) { w.PutArray(GetterArr(inf)); }
+        }
+
+        private class ByteSerializer<T> : FastCallSpecific<T, byte>
+        {
+            public override void Read(T inf, NetDataReader r) { Setter(inf, r.GetByte()); }
+            public override void Write(T inf, NetDataWriter w) { w.Put(Getter(inf)); }
+            public override void ReadArray(T inf, NetDataReader r) { SetterArr(inf, r.GetBytesWithLength()); }
+            public override void WriteArray(T inf, NetDataWriter w) { w.PutBytesWithLength(GetterArr(inf)); }
+        }
+
+        private class SByteSerializer<T> : FastCallSpecific<T, sbyte>
+        {
+            public override void Read(T inf, NetDataReader r) { Setter(inf, r.GetSByte()); }
+            public override void Write(T inf, NetDataWriter w) { w.Put(Getter(inf)); }
+            public override void ReadArray(T inf, NetDataReader r) { SetterArr(inf, r.GetSBytesWithLength()); }
+            public override void WriteArray(T inf, NetDataWriter w) { w.PutSBytesWithLength(GetterArr(inf)); }
+        }
+
+        private class FloatSerializer<T> : FastCallSpecific<T, float>
+        {
+            public override void Read(T inf, NetDataReader r) { Setter(inf, r.GetFloat()); }
+            public override void Write(T inf, NetDataWriter w) { w.Put(Getter(inf)); }
+            public override void ReadArray(T inf, NetDataReader r) { SetterArr(inf, r.GetFloatArray()); }
+            public override void WriteArray(T inf, NetDataWriter w) { w.PutArray(GetterArr(inf)); }
+        }
+
+        private class DoubleSerializer<T> : FastCallSpecific<T, double>
+        {
+            public override void Read(T inf, NetDataReader r) { Setter(inf, r.GetDouble()); }
+            public override void Write(T inf, NetDataWriter w) { w.Put(Getter(inf)); }
+            public override void ReadArray(T inf, NetDataReader r) { SetterArr(inf, r.GetDoubleArray()); }
+            public override void WriteArray(T inf, NetDataWriter w) { w.PutArray(GetterArr(inf)); }
+        }
+
+        private class BoolSerializer<T> : FastCallSpecific<T, bool>
+        {
+            public override void Read(T inf, NetDataReader r) { Setter(inf, r.GetBool()); }
+            public override void Write(T inf, NetDataWriter w) { w.Put(Getter(inf)); }
+            public override void ReadArray(T inf, NetDataReader r) { SetterArr(inf, r.GetBoolArray()); }
+            public override void WriteArray(T inf, NetDataWriter w) { w.PutArray(GetterArr(inf)); }
+        }
+
+        private class CharSerializer<T> : FastCallSpecificAuto<T, char>
+        {
+            protected override void ElementWrite(NetDataWriter w, ref char prop) { w.Put(prop); }
+            protected override void ElementRead(NetDataReader r, out char prop) { prop = r.GetChar(); }
+        }
+
+        private class IPEndPointSerializer<T> : FastCallSpecificAuto<T, IPEndPoint>
+        {
+            protected override void ElementWrite(NetDataWriter w, ref IPEndPoint prop) { w.Put(prop); }
+            protected override void ElementRead(NetDataReader r, out IPEndPoint prop) { prop = r.GetNetEndPoint(); }
+        }
+        
+        private class GuidSerializer<T> : FastCallSpecificAuto<T, Guid>
+        {
+            protected override void ElementWrite(NetDataWriter w, ref Guid guid) { w.Put(guid); }
+            protected override void ElementRead(NetDataReader r, out Guid guid) { guid = r.GetGuid(); }
+        }
+
+        private class StringSerializer<T> : FastCallSpecific<T, string>
+        {
+            private readonly int _maxLength;
+            public StringSerializer(int maxLength) { _maxLength = maxLength > 0 ? maxLength : short.MaxValue; }
+            public override void Read(T inf, NetDataReader r) { Setter(inf, r.GetString(_maxLength)); }
+            public override void Write(T inf, NetDataWriter w) { w.Put(Getter(inf), _maxLength); }
+            public override void ReadArray(T inf, NetDataReader r) { SetterArr(inf, r.GetStringArray(_maxLength)); }
+            public override void WriteArray(T inf, NetDataWriter w) { w.PutArray(GetterArr(inf), _maxLength); }
+        }
+
+        private class EnumByteSerializer<T> : FastCall<T>
+        {
+            protected readonly PropertyInfo Property;
+            protected readonly Type PropertyType;
+            public EnumByteSerializer(PropertyInfo property, Type propertyType)
+            {
+                Property = property;
+                PropertyType = propertyType;
+            }
+            public override void Read(T inf, NetDataReader r) { Property.SetValue(inf, Enum.ToObject(PropertyType, r.GetByte()), null); }
+            public override void Write(T inf, NetDataWriter w) { w.Put((byte)Property.GetValue(inf, null)); }
+            public override void ReadArray(T inf, NetDataReader r) { throw new InvalidTypeException("Unsupported type: Enum[]"); }
+            public override void WriteArray(T inf, NetDataWriter w) { throw new InvalidTypeException("Unsupported type: Enum[]"); }
+            public override void ReadList(T inf, NetDataReader r) { throw new InvalidTypeException("Unsupported type: List<Enum>"); }
+            public override void WriteList(T inf, NetDataWriter w) { throw new InvalidTypeException("Unsupported type: List<Enum>"); }
+        }
+
+        private class EnumIntSerializer<T> : EnumByteSerializer<T>
+        {
+            public EnumIntSerializer(PropertyInfo property, Type propertyType) : base(property, propertyType) { }
+            public override void Read(T inf, NetDataReader r) { Property.SetValue(inf, Enum.ToObject(PropertyType, r.GetInt()), null); }
+            public override void Write(T inf, NetDataWriter w) { w.Put((int)Property.GetValue(inf, null)); }
+        }
+
+        private sealed class ClassInfo<T>
+        {
+            public static ClassInfo<T> Instance;
+            private readonly FastCall<T>[] _serializers;
+            private readonly int _membersCount;
+
+            public ClassInfo(List<FastCall<T>> serializers)
+            {
+                _membersCount = serializers.Count;
+                _serializers = serializers.ToArray();
+            }
+
+            public void Write(T obj, NetDataWriter writer)
+            {
+                for (int i = 0; i < _membersCount; i++)
+                {
+                    var s = _serializers[i];
+                    if (s.Type == CallType.Basic)
+                        s.Write(obj, writer);
+                    else if (s.Type == CallType.Array)
+                        s.WriteArray(obj, writer);
+                    else
+                        s.WriteList(obj, writer);
+                }
+            }
+
+            public void Read(T obj, NetDataReader reader)
+            {
+                for (int i = 0; i < _membersCount; i++)
+                {
+                    var s = _serializers[i];
+                    if (s.Type == CallType.Basic)
+                        s.Read(obj, reader);
+                    else if(s.Type == CallType.Array)
+                        s.ReadArray(obj, reader);
+                    else
+                        s.ReadList(obj, reader);
+                }
+            }
+        }
+
+        private abstract class CustomType
+        {
+            public abstract FastCall<T> Get<T>();
+        }
+
+        private sealed class CustomTypeStruct<TProperty> : CustomType where TProperty : struct, INetSerializable
+        {
+            public override FastCall<T> Get<T>() { return new FastCallStruct<T, TProperty>(); }
+        }
+
+        private sealed class CustomTypeClass<TProperty> : CustomType where TProperty : class, INetSerializable
+        {
+            private readonly Func<TProperty> _constructor;
+            public CustomTypeClass(Func<TProperty> constructor) { _constructor = constructor; }
+            public override FastCall<T> Get<T>() { return new FastCallClass<T, TProperty>(_constructor); }
+        }
+
+        private sealed class CustomTypeStatic<TProperty> : CustomType
+        {
+            private readonly Action<NetDataWriter, TProperty> _writer;
+            private readonly Func<NetDataReader, TProperty> _reader;
+            public CustomTypeStatic(Action<NetDataWriter, TProperty> writer, Func<NetDataReader, TProperty> reader)
+            {
+                _writer = writer;
+                _reader = reader;
+            }
+            public override FastCall<T> Get<T>() { return new FastCallStatic<T, TProperty>(_writer, _reader); }
+        }
+
+        /// <summary>
+        /// Register custom property type
+        /// </summary>
+        /// <typeparam name="T">INetSerializable structure</typeparam>
+        public void RegisterNestedType<T>() where T : struct, INetSerializable
+        {
+            _registeredTypes.Add(typeof(T), new CustomTypeStruct<T>());
+        }
+
+        /// <summary>
+        /// Register custom property type
+        /// </summary>
+        /// <typeparam name="T">INetSerializable class</typeparam>
+        public void RegisterNestedType<T>(Func<T> constructor) where T : class, INetSerializable
+        {
+            _registeredTypes.Add(typeof(T), new CustomTypeClass<T>(constructor));
+        }
+
+        /// <summary>
+        /// Register custom property type
+        /// </summary>
+        /// <typeparam name="T">Any packet</typeparam>
+        /// <param name="writer">custom type writer</param>
+        /// <param name="reader">custom type reader</param>
+        public void RegisterNestedType<T>(Action<NetDataWriter, T> writer, Func<NetDataReader, T> reader)
+        {
+            _registeredTypes.Add(typeof(T), new CustomTypeStatic<T>(writer, reader));
+        }
+
+        private NetDataWriter _writer;
+        private readonly int _maxStringLength;
+        private readonly Dictionary<Type, CustomType> _registeredTypes = new Dictionary<Type, CustomType>();
+
+        public NetSerializer() : this(0)
+        {
+        }
+
+        public NetSerializer(int maxStringLength)
+        {
+            _maxStringLength = maxStringLength;
+        }
+
+        private ClassInfo<T> RegisterInternal<
+#if NET5_0_OR_GREATER
+        [DynamicallyAccessedMembers(Trimming.SerializerMemberTypes)]
+#endif
+            T>()
+        {
+            if (ClassInfo<T>.Instance != null)
+                return ClassInfo<T>.Instance;
+
+            var props = typeof(T).GetProperties(
+                BindingFlags.Instance |
+                BindingFlags.Public |
+                BindingFlags.GetProperty |
+                BindingFlags.SetProperty);
+            var serializers = new List<FastCall<T>>();
+            for (int i = 0; i < props.Length; i++)
+            {
+                var property = props[i];
+                var propertyType = property.PropertyType;
+
+                var elementType = propertyType.IsArray ? propertyType.GetElementType() : propertyType;
+                var callType = propertyType.IsArray ? CallType.Array : CallType.Basic;
+
+                if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
+                {
+                    elementType = propertyType.GetGenericArguments()[0];
+                    callType = CallType.List;
+                }
+
+                if (Attribute.IsDefined(property, typeof(IgnoreDataMemberAttribute)))
+                    continue;
+
+                var getMethod = property.GetGetMethod();
+                var setMethod = property.GetSetMethod();
+                if (getMethod == null || setMethod == null)
+                    continue;
+
+                FastCall<T> serialzer = null;
+                if (propertyType.IsEnum)
+                {
+                    var underlyingType = Enum.GetUnderlyingType(propertyType);
+                    if (underlyingType == typeof(byte))
+                        serialzer = new EnumByteSerializer<T>(property, propertyType);
+                    else if (underlyingType == typeof(int))
+                        serialzer = new EnumIntSerializer<T>(property, propertyType);
+                    else
+                        throw new InvalidTypeException("Not supported enum underlying type: " + underlyingType.Name);
+                }
+                else if (elementType == typeof(string))
+                    serialzer = new StringSerializer<T>(_maxStringLength);
+                else if (elementType == typeof(bool))
+                    serialzer = new BoolSerializer<T>();
+                else if (elementType == typeof(byte))
+                    serialzer = new ByteSerializer<T>();
+                else if (elementType == typeof(sbyte))
+                    serialzer = new SByteSerializer<T>();
+                else if (elementType == typeof(short))
+                    serialzer = new ShortSerializer<T>();
+                else if (elementType == typeof(ushort))
+                    serialzer = new UShortSerializer<T>();
+                else if (elementType == typeof(int))
+                    serialzer = new IntSerializer<T>();
+                else if (elementType == typeof(uint))
+                    serialzer = new UIntSerializer<T>();
+                else if (elementType == typeof(long))
+                    serialzer = new LongSerializer<T>();
+                else if (elementType == typeof(ulong))
+                    serialzer = new ULongSerializer<T>();
+                else if (elementType == typeof(float))
+                    serialzer = new FloatSerializer<T>();
+                else if (elementType == typeof(double))
+                    serialzer = new DoubleSerializer<T>();
+                else if (elementType == typeof(char))
+                    serialzer = new CharSerializer<T>();
+                else if (elementType == typeof(IPEndPoint))
+                    serialzer = new IPEndPointSerializer<T>();
+                else if (elementType == typeof(Guid))
+                    serialzer = new GuidSerializer<T>();
+                else
+                {
+                    _registeredTypes.TryGetValue(elementType, out var customType);
+                    if (customType != null)
+                        serialzer = customType.Get<T>();
+                }
+
+                if (serialzer != null)
+                {
+                    serialzer.Init(getMethod, setMethod, callType);
+                    serializers.Add(serialzer);
+                }
+                else
+                {
+                    throw new InvalidTypeException("Unknown property type: " + propertyType.FullName);
+                }
+            }
+            ClassInfo<T>.Instance = new ClassInfo<T>(serializers);
+            return ClassInfo<T>.Instance;
+        }
+
+        /// <exception cref="InvalidTypeException"><typeparamref name="T"/>'s fields are not supported, or it has no fields</exception>
+        public void Register<
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(Trimming.SerializerMemberTypes)]
+#endif
+        T>()
+        {
+            RegisterInternal<T>();
+        }
+
+        /// <summary>
+        /// Reads packet with known type
+        /// </summary>
+        /// <param name="reader">NetDataReader with packet</param>
+        /// <returns>Returns packet if packet in reader is matched type</returns>
+        /// <exception cref="InvalidTypeException"><typeparamref name="T"/>'s fields are not supported, or it has no fields</exception>
+        public T Deserialize<
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(Trimming.SerializerMemberTypes)]
+#endif
+        T>(NetDataReader reader) where T : class, new()
+        {
+            var info = RegisterInternal<T>();
+            var result = new T();
+            try
+            {
+                info.Read(result, reader);
+            }
+            catch
+            {
+                return null;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Reads packet with known type (non alloc variant)
+        /// </summary>
+        /// <param name="reader">NetDataReader with packet</param>
+        /// <param name="target">Deserialization target</param>
+        /// <returns>Returns true if packet in reader is matched type</returns>
+        /// <exception cref="InvalidTypeException"><typeparamref name="T"/>'s fields are not supported, or it has no fields</exception>
+        public bool Deserialize<
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(Trimming.SerializerMemberTypes)]
+#endif
+        T>(NetDataReader reader, T target) where T : class, new()
+        {
+            var info = RegisterInternal<T>();
+            try
+            {
+                info.Read(target, reader);
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Serialize object to NetDataWriter (fast)
+        /// </summary>
+        /// <param name="writer">Serialization target NetDataWriter</param>
+        /// <param name="obj">Object to serialize</param>
+        /// <exception cref="InvalidTypeException"><typeparamref name="T"/>'s fields are not supported, or it has no fields</exception>
+        public void Serialize<
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(Trimming.SerializerMemberTypes)]
+#endif
+        T>(NetDataWriter writer, T obj) where T : class, new()
+        {
+            RegisterInternal<T>().Write(obj, writer);
+        }
+
+        /// <summary>
+        /// Serialize object to byte array
+        /// </summary>
+        /// <param name="obj">Object to serialize</param>
+        /// <returns>byte array with serialized data</returns>
+        public byte[] Serialize<
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(Trimming.SerializerMemberTypes)]
+#endif
+        T>(T obj) where T : class, new()
+        {
+            if (_writer == null)
+                _writer = new NetDataWriter();
+            _writer.Reset();
+            Serialize(_writer, obj);
+            return _writer.CopyData();
+        }
+    }
+}
+
+#endregion
+
+
+#region NtpPacket.cs
+
+namespace LiteNetLib.Utils
+{
+    using System;
+
+    /// <summary>
+    /// Represents RFC4330 SNTP packet used for communication to and from a network time server.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Most applications should just use the <see cref="NtpPacket.CorrectionOffset" /> property.
+    /// </para>
+    /// <para>
+    /// The same data structure represents both request and reply packets.
+    /// Request and reply differ in which properties are set and to what values.
+    /// </para>
+    /// <para>
+    /// The only real property is <see cref="NtpPacket.Bytes" />.
+    /// All other properties read from and write to the underlying byte array
+    /// with the exception of <see cref="NtpPacket.DestinationTimestamp" />,
+    /// which is not part of the packet on network and it is instead set locally after receiving the packet.
+    /// </para>
+    /// <para>
+    /// Copied from <a href="https://guerrillantp.machinezoo.com/">GuerrillaNtp project</a>
+    /// with permission from Robert Vazan (@robertvazan) under MIT license, see https://github.com/RevenantX/LiteNetLib/pull/236
+    /// </para>
+    /// </remarks>
+    public class NtpPacket
+    {
+        private static readonly DateTime Epoch = new DateTime(1900, 1, 1);
+
+        /// <summary>
+        /// Gets RFC4330-encoded SNTP packet.
+        /// </summary>
+        /// <value>
+        /// Byte array containing RFC4330-encoded SNTP packet. It is at least 48 bytes long.
+        /// </value>
+        /// <remarks>
+        /// This is the only real property. All other properties except
+        /// <see cref="NtpPacket.DestinationTimestamp" /> read from or write to this byte array.
+        /// </remarks>
+        public byte[] Bytes { get; }
+
+        /// <summary>
+        /// Gets the leap second indicator.
+        /// </summary>
+        /// <value>
+        /// Leap second warning, if any. Special value
+        /// <see cref="NtpLeapIndicator.AlarmCondition" /> indicates unsynchronized server clock.
+        /// Default is <see cref="NtpLeapIndicator.NoWarning" />.
+        /// </value>
+        /// <remarks>
+        /// Only servers fill in this property. Clients can consult this property for possible leap second warning.
+        /// </remarks>
+        public NtpLeapIndicator LeapIndicator => (NtpLeapIndicator)((Bytes[0] & 0xC0) >> 6);
+
+        /// <summary>
+        /// Gets or sets protocol version number.
+        /// </summary>
+        /// <value>
+        /// SNTP protocol version. Default is 4, which is the latest version at the time of this writing.
+        /// </value>
+        /// <remarks>
+        /// In request packets, clients should leave this property at default value 4.
+        /// Servers usually reply with the same protocol version.
+        /// </remarks>
+        public int VersionNumber
+        {
+            get => (Bytes[0] & 0x38) >> 3;
+            private set => Bytes[0] = (byte)((Bytes[0] & ~0x38) | value << 3);
+        }
+
+        /// <summary>
+        /// Gets or sets SNTP packet mode, i.e. whether this is client or server packet.
+        /// </summary>
+        /// <value>
+        /// SNTP packet mode. Default is <see cref="NtpMode.Client" /> in newly created packets.
+        /// Server reply should have this property set to <see cref="NtpMode.Server" />.
+        /// </value>
+        public NtpMode Mode
+        {
+            get => (NtpMode)(Bytes[0] & 0x07);
+            private set => Bytes[0] = (byte)((Bytes[0] & ~0x07) | (int)value);
+        }
+
+        /// <summary>
+        /// Gets server's distance from the reference clock.
+        /// </summary>
+        /// <value>
+        /// <para>
+        /// Distance from the reference clock. This property is set only in server reply packets.
+        /// Servers connected directly to reference clock hardware set this property to 1.
+        /// Statum number is incremented by 1 on every hop down the NTP server hierarchy.
+        /// </para>
+        /// <para>
+        /// Special value 0 indicates that this packet is a Kiss-o'-Death message
+        /// with kiss code stored in <see cref="NtpPacket.ReferenceId" />.
+        /// </para>
+        /// </value>
+        public int Stratum => Bytes[1];
+
+        /// <summary>
+        /// Gets server's preferred polling interval.
+        /// </summary>
+        /// <value>
+        /// Polling interval in log2 seconds, e.g. 4 stands for 16s and 17 means 131,072s.
+        /// </value>
+        public int Poll => Bytes[2];
+
+        /// <summary>
+        /// Gets the precision of server clock.
+        /// </summary>
+        /// <value>
+        /// Clock precision in log2 seconds, e.g. -20 for microsecond precision.
+        /// </value>
+        public int Precision => (sbyte)Bytes[3];
+
+        /// <summary>
+        /// Gets the total round-trip delay from the server to the reference clock.
+        /// </summary>
+        /// <value>
+        /// Round-trip delay to the reference clock. Normally a positive value smaller than one second.
+        /// </value>
+        public TimeSpan RootDelay => GetTimeSpan32(4);
+
+        /// <summary>
+        /// Gets the estimated error in time reported by the server.
+        /// </summary>
+        /// <value>
+        /// Estimated error in time reported by the server. Normally a positive value smaller than one second.
+        /// </value>
+        public TimeSpan RootDispersion => GetTimeSpan32(8);
+
+        /// <summary>
+        /// Gets the ID of the time source used by the server or Kiss-o'-Death code sent by the server.
+        /// </summary>
+        /// <value>
+        /// <para>
+        /// ID of server's time source or Kiss-o'-Death code.
+        /// Purpose of this property depends on value of <see cref="NtpPacket.Stratum" /> property.
+        /// </para>
+        /// <para>
+        /// Stratum 1 servers write here one of several special values that describe the kind of hardware clock they use.
+        /// </para>
+        /// <para>
+        /// Stratum 2 and lower servers set this property to IPv4 address of their upstream server.
+        /// If upstream server has IPv6 address, the address is hashed, because it doesn't fit in this property.
+        /// </para>
+        /// <para>
+        /// When server sets <see cref="NtpPacket.Stratum" /> to special value 0,
+        /// this property contains so called kiss code that instructs the client to stop querying the server.
+        /// </para>
+        /// </value>
+        public uint ReferenceId => GetUInt32BE(12);
+
+        /// <summary>
+        /// Gets or sets the time when the server clock was last set or corrected.
+        /// </summary>
+        /// <value>
+        /// Time when the server clock was last set or corrected or <c>null</c> when not specified.
+        /// </value>
+        /// <remarks>
+        /// This Property is usually set only by servers. It usually lags server's current time by several minutes,
+        /// so don't use this property for time synchronization.
+        /// </remarks>
+        public DateTime? ReferenceTimestamp => GetDateTime64(16);
+
+        /// <summary>
+        /// Gets or sets the time when the client sent its request.
+        /// </summary>
+        /// <value>
+        /// This property is <c>null</c> in request packets.
+        /// In reply packets, it is the time when the client sent its request.
+        /// Servers copy this value from <see cref="NtpPacket.TransmitTimestamp" />
+        /// that they find in received request packet.
+        /// </value>
+        /// <seealso cref="NtpPacket.CorrectionOffset" />
+        /// <seealso cref="NtpPacket.RoundTripTime" />
+        public DateTime? OriginTimestamp => GetDateTime64(24);
+
+        /// <summary>
+        /// Gets or sets the time when the request was received by the server.
+        /// </summary>
+        /// <value>
+        /// This property is <c>null</c> in request packets.
+        /// In reply packets, it is the time when the server received client request.
+        /// </value>
+        /// <seealso cref="NtpPacket.CorrectionOffset" />
+        /// <seealso cref="NtpPacket.RoundTripTime" />
+        public DateTime? ReceiveTimestamp => GetDateTime64(32);
+
+        /// <summary>
+        /// Gets or sets the time when the packet was sent.
+        /// </summary>
+        /// <value>
+        /// Time when the packet was sent. It should never be <c>null</c>.
+        /// Default value is <see cref="System.DateTime.UtcNow" />.
+        /// </value>
+        /// <remarks>
+        /// This property must be set by both clients and servers.
+        /// </remarks>
+        /// <seealso cref="NtpPacket.CorrectionOffset" />
+        /// <seealso cref="NtpPacket.RoundTripTime" />
+        public DateTime? TransmitTimestamp { get { return GetDateTime64(40); } private set { SetDateTime64(40, value); } }
+
+        /// <summary>
+        /// Gets or sets the time of reception of response SNTP packet on the client.
+        /// </summary>
+        /// <value>
+        /// Time of reception of response SNTP packet on the client. It is <c>null</c> in request packets.
+        /// </value>
+        /// <remarks>
+        /// This property is not part of the protocol and has to be set when reply packet is received.
+        /// </remarks>
+        /// <seealso cref="NtpPacket.CorrectionOffset" />
+        /// <seealso cref="NtpPacket.RoundTripTime" />
+        public DateTime? DestinationTimestamp { get; private set; }
+
+        /// <summary>
+        /// Gets the round-trip time to the server.
+        /// </summary>
+        /// <value>
+        /// Time the request spent traveling to the server plus the time the reply spent traveling back.
+        /// This is calculated from timestamps in the packet as <c>(t1 - t0) + (t3 - t2)</c>
+        /// where t0 is <see cref="NtpPacket.OriginTimestamp" />,
+        /// t1 is <see cref="NtpPacket.ReceiveTimestamp" />,
+        /// t2 is <see cref="NtpPacket.TransmitTimestamp" />,
+        /// and t3 is <see cref="NtpPacket.DestinationTimestamp" />.
+        /// This property throws an exception in request packets.
+        /// </value>
+        public TimeSpan RoundTripTime
+        {
+            get
+            {
+                CheckTimestamps();
+                return (ReceiveTimestamp.Value - OriginTimestamp.Value) + (DestinationTimestamp.Value - TransmitTimestamp.Value);
+            }
+        }
+
+        /// <summary>
+        /// Gets the offset that should be added to local time to synchronize it with server time.
+        /// </summary>
+        /// <value>
+        /// Time difference between server and client. It should be added to local time to get server time.
+        /// It is calculated from timestamps in the packet as <c>0.5 * ((t1 - t0) - (t3 - t2))</c>
+        /// where t0 is <see cref="NtpPacket.OriginTimestamp" />,
+        /// t1 is <see cref="NtpPacket.ReceiveTimestamp" />,
+        /// t2 is <see cref="NtpPacket.TransmitTimestamp" />,
+        /// and t3 is <see cref="NtpPacket.DestinationTimestamp" />.
+        /// This property throws an exception in request packets.
+        /// </value>
+        public TimeSpan CorrectionOffset
+        {
+            get
+            {
+                CheckTimestamps();
+                return TimeSpan.FromTicks(((ReceiveTimestamp.Value - OriginTimestamp.Value) - (DestinationTimestamp.Value - TransmitTimestamp.Value)).Ticks / 2);
+            }
+        }
+
+        /// <summary>
+        /// Initializes default request packet.
+        /// </summary>
+        /// <remarks>
+        /// Properties <see cref="NtpPacket.Mode" /> and <see cref="NtpPacket.VersionNumber" />
+        /// are set appropriately for request packet. Property <see cref="NtpPacket.TransmitTimestamp" />
+        /// is set to <see cref="System.DateTime.UtcNow" />.
+        /// </remarks>
+        public NtpPacket() : this(new byte[48])
+        {
+            Mode = NtpMode.Client;
+            VersionNumber = 4;
+            TransmitTimestamp = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Initializes packet from received data.
+        /// </summary>
+        internal NtpPacket(byte[] bytes)
+        {
+            if (bytes.Length < 48)
+                throw new ArgumentException("SNTP reply packet must be at least 48 bytes long.", "bytes");
+            Bytes = bytes;
+        }
+
+        /// <summary>
+        /// Initializes packet from data received from a server.
+        /// </summary>
+        /// <param name="bytes">Data received from the server.</param>
+        /// <param name="destinationTimestamp">Utc time of reception of response SNTP packet on the client.</param>
+        /// <returns></returns>
+        public static NtpPacket FromServerResponse(byte[] bytes, DateTime destinationTimestamp)
+        {
+            return new NtpPacket(bytes) { DestinationTimestamp = destinationTimestamp };
+        }
+
+        internal void ValidateRequest()
+        {
+            if (Mode != NtpMode.Client)
+                throw new InvalidOperationException("This is not a request SNTP packet.");
+            if (VersionNumber == 0)
+                throw new InvalidOperationException("Protocol version of the request is not specified.");
+            if (TransmitTimestamp == null)
+                throw new InvalidOperationException("TransmitTimestamp must be set in request packet.");
+        }
+
+        internal void ValidateReply()
+        {
+            if (Mode != NtpMode.Server)
+                throw new InvalidOperationException("This is not a reply SNTP packet.");
+            if (VersionNumber == 0)
+                throw new InvalidOperationException("Protocol version of the reply is not specified.");
+            if (Stratum == 0)
+                throw new InvalidOperationException(string.Format("Received Kiss-o'-Death SNTP packet with code 0x{0:x}.", ReferenceId));
+            if (LeapIndicator == NtpLeapIndicator.AlarmCondition)
+                throw new InvalidOperationException("SNTP server has unsynchronized clock.");
+            CheckTimestamps();
+        }
+
+        private void CheckTimestamps()
+        {
+            if (OriginTimestamp == null)
+                throw new InvalidOperationException("Origin timestamp is missing.");
+            if (ReceiveTimestamp == null)
+                throw new InvalidOperationException("Receive timestamp is missing.");
+            if (TransmitTimestamp == null)
+                throw new InvalidOperationException("Transmit timestamp is missing.");
+            if (DestinationTimestamp == null)
+                throw new InvalidOperationException("Destination timestamp is missing.");
+        }
+
+        private DateTime? GetDateTime64(int offset)
+        {
+            var field = GetUInt64BE(offset);
+            if (field == 0)
+                return null;
+            return new DateTime(Epoch.Ticks + Convert.ToInt64(field * (1.0 / (1L << 32) * 10000000.0)));
+        }
+
+        private void SetDateTime64(int offset, DateTime? value)
+        {
+            SetUInt64BE(offset, value == null ? 0 : Convert.ToUInt64((value.Value.Ticks - Epoch.Ticks) * (0.0000001 * (1L << 32))));
+        }
+
+        private TimeSpan GetTimeSpan32(int offset)
+        {
+            return TimeSpan.FromSeconds(GetInt32BE(offset) / (double)(1 << 16));
+        }
+
+        private ulong GetUInt64BE(int offset)
+        {
+            return SwapEndianness(BitConverter.ToUInt64(Bytes, offset));
+        }
+
+        private void SetUInt64BE(int offset, ulong value)
+        {
+            FastBitConverter.GetBytes(Bytes, offset, SwapEndianness(value));
+        }
+
+        private int GetInt32BE(int offset)
+        {
+            return (int)GetUInt32BE(offset);
+        }
+
+        private uint GetUInt32BE(int offset)
+        {
+            return SwapEndianness(BitConverter.ToUInt32(Bytes, offset));
+        }
+
+        private static uint SwapEndianness(uint x)
+        {
+            return ((x & 0xff) << 24) | ((x & 0xff00) << 8) | ((x & 0xff0000) >> 8) | ((x & 0xff000000) >> 24);
+        }
+
+        private static ulong SwapEndianness(ulong x)
+        {
+            return ((ulong)SwapEndianness((uint)x) << 32) | SwapEndianness((uint)(x >> 32));
+        }
+    }
+
+    /// <summary>
+    /// Represents leap second warning from the server that instructs the client to add or remove leap second.
+    /// </summary>
+    /// <seealso cref="NtpPacket.LeapIndicator" />
+    public enum NtpLeapIndicator
+    {
+        /// <summary>
+        /// No leap second warning. No action required.
+        /// </summary>
+        NoWarning,
+
+        /// <summary>
+        /// Warns the client that the last minute of the current day has 61 seconds.
+        /// </summary>
+        LastMinuteHas61Seconds,
+
+        /// <summary>
+        /// Warns the client that the last minute of the current day has 59 seconds.
+        /// </summary>
+        LastMinuteHas59Seconds,
+
+        /// <summary>
+        /// Special value indicating that the server clock is unsynchronized and the returned time is unreliable.
+        /// </summary>
+        AlarmCondition
+    }
+
+    /// <summary>
+    /// Describes SNTP packet mode, i.e. client or server.
+    /// </summary>
+    /// <seealso cref="NtpPacket.Mode" />
+    public enum NtpMode
+    {
+        /// <summary>
+        /// Identifies client-to-server SNTP packet.
+        /// </summary>
+        Client = 3,
+
+        /// <summary>
+        /// Identifies server-to-client SNTP packet.
+        /// </summary>
+        Server = 4,
+    }
+}
+
+#endregion
+
+
+#region NtpRequest.cs
+
+namespace LiteNetLib.Utils
+{
+    using System.Net;
+    using System.Net.Sockets;
+
+    internal sealed class NtpRequest
+    {
+        private const int ResendTimer = 1000;
+        private const int KillTimer = 10000;
+        public const int DefaultPort = 123;
+        private readonly IPEndPoint _ntpEndPoint;
+        private float _resendTime = ResendTimer;
+        private float _killTime = 0;
+
+        public NtpRequest(IPEndPoint endPoint)
+        {
+            _ntpEndPoint = endPoint;
+        }
+
+        public bool NeedToKill => _killTime >= KillTimer;
+
+        public bool Send(Socket socket, float time)
+        {
+            _resendTime += time;
+            _killTime += time;
+            if (_resendTime < ResendTimer)
+            {
+                return false;
+            }
+            var packet = new NtpPacket();
+            try
+            {
+                int sendCount = socket.SendTo(packet.Bytes, 0, packet.Bytes.Length, SocketFlags.None, _ntpEndPoint);
+                return sendCount == packet.Bytes.Length;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+    }
+}
+
+#endregion
+
+
+#region Preserve.cs
+
+namespace LiteNetLib.Utils
+{
+    using System;
+
+    /// <summary>
+    ///   <para>PreserveAttribute prevents byte code stripping from removing a class, method, field, or property.</para>
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Constructor | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Event | AttributeTargets.Interface | AttributeTargets.Delegate, Inherited = false)]
+    public class PreserveAttribute : Attribute
+    {
+    }
+}
+
+#endregion
+
+#endif // QUANTUM_ENABLE_REMOTE_PROFILER && !QUANTUM_DISABLE_INTEGRATED_LITENETLIB
+
 
 #endregion
 
@@ -8663,26 +19375,36 @@ namespace Quantum {
         FPMathUtils.LoadLookupTables();
       }
 
-      if (inEditor == false && !data.Asset) {
-        data.Asset = AssetObject.Create<Map>();
+      Map asset = data.GetAsset(inEditor);
+      if (asset == null) {
+        if (inEditor) {
+          Log.Error($"Failed to bake map {data.name}. Asset {data.AssetRef} not found in QuantumEditorSettings.AssetSearchPaths or DB not ready.");
+          return;
+        } else {
+          asset = AssetObject.Create<Map>();
+          asset.name = data.gameObject.scene.name;
+          asset.Guid = QuantumUnityDB.CreateRuntimeDeterministicGuid(asset);
+          QuantumUnityDB.Global.AddAsset(asset);
+          data.AssetRef = asset;
+        }
       }
 
 #if UNITY_EDITOR
       if (inEditor) {
         // set scene name
-        data.Asset.Scene = data.gameObject.scene.name;
+        asset.Scene = data.gameObject.scene.name;
 
         var path = data.gameObject.scene.path;
-        data.Asset.ScenePath = path;
+        asset.ScenePath = path;
         if (string.IsNullOrEmpty(path)) {
-          data.Asset.SceneGuid = string.Empty;
+          asset.SceneGuid = string.Empty;
         } else {
-          data.Asset.SceneGuid = AssetDatabase.AssetPathToGUID(path);
+          asset.SceneGuid = AssetDatabase.AssetPathToGUID(path);
         }
         
         // map needs to be unloaded before it is modified; otherwise,
         // memory leaks might occur
-        QuantumUnityDB.DisposeGlobalAsset(data.Asset.Guid, immediate: true);
+        QuantumUnityDB.DisposeGlobalAsset(asset.Guid, immediate: true);
       }
 #endif
 
@@ -8702,7 +19424,7 @@ namespace Quantum {
 
       if (bakePrototypes) {
         using (TraceScope("BakingPrototypes")) {
-          BakePrototypes(data);
+          BakePrototypes(data, inEditor);
         }
       }
 
@@ -8715,8 +19437,10 @@ namespace Quantum {
     public static void BakeMeshes(QuantumMapData data, Boolean inEditor) {
       if (inEditor) {
 #if UNITY_EDITOR
-        var dirPath   = Path.GetDirectoryName(AssetDatabase.GetAssetPath(data.Asset));
-        var assetPath = Path.Combine(dirPath, data.Asset.name + "_mesh.asset");
+        var asset = data.GetAsset(true);
+        
+        var dirPath   = Path.GetDirectoryName(AssetDatabase.GetAssetPath(asset));
+        var assetPath = Path.Combine(dirPath, asset.name + "_mesh.asset");
 
         var binaryDataAsset = AssetDatabase.LoadAssetAtPath<Quantum.BinaryData>(assetPath);
         if (binaryDataAsset == null) {
@@ -8725,13 +19449,13 @@ namespace Quantum {
         }
 
         // Serialize to binary some of the data (max 20 megabytes for now)
-        var bytestream = new ByteStream(new Byte[data.Asset.GetStaticColliderTrianglesSerializedSize(isWriting: true)]);
-        data.Asset.SerializeStaticColliderTriangles(bytestream, allocator: null, true);
+        var bytestream = new ByteStream(new Byte[asset.GetStaticColliderTrianglesSerializedSize(isWriting: true)]);
+        asset.SerializeStaticColliderTriangles(bytestream, allocator: null, true);
 
         binaryDataAsset.SetData(bytestream.ToArray(), binaryDataAsset.IsCompressed);
         EditorUtility.SetDirty(binaryDataAsset);
 
-        data.Asset.StaticColliders3DTrianglesData = binaryDataAsset;
+        asset.StaticColliders3DTrianglesData = binaryDataAsset;
 #endif
       }
     }
@@ -8741,24 +19465,25 @@ namespace Quantum {
     public static IEnumerable<Quantum.NavMesh> BakeNavMeshes(QuantumMapData data, Boolean inEditor) {
       FPMathUtils.LoadLookupTables();
 
-      data.Asset.NavMeshLinks = new AssetRef<NavMesh>[0];
-      data.Asset.Regions      = new string[0];
+      var asset = data.GetAsset(inEditor);
+      asset.NavMeshLinks = new AssetRef<NavMesh>[0];
+      asset.Regions      = new string[0];
 
       InvokeCallbacks("OnBeforeBakeNavMesh", data);
 
-      var navmeshes = BakeNavMeshesLoop(data).ToList();
+      var navmeshes = BakeNavMeshesLoop(data, asset).ToList();
 
       InvokeCallbacks("OnCollectNavMeshes", data, navmeshes);
 
       if (inEditor) {
 #if UNITY_EDITOR
-        var        dirPath    = Path.GetDirectoryName(AssetDatabase.GetAssetPath(data.Asset));
+        var        dirPath    = Path.GetDirectoryName(AssetDatabase.GetAssetPath(asset));
         ByteStream bytestream = null;
         foreach (var navmesh in navmeshes) {
 
           // create and write navmesh (binary) _data asset
           {
-            var navmeshBinaryFilename = Path.Combine(dirPath, $"{data.Asset.name}_{navmesh.Name}_data.asset");
+            var navmeshBinaryFilename = Path.Combine(dirPath, $"{asset.name}_{navmesh.Name}_data.asset");
             var binaryDataAsset = AssetDatabase.LoadAssetAtPath<Quantum.BinaryData>(navmeshBinaryFilename);
             if (binaryDataAsset == null) {
               binaryDataAsset = ScriptableObject.CreateInstance<Quantum.BinaryData>();
@@ -8782,7 +19507,7 @@ namespace Quantum {
 
           // create and write navmesh Quantum asset
           {
-            var navmeshAssetPath = Path.Combine(dirPath, $"{data.Asset.name}_{navmesh.Name}.asset");
+            var navmeshAssetPath = Path.Combine(dirPath, $"{asset.name}_{navmesh.Name}.asset");
             var navMeshAsset = AssetDatabase.LoadAssetAtPath<Quantum.NavMesh>(navmeshAssetPath);
             if (navMeshAsset == null) {
               navMeshAsset = ScriptableObject.CreateInstance<Quantum.NavMesh>();
@@ -8800,8 +19525,8 @@ namespace Quantum {
             EditorUtility.CopySerialized(navmesh, navMeshAsset);
             EditorUtility.SetDirty(navMeshAsset);
 
-            ArrayUtils.Add(ref data.Asset.NavMeshLinks, (Quantum.AssetRef<Quantum.NavMesh>)navMeshAsset);
-            EditorUtility.SetDirty(data.Asset);
+            ArrayUtils.Add(ref asset.NavMeshLinks, (Quantum.AssetRef<Quantum.NavMesh>)navMeshAsset);
+            EditorUtility.SetDirty(asset);
           }
         }
 #endif
@@ -8812,8 +19537,8 @@ namespace Quantum {
         // A) overwriting the navmesh inside an already existing QAssetNavMesh ScriptableObject or
         // B) Creating new QAssetNavMesh ScriptableObjects (see above) and inject them into the DB (use UnityDB.OnAssetLoad callback).
         foreach (var navmesh in navmeshes) {
-          navmesh.Path = data.Asset.name + "_" + navmesh.Name;
-          ArrayUtils.Add(ref data.Asset.NavMeshLinks, (Quantum.AssetRef<Quantum.NavMesh>)navmesh);
+          navmesh.Path = asset.name + "_" + navmesh.Name;
+          ArrayUtils.Add(ref asset.NavMeshLinks, (Quantum.AssetRef<Quantum.NavMesh>)navmesh);
         }
       }
 
@@ -8848,8 +19573,10 @@ namespace Quantum {
       data.StaticCollider2DReferences = new List<MonoBehaviour>();
       data.StaticCollider3DReferences = new List<MonoBehaviour>();
 
+      var asset = data.GetAsset(inEditor);
+      
       // 2D
-      data.Asset.StaticColliders2D = new MapStaticCollider2D[0];
+      asset.StaticColliders2D = new MapStaticCollider2D[0];
       var staticCollider2DList = new List<MapStaticCollider2D>();
 
 #if QUANTUM_ENABLE_PHYSICS2D && !QUANTUM_DISABLE_PHYSICS2D
@@ -8865,10 +19592,10 @@ namespace Quantum {
           Rotation = collider.transform.rotation.ToFPRotation2D(),
 #if QUANTUM_XY
           VerticalOffset = -collider.transform.position.z.ToFP(),
-          Height         = collider.Height * scale.z.ToFP(),
+          Height         = collider.Height * Mathf.Abs(scale.z).ToFP(),
 #else
           VerticalOffset = collider.transform.position.y.ToFP(),
-          Height         = collider.Height * scale.y.ToFP(),
+          Height         = collider.Height * Mathf.Abs(scale.y).ToFP(),
 #endif
           PhysicsMaterial = collider.Settings.PhysicsMaterial,
           StaticData      = GetStaticData(collider.gameObject, collider.Settings, staticCollider2DList.Count),
@@ -8876,7 +19603,7 @@ namespace Quantum {
 
           // circle
           ShapeType    = Shape2DType.Circle,
-          CircleRadius = collider.Radius * FPMath.Max(scale2D.X, scale2D.Y),
+          CircleRadius = collider.Radius * FPMath.Max(FPMath.Abs(scale2D.X), FPMath.Abs(scale2D.Y)),
         });
 
         data.StaticCollider2DReferences.Add(collider);
@@ -8887,22 +19614,40 @@ namespace Quantum {
         collider.BeforeBake();
 
         var scale = collider.transform.lossyScale;
-        
+        var scale2D = scale.ToFPVector2();
+        var directionRotation = FP._0;
+
+        var capsuleSize = collider.Size;
+        if(collider.Direction == CapsuleDirection2D.Horizontal) {
+          directionRotation = FP.Rad_90;
+          capsuleSize.Y = collider.Size.X;
+          capsuleSize.X = collider.Size.Y;
+
+          var tempY = scale2D.Y;
+          scale2D.Y = scale2D.X;
+          scale2D.X = tempY;
+        }
 
         staticCollider2DList.Add(new MapStaticCollider2D {
           Position        = collider.transform.TransformPoint(collider.PositionOffset.ToUnityVector2()).ToFPVector2(),
-          Rotation        = collider.RotationOffset,
+          Rotation        = collider.transform.rotation.ToFPRotation2D() + directionRotation + collider.RotationOffset.FlipRotation() * FP.Deg2Rad,
+#if QUANTUM_XY
+          VerticalOffset = -collider.transform.position.z.ToFP(),
+          Height         = collider.Height * Math.Abs(scale.z).ToFP(),
+#else
+          VerticalOffset = collider.transform.position.y.ToFP(),
+          Height         = collider.Height * Math.Abs(scale.y).ToFP(),
+#endif
 
           PhysicsMaterial = collider.Settings.PhysicsMaterial,
           StaticData      = GetStaticData(collider.gameObject, collider.Settings, staticCollider2DList.Count),
 
           // capsule
           ShapeType    = Shape2DType.Capsule,
-          CapsuleSize  = new FPVector2(FP.FromFloat_UNSAFE(collider.Size.X.AsFloat * scale.x),FP.FromFloat_UNSAFE(collider.Size.Y.AsFloat * scale.y))
-
+          CapsuleSize  = new FPVector2(capsuleSize.X * FPMath.Abs(scale2D.X), capsuleSize.Y * FPMath.Abs(scale2D.Y))
         });
 
-        data.StaticCollider3DReferences.Add(collider);
+        data.StaticCollider2DReferences.Add(collider);
       }
 
       // polygon colliders
@@ -8919,7 +19664,7 @@ namespace Quantum {
           continue;
         }
 
-        var s = c.transform.localScale;
+        var s = c.transform.lossyScale;
         var vertices = c.Vertices.Select(x => {
           var v = x.ToUnityVector3();
           return new Vector3(v.x * s.x, v.y * s.y, v.z * s.z);
@@ -8938,10 +19683,10 @@ namespace Quantum {
           Rotation = rotation,
 #if QUANTUM_XY
           VerticalOffset = -c.transform.position.z.ToFP(),
-          Height         = c.Height * s.z.ToFP(),
+          Height         = c.Height * Mathf.Abs(s.z).ToFP(),
 #else
           VerticalOffset = c.transform.position.y.ToFP(),
-          Height         = c.Height * s.y.ToFP(),
+          Height         = c.Height * Mathf.Abs(s.y).ToFP(),
 #endif
           PhysicsMaterial = c.Settings.PhysicsMaterial,
           StaticData      = GetStaticData(c.gameObject, c.Settings, staticCollider2DList.Count),
@@ -8973,19 +19718,19 @@ namespace Quantum {
         var e = collider.Size.ToUnityVector3();
         var s = collider.transform.lossyScale;
 
-        e.x *= s.x;
-        e.y *= s.y;
-        e.z *= s.z;
+        e.x *= Mathf.Abs(s.x);
+        e.y *= Mathf.Abs(s.y);
+        e.z *= Mathf.Abs(s.z);
 
         staticCollider2DList.Add(new MapStaticCollider2D {
           Position = collider.transform.TransformPoint(collider.PositionOffset.ToUnityVector3()).ToFPVector2(),
           Rotation = collider.transform.rotation.ToFPRotation2D() + collider.RotationOffset.FlipRotation() * FP.Deg2Rad,
 #if QUANTUM_XY
           VerticalOffset = -collider.transform.position.z.ToFP(),
-          Height         = collider.Height * s.z.ToFP(),
+          Height         = collider.Height * Mathf.Abs(s.z).ToFP(),
 #else
           VerticalOffset = collider.transform.position.y.ToFP(),
-          Height         = collider.Height * s.y.ToFP(),
+          Height         = collider.Height * Mathf.Abs(s.y).ToFP(),
 #endif
           PhysicsMaterial = collider.Settings.PhysicsMaterial,
           StaticData      = GetStaticData(collider.gameObject, collider.Settings, staticCollider2DList.Count),
@@ -8999,7 +19744,7 @@ namespace Quantum {
         data.StaticCollider2DReferences.Add(collider);
       }
 
-      data.Asset.StaticColliders2D = staticCollider2DList.ToArray();
+      asset.StaticColliders2D = staticCollider2DList.ToArray();
 #endif
 
       // 3D statics
@@ -9008,8 +19753,8 @@ namespace Quantum {
       var staticCollider3DList = new List<MapStaticCollider3D>();
 
       // clear on mono behaviour and assets
-      data.Asset.CollidersManagedTriangles = new SortedDictionary<int, MeshTriangleVerticesCcw>();
-      data.Asset.StaticColliders3D = Array.Empty<MapStaticCollider3D>();
+      asset.CollidersManagedTriangles = new SortedDictionary<int, MeshTriangleVerticesCcw>();
+      asset.StaticColliders3D = Array.Empty<MapStaticCollider3D>();
 
       // initialize collider references, add default null on offset 0
       data.StaticCollider3DReferences = new List<MonoBehaviour>();
@@ -9020,8 +19765,12 @@ namespace Quantum {
       foreach (var collider in FindLocalObjects<QuantumStaticSphereCollider3D>(scene)) {
         collider.BeforeBake();
 
-        var scale = collider.transform.lossyScale;
-        var radiusScale = Mathf.Max(Mathf.Max(scale.x, scale.y), scale.z);
+        var absScale = collider.transform.lossyScale;
+        absScale.x = Mathf.Abs(absScale.x);
+        absScale.y = Mathf.Abs(absScale.y);
+        absScale.z = Mathf.Abs(absScale.z);
+
+        var radiusScale = Mathf.Max(Mathf.Max(absScale.x, absScale.y), absScale.z);
 
         var rot = collider.transform.rotation.ToFPQuaternion();
         staticCollider3DList.Add(new MapStaticCollider3D {
@@ -9032,7 +19781,7 @@ namespace Quantum {
 
           // circle
           ShapeType    = Shape3DType.Sphere,
-          SphereRadius = FP.FromFloat_UNSAFE(collider.Radius.AsFloat * radiusScale)
+          SphereRadius = FPMath.Abs(FP.FromFloat_UNSAFE(collider.Radius.AsFloat * radiusScale))
         });
 
         data.StaticCollider3DReferences.Add(collider);
@@ -9042,14 +19791,36 @@ namespace Quantum {
       foreach (var collider in FindLocalObjects<QuantumStaticCapsuleCollider3D>(scene)) {
         collider.BeforeBake();
 
-        var scale = collider.transform.lossyScale;
-        float radiusScale = Mathf.Max(scale.x, scale.z);
-        float heightScale = scale.y;
+        var absScale = collider.transform.lossyScale;
+        absScale.x = Mathf.Abs(absScale.x);
+        absScale.y = Mathf.Abs(absScale.y);
+        absScale.z = Mathf.Abs(absScale.z);
+        float radiusScale = Mathf.Max(absScale.x, absScale.z);
+        float heightScale = absScale.y;
+        var axisRotation = Vector3.zero;
+
+        switch (collider.Direction) {
+          case CapsuleDirection3D.X: // X
+            axisRotation = new Vector3(0, 0, 90);
+            heightScale = absScale.x;
+            radiusScale = Mathf.Max(absScale.y, absScale.z);
+            break;
+          case CapsuleDirection3D.Y: // Y
+            axisRotation = new Vector3(0, 0, 0);
+            heightScale = absScale.y;
+            radiusScale = Mathf.Max(absScale.x, absScale.z);
+            break;
+          case CapsuleDirection3D.Z: // Z
+            axisRotation = new Vector3(90, 0, 0);
+            heightScale = absScale.z;
+            radiusScale = Mathf.Max(absScale.x, absScale.y);
+            break;
+        }
         
 
         staticCollider3DList.Add(new MapStaticCollider3D {
           Position        = collider.transform.TransformPoint(collider.PositionOffset.ToUnityVector3()).ToFPVector3(),
-          Rotation        = FPQuaternion.Euler(collider.transform.rotation.eulerAngles.ToFPVector3() + collider.RotationOffset),
+          Rotation        = FPQuaternion.Euler(axisRotation.ToFPVector3() + collider.transform.rotation.eulerAngles.ToFPVector3() + collider.RotationOffset),
 
           PhysicsMaterial = collider.Settings.PhysicsMaterial,
           StaticData      = GetStaticData(collider.gameObject, collider.Settings, staticCollider3DList.Count),
@@ -9068,11 +19839,14 @@ namespace Quantum {
         collider.BeforeBake();
 
         var e = collider.Size.ToUnityVector3();
-        var s = collider.transform.lossyScale;
+        var absScale = collider.transform.lossyScale;
+        absScale.x = Mathf.Abs(absScale.x);
+        absScale.y = Mathf.Abs(absScale.y);
+        absScale.z = Mathf.Abs(absScale.z);
 
-        e.x *= s.x;
-        e.y *= s.y;
-        e.z *= s.z;
+        e.x *= absScale.x;
+        e.y *= absScale.y;
+        e.z *= absScale.z;
 
         staticCollider3DList.Add(new MapStaticCollider3D {
           Position        = collider.transform.TransformPoint(collider.PositionOffset.ToUnityVector3()).ToFPVector3(),
@@ -9115,7 +19889,7 @@ namespace Quantum {
           data.StaticCollider3DReferences.Add(collider);
 
           // add to static collider data
-          data.Asset.CollidersManagedTriangles.Add(staticColliderIndex, collider.MeshTriangles);
+          asset.CollidersManagedTriangles.Add(staticColliderIndex, collider.MeshTriangles);
         }
       }
 
@@ -9152,14 +19926,14 @@ namespace Quantum {
         terrain.Asset.Bake(staticColliderIndex);
 
         // add to static collider data
-        data.Asset.CollidersManagedTriangles.Add(staticColliderIndex, terrain.Asset.MeshTriangles);
+        asset.CollidersManagedTriangles.Add(staticColliderIndex, terrain.Asset.MeshTriangles);
       }
 
       // this has to hold
       Assert.Check(staticCollider3DList.Count == data.StaticCollider3DReferences.Count);
 
       // assign collider 3d array
-      data.Asset.StaticColliders3D = staticCollider3DList.ToArray();
+      asset.StaticColliders3D = staticCollider3DList.ToArray();
 
       // clear this so it's not re-used by accident
       staticCollider3DList = null;
@@ -9167,13 +19941,13 @@ namespace Quantum {
       BakeMeshes(data, inEditor);
 
       if (inEditor) {
-        QuantumEditorLog.LogImport($"Baked {data.Asset.StaticColliders2D.Length} 2D static colliders");
-        QuantumEditorLog.LogImport($"Baked {data.Asset.StaticColliders3D.Length} 3D static primitive colliders");
-        QuantumEditorLog.LogImport($"Baked {data.Asset.CollidersManagedTriangles.Select(x => x.Value.Triangles.Length).Sum()} 3D static triangles");
+        QuantumEditorLog.LogImport($"Baked {asset.StaticColliders2D.Length} 2D static colliders");
+        QuantumEditorLog.LogImport($"Baked {asset.StaticColliders3D.Length} 3D static primitive colliders");
+        QuantumEditorLog.LogImport($"Baked {asset.CollidersManagedTriangles.Select(x => x.Value.Triangles.Length).Sum()} 3D static triangles");
       }
     }
 
-    public static void BakePrototypes(QuantumMapData data) {
+    public static void BakePrototypes(QuantumMapData data, bool inEditor) {
       var scene = data.gameObject.scene;
       Assert.Check(scene.IsValid(), "Scene is invalid");
 
@@ -9185,14 +19959,15 @@ namespace Quantum {
 
       var converter = new QuantumEntityPrototypeConverter(data, prototypes);
       var buffer    = new List<ComponentPrototype>();
-      
-      ref var mapEntities = ref data.Asset.MapEntities;
+
+      var asset = data.GetAsset(inEditor);
+      ref var mapEntities = ref asset.MapEntities;
       Array.Resize(ref mapEntities, prototypes.Length);
       Array.Clear(mapEntities, 0, mapEntities.Length);
       
 #if UNITY_EDITOR
       // this is needed to clear up managed references
-      using var so = new SerializedObject(data.Asset);
+      using var so = new SerializedObject(asset);
       so.Update();
 #endif
 
@@ -9215,7 +19990,7 @@ namespace Quantum {
         buffer.Clear();
         
 #if UNITY_EDITOR
-        UpdateManagedReferenceIds(data.Asset, prototype, mapEntities[i].Components);
+        UpdateManagedReferenceIds(asset, prototype, mapEntities[i].Components);
 #endif
       }
       
@@ -9351,10 +20126,10 @@ namespace Quantum {
 
 #if QUANTUM_ENABLE_AI && !QUANTUM_DISABLE_AI
 
-    static IEnumerable<Quantum.NavMesh> BakeNavMeshesLoop(QuantumMapData data) {
+    static IEnumerable<Quantum.NavMesh> BakeNavMeshesLoop(QuantumMapData data, Map asset) {
 
 #if UNITY_EDITOR
-      QuantumGameGizmos.InvalidateNavMeshGizmos();
+      QuantumGameGizmos.InvalidateGizmos();
 #endif
       
       var scene = data.gameObject.scene;
@@ -9427,9 +20202,14 @@ namespace Quantum {
             p = new NavMeshBakerBenchmarkerProgressBar($"Baking {bakeData.Name}");
           }
           
-          navmesh = NavMeshBaker.BakeNavMesh(data.Asset, bakeData, progressBar: p);
+          navmesh = NavMeshBaker.BakeNavMesh(asset, bakeData, progressBar: p);
           navmesh.SerializeType = data.NavMeshSerializeType;
+#if UNITY_EDITOR
+          QuantumEditorLog.LogImport($"Baking Quantum NavMesh '{bakeData.Name}' complete ({i + 1}/{allBakeData.Count})");
+#else
           Log.Debug($"Baking Quantum NavMesh '{bakeData.Name}' complete ({i + 1}/{allBakeData.Count})");
+#endif
+
         } catch (Exception exn) {
           Log.Exception(exn);
         }
@@ -9760,12 +20540,14 @@ namespace Quantum {
       [InlineHelp]
       public bool FixTrianglesOnEdges = true;
       /// <summary>
-      /// Larger scaled navmeshes may require to increase this value (e.g. 0.001) when false-positive borders are detected. Min = float.Epsilon.
+      /// Increase this value when borders inside the navmesh are generated.
+      /// Start by setting the epsilon to 0.0001 and never increase to more than 0.001.
+      /// Default is 1e-6f (0.000001f).
       /// </summary>
       [InlineHelp]
       [Min(float.Epsilon)]
       [DrawIf("FixTrianglesOnEdges", true)]
-      public float FixTrianglesOnEdgesEpsilon = float.Epsilon;
+      public float FixTrianglesOnEdgesEpsilon = 0.000001f;
       /// <summary>
       /// Make the height offset considerably larger than FixTrianglesOnEdgesEpsilon to better detect degenerate triangles. Is the navmesh becomes deformed chose a smaller epsilon. . Min = float.Epsilon. Default is 0.05.
       /// </summary>
@@ -9868,6 +20650,32 @@ namespace Quantum {
       }
 
       /// <summary>
+      /// Identifies and removes degenerate triangles from the mesh triangles collection.
+      /// Will copy and recreated the triangles array when any degenerate triangles has been found.
+      /// The cleanup has to be performed before creating the links, otherwise the links will reference invalid triangles.
+      /// </summary>
+      /// <param name="triangles">Triangle array</param>
+      /// <param name="reporter">Progress reporter</param>
+      public static void RemoveDegenerateTriangles(ref NavMeshBakeDataTriangle[] triangles, Action<float> reporter) {
+        var trianglesCopy = default(List<NavMeshBakeDataTriangle>);
+        for (int i = triangles.Length - 1; i >= 0; --i) {
+          var t = triangles[i];
+          if (t.VertexIds != null && t.VertexIds.Length == 3) {
+            if (t.VertexIds[0] == t.VertexIds[1] || t.VertexIds[0] == t.VertexIds[2] || t.VertexIds[1] == t.VertexIds[2]) {
+              trianglesCopy ??= new List<NavMeshBakeDataTriangle>(triangles);
+              trianglesCopy.RemoveAt(i);
+              QuantumEditorLog.WarnImport($"Removed degenerate triangle {i}");
+            }
+          }
+          reporter.Invoke(i / (float)triangles.Length);
+        }
+
+        if (trianglesCopy != null) {
+          triangles = trianglesCopy.ToArray();
+        }
+      }
+
+      /// <summary>
       /// Removes unused vertices from the vertex array.
       /// </summary>
       /// <param name="vertices">Mesh vertices collection.</param>
@@ -9928,7 +20736,7 @@ namespace Quantum {
                   break;
                 }
                 if (unityAreaMap.TryGetValue(areaId, out var regionId) == false) {
-                  Log.Error($"Failed to map Unity navmesh area {areaId}");
+                  QuantumEditorLog.ErrorImport($"Failed to map Unity navmesh area {areaId}");
                   break;
                 }
                 if (regionMap.Contains(regionId) == false) {
@@ -9992,7 +20800,7 @@ namespace Quantum {
 
             var meshRenderer = region.gameObject.GetComponent<MeshRenderer>();
             if (meshRenderer == null) {
-              Debug.LogErrorFormat("MeshRenderer missing on MapNavMeshRegion object {0} with active RegionCasting", region.name);
+              QuantumEditorLog.ErrorImport($"MeshRenderer missing on MapNavMeshRegion object {region.name} with active RegionCasting");
             } else {
               var bounds = region.gameObject.GetComponent<MeshRenderer>().bounds;
               // Grow the bounds, because the generated map is not exact
@@ -10029,7 +20837,7 @@ namespace Quantum {
             if (regionMap.Contains(regionId) == false) {
               if (regionMap.Count >= Navigation.Constants.MaxRegions) {
                 // Still add to region map, but it won't be set on the triangles.
-                Debug.LogErrorFormat("Failed to create region '{0}' because Quantum max region ({1}) reached. Reduce the number of regions.", regionId, Navigation.Constants.MaxRegions);
+                QuantumEditorLog.ErrorImport($"Failed to create region '{regionId}' because Quantum max region ({Navigation.Constants.MaxRegions}) reached. Reduce the number of regions.");
               }
 
               regionMap.Add(regionId);
@@ -10040,7 +20848,7 @@ namespace Quantum {
               triangles[triangleIndex].Cost = regionCost;
             }
           } else {
-            Debug.LogWarningFormat("A triangle island (count = {0}) can not be matched with any region bounds, try to increase the RegionDetectionMargin.\n Triangle Ids: {1}", island.Count, String.Join(", ", island.Select(sdfdsf => sdfdsf.ToString()).ToArray()));
+            QuantumEditorLog.WarnImport($"A triangle island (count = {island.Count}) can not be matched with any region bounds, try to increase the RegionDetectionMargin.\n Triangle Ids: {String.Join(", ", island.Select(v => v.ToString()).ToArray())}");
           }
         }
       }
@@ -10074,18 +20882,12 @@ namespace Quantum {
           if (t == tri) {
             continue;
           }
+          
+          var hasV0 = triangles[t].VertexIds[0] == v0 || triangles[t].VertexIds[1] == v0 || triangles[t].VertexIds[2] == v0;
+          var hasV1 = triangles[t].VertexIds[0] == v1 || triangles[t].VertexIds[1] == v1 || triangles[t].VertexIds[2] == v1;
 
-          // Triangle shares at least one vertex?
-          if (triangles[t].VertexIds[0] == v0 || triangles[t].VertexIds[1] == v0 ||
-              triangles[t].VertexIds[2] == v0 || triangles[t].VertexIds[0] == v1 ||
-              triangles[t].VertexIds[1] == v1 || triangles[t].VertexIds[2] == v1) {
-            if (triangles[t].VertexIds[0] == v0 || triangles[t].VertexIds[1] == v0 || triangles[t].VertexIds[2] == v0) {
-              if (triangles[t].VertexIds[0] == v1 || triangles[t].VertexIds[1] == v1 || triangles[t].VertexIds[2] == v1) {
-                // Triangle shares two vertices, not interested in that
-                return -1;
-              }
-            }
-
+          // Triangles share exactly one vertex
+          if (hasV0 ^ hasV1) {
             if (Vector3Double.IsPointBetween(vertices[triangles[t].VertexIds[0]].Position, vertices[v0].Position, vertices[v1].Position, epsilon, epsilonHeight)) {
               // Returns the triangle that has a vertex on the provided segment and the vertex index that lies on it
               triangleVertexIndex = 0;
@@ -10176,7 +20978,7 @@ namespace Quantum {
         var unityNavMeshTriangulation = UnityEngine.AI.NavMesh.CalculateTriangulation();
 
         if (unityNavMeshTriangulation.vertices.Length == 0) {
-          Debug.LogError("Unity NavMesh not found");
+          QuantumEditorLog.ErrorImport("Unity NavMesh not found");
           return null;
         }
 
@@ -10258,6 +21060,12 @@ namespace Quantum {
           progressBar?.SetProgress(1);
         }
 
+        // Remove degenerate triangles
+        progressBar?.SetInfo("Removing Degenerate Triangles");
+        progressBar?.SetProgress(0);
+        ImportUtils.RemoveDegenerateTriangles(ref Triangles, p => progressBar?.SetProgress(p));
+        progressBar?.SetProgress(1);
+
         // Import regions
         var unityNavmeshAreaMap = settings.ImportRegionMode == NavmeshRegionImportMode.Simple ? CreateUnityNavmeshAreaMap() : new Dictionary<int, string>();
         List<string> regions = new List<string>() { "MainArea" };
@@ -10322,7 +21130,7 @@ namespace Quantum {
               continue;
             }
 
-            var regionId = string.Empty;
+            var regionId = "MainArea";
             switch (settings.ImportRegionMode) {
               case NavmeshRegionImportMode.Simple:
                 if (unityNavmeshAreaMap.TryGetValue(links[l].Area, out var areaName)) {
@@ -10331,7 +21139,9 @@ namespace Quantum {
                 break;
               case NavmeshRegionImportMode.Advanced:
                 var navMeshRegion = links[l].Object.GetComponent<QuantumNavMeshRegion>();
-                regionId = navMeshRegion != null && string.IsNullOrEmpty(navMeshRegion.Id) == false ? navMeshRegion.Id : string.Empty;
+                if (navMeshRegion != null && string.IsNullOrEmpty(navMeshRegion.Id) == false) {
+                  regionId = navMeshRegion.Id;
+                }
                 break;
             }
 
@@ -10347,9 +21157,9 @@ namespace Quantum {
             var endTriangle = FindTriangleIndex(Vertices, Triangles, settings.LinkErrorCorrection, triangleGrid, ref endPosition);
 
             if (startTriangle == -1) {
-              Debug.LogError($"Could not map start position {startPosition} of navmesh link to a triangle");
+              QuantumEditorLog.ErrorImport($"Could not map start position {startPosition} of navmesh link to a triangle");
             } else if (endTriangle == -1) {
-              Debug.LogError($"Could not map end position {endPosition} of navmesh link to a triangle");
+              QuantumEditorLog.ErrorImport($"Could not map end position {endPosition} of navmesh link to a triangle");
             } else {
               // Add link
 #if QUANTUM_XY
@@ -10374,7 +21184,6 @@ namespace Quantum {
           }
         }
 
-
         result.Vertices = Vertices.Select(v => v.Convert()).ToArray();
         result.Triangles = Triangles.ToArray();
 
@@ -10385,7 +21194,7 @@ namespace Quantum {
         });
         result.Regions = regions.ToArray();
 
-        Debug.LogFormat("Imported Unity NavMesh '{0}', cleaned up {1} vertices, found {2} region(s), found {3} link(s)", name, unityNavMeshTriangulation.vertices.Length - Vertices.Length, result.Regions.Length, result.Links.Length);
+        QuantumEditorLog.LogImport($"Imported Unity NavMesh '{name}', cleaned up {unityNavMeshTriangulation.vertices.Length - Vertices.Length} vertices, found {result.Regions.Length} region(s), found {result.Links.Length} link(s)");
       }
 
       return result;
@@ -10404,7 +21213,7 @@ namespace Quantum {
         foreach (var surface in navmeshSurfaces) {
           var surfaceComponent = surface.GetComponent<Unity.AI.Navigation.NavMeshSurface>();
           if (surfaceComponent == null) {
-            Debug.LogErrorFormat("No NavMeshSurface found on '{0}'", surface.name);
+            QuantumEditorLog.ErrorImport($"No NavMeshSurface found on '{surface.name}'");
           } else {
             if (surfaceComponent.agentTypeID != -1) {
               var settings = UnityEngine.AI.NavMesh.GetSettingsByID(surfaceComponent.agentTypeID);
@@ -10483,14 +21292,21 @@ namespace Quantum {
         var minPosition = new Vector2Double(double.MaxValue, double.MaxValue);
         for (int i = 0; i < vertices.Length; ++i) {
           maxPosition.X = Math.Max(maxPosition.X, vertices[i].Position.X);
-          maxPosition.Y = Math.Max(maxPosition.Y, vertices[i].Position.Z);
           minPosition.X = Math.Min(minPosition.X, vertices[i].Position.X);
+#if QUANTUM_XY
+          maxPosition.Y = Math.Max(maxPosition.Y, vertices[i].Position.Y);
+          minPosition.Y = Math.Min(minPosition.Y, vertices[i].Position.Y);
+#else
+          maxPosition.Y = Math.Max(maxPosition.Y, vertices[i].Position.Z);
           minPosition.Y = Math.Min(minPosition.Y, vertices[i].Position.Z);
+#endif
         }
 
         MaxPosition = maxPosition;
         MinPosition = minPosition;
         CellSize = Math.Max(MaxPosition.X - MinPosition.X, MaxPosition.Y - MinPosition.Y) / CellCount;
+
+        Assert.Always(CellSize > 0, "CellSize must be greater than 0.");
 
         for (int i = 0; i < triangles.Length; ++i) {
           int minCellIndexX = int.MaxValue, maxCellIndexX = int.MinValue, minCellIndexY = int.MaxValue, maxCellIndexY = int.MinValue;
@@ -10498,8 +21314,13 @@ namespace Quantum {
             var pos = vertices[triangles[i].VertexIds[j]].Position;
             minCellIndexX = Math.Min(minCellIndexX, (int)((pos.X - MinPosition.X) / CellSize));
             maxCellIndexX = Math.Max(maxCellIndexX, (int)((pos.X - MinPosition.X) / CellSize));
+#if QUANTUM_XY
+            minCellIndexY = Math.Min(minCellIndexY, (int)((pos.Y - MinPosition.Y) / CellSize));
+            maxCellIndexY = Math.Max(maxCellIndexY, (int)((pos.Y - MinPosition.Y) / CellSize));
+#else
             minCellIndexY = Math.Min(minCellIndexY, (int)((pos.Z - MinPosition.Y) / CellSize));
             maxCellIndexY = Math.Max(maxCellIndexY, (int)((pos.Z - MinPosition.Y) / CellSize));
+#endif
           }
 
           for (int x = minCellIndexX; x <= maxCellIndexX && x >= 0 && x < CellCount; x++) {
@@ -10524,7 +21345,11 @@ namespace Quantum {
 
       // find cell index (expand one cell for error correction)
       var _x = (int)((position.x - triangleGrid.MinPosition.X) / triangleGrid.CellSize);
+#if QUANTUM_XY
+      var _y = (int)((position.y - triangleGrid.MinPosition.Y) / triangleGrid.CellSize);
+#else
       var _y = (int)((position.z - triangleGrid.MinPosition.Y) / triangleGrid.CellSize);
+#endif
       var closestDistance = double.MaxValue;
 
       var xMin = Math.Max(0, _x - additionalCellsToCheck);
@@ -10838,6 +21663,15 @@ namespace Quantum {
 
         // Check height offset to edge
         var closestPoint = ClosestPointOnSegment(p, v0, v1);
+        
+        // Check actual distance to segment
+#if QUANTUM_XY
+        if (Vector2Double.Distance(new Vector2Double(closestPoint.X, closestPoint.Y), new Vector2Double(p.X, p.Y)) > epsilon) {
+#else
+        if (Vector2Double.Distance(new Vector2Double(closestPoint.X, closestPoint.Z), new Vector2Double(p.X, p.Z)) > epsilon) {
+#endif
+          return false;
+        }
 
 #if QUANTUM_XY
         return Math.Abs(closestPoint.Z - p.Z) < epsilonHeight;
@@ -11101,8 +21935,7 @@ namespace Quantum {
           safety += 1;
 
           if (safety > 100000) {
-            Debug.Log("Stuck in endless loop");
-
+            QuantumEditorLog.ErrorImport("Stuck in endless loop");
             break;
           }
 
@@ -11132,10 +21965,17 @@ namespace Quantum {
               }
             }
 
+#if QUANTUM_XY
+            Vector2 aPos = new Vector2(a.position.x, a.position.y);
+            Vector2 bPos = new Vector2(b.position.x, b.position.y);
+            Vector2 cPos = new Vector2(c.position.x, c.position.y);
+            Vector2 dPos = new Vector2(d.position.x, d.position.y);
+#else
             Vector2 aPos = new Vector2(a.position.x, a.position.z);
             Vector2 bPos = new Vector2(b.position.x, b.position.z);
             Vector2 cPos = new Vector2(c.position.x, c.position.z);
             Vector2 dPos = new Vector2(d.position.x, d.position.z);
+#endif
 
             //Use the circle test to test if we need to flip this edge
             if (IsPointInsideOutsideOrOnCircle(aPos, bPos, cPos, dPos) < 0f) {
@@ -11167,7 +22007,7 @@ namespace Quantum {
           }
         }
 
-        Debug.Log("Delaunay triangulation flipped edges: " + flippedEdges);
+        QuantumEditorLog.LogImport($"Delaunay triangulation flipped {flippedEdges} edges");
 
         //Dont have to convert from half edge to triangle because the algorithm will modify the objects, which belongs to the 
         //original triangles, so the triangles have the data we need
@@ -11249,9 +22089,15 @@ namespace Quantum {
         for (int i = 0; i < triangles.Count; i++) {
           Triangle tri = triangles[i];
 
+#if QUANTUM_XY
+          Vector2 v1 = new Vector2(tri.v1.position.x, tri.v1.position.y);
+          Vector2 v2 = new Vector2(tri.v2.position.x, tri.v2.position.y);
+          Vector2 v3 = new Vector2(tri.v3.position.x, tri.v3.position.y);
+#else
           Vector2 v1 = new Vector2(tri.v1.position.x, tri.v1.position.z);
           Vector2 v2 = new Vector2(tri.v2.position.x, tri.v2.position.z);
           Vector2 v3 = new Vector2(tri.v3.position.x, tri.v3.position.z);
+#endif
 
           if (!IsTriangleOrientedClockwise(v1, v2, v3)) {
             tri.ChangeOrientation();
@@ -11596,6 +22442,17 @@ namespace Quantum {
             return _realtimeClient.LeaveRoomAsync(option == ShutdownConnectionOptions.LeaveRoomAndBecomeInactive);
           }
 
+          if (_realtimeClient.State == ClientState.Leaving || 
+              _realtimeClient.State == ClientState.DisconnectingFromGameServer ||
+              _realtimeClient.State == ClientState.ConnectedToMasterServer) {
+            // Already leaving the room, wait for the result.
+            // This is also a workaround for the session runner async shutdown where inside internal destruction protocols this method was already called.
+            var handler = _realtimeClient.CreateConnectionHandler(false);
+            handler.Disposables.Enqueue(_realtimeClient.CallbackMessage.ListenManual<OnDisconnectedMsg>(m => handler.SetException(new DisconnectException(m.cause))));
+            handler.Disposables.Enqueue(_realtimeClient.CallbackMessage.ListenManual<OnConnectedToMasterMsg>(m => handler.SetResult(Photon.Realtime.ErrorCode.Ok)));
+            return handler.Task;
+          }
+
           break;
       }
 
@@ -11628,9 +22485,10 @@ namespace Quantum {
   using System;
   using System.Collections.Generic;
   using System.Linq;
+  using Photon.Client;
   using Photon.Deterministic;
   using UnityEngine;
-#if QUANTUM_REMOTE_PROFILER
+#if QUANTUM_ENABLE_REMOTE_PROFILER
   using System.Diagnostics;
   using System.Net;
   using Quantum;
@@ -11663,11 +22521,10 @@ namespace Quantum {
     public QuantumProfilingClientInfo() {
     }
 
-    public QuantumProfilingClientInfo(string clientId, DeterministicSessionConfig config, DeterministicPlatformInfo platformInfo) {
+    public QuantumProfilingClientInfo(DeterministicSessionConfig config, DeterministicPlatformInfo platformInfo) {
       ProfilerId = Guid.NewGuid().ToString();
       Config     = config;
-
-      Properties.Add(CreateProperty("ClientId", clientId));
+      
       Properties.Add(CreateProperty("MachineName", Environment.MachineName));
       Properties.Add(CreateProperty("Architecture", platformInfo.Architecture));
       Properties.Add(CreateProperty("Platform", platformInfo.Platform));
@@ -11695,7 +22552,7 @@ namespace Quantum {
     }
   }
 
-#if QUANTUM_REMOTE_PROFILER
+#if QUANTUM_ENABLE_REMOTE_PROFILER
   public class QuantumProfilingClient : IDisposable {
     const double BROADCAST_INTERVAL = 1;
 
@@ -11706,10 +22563,20 @@ namespace Quantum {
 
     Stopwatch _broadcastTimer;
     double    _broadcastNext;
-  
 
-    public QuantumProfilingClient(string clientId, DeterministicSessionConfig config, DeterministicPlatformInfo platformInfo) {
-      _clientInfo = new QuantumProfilingClientInfo(clientId, config, platformInfo);
+    class LiteNetLibLogger : LiteNetLib.INetLogger {
+      public void WriteNet(NetLogLevel level, string str, params object[] args) {
+        Log.Debug($"[LiteNetLib/{level}] {string.Format(str, args)}");
+      }
+    }
+    
+    static QuantumProfilingClient() {
+      // set up logging
+      LiteNetLib.NetDebug.Logger = new LiteNetLibLogger();
+    }
+
+    public QuantumProfilingClient(DeterministicSessionConfig config, DeterministicPlatformInfo platformInfo) {
+      _clientInfo = new QuantumProfilingClientInfo(config, platformInfo);
       _broadcastTimer = Stopwatch.StartNew();
 
       _listener = new EventBasedNetListener();
@@ -11722,17 +22589,19 @@ namespace Quantum {
       _listener.NetworkReceiveUnconnectedEvent += OnNetworkReceiveUnconnectedEvent;
       _listener.PeerConnectedEvent += OnPeerConnected;
       _listener.PeerDisconnectedEvent += OnPeerDisconnected;
+
+      
     }
 
     void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectinfo) {
-      Log.Info($"QuantumProfilingClient: Disconnected from {peer.EndPoint}");
+      Log.Info($"QuantumProfilingClient: Disconnected from {peer.Address}");
 
       _serverPeer = null;
       _broadcastNext = 0;
     }
 
     void OnPeerConnected(NetPeer peer) {
-      Log.Info($"QuantumProfilingClient: Connected to {peer.EndPoint}");
+      Log.Info($"QuantumProfilingClient: Connected to {peer.Address}");
       _serverPeer = peer;
 
       var writer = new NetDataWriter();
@@ -11777,6 +22646,8 @@ namespace Quantum {
         _manager = null;
       }
     }
+
+    public bool IsConnected => _serverPeer != null;
   }
 #endif
 }
@@ -12192,34 +23063,6 @@ namespace Quantum {
     }
 
     /// <summary>
-    /// Create and attach a remote profiler to the game.
-    /// </summary>
-    /// <param name="clientId">Client id</param>
-    /// <param name="deterministicConfig">Deterministic config</param>
-    /// <param name="platformInfo">Platform information</param>
-    /// <param name="game">Game object</param>
-    public void CreateProfiler(string clientId, DeterministicSessionConfig deterministicConfig,
-      DeterministicPlatformInfo platformInfo, IDeterministicGame game) {
-#if QUANTUM_REMOTE_PROFILER
-      if (!Application.isEditor) {
-        var client = new QuantumProfilingClient(clientId, deterministicConfig, platformInfo);
-
-        var subscription = QuantumCallback.SubscribeManual((CallbackTaskProfilerReportGenerated callback) => {
-          client.SendProfilingData(callback.Report);
-          client.Update();
-        }, game);
-
-        QuantumCallback.SubscribeManual((CallbackGameDestroyed callback) => {
-          subscription?.Dispose();
-          subscription = null;
-          client?.Dispose();
-          client = null;
-        }, game, once: true);
-      }
-#endif
-    }
-
-    /// <summary>
     /// Create the Unity platform information object.
     /// </summary>
     /// <returns>Platform info object</returns>
@@ -12287,7 +23130,11 @@ namespace Quantum {
       Native.Utils = new QuantumUnityNativeUtility();
 
       // load lookup table
+#if QUANTUM_ENABLE_ASYNC_LUT_LOADING
+      _ = FPMathUtils.LoadLookupTablesAsync(true);
+#else 
       FPMathUtils.LoadLookupTables(force);
+#endif
 
       // set runner factory and init Realtime.Async
       DefaultFactory = new QuantumRunnerUnityFactory();
@@ -12295,10 +23142,10 @@ namespace Quantum {
 #if ENABLE_PROFILER
       HostProfiler.Init(new QuantumUnityHostProfiler());
 #endif
-      
+
       // init debug draw functions
 #if QUANTUM_DRAW_SHAPES || UNITY_EDITOR
-      Draw.Init(DebugDraw.Ray, DebugDraw.Line, DebugDraw.Circle, DebugDraw.Sphere, DebugDraw.Rectangle, DebugDraw.Box, DebugDraw.Capsule, DebugDraw.Clear);
+      Draw.Init(DebugDraw.Ray, DebugDraw.Line, DebugDraw.Circle, DebugDraw.Sphere, DebugDraw.Rectangle, DebugDraw.Box, DebugDraw.Capsule, DebugDraw.Text, DebugDraw.Clear);
 #endif
     }
   }
@@ -12947,10 +23794,6 @@ namespace Quantum {
     public int SizeOf(Type type) {
       return UnsafeUtility.SizeOf(type);
     }
-
-    public bool CanResolveEnumSize {
-      get { return true; }
-    }
   }
 }
 
@@ -13121,6 +23964,7 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Runtime/QuantumUnityTypes.Common.cs
 
 // merged UnityTypes
+#pragma warning disable CS1574, CS1584, CS1581, CS1580
 
 #region QuantumGlobalScriptableObject.cs
 
@@ -13253,6 +24097,22 @@ namespace Quantum {
     }
 
     /// <summary>
+    /// Loads or returns the current global instance asynchronously. Returns <see langword="null"/> if loading an instance failed.
+    /// </summary>
+    /// <returns></returns>
+    protected static async System.Threading.Tasks.Task<T> GetGlobalAsyncInternal() {
+      var instance = await GetOrLoadGlobalInstanceAsync();
+      
+      if (ReferenceEquals(instance, null)) {
+        throw new InvalidOperationException($"Failed to load {typeof(T).Name}. If this happens in edit mode, make sure Quantum is properly installed in the Quantum HUB. " +
+          $"Otherwise, if the default path does not exist or does not point to a Resource, you need to use " +
+          $"{nameof(QuantumGlobalScriptableObjectAttribute)} attribute to point to a method that will perform the loading.");
+      }
+
+      return instance;
+    }
+
+    /// <summary>
     /// Unloads the global instance if it is loaded.
     /// </summary>
     /// <returns><see langword="true"/> if an instance was unloaded</returns>
@@ -13291,20 +24151,6 @@ namespace Quantum {
         return s_instance;
       }
       
-      T instance = null;
-      QuantumGlobalScriptableObjectUnloadDelegate unloadHandler = null;
-      
-      instance = LoadPlayerInstance(out unloadHandler);
-
-      if (instance) {
-        SetGlobalInternal(instance, unloadHandler);
-      }
-      
-      return instance;
-    }
-    
-    private static T LoadPlayerInstance(out QuantumGlobalScriptableObjectUnloadDelegate unloadHandler) {
-      
       foreach (var sourceAttribute in SourceAttributes) {
         if (Application.isEditor) {
           if (!Application.isPlaying && !sourceAttribute.AllowEditMode) {
@@ -13317,10 +24163,19 @@ namespace Quantum {
         }
         
         var result = sourceAttribute.Load(typeof(T));
+        
+        if (s_instance) {
+          LogTrace?.Log($"Something has loaded the instance of {typeof(T).FullName} while sync load was happening. Unloading the newly loaded instance and returning the actual global.");
+          if (result.Object) {
+            result.Unloader?.Invoke(result.Object);
+          }
+          return s_instance;
+        }
+        
         if (result.Object) {
           var instance = (T)result.Object;
-          unloadHandler = result.Unloader;
-          LogTrace?.Log($"{LogPrefix} Loader {sourceAttribute} was used to load {AsId(instance)}, has unloader: {unloadHandler != null}");
+          LogTrace?.Log($"{LogPrefix} Loader {sourceAttribute} was used to load {AsId(instance)}, has unloader: {result.Unloader != null}");
+          SetGlobalInternal(instance, result.Unloader);
           return instance;
         }
 
@@ -13331,8 +24186,58 @@ namespace Quantum {
       }
 
       LogTrace?.Log($"{LogPrefix} No source attribute was able to load the global instance");
-      unloadHandler = default;
-      return default;
+      return null;
+    }
+
+    private static async System.Threading.Tasks.Task<T> GetOrLoadGlobalInstanceAsync() {
+      if (s_instance) {
+        return s_instance;
+      }
+      
+      foreach (var sourceAttribute in SourceAttributes) {
+        if (Application.isEditor) {
+          if (!Application.isPlaying && !sourceAttribute.AllowEditMode) {
+            continue;
+          }
+        }
+
+        if (sourceAttribute.ObjectType != typeof(T) && !typeof(T).IsSubclassOf(sourceAttribute.ObjectType)) {
+          continue;
+        }
+        
+        var task = sourceAttribute.LoadAsync(typeof(T));
+        if (task == null) {
+          if (!sourceAttribute.AllowFallback) {
+            break;
+          }
+          continue;
+        }
+
+        var result = await task;
+        
+        if (s_instance) {
+          LogWarn?.Log($"Something has loaded the instance of {typeof(T).FullName} while async load was happening. Unloading the newly loaded instance and returning the actual global.");
+          if (result.Object) {
+            result.Unloader?.Invoke(result.Object);
+          }
+          return s_instance;
+        }
+        
+        if (result.Object) {
+          var instance = (T)result.Object;
+          LogTrace?.Log($"{LogPrefix} Loader {sourceAttribute} was used to load async {AsId(instance)}, has unloader: {result.Unloader != null}");
+          SetGlobalInternal(instance, result.Unloader);
+          return instance;
+        }
+        
+        if (!sourceAttribute.AllowFallback) {
+          // no fallback allowed
+          break;
+        }
+      }
+
+      LogTrace?.Log($"{LogPrefix} No source attribute was able to load the global instance");
+      return null;
     }
     
     private static void SetGlobalInternal(T value, QuantumGlobalScriptableObjectUnloadDelegate unloadHandler) {
@@ -13440,6 +24345,15 @@ namespace Quantum {
     /// </summary>
     /// <param name="type">The requested type</param>
     public abstract QuantumGlobalScriptableObjectLoadResult Load(Type type);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public virtual System.Threading.Tasks.Task<QuantumGlobalScriptableObjectLoadResult> LoadAsync(Type type) {
+      return null;
+    }
   }
   
   [Obsolete("Use one of QuantumGlobalScriptableObjectSourceAttribute-derived types instead", true)]
@@ -13502,6 +24416,182 @@ namespace Quantum {
 #endregion
 
 
+#region QuantumPlayerLoopSystemUtils.cs
+
+namespace Quantum {
+  using System;
+  using UnityEngine.LowLevel;
+
+  /// <summary>
+  /// Enum representing the possible modes for adding a system to the Unity Player Loop System.
+  /// </summary>
+  public enum QuantumPlayerLoopSystemAddMode {
+    /// <summary>Add the system as the first child of the parent system.</summary>
+    FirstChild,
+
+    /// <summary>Add the system as the last child of the parent system.</summary>
+    LastChild,
+
+    /// <summary>Add the system before the parent system in the player loop.</summary>
+    Before,
+
+    /// <summary>Add the system after the parent system in the player loop.</summary>
+    After
+  }
+  
+  /// <summary>
+  /// Represents a system that has been added to the PlayerLoopSystem.
+  /// </summary>
+  public readonly struct QuantumPlayerLoopSystemHandle : IDisposable {
+    /// <summary>
+    /// The type of the system.
+    /// </summary>
+    public readonly Type Type;
+    
+    /// <summary/>
+    public QuantumPlayerLoopSystemHandle(Type type) : this() {
+      Type = type;
+    }
+    
+    /// <summary/>
+    public void Dispose() {
+      if (Type == null) {
+        return;
+      }
+      QuantumPlayerLoopSystemUtils.RemoveFromPlayerLoop(Type);
+    }
+  }
+
+  
+  /// <summary>
+  /// Utility class for manipulating Unity Player Loop System.
+  /// </summary>
+  public static class QuantumPlayerLoopSystemUtils {
+    /// <summary>
+    /// Adds a new loop system in relation to <paramref name="referenceSystemType"/>
+    /// </summary>
+    public static IDisposable AddToPlayerLoop(Type referenceSystemType, QuantumPlayerLoopSystemAddMode addMode, Type ownerType, PlayerLoopSystem.UpdateFunction updateDelegate) {
+      var playerLoop = PlayerLoop.GetCurrentPlayerLoop();
+      var result = playerLoop.AddToPlayerLoop(referenceSystemType, addMode, ownerType, updateDelegate);
+      PlayerLoop.SetPlayerLoop(playerLoop);
+      return result;
+    }
+    
+    /// <summary>
+    /// Adds a new loop system in relation to <paramref name="referenceSystemType"/>
+    /// </summary>
+    public static QuantumPlayerLoopSystemHandle AddToPlayerLoop(ref this PlayerLoopSystem parentSystem, Type referenceSystemType, QuantumPlayerLoopSystemAddMode addMode, Type ownerType, PlayerLoopSystem.UpdateFunction updateDelegate) {
+      if (!AddToPlayerLoopInternal(ref parentSystem, referenceSystemType, addMode, ownerType, updateDelegate)) {
+        throw new ArgumentException($"Failed to register a system, reference system {referenceSystemType?.FullName} not found", nameof(referenceSystemType));
+      }
+
+      return new QuantumPlayerLoopSystemHandle(ownerType);
+    }
+    
+    static bool AddToPlayerLoopInternal(ref PlayerLoopSystem parentSystem, Type referenceSystemType, QuantumPlayerLoopSystemAddMode addMode, Type ownerType, PlayerLoopSystem.UpdateFunction updateDelegate) {
+      ref PlayerLoopSystem[] list = ref parentSystem.subSystemList;
+      var listLen = list?.Length ?? 0;
+
+      // did we find the type? e.g. EarlyUpdate/PreLateUpdate/etc.
+      if (parentSystem.type == referenceSystemType) {
+
+        if (addMode == QuantumPlayerLoopSystemAddMode.FirstChild) {
+          InsertSystem(ref list, 0, ownerType, updateDelegate);
+        } else if (addMode == QuantumPlayerLoopSystemAddMode.LastChild) {
+          InsertSystem(ref list, listLen, ownerType, updateDelegate);
+        } else {
+          throw new InvalidOperationException($"Unable to add with a mode {addMode} once a system has been entered");
+        }
+
+        return true;
+      }
+
+      for (int i = 0; i < listLen; ++i) {
+        var subSystem = list[i];
+
+        if (subSystem.type == referenceSystemType) {
+          if (addMode == QuantumPlayerLoopSystemAddMode.Before) {
+            InsertSystem(ref list, i, ownerType, updateDelegate);
+            return true;
+          } else if (addMode == QuantumPlayerLoopSystemAddMode.After) {
+            InsertSystem(ref list, i + 1, ownerType, updateDelegate);
+            return true;
+          }
+        }
+
+        if (AddToPlayerLoopInternal(ref list[i], referenceSystemType, addMode, ownerType, updateDelegate)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    /// <summary>
+    /// Removes a player loop system of given type.
+    /// </summary>
+    /// <returns>True if adding was successful</returns>
+    public static bool RemoveFromPlayerLoop(Type type) {
+      var playerLoop = PlayerLoop.GetCurrentPlayerLoop();
+
+      if (!playerLoop.RemoveFromPlayerLoop(type)) {
+        return false;
+      }
+      
+      PlayerLoop.SetPlayerLoop(playerLoop);
+      return true;
+    }
+    
+    /// <summary>
+    /// Removes a player loop system of given type.
+    /// </summary>
+    /// <returns>True if adding was successful</returns>
+    public static bool RemoveFromPlayerLoop(ref this PlayerLoopSystem parentSystem, Type type) {
+      ref PlayerLoopSystem[] list = ref parentSystem.subSystemList;
+      if (list == null) {
+        return false;
+      }
+
+      for (int i = 0; i < list.Length; ++i) {
+        var subSystem = list[i];
+        if (subSystem.type == type) {
+          // move remaining systems
+          for (int j = i + 1; j < list.Length; ++j) {
+            list[j - 1] = list[j];
+          }
+          Array.Resize(ref list, list.Length - 1);
+          return true;
+        } else if (RemoveFromPlayerLoop(ref list[i], type)) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    private static void InsertSystem(ref PlayerLoopSystem[] systems, int position, Type ownerType, PlayerLoopSystem.UpdateFunction updateDelegate) {
+      int oldLength = systems?.Length ?? 0;
+
+      if (position < 0 || position > oldLength) {
+        throw new ArgumentOutOfRangeException(nameof(position));
+      }
+
+      var system = new PlayerLoopSystem() {
+        type = ownerType,
+        updateDelegate = updateDelegate
+      };
+
+      Array.Resize(ref systems, oldLength + 1);
+      if (position < oldLength) {
+        Array.Copy(systems, position, systems, position + 1, systems.Length - position - 1);
+      }
+      systems[position] = system;
+    }
+  }
+}
+
+#endregion
+
+
 #region QuantumScriptableObject.cs
 
 namespace Quantum {
@@ -13516,6 +24606,7 @@ namespace Quantum {
 
 #endregion
 
+#pragma warning restore CS1574, CS1584, CS1581, CS1580
 
 
 #endregion
@@ -14055,6 +25146,7 @@ namespace Quantum {
 namespace Quantum {
   using System;
   using System.Diagnostics;
+  using System.Runtime.CompilerServices;
   using JetBrains.Annotations;
 #if QUANTUM_ENABLE_MPPM
   using System.Collections.Generic;
@@ -14197,21 +25289,30 @@ namespace Quantum {
         // start the MPE client to await commands
         var client = ChannelClient.GetOrCreateClient(MpeChannelName);
         client.Start(true);
-        var disconnect = client.RegisterMessageHandler(data => {
+        // ReSharper disable once AsyncVoidLambda
+        var disconnect = client.RegisterMessageHandler(async (byte[] data) => {
           var json = System.Text.Encoding.UTF8.GetString(data);
           var message = JsonUtility.FromJson<CommandWrapper>(json);
           
           QuantumEditorLog.TraceMppm($"Received command {message.Data}");
-          message.Data.Execute();
-          if (message.Data.NeedsAck) {
-            var ack = new AckMessage() {
-              Guid = message.Guid
-            };
-            var ackJson = JsonUtility.ToJson(ack);
-            QuantumEditorLog.TraceMppm($"Sending ack {ackJson}");
-            var ackBytes = System.Text.Encoding.UTF8.GetBytes(ackJson);
-            client.Send(ackBytes);
+          try {
+            await message.Data.ExecuteAsync();
+          } catch (Exception ex) {
+            QuantumEditorLog.Error($"Error while handling MPPM message {message.Data.GetType().FullName}: {ex}");
+            return;
           }
+
+          if (!message.Data.NeedsAck) {
+            return;
+          }
+          
+          var ack = new AckMessage() {
+            Guid = message.Guid
+          };
+          var ackJson = JsonUtility.ToJson(ack);
+          QuantumEditorLog.TraceMppm($"Sending ack {ackJson}");
+          var ackBytes = System.Text.Encoding.UTF8.GetBytes(ackJson);
+          client.Send(ackBytes);
         });
         Debug.Assert(disconnect != null);
         
@@ -14220,9 +25321,13 @@ namespace Quantum {
         Debug.Assert(Directory.Exists(mainInstanceCommandsFolderPath));
         foreach (var file in Directory.GetFiles(mainInstanceCommandsFolderPath, "*.json")) {
           var json = File.ReadAllText(file);
-          var wrapper = JsonUtility.FromJson<CommandWrapper>(json);
-          QuantumEditorLog.TraceMppm($"Received persistent command {wrapper.Data}");
-          wrapper.Data.Execute();
+          var message = JsonUtility.FromJson<CommandWrapper>(json);
+          QuantumEditorLog.TraceMppm($"Received persistent command {message.Data}");
+          message.Data.ExecuteAsync().ContinueWith(t => {
+            if (t.IsFaulted) {
+              QuantumEditorLog.Error($"Error while handling persistent MPPM message {message.Data.GetType().FullName}: {t.Exception}");
+            }
+          });
         }
       }
     }
@@ -14318,13 +25423,24 @@ namespace Quantum {
   // ReSharper disable once IdentifierTypo
   public abstract class QuantumMppmCommand {
     /// <summary>
-    /// Execute the command on a virtual instance.
+    /// Execute the command on a virtual instance. Executes synchronously.
     /// </summary>
-    public abstract void Execute();
+    public virtual void Execute() {
+    }
+
+    /// <summary>
+    /// Execute the command on a virtual instance. By default, calls <see cref="Execute"/>
+    /// </summary>
+    public virtual System.Threading.Tasks.Task ExecuteAsync() {
+      Execute();
+      return System.Threading.Tasks.Task.CompletedTask;
+    } 
+    
     /// <summary>
     /// Does the main instance need to wait for an ack?
     /// </summary>
     public virtual bool NeedsAck => false;
+    
     /// <summary>
     /// If the command is persistent (i.e. needs to be executed on each domain reload), this key is used to store it.
     /// </summary>
@@ -14373,6 +25489,28 @@ namespace Quantum {
   }
 }
 #endif
+
+#endregion
+
+
+#region QuantumUnityEditorPaths.cs
+
+namespace Quantum {
+  /// <summary>
+  /// Quantum Unity paths.
+  /// </summary>
+  public static class QuantumUnityEditorPaths {
+    /// <summary>
+    /// Root folder of Quantum installation.
+    /// </summary>
+    public const string Root =
+#if QUANTUM_UPM
+      "Packages/com.photonengine.quantum";
+#else
+      "Assets/Photon/Quantum";
+#endif
+  }
+}
 
 #endregion
 
@@ -14463,6 +25601,169 @@ namespace Quantum {
 #endregion
 
 
+#region QuantumUnitySceneManagerUtils.cs
+
+namespace Quantum {
+  using System;
+  using System.Collections.Generic;
+  using System.Linq;
+  using System.Text;
+  using System.Threading.Tasks;
+  using UnityEditor;
+  using UnityEngine;
+  using UnityEngine.SceneManagement;
+
+  /// <summary>
+  /// Exension and utility methods for <see cref="SceneManager"/> and <see cref="Scene"/> types.
+  /// </summary>
+  static partial class QuantumUnitySceneManagerUtils {
+
+    /// <summary>
+    /// A comparer that can be used when scenes need to be comparable, like when being as keys in a dictionary.
+    /// </summary>
+    public class SceneEqualityComparer : IEqualityComparer<Scene> {
+      /// <summary>
+      /// Compares scenes by their <see cref="Scene.handle"/>
+      /// </summary>
+      public bool Equals(Scene x, Scene y) {
+        return x.handle == y.handle;
+      }
+
+      
+      /// <summary>
+      /// Returns <see cref="Scene.handle"/>
+      /// </summary>
+      public int GetHashCode(Scene obj) {
+        return obj.handle;
+      }
+    }
+
+    /// <summary>
+    /// Returns true if <paramref name="scene"/> is in the build settings. Note that just checking <see cref="Scene.buildIndex"/> is not enough.
+    /// </summary>
+    public static bool IsAddedToBuildSettings(this Scene scene) {
+      if (scene.buildIndex < 0) {
+        return false;
+      }
+      // yep that's a thing: https://docs.unity3d.com/ScriptReference/SceneManagement.Scene-buildIndex.html
+      if (scene.buildIndex >= SceneManager.sceneCountInBuildSettings) {
+        return false;
+      }
+      return true;
+    }
+
+#if UNITY_EDITOR
+    /// <summary>
+    /// Editor-only. Adds scene to the build settings.
+    /// </summary>
+    /// <returns>False if the scene is already added</returns>
+    public static bool AddToBuildSettings(Scene scene) {
+      if (IsAddedToBuildSettings(scene)) {
+        return false;
+      }
+
+      EditorBuildSettings.scenes =
+        new[] { new EditorBuildSettingsScene(scene.path, true) }
+        .Concat(EditorBuildSettings.scenes)
+        .ToArray();
+
+      QuantumEditorLog.Log($"Added '{scene.path}' as first entry in Build Settings.");
+      return true;
+    }
+#endif
+
+    /// <summary>
+    /// Returns true if <paramref name="scene"/> can be unloaded.
+    /// </summary>
+    /// <param name="scene"></param>
+    /// <returns></returns>
+    public static bool CanBeUnloaded(this Scene scene) {
+      if (!scene.isLoaded) {
+        return false;
+      }
+      
+      for (int i = 0; i < SceneManager.sceneCount; ++i) {
+        var s = SceneManager.GetSceneAt(i);
+        if (s != scene && s.isLoaded) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    /// <summary>
+    /// Converts <paramref name="scene"/> into string, dumping all its fields and properties.
+    /// </summary>
+    public static string Dump(this Scene scene) {
+      StringBuilder result = new StringBuilder();
+
+      result.Append("[UnityScene:");
+      
+      if (scene.IsValid()) {
+        result.Append(scene.name);
+        result.Append(", isLoaded:").Append(scene.isLoaded);
+        result.Append(", buildIndex:").Append(scene.buildIndex);
+        result.Append(", isDirty:").Append(scene.isDirty);
+        result.Append(", path:").Append(scene.path);
+        result.Append(", rootCount:").Append(scene.rootCount);
+        result.Append(", isSubScene:").Append(scene.isSubScene);
+      } else {
+        result.Append("<Invalid>");
+      }
+
+      result.Append(", handle:").Append(scene.handle);
+      result.Append("]");
+      return result.ToString();
+    }
+
+    /// <summary>
+    /// Converts <paramref name="loadSceneParameters"/> to string.
+    /// </summary>
+    public static string Dump(this LoadSceneParameters loadSceneParameters) {
+      return $"[LoadSceneParameters: {loadSceneParameters.loadSceneMode}, localPhysicsMode:{loadSceneParameters.localPhysicsMode}]";
+    }
+    
+    /// <summary>
+    /// Gets scene's build index based on its name or path.
+    /// </summary>
+    public static int GetSceneBuildIndex(string nameOrPath) {
+      if (nameOrPath.IndexOf('/', StringComparison.Ordinal) >= 0) {
+        return SceneUtility.GetBuildIndexByScenePath(nameOrPath);
+      } else {
+        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; ++i) {
+          var scenePath = SceneUtility.GetScenePathByBuildIndex(i);
+          var sceneName = GetFileNameWithoutExtension(scenePath);
+          if (sceneName.Equals(nameOrPath, StringComparison.OrdinalIgnoreCase)) {
+            return i;
+          }
+        }
+
+        return -1;
+      }
+    }
+
+    internal static ReadOnlySpan<char> GetFileNameWithoutExtension(ReadOnlySpan<char> nameOrPath) {
+      var lastSlash = nameOrPath.LastIndexOf('/');
+      int index = 0;
+      if (lastSlash >= 0) {
+        index = lastSlash + 1;
+      } else {
+        index = 0;
+      }
+
+      var lastDot = nameOrPath.LastIndexOf('.');
+      if (lastDot >= index) {
+        return nameOrPath.Slice(index, lastDot - index);
+      } else {
+        return nameOrPath.Slice(index);
+      }
+    }
+  }
+}
+
+#endregion
+
+
 
 #endregion
 
@@ -14471,6 +25772,7 @@ namespace Quantum {
 
 namespace Quantum {
   using System;
+  using UnityEngine;
 
   partial class QuantumUnityDB {
 #if UNITY_EDITOR
@@ -14581,6 +25883,30 @@ namespace Quantum {
       return path;
     }
 
+    [ContextMenu("Verify")]
+    void VerifyAssetSources() {
+      foreach (var assetEntry in Entries) {
+        var source = assetEntry.Source;
+        var asset = assetEntry.Source?.EditorInstance;
+
+        if (asset == null) {
+          QuantumEditorLog.WarnImport($"Failed to obtain an instance for {assetEntry.Guid} (Path: {assetEntry.Path})");
+          continue;
+        }
+
+        if (asset.Guid != assetEntry.Guid) {
+          QuantumEditorLog.WarnImport($"Asset GUID mismatch for {UnityEditor.AssetDatabase.GetAssetPath(asset)}. Expected {assetEntry.Guid}, got {asset.Guid}", asset);
+        }
+
+        if (asset.Path != assetEntry.Path) {
+          QuantumEditorLog.WarnImport($"Asset path mismatch for {UnityEditor.AssetDatabase.GetAssetPath(asset)}. Expected {assetEntry.Path}, got {asset.Path}", asset);
+        }
+
+        if (source.AssetType != (Type)null && source.AssetType != asset.GetType()) {
+          QuantumEditorLog.WarnImport($"Asset type mismatch for {UnityEditor.AssetDatabase.GetAssetPath(asset)}. Expected {source.AssetType}, got {asset.GetType()}", asset);
+        }
+      }
+    }
 #endif
   }
 }
@@ -14607,6 +25933,19 @@ namespace Quantum {
     /// </summary>
     [StaticField] public static bool IsEnabled = true;
 
+    /// <summary>
+    /// The cutoff distance for rendering text.
+    /// </summary>
+    [StaticField] public static float TextDrawDistance = 1000;
+
+    /// <summary>
+    /// The style of the text in Draw.Text
+    /// </summary>
+    public static GUIStyle TextStyle {
+      get => _textStyle;
+      set => _textStyle = value;
+    }
+
     [StaticField] static Queue<Draw.DebugRay> _rays = new Queue<Draw.DebugRay>();
     [StaticField] static Queue<Draw.DebugLine> _lines = new Queue<Draw.DebugLine>();
     [StaticField] static Queue<Draw.DebugCircle> _circles = new Queue<Draw.DebugCircle>();
@@ -14614,7 +25953,8 @@ namespace Quantum {
     [StaticField] static Queue<Draw.DebugRectangle> _rectangles = new Queue<Draw.DebugRectangle>();
     [StaticField] static Queue<Draw.DebugBox> _boxes = new Queue<Draw.DebugBox>();
     [StaticField] static Queue<Draw.DebugCapsule> _capsules = new Queue<Draw.DebugCapsule>();
-    [StaticField] static Dictionary<ColorRGBA, Material> _materials = new Dictionary<ColorRGBA, Material>(ColorRGBA.EqualityComparer.Instance);
+    [StaticField] static Queue<Draw.DebugText> _texts = new Queue<Draw.DebugText>();
+    [StaticField] static Dictionary<DebugMaterial, Material> _materials = new Dictionary<DebugMaterial, Material>(DebugMaterial.Comparer);
     [StaticField] static Draw.DebugRay[] _raysArray = new Draw.DebugRay[64];
     [StaticField] static Draw.DebugLine[] _linesArray = new Draw.DebugLine[64];
     [StaticField] static Draw.DebugCircle[] _circlesArray = new Draw.DebugCircle[64];
@@ -14622,6 +25962,7 @@ namespace Quantum {
     [StaticField] static Draw.DebugRectangle[] _rectanglesArray = new Draw.DebugRectangle[64];
     [StaticField] static Draw.DebugBox[] _boxesArray = new Draw.DebugBox[64];
     [StaticField] static Draw.DebugCapsule[] _capsuleArray = new Draw.DebugCapsule[64];
+    [StaticField] static Draw.DebugText[] _textsArray = new Draw.DebugText[64];
     [StaticField] static int _raysCount;
     [StaticField] static int _linesCount;
     [StaticField] static int _circlesCount;
@@ -14629,9 +25970,16 @@ namespace Quantum {
     [StaticField] static int _rectanglesCount;
     [StaticField] static int _boxesCount;
     [StaticField] static int _capsuleCount;
+    [StaticField] static int _textsCount;
     [StaticField] static Vector3[] _circlePoints;
+    [StaticField] private static readonly GUIContent _guiContent = new GUIContent();
+    [StaticField] private static GUIStyle _textStyle = new GUIStyle { normal = new GUIStyleState { } };
+    [StaticField] private static readonly GUIStyle _bgStyle = new GUIStyle { normal = new GUIStyleState { background = Texture2D.whiteTexture } };
 
-    const int CircleResolution = 64;
+    private static readonly int ColorProperty = Shader.PropertyToID("_Color");
+    private static readonly int UseShadingProperty = Shader.PropertyToID("_UseShading");
+
+    const int CircleResolution = 32;
 
     static Vector3[] CirclePoints {
       get {
@@ -14642,6 +25990,7 @@ namespace Quantum {
             _circlePoints[i] = new Vector3(Mathf.Cos(theta), 0.0f, Mathf.Sin(theta));
           }
         }
+
         return _circlePoints;
       }
     }
@@ -14657,6 +26006,20 @@ namespace Quantum {
 
       lock (_rays) {
         _rays.Enqueue(ray);
+      }
+    }
+
+    /// <summary>
+    /// The action to call on Draw.Text.
+    /// </summary>
+    /// <param name="text">The text information to draw in the view.</param>
+    public static void Text(Draw.DebugText text) {
+      if (IsEnabled == false) {
+        return;
+      }
+
+      lock (_texts) {
+        _texts.Enqueue(text);
       }
     }
 
@@ -14749,20 +26112,25 @@ namespace Quantum {
     /// Will set the main color on the material.
     /// </summary>
     /// <param name="color">Color</param>
+    /// <param name="shaded">If the material should be shaded</param>
     /// <returns>Material</returns>
-    public static Material GetMaterial(ColorRGBA color) {
-      if (_materials.TryGetValue(color, out var mat)) {
+    public static Material GetMaterial(ColorRGBA color, bool shaded = false) {
+      var key = new DebugMaterial { Color = color, UseShading = shaded };
+
+      if (_materials.TryGetValue(key, out var mat)) {
         if (mat != null) {
           return mat;
         }
 
-        _materials.Remove(color);
+        _materials.Remove(key);
       }
 
       mat = new Material(QuantumMeshCollection.Global.DebugMaterial);
-      mat.SetColor("_Color", color.AsColor);
+      mat.SetColor(ColorProperty, color.AsColor);
+      mat.SetFloat(UseShadingProperty, shaded ? 1f : 0f);
 
-      _materials.Add(color, mat);
+      _materials.Add(key, mat);
+
       return mat;
     }
 
@@ -14778,7 +26146,9 @@ namespace Quantum {
       TakeAllFromQueueAndClearLocked(_rectangles, ref _rectanglesArray);
       TakeAllFromQueueAndClearLocked(_boxes, ref _boxesArray);
       TakeAllFromQueueAndClearLocked(_capsules, ref _capsuleArray);
+      TakeAllFromQueueAndClearLocked(_texts, ref _textsArray);
 
+      _textsCount = 0;
       _raysCount = 0;
       _linesCount = 0;
       _circlesCount = 0;
@@ -14799,6 +26169,7 @@ namespace Quantum {
       _rectanglesCount = TakeAllFromQueueAndClearLocked(_rectangles, ref _rectanglesArray);
       _boxesCount = TakeAllFromQueueAndClearLocked(_boxes, ref _boxesArray);
       _capsuleCount = TakeAllFromQueueAndClearLocked(_capsules, ref _capsuleArray);
+      _textsCount = TakeAllFromQueueAndClearLocked(_texts, ref _textsArray);
     }
 
     /// <summary>
@@ -14808,11 +26179,85 @@ namespace Quantum {
     public static void DrawAll() {
     }
 
+    internal static void OnGUI() {
+#if !UNITY_EDITOR && QUANTUM_DRAW_SHAPES
+      if (IsEnabled == false) {
+        return;
+      }
+
+      if (Camera.current != null) {
+        for (Int32 i = 0; i < _textsCount; ++i) {
+          DrawText(_textsArray[i]);
+        }
+      }
+#endif
+    }
+
+    private static void DrawText(Draw.DebugText debugText) {
+      var text = debugText.Text;
+      var backColor = debugText.BackgroundColor.AsColor;
+      var textColor = debugText.Color.AsColor;
+      var restoreTextColor = GUI.color;
+      var restoreBackColor = GUI.backgroundColor;
+
+      GUI.backgroundColor = backColor;
+
+      var camera = Camera.current;
+
+      if (camera == null) {
+        return;
+      }
+
+      var worldPos = debugText.Position.ToUnityVector3(true);
+
+      Vector3 viewPos = camera.WorldToViewportPoint(worldPos);
+      var viewVector = new Vector2(viewPos.x, 1 - viewPos.y);
+      var screenPos = new Vector2(viewVector.x * camera.pixelWidth, viewVector.y * camera.pixelHeight);
+
+      if (viewPos.z < 0) {
+        GUI.color = restoreTextColor;
+        return;
+      }
+
+      var distToCamera = Vector3.Distance(worldPos, camera.transform.position);
+
+      _guiContent.text = text;
+      _textStyle.normal.textColor = textColor;
+
+      var fontSize = debugText.Size;
+
+      if (debugText.DrawScaling == Draw.DebugText.Scaling.World) {
+        float normalizedDist = Mathf.Clamp01(distToCamera / TextDrawDistance);
+
+        float nonLinearScale = Mathf.Exp(-4f * normalizedDist);
+
+        float minScale = 0.05f;
+        float finalScale = Mathf.Max(minScale, nonLinearScale);
+
+        fontSize = Mathf.Max(1, Mathf.RoundToInt(fontSize * finalScale));
+      }
+
+      _textStyle.fontSize = fontSize;
+
+      Vector2 size = _textStyle.CalcSize(_guiContent);
+
+      var x = screenPos.x - (size.x / 2);
+
+      var r = new Rect(x, screenPos.y, size.x, size.y);
+
+      if (debugText.BackgroundColor.A > 0) {
+        GUI.Box(r, string.Empty, _bgStyle);
+      }
+
+      GUI.Label(r, _guiContent, _textStyle);
+
+      GUI.backgroundColor = restoreBackColor;
+    }
+
     /// <summary>
     /// Must be called from Unity callback OnPostRenderInternal to draw all debug shapes on top of everything else.
     /// </summary>
-    /// <param name="camera">The scene camera</param>
-    public static void OnPostRender(Camera camera) {
+    public static void OnPostRender() {
       if (IsEnabled == false) {
         return;
       }
@@ -14844,6 +26289,16 @@ namespace Quantum {
       for (Int32 i = 0; i < _capsuleCount; ++i) {
         DrawCapsule(_capsuleArray[i]);
       }
+
+#if UNITY_EDITOR
+      UnityEditor.Handles.BeginGUI();
+
+      for (Int32 i = 0; i < _textsCount; ++i) {
+        DrawText(_textsArray[i]);
+      }
+
+      UnityEditor.Handles.EndGUI();
+#endif
     }
 
     static void DrawRay(Draw.DebugRay ray) {
@@ -14867,11 +26322,36 @@ namespace Quantum {
     }
 
     static void DrawSphere(Draw.DebugSphere sphere) {
-      Matrix4x4 mat = Matrix4x4.TRS(sphere.Center.ToUnityVector3(true), Quaternion.identity, Vector3.one * (sphere.Radius.AsFloat + sphere.Radius.AsFloat));
-      GetMaterial(sphere.Color).SetPass(0);
-      GL.wireframe = sphere.Wire;
-      Graphics.DrawMeshNow(QuantumMeshCollection.Global.Sphere, mat);
-      GL.wireframe = false;
+      var radius = sphere.Radius.AsFloat;
+      var pos = sphere.Center.ToUnityVector3(true);
+
+      // wireframe, draw circles that intersect at their poles
+      if (sphere.Wire) {
+        GetMaterial(sphere.Color).SetPass(0);
+
+        GL.PushMatrix();
+        // XZ
+        var m = Matrix4x4.TRS(pos, Quaternion.identity, Vector3.one);
+        GL.MultMatrix(m);
+        Draw2DCircle(Vector3.zero, radius);
+
+        // XY
+        m = Matrix4x4.TRS(pos, Quaternion.Euler(90, 0, 0), Vector3.one);
+        GL.MultMatrix(m);
+        Draw2DCircle(Vector3.zero, radius);
+
+        // YZ
+        m = Matrix4x4.TRS(pos, Quaternion.Euler(0, 0, 90), Vector3.one);
+        GL.MultMatrix(m);
+        Draw2DCircle(Vector3.zero, radius);
+
+        GL.PopMatrix();
+      } else {
+        GetMaterial(sphere.Color, true).SetPass(0);
+
+        var m = Matrix4x4.TRS(pos, Quaternion.identity, Vector3.one * (radius + radius));
+        Graphics.DrawMeshNow(QuantumMeshCollection.Global.Sphere, m);
+      }
     }
 
     static void DrawCircle(Draw.DebugCircle circle) {
@@ -14891,6 +26371,7 @@ namespace Quantum {
         for (int i = 0; i < CirclePoints.Length; i++) {
           GL.Vertex3(CirclePoints[i].x * circle.Radius.AsFloat, 0.0f, CirclePoints[i].z * circle.Radius.AsFloat);
         }
+
         GL.Vertex3(CirclePoints[0].x * circle.Radius.AsFloat, 0.0f, CirclePoints[0].z * circle.Radius.AsFloat);
 #endif
         GL.End();
@@ -14954,11 +26435,11 @@ namespace Quantum {
     }
 
     static void DrawCube(Draw.DebugBox cube) {
-      GetMaterial(cube.Color).SetPass(0);
-
       var m = Matrix4x4.TRS(cube.Center.ToUnityVector3(true), cube.Rotation.ToUnityQuaternion(true), cube.Size.ToUnityVector3(true));
 
       if (cube.Wire) {
+        GetMaterial(cube.Color).SetPass(0);
+
         GL.PushMatrix();
         GL.MultMatrix(m);
         GL.Begin(GL.LINE_STRIP);
@@ -14987,14 +26468,16 @@ namespace Quantum {
         GL.PopMatrix();
       } else {
         // TODO: QUADS would also work
+        GetMaterial(cube.Color, true).SetPass(0);
+
         Graphics.DrawMeshNow(QuantumMeshCollection.Global.Cube, m);
       }
     }
 
     static void DrawCapsule(Draw.DebugCapsule capsule) {
-      GetMaterial(capsule.Color).SetPass(0);
-
       if (capsule.Is2D) {
+        GetMaterial(capsule.Color).SetPass(0);
+        
         var m = Matrix4x4.TRS(capsule.Center.ToUnityVector3(true), capsule.Rotation.ToUnityQuaternion(true), Vector3.one);
 
         // TODO: solid capsule shape, should probably be done with a texture
@@ -15041,6 +26524,8 @@ namespace Quantum {
         GL.PopMatrix();
       } else {
         if (capsule.Wire) {
+          GetMaterial(capsule.Color).SetPass(0);
+          
           GL.PushMatrix();
 
 #if QUANTUM_XY
@@ -15076,6 +26561,8 @@ namespace Quantum {
 
           GL.PopMatrix();
         } else {
+          GetMaterial(capsule.Color, true).SetPass(0);
+          
           var height = capsule.Height.AsFloat / 2.0f;
           var diameter = capsule.Diameter.AsFloat;
           var m = Matrix4x4.TRS(capsule.Center.ToUnityVector3(true), capsule.Rotation.ToUnityQuaternion(true), (Vector3.up * height) + (Vector3.right + Vector3.forward) * diameter);
@@ -15172,6 +26659,40 @@ namespace Quantum {
         }
 
         return count;
+      }
+    }
+
+    struct DebugMaterial : IEquatable<DebugMaterial> {
+      private sealed class ColorUseShadingEqualityComparer : IEqualityComparer<DebugMaterial> {
+        Boolean IEqualityComparer<DebugMaterial>.Equals(DebugMaterial x, DebugMaterial y) {
+          return x.Equals(y);
+        }
+
+        Int32 IEqualityComparer<DebugMaterial>.GetHashCode(DebugMaterial x) {
+          return x.GetHashCode();
+        }
+      }
+
+      [StaticField(StaticFieldResetMode.None)]
+      public static readonly IEqualityComparer<DebugMaterial> Comparer = new ColorUseShadingEqualityComparer();
+
+      public ColorRGBA Color;
+      public bool UseShading;
+
+      public override Boolean Equals(object obj) {
+        if (obj is DebugMaterial) {
+          return Equals((DebugMaterial)obj);
+        }
+
+        return false;
+      }
+      
+      public Boolean Equals(DebugMaterial other) {
+        return this.UseShading == other.UseShading && other.Color.Equals(this.Color);
+      }
+
+      public override int GetHashCode() {
+        return HashCode.Combine(Color, UseShading);
       }
     }
   }
@@ -15449,27 +26970,47 @@ namespace Quantum {
   /// </summary>
   public static class FPMathUtils {
     /// <summary>
-    /// Load the lookup tables from the resources folders.
+    /// Load the lookup tables. By default, loaded from Resources.
     /// </summary>
     /// <param name="force">Will reload the table if set to true</param>
     public static void LoadLookupTables(Boolean force = false) {
       if (FPLut.IsLoaded && force == false) {
         return;
       }
-
-      FPLut.Init(file => {
-#if UNITY_EDITOR
-        if (!Application.isPlaying) {
-          var path = "Assets/Photon/Quantum/Resources/LUT/" + file + ".bytes";
-          var textAsset = UnityEditor.AssetDatabase.LoadAssetAtPath<TextAsset>(path);
-          if (textAsset) {
-            return textAsset.bytes;
-          }
-        }
-#endif
-        return UnityEngine.Resources.Load<TextAsset>("LUT/" + file).bytes;
-      });
+      
+      if (!QuantumLookupTables.TryGetGlobal(out var global)) {
+        Log.Error($"Failed to load {nameof(QuantumLookupTables)}");
+        return;
+      }
+      
+      FPLut.Init(
+        sinCos: global.TableSinCos != null ? global.TableSinCos.bytes : null,
+        tan: global.TableTan != null ? global.TableTan.bytes : null,
+        asin: global.TableAsin != null ? global.TableAsin.bytes : null,
+        acos: global.TableAcos != null ? global.TableAcos.bytes : null,
+        atan: global.TableAtan != null ? global.TableAtan.bytes : null,
+        sqrt: global.TableSqrt != null ? global.TableSqrt.bytes : null);
     }
+
+    /// <summary>
+    /// Load the lookup tables asynchronously. By default, loaded from Resources.
+    /// </summary>
+    /// <param name="force">Will reload the table if set to true</param>
+    public static async System.Threading.Tasks.Task LoadLookupTablesAsync(bool force = false) {
+      if (FPLut.IsLoaded && force == false) {
+        return;
+      }
+      
+      var global = await QuantumLookupTables.GetGlobalAsync();
+      
+      FPLut.Init(
+        sinCos: global.TableSinCos != null ? global.TableSinCos.bytes : null,
+        tan: global.TableTan != null ? global.TableTan.bytes : null,
+        asin: global.TableAsin != null ? global.TableAsin.bytes : null,
+        acos: global.TableAcos != null ? global.TableAcos.bytes : null,
+        atan: global.TableAtan != null ? global.TableAtan.bytes : null,
+        sqrt: global.TableSqrt != null ? global.TableSqrt.bytes : null);
+    } 
 
     /// <summary>
     /// Convert a float to an FP, with rounding towards zero.
@@ -15491,7 +27032,7 @@ namespace Quantum {
     }
 
     /// <summary>
-    /// Inverts the FP if QUNATUM_XY is not defined.
+    /// Inverts the FP if QUANTUM_XY is not defined.
     /// </summary>
     /// <param name="r">2D rotation</param>
     /// <returns>Inverted value.</returns>
@@ -16074,10 +27615,11 @@ namespace Quantum {
     /// <param name="center">The center of the capsule.</param>
     /// <param name="radius">The radius of the capsule.</param>
     /// <param name="height">The height of the capsule.</param>
+    /// <param name="tHeight">The height of the vertical transform</param>
     /// <param name="color">The color of the gizmo.</param>
     /// <param name="rotation">The rotation of the capsule. If null, identity rotation is used.</param>
     /// <param name="style">The style of the gizmo. If not provided, default style is used.</param>
-    public static void DrawGizmosCapsule2D(Vector3 center, float radius, float height, Color color, Quaternion? rotation = null, QuantumGizmoStyle style = default) {
+    public static void DrawGizmosCapsule2D(Vector3 center, float radius, float height, float tHeight, Color color, Quaternion? rotation = null, QuantumGizmoStyle style = default) {
 #if UNITY_EDITOR
 
       var matrix = Matrix4x4.TRS(center, rotation ?? Quaternion.identity, Vector3.one);
@@ -16085,21 +27627,159 @@ namespace Quantum {
       Handles.matrix = matrix;
       Gizmos.color = color;
       Handles.color = Gizmos.color;
+
 #if QUANTUM_XY
-      var left = Vector3.left * radius;
-      var right = Vector3.right * radius;
-      Handles.DrawLine(left + Vector3.up * height, left + Vector3.down * height);
-      Handles.DrawLine(right + Vector3.up * height, right + Vector3.down * height);
-      Handles.DrawWireArc(Vector3.up * height, Vector3.forward, Vector3.right * radius, 180, radius);
-      Handles.DrawWireArc(Vector3.down * height, Vector3.back, Vector3.left * radius, -180, radius);
+
+      var up = Vector3.back;
+      var down = Vector3.forward;
+
+      var capsuleLeft = Vector3.left * radius;
+      var capsuleRight = Vector3.right * radius;
+      var capsuleTop = Vector3.up * height;
+      var capsuleBottom = Vector3.down * height;
+
+      // the vertices
+      var v1 = capsuleLeft + capsuleBottom;
+      var v2 = capsuleLeft + capsuleTop;
+      var v3 = capsuleRight + capsuleBottom;
+      var v4 = capsuleRight + capsuleTop;
+
+      var yAxis = 1;
+      var zAxis = 0;
 #else
-      var left = Vector3.left * radius;
-      var right = Vector3.right * radius;
-      Handles.DrawLine(left + Vector3.back * height, left + Vector3.forward * height);
-      Handles.DrawLine(right + Vector3.back * height, right + Vector3.forward * height);
-      Handles.DrawWireArc(Vector3.back * height, Vector3.up, Vector3.right * radius, 180, radius);
-      Handles.DrawWireArc(Vector3.forward * height, Vector3.down, Vector3.left * radius, -180, radius);
+
+      var up = Vector3.up;
+      var down = Vector3.down;
+
+      var capsuleLeft = Vector3.left * radius;
+      var capsuleRight = Vector3.right * radius;
+      var capsuleTop = Vector3.forward * height;
+      var capsuleBottom = Vector3.back * height;
+
+      // the vertices
+      var v1 = capsuleLeft + capsuleBottom;
+      var v2 = capsuleLeft + capsuleTop;
+      var v3 = capsuleRight + capsuleBottom;
+      var v4 = capsuleRight + capsuleTop;
+
+      var yAxis = 0;
+      var zAxis = 1;
+
 #endif
+
+      // draw the wires of the capsule
+      Handles.DrawLine(v1, v2);
+      Handles.DrawLine(v3, v4);
+      Handles.DrawWireArc(capsuleBottom, up, capsuleRight, 180, radius);
+      Handles.DrawWireArc(capsuleTop, down, capsuleLeft, -180, radius);
+
+      // draw the shape of the capsule
+      var numberOfLines = 8;
+      var distance = numberOfLines / Mathf.PI;
+      var cycleOffset = Mathf.PI / 2;
+      var vertices = new Vector3[(int)numberOfLines * 2 + 2];
+
+      // the points of the top
+      for (int i = 0; i < numberOfLines + 1; i++) {
+        var sin = Mathf.Sin(i / distance + cycleOffset) * radius;
+        var cos = Mathf.Cos(i / distance + cycleOffset) * radius;
+        vertices[i] = new Vector3(capsuleTop.x + sin, capsuleTop.y - cos * yAxis, capsuleTop.z - cos * zAxis);
+      }
+
+      // the points of the bottom
+      for (int i = (int)numberOfLines + 1; i < numberOfLines * 2 + 2; i++) {
+        var sin = Mathf.Sin((i - 1) / distance + cycleOffset) * radius;
+        var cos = Mathf.Cos((i - 1) / distance + cycleOffset) * radius;
+        vertices[i] = new Vector3(capsuleBottom.x + sin, capsuleBottom.y - cos * yAxis, capsuleBottom.z - cos * zAxis);
+      }
+
+      // draw the capsule shape with the points
+      Handles.DrawAAConvexPolygon(vertices.ToArray());
+
+
+      // draw the capsule vertical transform height
+      tHeight = Mathf.Abs(tHeight);
+      if (tHeight > 0) {
+        Vector3 th = up * tHeight;
+
+        // draw another wired capsule but at height position
+        Handles.DrawLine(v1 + th, v2 + th);
+        Handles.DrawLine(v3 + th, v4 + th);
+        Handles.DrawWireArc(capsuleBottom + th, up, capsuleRight, 180, radius);
+        Handles.DrawWireArc(capsuleTop + th, down, capsuleLeft, -180, radius);
+
+        // draw the lines between the arcs of the capsule
+        // the arc up
+        var capsuleTopH = capsuleTop + th;
+        for (float i = 0; i < numberOfLines; i++) {
+          var sin = Mathf.Sin(i / distance + cycleOffset) * radius;
+          var cos = Mathf.Cos(i / distance + cycleOffset) * radius;
+          Handles.DrawLine(
+            new Vector3(capsuleTop.x  + sin, capsuleTop.y  - cos * yAxis, capsuleTop.z  - cos * zAxis), 
+            new Vector3(capsuleTopH.x + sin, capsuleTopH.y - cos * yAxis, capsuleTopH.z - cos * zAxis)
+          );
+        }
+
+        // the arc down
+        var capsuleBottomH = capsuleBottom + th;
+        for (float i = 0; i < numberOfLines; i++) {
+          var sin = Mathf.Sin(i / distance - cycleOffset) * radius;
+          var cos = Mathf.Cos(i / distance - cycleOffset) * radius;
+          Handles.DrawAAConvexPolygon(
+            new Vector3(capsuleBottom.x  + sin, capsuleBottom.y  - cos * yAxis, capsuleBottom.z  - cos * zAxis), 
+            new Vector3(capsuleBottomH.x + sin, capsuleBottomH.y - cos * yAxis, capsuleBottomH.z - cos * zAxis)
+          );
+        }
+
+        // draw a second capsule shape at transform height
+        for (int i = 0; i < vertices.Length; i++) {
+          vertices[i] = vertices[i] + th;
+        }
+        Handles.DrawAAConvexPolygon(vertices.ToArray());
+
+        // draw side planes for the capsule at transform height
+        Handles.color = Gizmos.color / 2;
+        Handles.DrawAAConvexPolygon(new Vector3[] {
+          v1, v1 + th,
+          v2 + th, v2
+        });
+        Handles.DrawAAConvexPolygon(new Vector3[] {
+          v3, v3 + th,
+          v4 + th, v4
+        });
+
+        // draw the planes between the arcs of the capsule
+        // the arc up planes
+        capsuleTopH = capsuleTop + th;
+        for (float i = 0; i < numberOfLines; i++) {
+          var sin = Mathf.Sin(i / distance + cycleOffset) * radius;
+          var cos = Mathf.Cos(i / distance + cycleOffset) * radius;
+          var sin2 = Mathf.Sin((i + 1) / distance + cycleOffset) * radius;
+          var cos2 = Mathf.Cos((i + 1) / distance + cycleOffset) * radius;
+          Handles.DrawAAConvexPolygon(new Vector3[] {
+            new Vector3(capsuleTop.x  + sin,  capsuleTop.y  - cos  * yAxis, capsuleTop.z  - cos * zAxis), 
+            new Vector3(capsuleTopH.x + sin,  capsuleTopH.y - cos  * yAxis, capsuleTopH.z - cos * zAxis),
+            new Vector3(capsuleTopH.x + sin2, capsuleTopH.y - cos2 * yAxis, capsuleTopH.z - cos2 * zAxis), 
+            new Vector3(capsuleTop.x  + sin2, capsuleTop.y  - cos2 * yAxis, capsuleTop.z  - cos2 * zAxis)
+          });
+        }
+
+        // the arc down planes
+        capsuleBottomH = capsuleBottom + th;
+        for (float i = 0; i < numberOfLines; i++) {
+          var sin = Mathf.Sin(i / distance - cycleOffset) * radius;
+          var cos = Mathf.Cos(i / distance - cycleOffset) * radius;
+          var sin2 = Mathf.Sin((i + 1) / distance - cycleOffset) * radius;
+          var cos2 = Mathf.Cos((i + 1) / distance - cycleOffset) * radius;
+          Handles.DrawAAConvexPolygon(new Vector3[] {
+            new Vector3(capsuleBottom.x  + sin,  capsuleBottom.y  - cos  * yAxis, capsuleBottom.z  - cos  * zAxis), 
+            new Vector3(capsuleBottomH.x + sin,  capsuleBottomH.y - cos  * yAxis, capsuleBottomH.z - cos  * zAxis),
+            new Vector3(capsuleBottomH.x + sin2, capsuleBottomH.y - cos2 * yAxis, capsuleBottomH.z - cos2 * zAxis), 
+            new Vector3(capsuleBottom.x  + sin2, capsuleBottom.y  - cos2 * yAxis, capsuleBottom.z  - cos2 * zAxis)
+          });
+        }
+      }
+
       matrix = Matrix4x4.identity;
       Handles.color = Gizmos.color = Color.white;
       Handles.matrix = matrix;
@@ -16433,6 +28113,19 @@ namespace Quantum {
     /// <param name="arrowHeadLength">The length of the arrow head (default is DefaultArrowHeadLength).</param>
     /// <param name="arrowHeadAngle">The angle of the arrow head (default is DefaultArrowHeadAngle).</param>
     public static void DrawGizmoVector(Vector3 start, Vector3 end, float arrowHeadLength = DefaultArrowHeadLength, float arrowHeadAngle = DefaultArrowHeadAngle) {
+      DrawGizmoVector(start, end, arrowHeadLength, arrowHeadAngle, out var direction);
+    }
+
+
+    /// <summary>
+    /// Draws a vector gizmo from the specified start point to the specified end point.
+    /// </summary>
+    /// <param name="start">The starting point of the vector.</param>
+    /// <param name="end">The ending point of the vector.</param>
+    /// <param name="arrowHeadLength">The length of the arrow head.</param>
+    /// <param name="arrowHeadAngle">The angle of the arrow head.</param>
+    /// <param name="direction">The calculated direction vector.</param>
+    public static void DrawGizmoVector(Vector3 start, Vector3 end, float arrowHeadLength, float arrowHeadAngle, out Vector3 direction) {
       Gizmos.DrawLine(start, end);
 
       var l = (start - end).magnitude;
@@ -16441,29 +28134,29 @@ namespace Quantum {
         arrowHeadLength = l / 2;
       }
 
-      var d = (start - end).normalized;
+      direction = (start - end).normalized;
 
       float cos = Mathf.Cos(arrowHeadAngle * Mathf.Deg2Rad);
       float sin = Mathf.Sin(arrowHeadAngle * Mathf.Deg2Rad);
 
       Vector3 left = Vector3.zero;
 #if QUANTUM_XY
-      left.x = d.x * cos - d.y * sin;
-      left.y = d.x * sin + d.y * cos;
+      left.x = direction.x * cos - direction.y * sin;
+      left.y = direction.x * sin + direction.y * cos;
 #else
-      left.x = d.x * cos - d.z * sin;
-      left.z = d.x * sin + d.z * cos;
+      left.x = direction.x * cos - direction.z * sin;
+      left.z = direction.x * sin + direction.z * cos;
 #endif
 
       sin = -sin;
 
       Vector3 right = Vector3.zero;
 #if QUANTUM_XY
-      right.x = d.x * cos - d.y * sin;
-      right.y = d.x * sin + d.y * cos;
+      right.x = direction.x * cos - direction.y * sin;
+      right.y = direction.x * sin + direction.y * cos;
 #else
-      right.x = d.x * cos - d.z * sin;
-      right.z = d.x * sin + d.z * cos;
+      right.x = direction.x * cos - direction.z * sin;
+      right.z = direction.x * sin + direction.z * cos;
 #endif
 
       Gizmos.DrawLine(end, end + left * arrowHeadLength);
@@ -16542,15 +28235,16 @@ namespace Quantum {
     /// <param name="style">The gizmo style to use.</param>
     public static void DrawGizmosEdge(Vector3 start, Vector3 end, float height, Color color, QuantumGizmoStyle style = default) {
       Gizmos.color = color;
+      height = Math.Abs(height);
 
-      if (Math.Abs(height) > float.Epsilon) {
+      if (height > float.Epsilon) {
         var startToEnd = end - start;
         var edgeSize   = startToEnd.magnitude;
         var size       = new Vector3(edgeSize, 0);
         var center     = start + startToEnd / 2;
 #if QUANTUM_XY
-        size.z = height;
-        center.z += height / 2;
+        size.z = -height;
+        center.z -= height / 2;
 #else
         size.y   =  height;
         center.y += height / 2;
@@ -16739,7 +28433,11 @@ namespace Quantum {
           result += ($"{section.Name} took {section.TimeInMs} ms" + "\n");
         }
 
+#if UNITY_EDITOR
+        QuantumEditorLog.LogImport(result);
+#else
         Log.Debug(result);
+#endif
       }
     }
 
@@ -16928,13 +28626,19 @@ namespace Quantum {
       get => GlobalInternal;
       protected set => GlobalInternal = value;
     } 
-
+    
     /// <summary>
     /// Try get or load the global instance.
     /// </summary>
     /// <param name="global">Resulting global instance</param>
     /// <returns>True if the global instance was found</returns>
     public static bool TryGetGlobal(out T global) => TryGetGlobalInternal(out global);
+
+    /// <summary>
+    /// Get the Global instance of the scriptable object, attempting to load it asynchronously.
+    /// After it is done regular global accessor can be used.
+    /// </summary>
+    public static System.Threading.Tasks.Task<T> GetGlobalAsync() => GetGlobalAsyncInternal();
   }
 }
 
@@ -17815,7 +29519,102 @@ namespace Quantum {
   public static class SerializedObjectExtensions {
     [StaticField(StaticFieldResetMode.None)]
     private static readonly Regex _arrayElementRegex = new Regex(@"\.Array\.data\[\d+\]$", RegexOptions.Compiled);
+    
+    /// <summary>
+    /// Get the index this element is at.
+    /// </summary>
+    /// <param name="element"></param>
+    /// <returns></returns>
+    public static int GetArrayIndex(this SerializedProperty element)
+    {
+      string path = element.propertyPath;
+      int start = path.LastIndexOf('[');
+      int end = path.LastIndexOf(']');
+    
+      if (start != -1 && end != -1)
+      {
+        string indexString = path.Substring(start + 1, end - start - 1);
+        return int.Parse(indexString);
+      }
+    
+      return -1; // Not an array element or parsing failed
+    }
 
+    /// <summary>
+    /// Gets the object the property represents.
+    /// </summary>
+    /// <param name="property">Serialized property to get the target object from</param>
+    /// <param name="fieldInfo">The field containing the object</param>
+    /// <returns>The target object or null if not found</returns>
+    public static object GetTargetObject(this SerializedProperty property, out FieldInfo fieldInfo, out object parent) {
+      fieldInfo = null;
+      parent = null;
+      
+      if (property == null) {
+        throw new ArgumentNullException(nameof(property));
+      }
+      
+      var path = property.propertyPath.Replace(".Array.data[", "[");
+      object targetObject = property.serializedObject.targetObject;
+      var elements = path.Split('.');
+      
+      foreach (var element in elements) {
+        if (element.Contains("[")) {
+          var elementName = element.Substring(0, element.IndexOf("[", StringComparison.Ordinal));
+          var index = Convert.ToInt32(element.Substring(element.IndexOf("[", StringComparison.Ordinal)).Replace("[", string.Empty).Replace("]", string.Empty));
+          parent = targetObject;
+          targetObject = GetFieldValue(targetObject, elementName, index, out fieldInfo);
+        } else {
+          parent = targetObject;
+          targetObject = GetFieldValue(targetObject, element, out fieldInfo);
+        }
+        
+        if (targetObject == null) {
+          return null;
+        }
+      }
+      
+      return targetObject;
+    }
+    
+    private static object GetFieldValue(object source, string name, out FieldInfo fieldInfo) {
+      fieldInfo = null;
+      if (source == null) {
+        return null;
+      }
+      
+      var type = source.GetType();
+      
+      while (type != null) {
+        var field = type.GetField(name, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+        if (field != null) {
+          fieldInfo = field;
+          return field.GetValue(source);
+        }
+        
+        type = type.BaseType;
+      }
+      
+      return null;
+    }
+    
+    private static object GetFieldValue(object source, string name, int index, out FieldInfo fieldInfo) {
+      var enumerable = GetFieldValue(source, name, out fieldInfo) as IEnumerable;
+      if (enumerable == null) {
+        return null;
+      }
+      
+      var enumerator = enumerable.GetEnumerator();
+      
+      for (int i = 0; i <= index; i++) {
+        if (!enumerator.MoveNext()) {
+          return null;
+        }
+      }
+      
+      return enumerator.Current;
+    }
+    
     /// <summary>
     /// Find a property in the serialized object or throw an exception if not found.
     /// </summary>

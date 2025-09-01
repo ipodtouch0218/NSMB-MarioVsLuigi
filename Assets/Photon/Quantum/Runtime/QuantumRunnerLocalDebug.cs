@@ -113,6 +113,14 @@ namespace Quantum {
         return;
       }
 
+      var gameMenu = FindFirstObjectByType<QuantumStartUI>();
+      if (gameMenu != null && gameMenu.gameObject.activeSelf) {
+        // If a game menu / start GUI is present, we assume that the game is started from the menu code.
+        // In this case, we don't want to start the simulation here, but rather let the menu scene handle it.
+        enabled = false;
+        return;
+      }
+
       // Subscribe to the game started callback to add players
       QuantumCallback.Subscribe(this, (CallbackGameStarted c) => OnGameStarted(c.Game, c.IsResync), game => game == QuantumRunner.Default.Game);
 
@@ -161,7 +169,7 @@ namespace Quantum {
       }
 
       // set map to this maps asset
-      runtimeConfig.Map = mapdata.Asset;
+      runtimeConfig.Map = mapdata.AssetRef;
 
       // if not set, try to set simulation config from global default configs
       if (runtimeConfig.SimulationConfig.Id.IsValid == false && QuantumDefaultConfigs.TryGetGlobal(out var defaultConfigs)) {
@@ -176,7 +184,7 @@ namespace Quantum {
         RunnerFactory         = QuantumRunnerUnityFactory.DefaultFactory,
         GameParameters        = QuantumRunnerUnityFactory.CreateGameParameters,
         RuntimeConfig         = runtimeConfig,
-        SessionConfig         = SessionConfig?.Config ?? QuantumDeterministicSessionConfigAsset.DefaultConfig,
+        SessionConfig         = (SessionConfig != null ? SessionConfig.Config : null) ?? QuantumDeterministicSessionConfigAsset.DefaultConfig,
         ReplayProvider        = null,
         GameMode              = DeterministicGameMode.Local,
         InitialTick           = frameNumber,
@@ -196,6 +204,11 @@ namespace Quantum {
     }
 
     private void OnGameStarted(QuantumGame game, bool isResync) {
+      if (LocalPlayers == null) {
+        // Can happen when a new scene has not been saved yet.
+        return;
+      }
+
       for (Int32 i = 0; i < LocalPlayers.Length; ++i) {
         game.AddPlayer(i, LocalPlayers[i]);
       }

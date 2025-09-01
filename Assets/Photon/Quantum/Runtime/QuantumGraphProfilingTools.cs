@@ -7,7 +7,7 @@ namespace Quantum.Profiling {
   /// <summary>
   /// A Unity script that renders additional profiling tools to the graph UI.
     /// </summary>
-  public sealed class QuantumGraphProfilingTools : MonoBehaviour {
+  public sealed class QuantumGraphProfilingTools : QuantumMonoBehaviour {
     [SerializeField]
     private bool _enableOnAwake;
     [SerializeField]

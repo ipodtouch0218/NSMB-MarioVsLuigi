@@ -504,9 +504,9 @@ namespace Quantum.Editor {
               }, i);
             }
             
-#if !QUANTUM_REMOTE_PROFILER
+#if !QUANTUM_ENABLE_REMOTE_PROFILER
             menu.AddSeparator(string.Empty);
-            menu.AddDisabledItem(new GUIContent("Define QUANTUM_REMOTE_PROFILER to enable Player profiling"));
+            menu.AddDisabledItem(new GUIContent("Define QUANTUM_ENABLE_REMOTE_PROFILER to enable Player profiling"));
 #endif
             menu.DropDown(dropdownRect);
           }
@@ -853,7 +853,7 @@ namespace Quantum.Editor {
           }
 
           QuantumEditorLog.Log($"Attaching to a local runner {runner}");
-          var info = new QuantumProfilingClientInfo(runner.Id, runner.Session.SessionConfig, runner.Session.PlatformInfo);
+          var info = new QuantumProfilingClientInfo(runner.Session.SessionConfig, runner.Session.PlatformInfo);
           info.ProfilerId = "Editor";
 
           QuantumCallback.Subscribe(this, (CallbackTaskProfilerReportGenerated callback) => OnProfilerSample(info, callback.Report),

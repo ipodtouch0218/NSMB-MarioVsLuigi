@@ -1,0 +1,24 @@
+{
+  "name": "com.photonengine.photonlibs",
+  "version": "5.1.5",
+  "displayName": "Photon Libs",
+  "description": "Photon Libs - Cross-Platform Networking Engine Libraries",
+  "unity": "2021.3",
+  "documentationUrl": "https://doc.photonengine.com/realtime",
+  "licensesUrl": "https://www.photonengine.com/terms",
+  "dependencies": {
+   },
+  "samples": [
+  ],
+  "keywords": [
+    "Photon",
+    "Network",
+    "Multiplayer",
+    "UDP"
+  ],
+  "author": {
+    "name": "Photon Engine",
+    "email": "hello@photonengine.com",
+    "url": "https://www.photonengine.com/"
+  }
+}

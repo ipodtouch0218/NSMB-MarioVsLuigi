@@ -12,8 +12,8 @@ namespace Quantum
 
         public void PollInput(CallbackPollInput callback)
         {
-            Quantum.Input i = new Quantum.Input();
-            callback.SetInput(i, DeterministicInputFlags.Repeatable);
+            Quantum.Input input = new Quantum.Input();
+            callback.SetInput(input, DeterministicInputFlags.Repeatable);
         }
     }
 }

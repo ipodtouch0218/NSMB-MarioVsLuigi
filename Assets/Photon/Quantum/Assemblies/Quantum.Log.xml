@@ -282,6 +282,50 @@
         <member name="F:Quantum.TraceChannels.Input">
             <summary>Input</summary>
         </member>
+        <member name="T:Quantum.InternalLogStreams">
+            <summary>
+            Provides static log streams for different log levels.
+            </summary>
+        </member>
+        <member name="F:Quantum.InternalLogStreams.LogTrace">
+            <summary> Global trace stream </summary>
+        </member>
+        <member name="F:Quantum.InternalLogStreams.LogTracePhysics2D">
+            <summary> Physics2D trace stream </summary>
+        </member>
+        <member name="F:Quantum.InternalLogStreams.LogTracePhysics3D">
+            <summary> Physics3D trace stream </summary>
+        </member>
+        <member name="F:Quantum.InternalLogStreams.LogTraceAssets">
+            <summary> Assets trace stream </summary>
+        </member>
+        <member name="F:Quantum.InternalLogStreams.LogTraceMemory">
+            <summary> Memory trace stream </summary>
+        </member>
+        <member name="F:Quantum.InternalLogStreams.LogTraceInput">
+            <summary> Input trace stream </summary>
+        </member>
+        <member name="F:Quantum.InternalLogStreams.LogDebugPhysics2D">
+            <summary> Physics2D debug stream </summary>
+        </member>
+        <member name="F:Quantum.InternalLogStreams.LogDebugPhysics3D">
+            <summary> Physics3D debug stream </summary>
+        </member>
+        <member name="F:Quantum.InternalLogStreams.LogDebug">
+            <summary>Debug log stream.</summary>
+        </member>
+        <member name="F:Quantum.InternalLogStreams.LogInfo">
+            <summary>Info log stream.</summary>
+        </member>
+        <member name="F:Quantum.InternalLogStreams.LogWarn">
+            <summary>Warning log stream.</summary>
+        </member>
+        <member name="F:Quantum.InternalLogStreams.LogError">
+            <summary>Error log stream.</summary>
+        </member>
+        <member name="F:Quantum.InternalLogStreams.LogException">
+            <summary>Exception log stream.</summary>
+        </member>
         <member name="T:Quantum.QuantumEditorLog">
             <summary>
             A logger that writes logs to the Unity console with the purpose of being used in the Unity Editor.
@@ -481,7 +525,7 @@
         </member>
         <member name="M:Quantum.QuantumEditorLog.TraceImport(System.String)">
             <summary>
-            Logs a message to the Unity console if QUANTUM_EDITOR_TRACE is defined. Use in the Import context.
+            Logs a message to the Unity console if QUANTUM_EDITOR_TRACE_IMPORT is defined. Use in the Import context.
             </summary>
             <param name="msg">A message</param>
         </member>
@@ -505,7 +549,7 @@
         </member>
         <member name="M:Quantum.QuantumEditorLog.TraceInspector(System.String)">
             <summary>
-            Logs a message to the Unity console if QUANTUM_EDITOR_INSPECTOR_TRACE is defined. Use in the Inspector context.
+            Logs a message to the Unity console if QUANTUM_EDITOR_TRACE_INSPECTOR is defined. Use in the Inspector context.
             </summary>
             <param name="msg">A message</param>
         </member>
@@ -529,13 +573,13 @@
         </member>
         <member name="M:Quantum.QuantumEditorLog.TraceTest(System.String)">
             <summary>
-            Logs a message to the Unity console if QUANTUM_EDITOR_TRACE is defined. Use in the Test context.
+            Logs a message to the Unity console if QUANTUM_EDITOR_TRACE_TEST is defined. Use in the Test context.
             </summary>
             <param name="msg">A message</param>
         </member>
         <member name="M:Quantum.QuantumEditorLog.TraceMppm(System.String)">
             <summary>
-            Logs a message to the Unity console if QUANTUM_EDITOR_TRACE is defined. Use in the Mppm context.
+            Logs a message to the Unity console if QUANTUM_EDITOR_TRACE_MPPM is defined. Use in the Mppm context.
             </summary>
             <param name="msg">A message</param>
         </member>
@@ -577,30 +621,24 @@
             <summary>
             Always throws an AssertException with a message.
             </summary>
-            <typeparam name="T0"></typeparam>
             <param name="format">An error message format</param>
             <param name="args"></param>
             <exception cref="T:Quantum.AssertException"></exception>
         </member>
-        <member name="M:Quantum.Assert.Check(System.Object)">
+        <member name="M:Quantum.Assert.Check(System.Object,System.String)">
             <summary>
             Throws an AssertException if the <paramref name="condition"/> is <c>null</c>
             </summary>
             <param name="condition">Value to check</param>
+            <param name="error">An error message</param>
             <exception cref="T:Quantum.AssertException"></exception>
         </member>
-        <member name="M:Quantum.Assert.Check(System.Void*)">
+        <member name="M:Quantum.Assert.Check(System.Void*,System.String)">
             <summary>
             Throws an AssertException if the <paramref name="condition"/> is <c>null</c>
             </summary>
             <param name="condition">Value to check</param>
-            <exception cref="T:Quantum.AssertException"></exception>
-        </member>
-        <member name="M:Quantum.Assert.Check(System.Boolean)">
-            <summary>
-            Throws an AssertException if the <paramref name="condition"/> is <see langword="false"/>
-            </summary>
-            <param name="condition">Value to check</param>
+            <param name="error">An error message</param>
             <exception cref="T:Quantum.AssertException"></exception>
         </member>
         <member name="M:Quantum.Assert.Check(System.Boolean,System.String)">
@@ -705,13 +743,6 @@
             <param name="error">An error message</param>
             <exception cref="T:Quantum.AssertException"></exception>
         </member>
-        <member name="M:Quantum.Assert.Always(System.Boolean)">
-            <summary>
-            Throws an AssertException with a message if the <paramref name="condition"/> is <see langword="false"/>, even in non-DEBUG builds.
-            </summary>
-            <param name="condition">Value to check</param>
-            <exception cref="T:Quantum.AssertException"></exception>
-        </member>
         <member name="M:Quantum.Assert.Always(System.Boolean,System.String)">
             <summary>
             Throws an AssertException with a message if <paramref name="condition"/> is <see langword="false"/>, even in non-DEBUG builds.
@@ -780,6 +811,40 @@
             <param name="condition">Value to check</param>
             <exception cref="T:Quantum.AssertException"></exception>
         </member>
+        <member name="M:Quantum.Assert.Log(System.Boolean,System.String)">
+            <summary>
+            Logs an assertion if the <paramref name="condition"/> is <see langword="false"/>. For Unity builds, log goes straight to UnityEngine.Debug. Otherwise, log goes to LogError stream.
+            </summary>
+            <param name="condition">Value to check</param>
+            <param name="message"></param>
+        </member>
+        <member name="M:Quantum.Assert.Log``1(System.Boolean,System.String,``0)">
+            <summary>
+            Logs an assertion if the <paramref name="condition"/> is <see langword="false"/>. For Unity builds, log goes straight to UnityEngine.Debug. Otherwise, log goes to LogError stream.
+            </summary>
+            <param name="condition">Value to check</param>
+        </member>
+        <member name="M:Quantum.Assert.Log``2(System.Boolean,System.String,``0,``1)">
+            <summary>
+            Logs an assertion if the <paramref name="condition"/> is <see langword="false"/>. For Unity builds, log goes straight to UnityEngine.Debug. Otherwise, log goes to LogError stream.
+            </summary>
+            <param name="condition">Value to check</param>
+            <param name="format"></param>
+        </member>
+        <member name="M:Quantum.Assert.Log``3(System.Boolean,System.String,``0,``1,``2)">
+            <summary>
+            Logs an assertion if the <paramref name="condition"/> is <see langword="false"/>. For Unity builds, log goes straight to UnityEngine.Debug. Otherwise, log goes to LogError stream.
+            </summary>
+            <param name="condition">Value to check</param>
+            <param name="format"></param>
+        </member>
+        <member name="M:Quantum.Assert.Log``4(System.Boolean,System.String,``0,``1,``2,``3)">
+            <summary>
+            Logs an assertion if the <paramref name="condition"/> is <see langword="false"/>. For Unity builds, log goes straight to UnityEngine.Debug. Otherwise, log goes to LogError stream.
+            </summary>
+            <param name="condition">Value to check</param>
+            <param name="format"></param>
+        </member>
         <member name="T:Quantum.ConsoleLogStream">
             <summary>
             A log stream that writes log messages to the console with a specified color.
@@ -806,6 +871,71 @@
             <param name="source">The source of the log message.</param>
             <param name="message">The log message.</param>
             <param name="error">The exception to log.</param>
+        </member>
+        <member name="T:Quantum.DebugLogStream">
+            <summary>
+            Represents a debug log stream that supports logging to different streams.
+            </summary>
+        </member>
+        <member name="F:Quantum.DebugLogStream.InfoStream">
+            <summary>Stream for logging informational messages.</summary>
+        </member>
+        <member name="F:Quantum.DebugLogStream.WarnStream">
+            <summary>Stream for logging warning messages.</summary>
+        </member>
+        <member name="F:Quantum.DebugLogStream.ErrorStream">
+            <summary>Stream for logging error messages.</summary>
+        </member>
+        <member name="M:Quantum.DebugLogStream.#ctor(Quantum.LogStream,Quantum.LogStream,Quantum.LogStream)">
+            <summary>
+            Initializes a new instance of the DebugLogStream class.
+            </summary>
+            <param name="innerStream">The stream for informational messages.</param>
+            <param name="warnStream">The stream for warning messages.</param>
+            <param name="errorStream">The stream for error messages.</param>
+        </member>
+        <member name="M:Quantum.DebugLogStream.Log(Quantum.ILogSource,System.String)">
+            <summary>Logs a message with a source to the InfoStream.</summary>
+        </member>
+        <member name="M:Quantum.DebugLogStream.Log(System.String)">
+            <summary>Logs a message to the InfoStream.</summary>
+        </member>
+        <member name="M:Quantum.DebugLogStream.Info(Quantum.ILogSource,System.String)">
+            <summary>Logs an info message with a source to the InfoStream.</summary>
+        </member>
+        <member name="M:Quantum.DebugLogStream.Info(System.String)">
+            <summary>Logs an info message to the InfoStream.</summary>
+        </member>
+        <member name="M:Quantum.DebugLogStream.Error(Quantum.ILogSource,System.String)">
+            <summary>Logs an error message with a source to the ErrorStream.</summary>
+        </member>
+        <member name="M:Quantum.DebugLogStream.Error(System.String)">
+            <summary>Logs an error message to the ErrorStream.</summary>
+        </member>
+        <member name="M:Quantum.DebugLogStream.Error(System.Exception)">
+            <summary>Logs an exception to the ErrorStream.</summary>
+        </member>
+        <member name="M:Quantum.DebugLogStream.Exception(System.Exception)">
+            <summary>Logs an exception to the ErrorStream.</summary>
+        </member>
+        <member name="M:Quantum.DebugLogStream.Warn(Quantum.ILogSource,System.String)">
+            <summary>Logs a warning message with a source to the WarnStream.</summary>
+        </member>
+        <member name="M:Quantum.DebugLogStream.Warn(System.String)">
+            <summary>Logs a warning message to the WarnStream.</summary>
+        </member>
+        <member name="M:Quantum.DebugLogStream.If(System.Boolean)">
+            <summary>
+            Returns self if <paramref name="condition"/> is true.
+            </summary>
+        </member>
+        <member name="M:Quantum.DebugLogStream.Once(System.Boolean@)">
+            <summary>
+            Returns self if <paramref name="flag"/> is false and then sets it to true.
+            </summary>
+        </member>
+        <member name="M:Quantum.DebugLogStream.Dispose">
+            <summary>Disposes the DebugLogStream and its underlying streams.</summary>
         </member>
         <member name="T:Quantum.ILogSource">
             <summary>
@@ -968,6 +1098,16 @@
             Logs an exception.
             </summary>
             <param name="error">The exception to log.</param>
+        </member>
+        <member name="M:Quantum.LogStream.If(System.Boolean)">
+            <summary>
+            Returns self if <paramref name="condition"/> is true.
+            </summary>
+        </member>
+        <member name="M:Quantum.LogStream.Once(System.Boolean@)">
+            <summary>
+            Returns self if <paramref name="flag"/> is false and then sets it to true.
+            </summary>
         </member>
         <member name="M:Quantum.LogStream.Dispose">
             <inheritdoc/>
@@ -1181,6 +1321,71 @@
             <summary>
             Disposes the <see cref="T:Quantum.TextWriterLogStream"/> instance and optionally disposes the underlying <see cref="T:System.IO.TextWriter"/>.
             </summary>
+        </member>
+        <member name="T:Quantum.TraceLogStream">
+            <summary>
+            Represents a trace log stream that supports logging to different streams.
+            </summary>
+        </member>
+        <member name="F:Quantum.TraceLogStream.InfoStream">
+            <summary>Stream for logging informational messages.</summary>
+        </member>
+        <member name="F:Quantum.TraceLogStream.WarnStream">
+            <summary>Stream for logging warning messages.</summary>
+        </member>
+        <member name="F:Quantum.TraceLogStream.ErrorStream">
+            <summary>Stream for logging error messages.</summary>
+        </member>
+        <member name="M:Quantum.TraceLogStream.#ctor(Quantum.LogStream,Quantum.LogStream,Quantum.LogStream)">
+            <summary>
+            Initializes a new instance of the TraceLogStream class.
+            </summary>
+            <param name="innerStream">The stream for informational messages.</param>
+            <param name="warnStream">The stream for warning messages.</param>
+            <param name="errorStream">The stream for error messages.</param>
+        </member>
+        <member name="M:Quantum.TraceLogStream.Log(Quantum.ILogSource,System.String)">
+            <summary>Logs a message with a source to the InfoStream.</summary>
+        </member>
+        <member name="M:Quantum.TraceLogStream.Log(System.String)">
+            <summary>Logs a message to the InfoStream.</summary>
+        </member>
+        <member name="M:Quantum.TraceLogStream.Info(Quantum.ILogSource,System.String)">
+            <summary>Logs an info message with a source to the InfoStream.</summary>
+        </member>
+        <member name="M:Quantum.TraceLogStream.Info(System.String)">
+            <summary>Logs an info message to the InfoStream.</summary>
+        </member>
+        <member name="M:Quantum.TraceLogStream.Error(Quantum.ILogSource,System.String)">
+            <summary>Logs an error message with a source to the ErrorStream.</summary>
+        </member>
+        <member name="M:Quantum.TraceLogStream.Error(System.String)">
+            <summary>Logs an error message to the ErrorStream.</summary>
+        </member>
+        <member name="M:Quantum.TraceLogStream.Error(System.Exception)">
+            <summary>Logs an exception to the ErrorStream.</summary>
+        </member>
+        <member name="M:Quantum.TraceLogStream.Exception(System.Exception)">
+            <summary>Logs an exception to the ErrorStream.</summary>
+        </member>
+        <member name="M:Quantum.TraceLogStream.Warn(Quantum.ILogSource,System.String)">
+            <summary>Logs a warning message with a source to the WarnStream.</summary>
+        </member>
+        <member name="M:Quantum.TraceLogStream.Warn(System.String)">
+            <summary>Logs a warning message to the WarnStream.</summary>
+        </member>
+        <member name="M:Quantum.TraceLogStream.If(System.Boolean)">
+            <summary>
+            Returns self if <paramref name="condition"/> is true.
+            </summary>
+        </member>
+        <member name="M:Quantum.TraceLogStream.Once(System.Boolean@)">
+            <summary>
+            Returns self if <paramref name="flag"/> is false and then sets it to true.
+            </summary>
+        </member>
+        <member name="M:Quantum.TraceLogStream.Dispose">
+            <summary>Disposes the TraceLogStream and its underlying streams.</summary>
         </member>
         <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute">
             <summary>Specifies that the method or property will ensure that the listed field and property members have not-null values.</summary>

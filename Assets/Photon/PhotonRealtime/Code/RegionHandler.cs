@@ -519,19 +519,7 @@ namespace Photon.Realtime
         /// <returns>True unless Aborted.</returns>
         public bool Start()
         {
-            // all addresses for Photon region servers will contain a :port ending. this needs to be removed first.
-            // PhotonPing.StartPing() requires a plain (IP) address without port or protocol-prefix (on all but Windows 8.1 and WebGL platforms).
-            string address = this.region.HostAndPort;
-            int indexOfColon = address.LastIndexOf(':');
-            if (indexOfColon > 1)
-            {
-                address = address.Substring(0, indexOfColon);
-            }
-            this.regionAddress = ResolveHost(address);
-
-
             this.ping = this.GetPingImplementation();
-
 
             this.Done = false;
             this.CurrentAttempt = 0;
@@ -582,9 +570,33 @@ namespace Photon.Realtime
 
             int rttSum = 0;
             int replyCount = 0;
-
-
             Stopwatch sw = new Stopwatch();
+
+            try
+            {
+                // all addresses for Photon region servers will contain a :port ending. this needs to be removed first.
+                // PhotonPing.StartPing() requires a plain (IP) address without port or protocol-prefix (on all but Windows 8.1 and WebGL platforms).
+                string address = this.region.HostAndPort;
+                int indexOfColon = address.LastIndexOf(':');
+                if (indexOfColon > 1)
+                {
+                    address = address.Substring(0, indexOfColon);
+                }
+
+                sw.Start();
+                this.regionAddress = ResolveHost(address);
+                sw.Stop();
+                if (sw.ElapsedMilliseconds > 100)
+                {
+                    Log.Info($"RegionPingThreaded.ResolveHost() took: {sw.ElapsedMilliseconds}ms");
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Info($"RegionPingThreaded ResolveHost failed for {this.region}. Caught: {e}");
+                this.Aborted = true;
+            }
+
             for (this.CurrentAttempt = 0; this.CurrentAttempt < Attempts; this.CurrentAttempt++)
             {
                 if (this.Aborted)
@@ -601,7 +613,7 @@ namespace Photon.Realtime
                 }
                 catch (Exception e)
                 {
-                    System.Diagnostics.Debug.WriteLine("RegionPinger.RegionPingThreaded() caught exception for ping.StartPing(). Exception: " + e + " Source: " + e.Source + " Message: " + e.Message);
+                    Log.Info("RegionPinger.RegionPingThreaded() caught exception for ping.StartPing(). Exception: " + e + " Source: " + e.Source + " Message: " + e.Message);
                     break;
                 }
 
@@ -664,9 +676,33 @@ namespace Photon.Realtime
 
             int rttSum = 0;
             int replyCount = 0;
-
-
             Stopwatch sw = new Stopwatch();
+
+            try
+            {
+                // all addresses for Photon region servers will contain a :port ending. this needs to be removed first.
+                // PhotonPing.StartPing() requires a plain (IP) address without port or protocol-prefix (on all but Windows 8.1 and WebGL platforms).
+                string address = this.region.HostAndPort;
+                int indexOfColon = address.LastIndexOf(':');
+                if (indexOfColon > 1)
+                {
+                    address = address.Substring(0, indexOfColon);
+                }
+
+                sw.Start();
+                this.regionAddress = ResolveHost(address);
+                sw.Stop();
+                if (sw.ElapsedMilliseconds > 100)
+                {
+                    Log.Info($"RegionPingCoroutine.ResolveHost() took: {sw.ElapsedMilliseconds}ms");
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Info($"RegionPingCoroutine ResolveHost failed for {this.region}. Caught: {e}");
+                this.Aborted = true;
+            }
+
             for (this.CurrentAttempt = 0; this.CurrentAttempt < Attempts; this.CurrentAttempt++)
             {
                 if (this.Aborted)
@@ -683,7 +719,7 @@ namespace Photon.Realtime
                 }
                 catch (Exception e)
                 {
-                    Debug.Log("RegionPinger.RegionPingCoroutine() caught exception for ping.StartPing(). Exception: " + e + " Source: " + e.Source + " Message: " + e.Message);
+                    Log.Info("RegionPinger.RegionPingCoroutine() caught exception for ping.StartPing(). Exception: " + e + " Source: " + e.Source + " Message: " + e.Message);
                     break;
                 }
 

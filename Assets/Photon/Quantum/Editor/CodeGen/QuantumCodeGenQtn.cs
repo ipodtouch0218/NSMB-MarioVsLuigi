@@ -16,7 +16,11 @@ namespace Quantum.Editor {
     /// <summary>
     /// The Quantum CodeGen version that the SDK expects. This is used to show a hint to restart UnityEditor during upgrading for example.
     /// </summary>
+#if QUANTUM_UPM
+    public const string VersionFilepath = "Packages/com.photonengine.quantum/Editor/CodeGen/QuantumCodeGenQtn.Version.txt";
+#else
     public const string VersionFilepath = "Assets/Photon/Quantum/Editor/CodeGen/QuantumCodeGenQtn.Version.txt";
+#endif
 
     /// <summary>
     /// Runs the Quantum CodeGen for all <see cref="QuantumQtnAsset"/> in the project with default settings. Can be invoked with
@@ -160,6 +164,14 @@ namespace Quantum.Editor {
       Run(verbose, null);
     }
     
+    static string AppendFileIndex(string file, int index) {
+      if (index == 0) {
+        return file;
+      }
+
+      return Path.GetFileNameWithoutExtension(file) + $".Part{index+1}" + Path.GetExtension(file);
+    }
+    
     static void UpdateScriptsDirectory(string outputDir, IEnumerable<GeneratorOutputFile> files, Action<string> logProgress, Predicate<string> ignoreFilter = null) {
       logProgress?.Invoke($"Generating scripts to {outputDir}");
       Directory.CreateDirectory(outputDir); // Create a directory first, because it might not exist.
@@ -167,14 +179,17 @@ namespace Quantum.Editor {
       var generatedFiles = new HashSet<string>();
 
       foreach (var file in files) {
-        if (string.IsNullOrEmpty(file.Contents)) {
-          continue;
-        }
+        for (int i = 0; i < file.Contents?.Length; ++i) {
+          if (string.IsNullOrEmpty(file.Contents[i])) {
+            continue;
+          }
 
-        if (string.IsNullOrEmpty(file.UserFolder) && !generatedFiles.Add(file.Name)) {
-          throw new InvalidOperationException($"File already generated: {file.Name}");
+          var fileName = AppendFileIndex(file.Name, i);
+          if (string.IsNullOrEmpty(file.UserFolder) && !generatedFiles.Add(fileName)) {
+            throw new InvalidOperationException($"File already generated: {fileName}");
+          }
+          UpdateFile(fileName, file.Contents[i], file.FormerNames, file.UserFolder);  
         }
-        UpdateFile(file.Name, file.Contents, file.FormerNames, file.UserFolder);
       }
 
       var orphanedFiles = Directory.GetFiles(outputDir, "*.cs")

@@ -1,6 +1,8 @@
 namespace Quantum {
+  using System;
   using System.Collections.Generic;
   using UnityEngine;
+  using UnityEngine.Serialization;
 
   /// <summary>
   /// Unity component that holds and bakes the map data for a Quantum map from a given scene.
@@ -12,8 +14,9 @@ namespace Quantum {
     /// The source asset to bake the data into.
     /// </summary>
     [InlineHelp]
-    public Map Asset;
-
+    [DisplayName("Asset")]
+    public AssetRef<Map> AssetRef;
+    
     /// <summary>
     /// How the map data should be baked.
     /// </summary>
@@ -49,6 +52,41 @@ namespace Quantum {
     void Update() {
       transform.position = Vector3.zero;
       transform.rotation = Quaternion.identity;
+    }
+    
+    [Obsolete("Use GetAsset instead. To assign a value, use AssetRef field.", true)]
+    [HideInInspector]
+    public Map Asset;
+    
+    public Map GetAsset(bool forEditor) {
+#if UNITY_EDITOR
+      if (forEditor) {
+        return QuantumUnityDB.GetGlobalAssetEditorInstance(AssetRef);
+      }
+#endif
+      return QuantumUnityDB.GetGlobalAsset(AssetRef);
+    }
+
+    void OnValidate() {
+#pragma warning disable CS0612 // Type or member is obsolete
+      if (TryMigrateAsset()) {
+#if UNITY_EDITOR
+        UnityEditor.EditorUtility.SetDirty(this);
+        UnityEditor.EditorUtility.SetDirty(gameObject);
+#endif
+      }
+#pragma warning restore CS0612 // Type or member is obsolete
+
+      [Obsolete]
+      bool TryMigrateAsset() {
+        if (!Asset) {
+          return false;
+        }
+      
+        AssetRef = Asset;
+        Asset = null;
+        return true;
+      }
     }
   }
 }

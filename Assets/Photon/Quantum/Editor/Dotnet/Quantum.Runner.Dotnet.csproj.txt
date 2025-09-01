@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="[UnityProjectPath]/Assets/Photon/Quantum/Editor/Dotnet/QuantumConsoleRunner.cs" />
+    <Compile Include="[UnityProjectPath]/Editor/Dotnet/QuantumConsoleRunner.cs" />
   </ItemGroup>
 
   <ItemGroup>

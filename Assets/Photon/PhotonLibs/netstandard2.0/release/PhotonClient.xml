@@ -166,18 +166,18 @@
             </summary>
             <remarks>If the Size exceeded the remaining message length, only the remaining data is read. This may be null, if the size was somehow less than 1.</remarks>
         </member>
-        <member name="M:Photon.Client.Security.DiffieHellmanCryptoProvider.#ctor">
+        <member name="M:Photon.Client.Encryption.DiffieHellmanCryptoProvider.#ctor">
             <summary>
-            Initializes a new instance of the <see cref="T:Photon.Client.Security.DiffieHellmanCryptoProvider"/> class.
+            Initializes a new instance of the <see cref="T:Photon.Client.Encryption.DiffieHellmanCryptoProvider"/> class.
             </summary>
         </member>
-        <member name="P:Photon.Client.Security.DiffieHellmanCryptoProvider.PublicKey">
+        <member name="P:Photon.Client.Encryption.DiffieHellmanCryptoProvider.PublicKey">
             <summary>
             Gets the public key that can be used by another DiffieHellmanCryptoProvider object
             to generate a shared secret agreement.
             </summary>
         </member>
-        <member name="M:Photon.Client.Security.DiffieHellmanCryptoProvider.DeriveSharedKey(System.Byte[])">
+        <member name="M:Photon.Client.Encryption.DiffieHellmanCryptoProvider.DeriveSharedKey(System.Byte[])">
             <summary>
             Derives the shared key is generated from the secret agreement between two parties,
             given a byte array that contains the second party's public key.
@@ -186,40 +186,40 @@
             The second party's public key.
             </param>
         </member>
-        <member name="T:Photon.Client.Security.ICryptoProvider">
-            <summary>Interface for Photon's DiffieHellman/Payload Encryption.</summary>
-        </member>
-        <member name="T:Photon.Client.Security.OakleyGroups">
-            <summary>
-            Provides classical Diffie-Hellman Modular Exponentiation Groups defined by the
-            OAKLEY Key Determination Protocol (RFC 2412).
-            </summary>
-        </member>
-        <member name="F:Photon.Client.Security.OakleyGroups.Generator">
-            <summary>
-            Gets the generator (N) used by the the well known groups 1,2 and 5.
-            </summary>
-        </member>
-        <member name="F:Photon.Client.Security.OakleyGroups.OakleyPrime768">
-            <summary>
-            Gets the 768 bit prime for the well known group 1.
-            </summary>
-        </member>
-        <member name="F:Photon.Client.Security.OakleyGroups.OakleyPrime1024">
-            <summary>
-            Gets the 1024 bit prime for the well known group 2.
-            </summary>
-        </member>
-        <member name="F:Photon.Client.Security.OakleyGroups.OakleyPrime1536">
-            <summary>
-            Gets the 1536  bit prime for the well known group 5.
-            </summary>
-        </member>
         <member name="T:Photon.Client.Encryption.IPhotonEncryptor">
             <summary>Interface for DatagramEncryptor implementations.</summary>
         </member>
         <member name="M:Photon.Client.Encryption.IPhotonEncryptor.Init(System.Byte[],System.Byte[],System.Byte[],System.Boolean,System.Int32)">
             <summary>Initialize the encryptor.</summary>
+        </member>
+        <member name="T:Photon.Client.Encryption.ICryptoProvider">
+            <summary>Interface for Photon's DiffieHellman/Payload Encryption.</summary>
+        </member>
+        <member name="T:Photon.Client.Encryption.OakleyGroups">
+            <summary>
+            Provides classical Diffie-Hellman Modular Exponentiation Groups defined by the
+            OAKLEY Key Determination Protocol (RFC 2412).
+            </summary>
+        </member>
+        <member name="F:Photon.Client.Encryption.OakleyGroups.Generator">
+            <summary>
+            Gets the generator (N) used by the the well known groups 1,2 and 5.
+            </summary>
+        </member>
+        <member name="F:Photon.Client.Encryption.OakleyGroups.OakleyPrime768">
+            <summary>
+            Gets the 768 bit prime for the well known group 1.
+            </summary>
+        </member>
+        <member name="F:Photon.Client.Encryption.OakleyGroups.OakleyPrime1024">
+            <summary>
+            Gets the 1024 bit prime for the well known group 2.
+            </summary>
+        </member>
+        <member name="F:Photon.Client.Encryption.OakleyGroups.OakleyPrime1536">
+            <summary>
+            Gets the 1536  bit prime for the well known group 5.
+            </summary>
         </member>
         <member name="F:Photon.Client.EnetChannel.outgoingReliableUnsequencedNumber">
             <summary>Number for reliable unsequenced commands (separate from "standard" reliable sequenced). Used to avoid duplicates.</summary>
@@ -963,6 +963,9 @@
         <member name="F:Photon.Client.PeerBase.timeIntCurrentSend">
             <summary>Set to timeInt, whenever SendOutgoingCommands actually checks outgoing queues to send them. Must be connected.</summary>
         </member>
+        <member name="P:Photon.Client.PeerBase.ServerFeatureFlags">
+            <summary>In a UDP connection, the server's VerifyConnect command may indicate certain features are available (or not).</summary>
+        </member>
         <member name="P:Photon.Client.PeerBase.mtu">
             <summary> Maximum Transfer Unit to be used for UDP+TCP</summary>
         </member>
@@ -1054,7 +1057,7 @@
             <summary>Target framework this dll was built for.</summary>
         </member>
         <member name="F:Photon.Client.PhotonPeer.ClientSdkId">
-            <summary>A simplified identifier for client SDKs. Photon's APIs might modify this (as a dll can be used in more than one product). Helps debugging.</summary>
+            <summary>A simplified identifier for client SDKs. Helps debugging. Only Photon APIs should set this.</summary>
         </member>
         <member name="P:Photon.Client.PhotonPeer.ClientSdkIdShifted">
             <summary>For the Init-request, we shift the ClientId by one and the last bit signals a "debug" (0) or "release" build (1).</summary>
@@ -1073,7 +1076,12 @@
             <summary>Option to enable V3 Init Requests (WIP).</summary>
         </member>
         <member name="F:Photon.Client.PhotonPeer.UseAck2">
-            <summary>Option to enable ACK2 (WIP).</summary>
+            <summary>If true and IsAck2Available is also true, sequential acknowledgements will be used between this client and server.</summary>
+            <remarks>Even if this gets set to true, ACK2 is only used if the connected server also supports this feature.</remarks>
+        </member>
+        <member name="P:Photon.Client.PhotonPeer.IsAck2Available">
+            <summary>After connecting, this indicates if the server has the ACK2 feature. If the client does not have the feature, this is always false.</summary>
+            <remarks>Can only be available for UDP connections.</remarks>
         </member>
         <member name="F:Photon.Client.PhotonPeer.EnableEncryptedFlag">
             <summary>
@@ -1117,6 +1125,9 @@
             This affects the callbacks to IPhotonPeerListener.DebugReturn.
             Default Level: Error.
             </remarks>
+        </member>
+        <member name="P:Photon.Client.PhotonPeer.DebugOut">
+            <summary>Sets the level (and amount) of logging for the PhotonPeer.</summary>
         </member>
         <member name="P:Photon.Client.PhotonPeer.Listener">
             <summary>
@@ -1281,7 +1292,7 @@
              and could lead to timeouts.
             
              Building the checksum has a low processing overhead but increases integrity of sent and received data.
-             Packages discarded due to failed CRC cecks are counted in PhotonPeer.PacketLossByCrc.
+             Packages discarded due to failed CRC checks are counted in PhotonPeer.PacketLossByCrc.
              </remarks>
         </member>
         <member name="F:Photon.Client.PhotonPeer.PingInterval">
@@ -1641,13 +1652,30 @@
              <remarks>
              Calling this method does not immediately close a connection. Disconnect lets the server
              know that this client is no longer listening. For the server, this is a much faster way
-             to detect that the client is gone but it requires the client to send a few final messages.
+             to detect that the client is gone, but it requires the client to send a few final messages.
             
              On completion, OnStatusChanged is called with the StatusCode.Disconnect.
+            
+             Any resulting callbacks are queued and need to be dispatched (call Peer.DispatchIncomingCommands()).
+             This avoids issues when Disconnect() in Unity when Disconnect gets called off main-thread.
             
              If the client is disconnected already or the connection thread is stopped, then there is no callback.
             
              The default server logic will leave any joined game and trigger the respective event.
+             </remarks>
+        </member>
+        <member name="M:Photon.Client.PhotonPeer.SimulateTimeoutDisconnect">
+             <summary>Debug dll only: Simulates a local timeout disconnect without delay. Useful for debugging.</summary>
+             <remarks>
+             To simulate specific disconnect and reconnect scenarios, this method can be used to simulate
+             a client side timeout-disconnect immediately - as if acknowledgements were missing for a while already.
+            
+             The PhotonPeer will not signal a disconnect to the server.
+             For the duration of the server's timeout time, this peer will be considered connected.
+             
+             Continue to call DispatchIncomingCommands() to get the associated callbacks - more than one state change is possible.
+            
+             On a release build of the PhotonClient dll, this method will not do anything!
              </remarks>
         </member>
         <member name="M:Photon.Client.PhotonPeer.FetchServerTimestamp">

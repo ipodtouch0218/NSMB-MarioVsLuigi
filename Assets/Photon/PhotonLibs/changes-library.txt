@@ -3,6 +3,46 @@ Photon C# Client Library - Changelog
 www.photonengine.com  -  Join our Discord Server: https://dashboard.photonengine.com/account/profile
 
 
+Version 5.1.9
+    Added: PhotonPeer.SimulateTimeoutDisconnect() to immediately trigger a local timeout-disconnect (without informing the server) for debug purposes. This is only implemented in the debug builds of the PhotonClient dll.
+
+Version 5.1.8 (25. August 2025 - rev8056)
+    Changed: Protocol 1.8. iteration over PhotonHashtable entries to achieve non-alloc serialization for the container.
+    No notable changes.
+
+Version 5.1.7 (31. July 2025 - rev8015)
+    Added: FeatureFlags for UDP connections to communicate which features a client / server has.
+    Added: PhotonPeer.UseAck2. While available in all new builds, the feature is not built into the client yet. When built into the client, it will check the server's FeatureFlags before enabling it per connection.
+    Changed: CT_VERIFYCONNECT reading. Currently, the feature flag value is directly set on the peer (not entirely "correct" as it should possibly do it when handling verify connect).
+    Added: Obsolete property DebugOut to allow a little easier migration from v4 to v5.
+
+Version 5.1.6 (01. July 2025 - rev7991)
+    Added: SupportClass overload for CalculateCrc() with offset.
+    Changed: CalculateCrc() without offset is now obsolete.
+	Internal: Worked on sequential acknowledgements (a.k.a. ACK2). Some refactoring and internal implentation details apply to all command handling, even if this feature is not released yet.
+	Changed: Send Window in SerializeToBuffer(). If a fragment's start-sequence number is inside the Send Window, related fragments can be sent.
+	Changed: Channel outgoingReliableCommandsList and outgoingUnreliableCommandsList are now of type List<NCommand>. Allows skip over individual entries.
+	Added: PeerBase.bestRoundtripTimeout to track the session's best resend-timeout.
+	Added: PeerBase.throttledBySendWindow debug value to count how often reliable sequenced commands are not sent due to lacking acknowledgements.
+	Added: PeerBase.rttVarString property to provide a formatted rtt/variance string. This is updated on access.
+	Changed: EnetPeer SendWindow is only applied to sequenced reliable commands. It does not apply to unsequenced reliable commands, because the server has a longer queue for those.
+
+Version 5.1.5 (24. April 2025 - rev7920)
+    Fixed: Bug in QueueIncomingCommand() which allowed duplicates of commands being queued. This affected fragment reassembly, leading to exceptions and disconnects. This bug has been in v5.1.3 and v5.1.4.
+
+Version 5.1.4 (10. April 2025 - rev7900)
+    Changed: WebSocket implementation for Unity WebGL/JS. It is compatible with Unity 6, Emscripten 2023 and C/C++ Threading support. This makes the WebSocket.jslib require Unity 2021.3.x or newer. Mail us to get support for older Unity versions if necessary.
+    Removed: Internally outdated call of OnConnect() from the WebGL SocketWebTcp implementation.
+    Changed: Internally used classes from namespace Photon.Client.Security are moved to Photon.Client.Encryption.
+    Fixed: Handling of unsequenced reliable commands in QueueIncomingCommand().
+
+Version 5.1.3 (06. March 2025 - rev7864)
+    Changed: WebSocket implementation for Unity WebGL/JS exports and WebSocket-sharp based implementation (in PhotonLibs\WebSocket\).
+    Note: The goal is to process incoming messages in WebGL (and with WebSocket-sharp) more directly. This specifically helps the Voice SDK on WebGL to process the stream while in background.
+    Changed: WebSocketTcp and WebSocket to receive incoming messages via callbacks. At the same time our WebSocket code now also implements all typical callbacks for WS/WSS.
+    Changed: WebSocket.jslib replicates "standard" JS websocket methods and callbacks in its interface instead of caching messages for polling.
+    Changed: PreserveAttribute in SupportClass.cs is now public, so it can be used in WebSocket code as needs be.
+
 Version 5.1.2 (19. November 2024 - rev7770)
 	Fixed: Some allocations that can be avoided. For example the EventData.Sender is no longer allocating anything, if the Sender of an event was not set (it is considered ActorNumber 0).
 

@@ -24,7 +24,7 @@ public class MvLEditorUtils : EditorWindow {
             return;
         }
 
-        EditorGUIUtility.PingObject(QuantumUnityDB.GetGlobalAsset(qmd.Asset.UserAsset));
+        EditorGUIUtility.PingObject(QuantumUnityDB.GetGlobalAsset(qmd.GetAsset(true).UserAsset));
     }
 
     public void OnGUI() {
@@ -99,7 +99,7 @@ public class MvLEditorUtils : EditorWindow {
         EditorUtility.SetDirty(simulationConfig);
 
         QuantumMapData mapHolder = FindFirstObjectByType<QuantumMapData>();
-        mapHolder.Asset = map;
+        mapHolder.AssetRef = map;
         EditorUtility.SetDirty(mapHolder);
         EditorUtility.SetDirty(mapHolder.gameObject);
 

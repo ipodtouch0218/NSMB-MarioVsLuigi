@@ -1,0 +1,872 @@
+fileFormatVersion: 2
+guid: a2cbc3f391c9f47488a7118fb5805195
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 128
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 1024
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: PhotonUISpriteToggleBgColor
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 888
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ff34e896120dc04479406517444a0fcf
+      internalID: -1349871011
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteToggleFullColor
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 888
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6e9b9856518055249a0aa2e99a1b2d3d
+      internalID: -194065673
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteToggleCheckColor
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 888
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 034b4924c64bdd74da19237515b965ed
+      internalID: -2015134692
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteToggleBg
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 888
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f15f3fd9da9314246818b42b82556d1b
+      internalID: -1934667384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteToggleFull
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 888
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f7dc13b3e7b16b449bd97bb7d064e1ca
+      internalID: -1489297443
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteToggleCheck
+      rect:
+        serializedVersion: 2
+        x: 688
+        y: 888
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2fba513530db36b44b6c97250d48d8fc
+      internalID: 1281745629
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteConnectingColor
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 753
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2d15d1649fbafdf4a85983c472e8b4d4
+      internalID: -1305120578
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteConnecting
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 752
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 26dc1a53bc464dd48aee437eda6ded26
+      internalID: 1295144572
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteMutedOn
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 752
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bc62f26f6a5014e47aea104cb308d95c
+      internalID: -1178160655
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteMutedOff
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 753
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 76543c525a6d4514699c061036ddbd82
+      internalID: 1465902259
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteMutedOnColor
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 752
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d1b6244915a22cd49a224eb7a7358b8e
+      internalID: 1713711447
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteMutedOffColor
+      rect:
+        serializedVersion: 2
+        x: 688
+        y: 752
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 75eb056a082e14f4294f2d51dd77913c
+      internalID: -143256828
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteSwitchOff
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 616
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: be3b42f643a7aeb48b964d6bf80396bf
+      internalID: -210890380
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteSwitchOn
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 617
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7dc758f122639a9459ba55935669ddb0
+      internalID: -1385595579
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteSignal0
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 480
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a75d1bdce01ff2c4d8c01dccb843a05d
+      internalID: 1359659142
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteCopyButton
+      rect:
+        serializedVersion: 2
+        x: 279
+        y: 615
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 13fe47daef58e26429586f49536c09c6
+      internalID: 798397956
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteSignal2
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 480
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d710ab3aa0e2b6f4bad7091c69bdae22
+      internalID: -551856006
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteSignal3
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 482
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 79f18cfd63b27f74ab5a9c599a1c7897
+      internalID: -273020082
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteSignal4
+      rect:
+        serializedVersion: 2
+        x: 688
+        y: 480
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 29fbc0e1dd5737243906c51f8f5e2f3e
+      internalID: 1698759296
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteSignal0Color
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 344
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7288e36ff4d3670418e71c0714f3e39c
+      internalID: -211085536
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteSignal1
+      rect:
+        serializedVersion: 2
+        x: 279
+        y: 480
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a4e2d87e57514c3419ffea731b15c598
+      internalID: -1253545181
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteSignal2Color
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 344
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9401c23f07172a94aa212216d1f30293
+      internalID: -656178894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteSignal3Color
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 344
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f663c846dd63c594c8c4b305cdcc027d
+      internalID: 1894221246
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteSignal4Color
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 344
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e1585253bed1fe945b8b78025457ec0f
+      internalID: -2106095671
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteError
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 208
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7383b0e5db5f6da4981acf5ab407fe97
+      internalID: 54080320
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteSignal1Color
+      rect:
+        serializedVersion: 2
+        x: 279
+        y: 344
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f6183809fe1e9114c884ab15dfc05b94
+      internalID: -1173093779
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteCopyButtonColor
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 616
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c9921d8a40089144c935e355f81b75bd
+      internalID: 1139966411
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteSignalOff
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 480
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bacfdb4fe877bde4d809b7e1e28b75d1
+      internalID: 1860911246
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteSignalOffColor
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 344
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 209fb20204bbd614eb9665057b9ce25f
+      internalID: 559184523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteGradient
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 208
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0aa69dd6c46de09478b92c448f44be8b
+      internalID: -1555580473
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteMenuButtonOpen
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 209
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 07b454ca4b7413a4a844b3a8f0205a0c
+      internalID: -250875479
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteMenuButtonClose
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 208
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 715e719d8871cdd4299588dcf381cd68
+      internalID: 1586394734
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteMenuButtonOpenColor
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 208
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4b4a2f7eba56567479ecb077727a0ae3
+      internalID: 1664425059
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PhotonUISpriteMenuButtonCloseColor
+      rect:
+        serializedVersion: 2
+        x: 688
+        y: 209
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1910c70dfc5620c4faba4e9abb5a7c1f
+      internalID: 1260246714
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 418e09d3bfc506540a35757b0f9a400e
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      PhotonCommonCommonImages_14: -927753380
+      PhotonUISpriteConnecting: 1295144572
+      PhotonUISpriteConnectingColor: -1305120578
+      PhotonUISpriteCopyButton: 798397956
+      PhotonUISpriteCopyButtonColor: 1139966411
+      PhotonUISpriteError: 54080320
+      PhotonUISpriteGradient: -1555580473
+      PhotonUISpriteMenuButtonClose: 1586394734
+      PhotonUISpriteMenuButtonCloseColor: 1260246714
+      PhotonUISpriteMenuButtonOpen: -250875479
+      PhotonUISpriteMenuButtonOpenColor: 1664425059
+      PhotonUISpriteMutedOff: 1465902259
+      PhotonUISpriteMutedOffColor: -143256828
+      PhotonUISpriteMutedOn: -1178160655
+      PhotonUISpriteMutedOnColor: 1713711447
+      PhotonUISpriteSignal0: 1359659142
+      PhotonUISpriteSignal0Color: -211085536
+      PhotonUISpriteSignal1: -1253545181
+      PhotonUISpriteSignal1Color: -1173093779
+      PhotonUISpriteSignal2: -551856006
+      PhotonUISpriteSignal2Color: -656178894
+      PhotonUISpriteSignal3: -273020082
+      PhotonUISpriteSignal3Color: 1894221246
+      PhotonUISpriteSignal4: 1698759296
+      PhotonUISpriteSignal4Color: -2106095671
+      PhotonUISpriteSignalOff: 1860911246
+      PhotonUISpriteSignalOffColor: 559184523
+      PhotonUISpriteSwitchOff: -210890380
+      PhotonUISpriteSwitchOn: -1385595579
+      PhotonUISpriteToggleBg: -1934667384
+      PhotonUISpriteToggleBgColor: -1349871011
+      PhotonUISpriteToggleCheck: 1281745629
+      PhotonUISpriteToggleCheckColor: -2015134692
+      PhotonUISpriteToggleFull: -1489297443
+      PhotonUISpriteToggleFullColor: -194065673
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

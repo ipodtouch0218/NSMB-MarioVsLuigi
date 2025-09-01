@@ -1,7 +1,9 @@
 namespace Quantum {
   using System;
   using System.Collections.Generic;
+  using System.Linq;
   using System.Reflection;
+  using UnityEngine;
 
   /// <summary>
   /// A Quantum configuration asset that will create and start Quantum systems in a data-driven way when starting the simulation.
@@ -23,11 +25,12 @@ namespace Quantum {
       /// <summary>
       /// System type name. Use typeof(SystemBase).FullName to get a valid name programmatically. E.g. Quantum.Core.SystemSignalsOnly.
       /// </summary>
-      [SerializableType(WarnIfNoPreserveAttribute = true)]
       public SerializableType<SystemBase> SystemType;
       /// <summary>
       /// Optional System name. If set, then the SystemType class needs to have a matching constructor.
       /// </summary>
+      [HideInInspector]
+      [Obsolete("Name is not used anymore")]
       public string SystemName;
       /// <summary>
       /// Start system disabled.
@@ -60,14 +63,12 @@ namespace Quantum {
       /// Add a child system.
       /// </summary>
       /// <typeparam name="TSystem">System type</typeparam>
-      /// <param name="name">System name</param>
       /// <param name="enabled">Start enabled</param>
       /// <returns>The created child system entry</returns>
-      public T AddSystem<TSystem>(string name = null, bool enabled = true) where TSystem : SystemBase {
+      public T AddSystem<TSystem>(bool enabled = true) where TSystem : SystemBase {
         var entry = new T() {
           SystemType = typeof(TSystem),
           StartDisabled = !enabled,
-          SystemName = name
         };
         Children.Add(entry);
         return entry;
@@ -109,15 +110,13 @@ namespace Quantum {
     /// Converts the systems configuration into a list of system objects while calling the matching (Name, Children) constructors.
     /// This method throws AssertionExceptions on any invalid system configuration.
     /// 
-    ///                                      SystemBase   
-    ///        __________________________________|___________________________________________________________
-    ///       |                 |                |                    |                     |                |
-    /// SystemGroup     SystemMainThread  SystemArrayComponent  SystemArrayFilter  SystemSignalsOnly  SystemThreadedFilter
-    ///  children (SystemBase)  |
-    ///               __________|__________
-    ///              |                     |
-    ///   SystemMainThreadGroup  SystemMainThreadFilter
-    ///        children (SystemMainThread)
+    ///                                                SystemBase   
+    ///                                            Children[] (SystemBase)
+    ///             _______________________________________|______________________________________
+    ///            |                    |                  |                  |                  |
+    ///     SystemMainThread  SystemArrayComponent  SystemArrayFilter  SystemSignalsOnly  SystemThreadedFilter
+    ///            |
+    ///  SystemMainThreadFilter
     /// </summary>
     public static List<SystemBase> CreateSystems(SystemsConfig config) {
       Assert.Always(config != null, "SystemsConfig is invalid.");
@@ -146,81 +145,76 @@ namespace Quantum {
       Assert.Always(type.IsAbstract == false, "Cannot create abstract SystemType {0}", type);
       Assert.Always(typeof(RequiredBaseType).IsAssignableFrom(type), "System type {0} must be derived from {1}", type, typeof(RequiredBaseType).Name);
 
-      var result = default(SystemBase);
       var childrenEntries = entry.GetChildren();
-
-      if (typeof(SystemGroup).IsAssignableFrom(type)) {
-        Assert.Always(childrenEntries != null, "SystemType {0} is derived from SystemGroup and requires the Children parameter to be not null.", type);; 
-        var children = new List<SystemBase>(childrenEntries.Count);
-        for (int i = 0; i < childrenEntries.Count; i++) {
-          children.Add(CreateSystems<SystemBase>(childrenEntries[i]) as SystemBase);
-        }
-        result = Create(type, entry.SystemName, children.ToArray());
-      } else if (typeof(SystemMainThreadGroup).IsAssignableFrom(type) ) {
-        Assert.Always(childrenEntries != null, "SystemType {0} is derived from SystemMainThreadGroup and requires the Children parameter to be not null.", type); ;
-        var children = new List<SystemMainThread>(childrenEntries.Count);
-        for (int i = 0; i < childrenEntries.Count; i++) {
-          children.Add(CreateSystems<SystemMainThread>(childrenEntries[i]) as SystemMainThread);
-        }
-        result = Create(type, entry.SystemName, children.ToArray());
-      } else {
-        result = Create<SystemBase>(type, entry.SystemName, null);
+      var children = new List<SystemBase>(childrenEntries.Count);
+      for (int i = 0; i < childrenEntries.Count; i++) {
+        children.Add(CreateSystems<SystemBase>(childrenEntries[i]) as SystemBase);
       }
 
+      var result = Create(type, children.ToArray());
       result.StartEnabled = !entry.StartDisabled;
       return result;
     }
 
-    private static SystemBase Create<ChildrenType>(Type type, string name, ChildrenType[] children) where ChildrenType : SystemBase{
-      // Conventions are: (), (name), (name, children)
-      if (string.IsNullOrEmpty(name) == false && children != null) {
-        Assert.Always(type.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, new Type[] { typeof(string), typeof(ChildrenType[]) }, null) != null, 
-          "SystemType {0} does not have the constructor for (string, {1}).", type, typeof(ChildrenType));
-        return Activator.CreateInstance(type, name, children) as SystemBase;
+    private static SystemBase Create<ChildrenType>(Type type, ChildrenType[] children) where ChildrenType : SystemBase {
+      var result = default(SystemBase);
+
+      // Conventions and priority are: (children), [Obsolete](name, children), [Obsolete](name), ()
+      var constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, new Type[] { typeof(ChildrenType[]) }, null);
+      if (constructor != null && constructor.GetCustomAttribute<ObsoleteAttribute>() == null) {
+        result = Activator.CreateInstance(type, children) as SystemBase;
+      } else {
+        constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, new Type[] { typeof(string), typeof(ChildrenType[]) }, null);
+        if (constructor != null && constructor.GetCustomAttribute<ObsoleteAttribute>() == null) {
+          result = Activator.CreateInstance(type, null, children) as SystemBase;
+        } else {
+          constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, new Type[] { typeof(string) }, null);
+          if (constructor != null && constructor.GetCustomAttribute<ObsoleteAttribute>() == null) {
+            result = Activator.CreateInstance(type, null) as SystemBase;
+          } else {
+            Assert.Always(type.GetConstructor(Type.EmptyTypes) != null, "SystemType {0} does not have a default constructor", type);
+            result = Activator.CreateInstance(type) as SystemBase;
+          }
+        }
       }
-      else if (string.IsNullOrEmpty(name) == false){
-        Assert.Always(type.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, new Type[] { typeof(string) }, null) != null,
-          "SystemType {0} does not have the constructor for (string).", type);
-        return Activator.CreateInstance(type, name) as SystemBase;
+
+      // If derived systems do not have the constructor convention, still try to set children.
+      if (result != null) {
+        if (children != null && children.Length > 0 && result.ChildSystems.Count() == 0) {
+          result.ChildSystems = children;
+        }
       }
-      else {
-        Assert.Always(type.GetConstructor(Type.EmptyTypes) != null,
-          "SystemType {0} does not have a default constructor", type);
-        return Activator.CreateInstance(type) as SystemBase;
-      }
+
+      return result;
     }
 
     /// <summary>
     /// Add a system entry that describes a system to be instantiated on simulation start.
     /// </summary>
-    /// <typeparam name="T">System type</typeparam>
-    /// <param name="name">System name</param>
     /// <param name="enabled">System starts enabled</param>
     /// <returns>System entry that was added to the config</returns>
-    public SystemEntry AddSystem<T>(string name = null, bool enabled = true) where T : SystemBase {
-      return AddSystem(typeof(T), name, enabled);
+    public SystemEntry AddSystem<T>(bool enabled = true) where T : SystemBase {
+      return AddSystem(typeof(T), enabled);
     }
 
     /// <summary>
     /// Add a system entry that describes a system to be instantiated on simulation start.
     /// </summary>
     /// <param name="systemType">System type</param>
-    /// <param name="name">System name</param>
     /// <param name="enabled">System starts enabled</param>
     /// <returns>System entry that was added to the config</returns>
     /// <exception cref="ArgumentNullException">Is raised of the systemType is null</exception>
-    public SystemEntry AddSystem(Type systemType, string name = null, bool enabled = true) {
+    public SystemEntry AddSystem(Type systemType, bool enabled = true) {
       if (systemType == null) throw new ArgumentNullException(nameof(systemType));
-      
+
       var entry = new SystemEntry() {
         SystemType = systemType,
         StartDisabled = !enabled,
-        SystemName = name
       };
       Entries.Add(entry);
       return entry;
     }
-    
+
 #if QUANTUM_UNITY
     /// <summary>
     /// Unity Reset() event will add all Quantum core default systems to the asset.

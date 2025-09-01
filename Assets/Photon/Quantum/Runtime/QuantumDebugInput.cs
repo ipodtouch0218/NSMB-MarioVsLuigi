@@ -16,6 +16,14 @@ namespace Quantum {
     /// </summary>
     /// <param name="callback"></param>
     public void PollInput(CallbackPollInput callback) {
+#if DEBUG
+      if (callback.IsInputSet) {
+        Debug.LogWarning($"{nameof(QuantumDebugInput)}.{nameof(PollInput)}: Input was already set by another user script, unsubscribing from the poll input callback. Please delete this component.", this);
+        QuantumCallback.UnsubscribeListener(this);
+        return;
+      }
+#endif
+
       Quantum.Input i = new Quantum.Input();
       callback.SetInput(i, DeterministicInputFlags.Repeatable);
     }

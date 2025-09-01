@@ -31,6 +31,11 @@
             "name": "com.unity.modules.physics2d",
             "expression": "1.0",
             "define": "QUANTUM_ENABLE_PHYSICS2D"
+        },
+        {
+            "name": "Unity",
+            "expression": "2021",
+            "define": "QUANTUM_UNITY_SIMULATION"
         }
     ],
     "noEngineReferences": false

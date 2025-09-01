@@ -78,6 +78,11 @@
             "name": "com.unity.inputsystem",
             "expression": "1.0",
             "define": "QUANTUM_ENABLE_INPUTSYSTEM"
+        },
+        {
+            "name": "com.photonengine.quantum",
+            "expression": "1.0",
+            "define": "QUANTUM_UPM"
         }
     ],
     "noEngineReferences": false

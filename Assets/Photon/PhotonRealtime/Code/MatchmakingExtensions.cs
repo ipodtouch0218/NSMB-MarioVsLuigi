@@ -23,28 +23,7 @@ namespace Photon.Realtime
     public static class MatchmakingExtensions
     {
         /// <summary>
-        /// Is raised by the matchmaking extension methods operations failed.
-        /// </summary>
-        public class Exception : System.Exception
-        {
-            /// <summary>
-            /// Create a new exception with a message and error code.
-            /// </summary>
-            /// <param name="message">Debug message.</param>
-            /// <param name="errorCode">Error code.</param>
-            public Exception(string message, short errorCode) : base(message)
-            {
-                ErrorCode = errorCode;
-            }
-
-            /// <summary>
-            /// Photon error code <see cref="Realtime.ErrorCode"/>
-            /// </summary>
-            public short ErrorCode { get; set; }
-        }
-
-        /// <summary>
-        /// Run the Photon connection logic to connect to a game server and enter a room. 
+        /// Run the Photon connection logic to connect to a game server and enter a room.
         /// This method only returns after successfully entered a room.
         /// This method throws an exception on any errors.
         /// </summary>
@@ -52,7 +31,6 @@ namespace Photon.Realtime
         /// <param name="arguments">Photon matchmaking arguments.</param>
         /// <returns>Client connection object that is connected to a Photon room</returns>
         /// <exception cref="ArgumentException">Arguments were incomplete.</exception>
-        /// <exception cref="MatchmakingExtensions.Exception">Connection failed.</exception>
         /// <exception cref="DisconnectException">Is thrown when the connection terminated.</exception>
         /// <exception cref="AuthenticationFailedException">Is thrown when the authentication failed.</exception>
         /// <exception cref="OperationStartException">Is thrown when the operation could not be started.</exception>
@@ -79,14 +57,23 @@ namespace Photon.Realtime
             return asyncConfig.TaskFactory.StartNew(async () =>
             {
                 client = client ?? arguments.NetworkClient ?? new RealtimeClient();
-                var isRandom = arguments.RoomName == null;
+                var isRandom = string.IsNullOrEmpty(arguments.RoomName);
                 var canCreate = arguments.CanOnlyJoin == false;
 
-                if (arguments.AuthValues != null) {
-                    client.AuthValues = arguments.AuthValues.CopyTo(new AuthenticationValues());
+
+                if (client.IsConnected == false)
+                {
+                    // if entirely offline, auth values and CRC can be set
+                    if (arguments.AuthValues != null)
+                    {
+                        client.AuthValues = arguments.AuthValues.CopyTo(new AuthenticationValues());
+                    }
+
+                    client.RealtimePeer.CrcEnabled = arguments.EnableCrc;
                 }
 
                 await client.ConnectUsingSettingsAsync(arguments.PhotonSettings, asyncConfig);
+
 
                 short result = 0;
                 if (isRandom)
@@ -94,14 +81,14 @@ namespace Photon.Realtime
                     if (canCreate)
                     {
                         result = await client.JoinRandomOrCreateRoomAsync(
-                            arguments.BuildJoinRandomRoomArgs(), 
+                            arguments.BuildJoinRandomRoomArgs(),
                             arguments.BuildEnterRoomArgs(),
                             config: asyncConfig);
                     }
                     else
                     {
                         result = await client.JoinRandomRoomAsync(
-                            arguments.BuildJoinRandomRoomArgs(), 
+                            arguments.BuildJoinRandomRoomArgs(),
                             config: asyncConfig);
                     }
                 }
@@ -130,12 +117,12 @@ namespace Photon.Realtime
                     return client;
                 }
 
-                throw new Exception($"Failed to connect and join with error '{result}'", result);
+                throw new OperationException(result, $"Failed to connect and join with error '{result}'");
             }).Unwrap();
         }
 
         /// <summary>
-        /// Run different Photon reconnection logic to reconnect to a game server and re-enter a room. 
+        /// Run different Photon reconnection logic to reconnect to a game server and re-enter a room.
         /// Requires <see cref="MatchmakingReconnectInformation"/> to be initialized.
         /// Different reconnection strategies are applied to rejoin a room. Also works after an app restart if the ReconnectInformation is correctly set up.
         /// This method only returns after successfully re-entered the room.
@@ -145,7 +132,6 @@ namespace Photon.Realtime
         /// <param name="arguments">Photon matchmaking arguments.</param>
         /// <returns>Client connection object that is connected to a Photon room</returns>
         /// <exception cref="ArgumentException">Arguments were incomplete, reconnection information not set or invalid.</exception>
-        /// <exception cref="MatchmakingExtensions.Exception">Reconnection failed.</exception>
         /// <exception cref="DisconnectException">Is thrown when the connection terminated.</exception>
         /// <exception cref="AuthenticationFailedException">Is thrown when the authentication failed.</exception>
         /// <exception cref="OperationStartException">Is thrown when the operation could not be started.</exception>
@@ -189,6 +175,7 @@ namespace Photon.Realtime
 
             Log.Info($"Reconnecting to room {arguments.ReconnectInformation.Room}");
 
+
             var asyncConfig = arguments.AsyncConfig ?? AsyncConfig.Global;
             var cancelToken = asyncConfig.CancellationToken;
 
@@ -196,37 +183,64 @@ namespace Photon.Realtime
             {
                 client = (client ?? arguments.NetworkClient) ?? new RealtimeClient();
 
-                if (client.State == ClientState.PeerCreated)
+
+                // result for the OpReconnectAndRejoin / OpReJoin. compare to related ErrorCode values
+                short? result = null;
+
+                // Try to fast reconnect only if ClientTTL is > 0
+                if (arguments.CanRejoin && arguments.FastReconnectDisabled == false)
+                { 
+                    // attempt a ReconnectAndRejoin() first (this may throw an exception if the reconnect values are not available but that is to be expected)
+                    try
+                    {
+                        result = await client.ReconnectAndRejoinAsync(ticket: arguments.Ticket, config: asyncConfig);
+
+                        if (result.HasValue && result.Value == ErrorCode.Ok)
+                        {
+                            // successfully used ReconnectAndRejoin()
+                            // update ReconnectInfo and return client
+                            arguments.ReconnectInformation?.Set(client);
+                            return client;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // could be for a number of reasons. this is a normal case at runtime and we could just go on with the code below. just log
+                        Log.Info($"Direct reconnect via ReconnectAndRejoinAsync() failed (Message: {ex}). Attempting a normal connect and rejoin.", client.LogLevel, client.LogPrefix);
+                    }
+                }
+
+                // We expect the connection to either be offline or connected to Master or Lobby
+                if (client.IsConnected && (client.State != ClientState.ConnectedToMasterServer || client.State == ClientState.JoinedLobby)) {
+                    // Wait for disconnect
+                    await client.DisconnectAsync(asyncConfig);
+                }
+
+                // the following code tries to get the client into the expected room anyway
+                // try to connect and re-join or join the room (last resort: as new actor)
+
+                if (client.IsConnected == false)
                 {
-                    // New client object cannot ReconnectAndRejoin()
-                    // TODO: there is a risk of a different master (rotation, cloud).
+                    // if entirely offline, auth values and CRC can be set
+                    if (arguments.AuthValues != null)
+                    {
+                        client.AuthValues = arguments.AuthValues.CopyTo(new AuthenticationValues());
+                    }
+
+                    client.RealtimePeer.CrcEnabled = arguments.EnableCrc;
                     arguments.PhotonSettings.FixedRegion = arguments.ReconnectInformation.Region;
-                    client.AuthValues = new AuthenticationValues { UserId = arguments.ReconnectInformation.UserId };
+
+                    
+                    // if this fails, the async task fails. this is mandatory, so exceptions have to be handled where the result is needed.
                     await client.ConnectUsingSettingsAsync(arguments.PhotonSettings, asyncConfig);
                 }
 
-                short? result = null;
-                var canRejoin = arguments.CanRejoin;
 
-                // ConnectedToMasterServer would mean we could skip this and continue with joining the room 
-                if (client.State != ClientState.ConnectedToMasterServer)
-                {
-                    await client.DisconnectAsync(asyncConfig);
-                    if (canRejoin)
-                    {
-                        // If PlayerTtlInSeconds > 0 try to use fast reconnect: ReconnectAndRejoinAsync
-                        result = await client.ReconnectAndRejoinAsync(throwOnError: false, config: asyncConfig);
-                    }
-                    else
-                    {
-                        // Otherwise try to reconnect to master server
-                        await client.ReconnectToMasterAsync(asyncConfig);
-                    }
-                }
-
-#if UNITY_WEBGL
+                #if UNITY_WEBGL
                 var sw = new Stopwatch();
-#endif
+                #endif
+
+                var canRejoin = arguments.CanRejoin;
                 var joinIterations = 0;
                 while (joinIterations++ < 10)
                 {
@@ -245,33 +259,32 @@ namespace Photon.Realtime
                         {
                             // This will happen when the client created a new connection and the corresponding actor is still marked active in the room (10 second timeout).
                             // TODO: do we get same actor (playerTTL > 0)
-#if UNITY_WEBGL
+                            #if UNITY_WEBGL
                             sw.Restart();
                             while (cancelToken.IsCancellationRequested == false && sw.ElapsedMilliseconds < 1000)
                             {
                                 // Task.Delay() requires threading which is not supported on WebGL. Using this yield seems to be the simplest workaround.
                                 await Task.Yield();
                             }
-#else
+                            #else
                             await Task.Delay(1000, cancelToken);
-#endif
-
+                            #endif
                         }
                         else if (result.Value == ErrorCode.JoinFailedWithRejoinerNotFound)
                         {
-                            // We tried to rejoin but there is not inactive actor in the room, try joining instead.
+                            // We tried to rejoin but there is no inactive actor in the room, try joining instead.
                             canRejoin = false;
                         }
                         else
                         {
                             // Error
-                            throw new Exception($"Failed to join the room with error '{result}'", result.Value);
+                            throw new OperationException(result.Value, $"Failed to join the room with error '{result}'");
                         }
                     }
 
                     if (joinIterations > 1)
                     {
-                        Log.Info($"Reconnection attempt ({joinIterations}/10)");
+                        Log.Info($"Reconnection attempt ({joinIterations}/10)", client.LogLevel, client.LogPrefix);
                     }
 
                     if (cancelToken.IsCancellationRequested)
@@ -281,10 +294,7 @@ namespace Photon.Realtime
 
                     if (canRejoin)
                     {
-                        result = await client.RejoinRoomAsync(arguments.ReconnectInformation.Room,
-                            ticket: arguments.Ticket, 
-                            throwOnError: false, 
-                            config: asyncConfig);
+                        result = await client.RejoinRoomAsync(arguments.ReconnectInformation.Room, ticket: arguments.Ticket, throwOnError: false, config: asyncConfig);
                     }
                     else
                     {
@@ -315,11 +325,11 @@ namespace Photon.Realtime
                 Lobby = arguments.Lobby,
                 Ticket = arguments.Ticket,
                 ExpectedUsers = arguments.ExpectedUsers,
-                RoomOptions = new RoomOptions()
+                RoomOptions = arguments.CustomRoomOptions ?? new RoomOptions()
                 {
                     MaxPlayers = (byte)arguments.MaxPlayers,
-                    IsOpen = true,
-                    IsVisible = true,
+                    IsOpen = arguments.IsRoomOpen.HasValue ? arguments.IsRoomOpen.Value : true,
+                    IsVisible = arguments.IsRoomVisible.HasValue ? arguments.IsRoomVisible.Value : true,
                     DeleteNullProperties = true,
                     PlayerTtl = arguments.PlayerTtlInSeconds * 1000,
                     EmptyRoomTtl = arguments.EmptyRoomTtlInSeconds * 1000,
@@ -384,7 +394,7 @@ namespace Photon.Realtime
         /// </summary>
         public string RoomName;
         /// <summary>
-        /// Max clients for the Photon room. 0 = unlimited. 
+        /// Max clients for the Photon room. 0 = unlimited.
         /// Set on <see cref="JoinRandomRoomArgs.ExpectedMaxPlayers"/> and <see cref="EnterRoomArgs.RoomOptions"/>.MaxPlayers."/>
         /// </summary>
         public int MaxPlayers;
@@ -405,7 +415,7 @@ namespace Photon.Realtime
         /// </summary>
         public AuthenticationValues AuthValues;
         /// <summary>
-        /// Photon server plugin to connect to. 
+        /// Photon server plugin to connect to.
         /// </summary>
         public string PluginName;
         /// <summary>
@@ -413,7 +423,7 @@ namespace Photon.Realtime
         /// </summary>
         public MatchmakingReconnectInformation ReconnectInformation;
         /// <summary>
-        /// Custom room properties. 
+        /// Custom room properties.
         /// Set on <see cref="EnterRoomArgs.RoomOptions"/> and <see cref="JoinRandomRoomArgs.ExpectedCustomRoomProperties"/>
         /// </summary>
         public PhotonHashtable CustomProperties;
@@ -446,6 +456,28 @@ namespace Photon.Realtime
         /// Set on <see cref="JoinRandomRoomArgs.MatchingType"/>
         /// </summary>
         public MatchmakingMode RandomMatchingType;
+        /// <summary>
+        /// Optionally set explicit room options to use for <see cref="EnterRoomArgs.RoomOptions"/>.
+        /// No properties will be set internally when this is set (see BuildEnterRoomArgs).
+        /// </summary>
+        public RoomOptions CustomRoomOptions;
+        /// <summary>
+        /// Optionally set an explicit initial <see cref="RoomOptions.IsVisible"/> value. Default is <see langword="true"/>
+        /// </summary>
+        public bool? IsRoomVisible;
+        /// <summary>
+        /// Optionally set an explicit initial <see cref="RoomOptions.IsOpen"/> value. Default is <see langword="true"/>
+        /// </summary>
+        public bool? IsRoomOpen;
+        /// <summary>
+        /// Enable CRC for Photon networking to detect corrupted packages.
+        /// Building the checksum with <see cref="PhotonPeer.CrcEnabled"/> has a low processing overhead but increases integrity of sent and received data.
+        /// </summary>
+        public bool EnableCrc;
+        /// <summary>
+        /// Disables fast reconnecting to the Photon server to initially run <see cref="RealtimeClient.ReconnectAndRejoin"/> when the interruption is less then 10 second.
+        /// </summary>
+        public bool FastReconnectDisabled;
 
         /// <summary>
         /// Creates authentication values object in field <see cref="AuthValues"/> and sets the <see cref="AuthenticationValues.UserId"/>.
@@ -532,7 +564,7 @@ namespace Photon.Realtime
 #endif
 
     /// <summary>
-    /// Reconnection information storage. 
+    /// Reconnection information storage.
     /// Internally runs <see cref="Set(RealtimeClient, TimeSpan)"/> during <see cref="MatchmakingExtensions.ConnectToRoomAsync(RealtimeClient, MatchmakingArguments)"/>.
     /// </summary>
     [Serializable]

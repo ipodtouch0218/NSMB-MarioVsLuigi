@@ -45,7 +45,7 @@ namespace NSMB.Cameras {
         public override void Start() {
             base.Start();
             QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
-            stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindFirstObjectByType<QuantumMapData>().Asset.UserAsset);
+            stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindFirstObjectByType<QuantumMapData>().GetAsset(false).UserAsset);
 
             Settings.Controls.Replay.Reset.performed += OnReset;
             OnScreenshake += OnScreenshakeCallback;

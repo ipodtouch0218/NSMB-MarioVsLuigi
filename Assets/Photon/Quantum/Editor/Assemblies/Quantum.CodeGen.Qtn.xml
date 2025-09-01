@@ -115,6 +115,11 @@
  Represents the kind of generated files.
  </summary>
 </member>
+<member name="F:Quantum.CodeGen.GeneratorOptions.MaxLinesPerFile@">
+ <summary>
+ Max lines per output file. If a file is estimated to go above that limit, it will be split.
+ </summary>
+</member>
 <member name="F:Quantum.CodeGen.GeneratorOptions.FileNamePrefix@">
  <summary>Prefix for the generated file names. Default is "Quantum".</summary>
 </member>
@@ -200,6 +205,11 @@
  New line characters. If <see langword="null"/>, the default new line characters for the current environment are used.
  </summary>
 </member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.MaxLinesPerFile(System.Int32)">
+ <summary>
+ Max lines per output file. If a file is estimated to go above that limit, it will be split.
+ </summary>
+</member>
 <member name="P:Quantum.CodeGen.GeneratorOptions.LibName(System.String)">
  <summary>
  If not <see langword="null"/> or empty, runs code generator in "Lib mode":
@@ -258,6 +268,11 @@
 <member name="P:Quantum.CodeGen.GeneratorOptions.NewLine">
  <summary>
  New line characters. If <see langword="null"/>, the default new line characters for the current environment are used.
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.MaxLinesPerFile">
+ <summary>
+ Max lines per output file. If a file is estimated to go above that limit, it will be split.
  </summary>
 </member>
 <member name="P:Quantum.CodeGen.GeneratorOptions.LibName">

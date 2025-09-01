@@ -142,39 +142,44 @@ namespace Photon.Realtime
         }
 
 
+        private static readonly StringBuilder prefixesBuilder = new StringBuilder();
+
         /// <summary>Prefixes the message with timestamp, log level and prefix.</summary>
         static string ApplyPrefixes(string msg, LogLevel lvl = LogLevel.Error, string prefix = null)
         {
-            StringBuilder sb = new StringBuilder();
-
-            if (LogPrefix == PrefixOptions.Time || LogPrefix == PrefixOptions.TimeAndLevel)
+            lock (prefixesBuilder)
             {
-                //sb.Append($"[{GetFormattedTimestamp()}]");
-                TimeSpan span = sw.Elapsed;
-                if (span.Minutes > 0)
+                prefixesBuilder.Clear();
+                if (LogPrefix == PrefixOptions.Time || LogPrefix == PrefixOptions.TimeAndLevel)
                 {
-                    sb.Append($"[{span.Minutes}:{span.Seconds:D2}.{span.Milliseconds:D3}]");
+                    //sb.Append($"[{GetFormattedTimestamp()}]");
+                    TimeSpan span = sw.Elapsed;
+                    if (span.Minutes > 0)
+                    {
+                        prefixesBuilder.Append($"[{span.Minutes}:{span.Seconds:D2}.{span.Milliseconds:D3}]");
+                    }
+                    else
+                        prefixesBuilder.Append($"[{span.Seconds:D2}.{span.Milliseconds:D3}]");
+
                 }
-                else
-                    sb.Append($"[{span.Seconds:D2}.{span.Milliseconds:D3}]");
 
-            }
-            if (LogPrefix == PrefixOptions.Level || LogPrefix == PrefixOptions.TimeAndLevel)
-            {
-                sb.Append($"[{lvl}]");
-            }
+                if (LogPrefix == PrefixOptions.Level || LogPrefix == PrefixOptions.TimeAndLevel)
+                {
+                    prefixesBuilder.Append($"[{lvl}]");
+                }
 
-            if (!string.IsNullOrEmpty(prefix))
-            {
-                sb.Append($"{prefix}: ");
-            }
-            else if (sb.Length > 0)
-            {
-                sb.Append(" ");
-            }
+                if (!string.IsNullOrEmpty(prefix))
+                {
+                    prefixesBuilder.Append($"{prefix}: ");
+                }
+                else if (prefixesBuilder.Length > 0)
+                {
+                    prefixesBuilder.Append(" ");
+                }
 
-            sb.Append(msg);
-            return sb.ToString();
+                prefixesBuilder.Append(msg);
+                return prefixesBuilder.ToString();
+            }
         }
 
 

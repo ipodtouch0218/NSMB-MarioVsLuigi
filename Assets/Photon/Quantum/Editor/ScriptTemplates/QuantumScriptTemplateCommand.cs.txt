@@ -1,0 +1,11 @@
+namespace Quantum
+{
+    using Photon.Deterministic;
+
+    public class #SCRIPTNAME# : DeterministicCommand
+    {
+        public override void Serialize(BitStream stream) 
+        {
+        }
+    }
+}

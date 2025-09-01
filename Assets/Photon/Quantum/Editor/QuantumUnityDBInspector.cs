@@ -91,7 +91,7 @@ namespace Quantum.Editor {
         }
       }
 
-      public string Name => TargetObject?.name ?? "";
+      public string Name => (TargetObject != null ? TargetObject.name : null) ?? "";
       public string QuantumPath => Entry?.Path ?? "";
       public string AssetType => Entry?.Source.AssetType?.Name ?? "";
       public AssetObjectState LoadState => Entry != null ? QuantumUnityDB.GetGlobalAssetState(QuantumGuid) : AssetObjectState.NotFound;

@@ -291,7 +291,7 @@ namespace Quantum.Profiling {
   /// The base class for all Quantum graph profilers.
   /// </summary>
   /// <typeparam name="TGraph">Type of graph <see cref="QuantumGraphSeries"/></typeparam>
-  public abstract class QuantumGraphProfiler<TGraph> : MonoBehaviour where TGraph : QuantumGraphSeries {
+  public abstract class QuantumGraphProfiler<TGraph> : QuantumMonoBehaviour where TGraph : QuantumGraphSeries {
     /// <summary>
     /// The graph object.
     /// </summary>
@@ -612,7 +612,7 @@ namespace Quantum.Profiling {
   /// <summary>
   /// A graph series is the base class to render graphs in Unity.
   /// </summary>
-  public abstract class QuantumGraphSeries : MonoBehaviour {
+  public abstract class QuantumGraphSeries : QuantumMonoBehaviour {
     private const string SHADER_PROPERTY_VALUES = "_Values";
     private const string SHADER_PROPERTY_SAMPLES = "_Samples";
 

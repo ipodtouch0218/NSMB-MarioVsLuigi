@@ -47,6 +47,11 @@ namespace Quantum {
     /// </summary>
     protected virtual bool UpdateVerticesFromSourceOnBake => true;
 
+    private void OnValidate() {
+      Height = FPMath.Clamp(Height, 0, Height);
+      UpdateFromSourceCollider();
+    }
+
     /// <summary>
     /// Copy collider configuration from source collider if exist. 
     /// </summary>

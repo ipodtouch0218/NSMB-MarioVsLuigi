@@ -14,34 +14,15 @@
 namespace Photon.Client
 {
     using System;
-    using System.Collections;
-    using UnityEngine;
+
+    #if UNITY_2019_3_OR_NEWER
     using UnityEngine.Scripting;
-    using SupportClassPun = SupportClass;
-
-
-    /// <summary>
-    /// Yield Instruction to Wait for real seconds. Very important to keep connection working if Time.TimeScale is altered, we still want accurate network events
-    /// </summary>
-    public sealed class WaitForRealSeconds : CustomYieldInstruction
-    {
-        private readonly float _endTime;
-
-        public override bool keepWaiting
-        {
-            get { return this._endTime > Time.realtimeSinceStartup; }
-        }
-
-        public WaitForRealSeconds(float seconds)
-        {
-            this._endTime = Time.realtimeSinceStartup + seconds;
-        }
-    }
-
+    #endif
 
     /// <summary>
-    /// Internal class to encapsulate the network i/o functionality for the realtime libary.
+    /// Internal class to encapsulate the network i/o functionality for the realtime library.
     /// </summary>
+    [Preserve]
     public class SocketWebTcp : PhotonSocket, IDisposable
     {
         private WebSocket sock;
@@ -55,10 +36,9 @@ namespace Photon.Client
             this.ProxyServerAddress = npeer.ProxyServerAddress;
             if (this.ReportDebugOfLevel(LogLevel.Info))
             {
-                this.Listener.DebugReturn(LogLevel.Info, "new SocketWebTcp() for Unity. Server: " + this.ServerAddress + (String.IsNullOrEmpty(this.ProxyServerAddress) ? "" : ", Proxy: " + this.ProxyServerAddress));
+                this.Listener.DebugReturn(LogLevel.Info, "SocketWebTcp() "+ WebSocket.Implementation+". Server: " + this.ServerAddress + (String.IsNullOrEmpty(this.ProxyServerAddress) ? "" : ", Proxy: " + this.ProxyServerAddress));
             }
 
-            //this.Protocol = ConnectionProtocol.WebSocket;
             this.PollReceive = false;
         }
 
@@ -85,33 +65,16 @@ namespace Photon.Client
             this.State = PhotonSocketState.Disconnected;
         }
 
-        GameObject websocketConnectionObject;
 
         public override bool Connect()
         {
-            //bool baseOk = base.Connect();
-            //if (!baseOk)
-            //{
-            //    return false;
-            //}
-
-
             this.State = PhotonSocketState.Connecting;
 
 
-            if (this.websocketConnectionObject != null)
+            if (!this.ConnectAddress.Contains("IPv6"))
             {
-                UnityEngine.Object.Destroy(this.websocketConnectionObject);
+                this.ConnectAddress += "&IPv6"; // this makes the Photon Server return a host name for the next server (NS points to MS and MS points to GS)
             }
-
-            this.websocketConnectionObject = new GameObject("websocketConnectionObject");
-            MonoBehaviour mb = this.websocketConnectionObject.AddComponent<MonoBehaviourExt>();
-            this.websocketConnectionObject.hideFlags = HideFlags.HideInHierarchy;
-            UnityEngine.Object.DontDestroyOnLoad(this.websocketConnectionObject);
-
-
-            this.ConnectAddress += "&IPv6"; // this makes the Photon Server return a host name for the next server (NS points to MS and MS points to GS)
-
 
             // earlier, we read the proxy address/scheme and failed to connect entirely, if that wasn't successful...
             // it was either successful (using the resulting proxy address) or no connect at all...
@@ -129,7 +92,7 @@ namespace Photon.Client
 
             try
             {
-                this.sock = new WebSocket(new Uri(this.ConnectAddress), proxyServerAddress, this.SerializationProtocol);
+                this.sock = new WebSocket(new Uri(this.ConnectAddress), proxyServerAddress, this.OpenCallback, this.ReceiveCallback, this.ErrorCallback, this.CloseCallback, this.SerializationProtocol);
                 this.sock.DebugReturn = (LogLevel l, string s) =>
                                         {
                                             if (this.State != PhotonSocketState.Disconnected)
@@ -139,14 +102,47 @@ namespace Photon.Client
                                         };
 
                 this.sock.Connect();
-                mb.StartCoroutine(this.ReceiveLoop());
-
                 return true;
             }
             catch (Exception e)
             {
                 this.Listener.DebugReturn(LogLevel.Error, "SocketWebTcp.Connect() caught exception: " + e);
                 return false;
+            }
+        }
+
+        private void CloseCallback(int code, string reason)
+        {
+            if (this.State == PhotonSocketState.Connecting)
+            {
+                this.HandleException(StatusCode.ExceptionOnConnect); // sets state to Disconnecting
+                return;
+            }
+
+            // passing-on close only if this socket is still used / expected to be connected
+            if (this.State != PhotonSocketState.Disconnecting && this.State != PhotonSocketState.Disconnected)
+            {
+                this.Listener.DebugReturn(LogLevel.Error, "SocketWebTcp.CloseCallback(). Going to disconnect. Server: " + this.ServerAddress + " Error: " + code + " Reason: " + reason);
+                this.HandleException(StatusCode.DisconnectByServerReasonUnknown); // sets state to Disconnecting
+            }
+        }
+
+        // code can be from JsLib or WebSocket-Sharp, so it is not guaranteed to be the same in both cases
+        private void ErrorCallback(int code, string message)
+        {
+            // passing-on errors only if this socket is still used / expected to be connected
+            if (this.State != PhotonSocketState.Disconnecting && this.State != PhotonSocketState.Disconnected)
+            {
+                this.Listener.DebugReturn(LogLevel.Error, "SocketWebTcp.ErrorCallback(). Going to disconnect. Server: " + this.ServerAddress + " Error: " + code + " Message: " + message);
+                this.HandleException(this.State != PhotonSocketState.Connected ? StatusCode.ExceptionOnConnect : StatusCode.ExceptionOnReceive); // sets state to Disconnecting
+            }
+        }
+
+        private void OpenCallback()
+        {
+            if (State == PhotonSocketState.Connecting)
+            {
+                this.State = PhotonSocketState.Connected;
             }
         }
 
@@ -255,7 +251,6 @@ namespace Photon.Client
         }
 
 
-
         public override bool Disconnect()
         {
             if (this.ReportDebugOfLevel(LogLevel.Info))
@@ -282,18 +277,11 @@ namespace Photon.Client
                 }
             }
 
-            if (this.websocketConnectionObject != null)
-            {
-                UnityEngine.Object.Destroy(this.websocketConnectionObject);
-            }
-
             this.State = PhotonSocketState.Disconnected;
             return true;
         }
 
-        /// <summary>
-        /// used by TPeer*
-        /// </summary>
+        /// <summary>Used by TPeer</summary>
         public override PhotonSocketError Send(byte[] data, int length)
         {
             if (this.State != PhotonSocketState.Connected)
@@ -309,11 +297,6 @@ namespace Photon.Client
                     Buffer.BlockCopy(data, 0, trimmedData, 0, length);
                     data = trimmedData;
                 }
-
-                //if (this.ReportDebugOfLevel(LogLevel.ALL))
-                //{
-                //    this.Listener.DebugReturn(LogLevel.ALL, "Sending: " + SupportClassPun.ByteArrayToString(data));
-                //}
 
                 if (this.sock != null)
                 {
@@ -331,105 +314,39 @@ namespace Photon.Client
             return PhotonSocketError.Success;
         }
 
+
         public override PhotonSocketError Receive(out byte[] data)
         {
             data = null;
             return PhotonSocketError.NoData;
         }
 
-
-        internal const int ALL_HEADER_BYTES = 9;
-        internal const int TCP_HEADER_BYTES = 7;
-        internal const int MSG_HEADER_BYTES = 2;
-
-        public IEnumerator ReceiveLoop()
+        public void ReceiveCallback(byte[] buf, int len)
         {
-            //this.Listener.DebugReturn(LogLevel.Info, "ReceiveLoop()");
-            if (this.sock != null)
+            // once the websocket is disconnecting / disconnected, it should not receive anything anymore
+            if (State == PhotonSocketState.Disconnecting || State == PhotonSocketState.Disconnected)
             {
-                while (this.sock != null && !this.sock.Connected && this.sock.Error == null)
-                {
-                    yield return new WaitForRealSeconds(0.1f);
-                }
-
-                if (this.sock != null)
-                {
-                    if (this.sock.Error != null)
-                    {
-                        this.Listener.DebugReturn(LogLevel.Error, "Exiting receive thread. Server: " + this.ServerAddress + " Error: " + this.sock.Error);
-                        this.HandleException(StatusCode.ExceptionOnConnect);
-                    }
-                    else
-                    {
-                        // connected
-                        if (this.ReportDebugOfLevel(LogLevel.Debug))
-                        {
-                            this.Listener.DebugReturn(LogLevel.Debug, "Receiving by websocket. this.State: " + this.State);
-                        }
-
-                        this.State = PhotonSocketState.Connected;
-                        //this.peerBase.OnConnect();
-
-                        while (this.State == PhotonSocketState.Connected)
-                        {
-                            if (this.sock != null)
-                            {
-                                if (this.sock.Error != null)
-                                {
-                                    this.Listener.DebugReturn(LogLevel.Error, "Exiting receive thread (inside loop). Server: " + this.ServerAddress + " Error: " + this.sock.Error);
-                                    this.HandleException(StatusCode.ExceptionOnReceive);
-                                    break;
-                                }
-                                else
-                                {
-                                    byte[] inBuff = this.sock.Recv();
-                                    if (inBuff == null || inBuff.Length == 0)
-                                    {
-                                        // nothing received. wait a bit, try again
-                                        yield return new WaitForRealSeconds(0.02f);
-                                        continue;
-                                    }
-
-                                    //if (this.ReportDebugOfLevel(LogLevel.ALL))
-                                    //{
-                                    //    this.Listener.DebugReturn(LogLevel.ALL, "TCP << " + inBuff.Length + " = " + SupportClassPun.ByteArrayToString(inBuff));
-                                    //}
-
-                                    if (inBuff.Length > 0)
-                                    {
-                                        try
-                                        {
-                                            this.HandleReceivedDatagram(inBuff, inBuff.Length, false);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            if (this.State != PhotonSocketState.Disconnecting && this.State != PhotonSocketState.Disconnected)
-                                            {
-                                                if (this.ReportDebugOfLevel(LogLevel.Error))
-                                                {
-                                                    this.EnqueueDebugReturn(LogLevel.Error, "Receive issue. State: " + this.State + ". Server: '" + this.ServerAddress + "' Exception: " + e);
-                                                }
-
-                                                this.HandleException(StatusCode.ExceptionOnReceive);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                return;
             }
 
-            this.Disconnect();
-        }
+            try
+            {
+                this.HandleReceivedDatagram(buf, len, false);
+            }
+            catch (Exception e)
+            {
+                if (this.State != PhotonSocketState.Disconnecting && this.State != PhotonSocketState.Disconnected)
+                {
+                    if (this.ReportDebugOfLevel(LogLevel.Error))
+                    {
+                        this.EnqueueDebugReturn(LogLevel.Error, "SocketWebTcp.ReceiveCallback() caught exception. Going to disconnect. State: " + this.State + ". Server: '" + this.ServerAddress + "' Exception: " + e);
+                    }
 
-
-        private class MonoBehaviourExt : MonoBehaviour
-        {
+                    this.HandleException(StatusCode.ExceptionOnReceive);
+                }
+            }
         }
     }
 }
-
 
 #endif

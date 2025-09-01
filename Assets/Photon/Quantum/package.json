@@ -1,0 +1,27 @@
+{
+  "name": "com.photonengine.quantum",
+  "version": "3.0.7",
+  "displayName": "Photon Quantum",
+  "description": "Photon Quantum - Deterministic Multiplayer Engine",
+  "unity": "2021.3",
+  "documentationUrl": "https://doc.photonengine.com/quantum",
+  "licensesUrl": "https://www.photonengine.com/terms",
+  "dependencies": {
+    "com.photonengine.realtime": "5.1.0"
+  },
+  "samples": [
+  ],
+  "keywords": [
+    "Photon",
+    "Network",
+    "Multiplayer",
+    "UDP",
+    "Deterministic",
+    "Rollback"
+  ],
+  "author": {
+    "name": "Photon Engine",
+    "email": "hello@photonengine.com",
+    "url": "https://www.photonengine.com/"
+  }
+}

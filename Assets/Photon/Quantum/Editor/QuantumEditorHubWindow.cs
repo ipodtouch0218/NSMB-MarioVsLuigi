@@ -4,11 +4,12 @@ namespace Quantum.Editor {
   using System.Linq;
   using UnityEditor;
   using UnityEngine;
+  using Object = UnityEngine.Object;
 
   /// <summary>
   /// The main class to manage the Quantum Hub window.
   /// The Hub for example completes the installation of a user project by creating vital config files that are not overwritten by upgrades.
-  /// It can also install samples and addons that are packaged with the Quantum SDK.
+  /// It can also install samples and addons that are packaged with the SDK.
   /// </summary>
   [InitializeOnLoad]
   internal partial class QuantumEditorHubWindow : EditorWindow {
@@ -25,67 +26,76 @@ namespace Quantum.Editor {
     static partial void CreateWindowUser(ref QuantumEditorHubWindow window);
     static partial void OnImportPackageCompletedUser(string packageName);
     static partial void CheckPopupConditionUser(ref bool shouldPopup, ref int page);
+    static partial void FindPagesUser(List<QuantumEditorHubPage> pages);
 
     static Vector2 _windowSize = new Vector2(850, 600);
     static Vector2 _windowPosition = new Vector2(100, 100);
     static List<QuantumEditorHubPage> _pages;
     static bool _pagesInitialized;
-    static int? _currentPage;
-    Vector2? _scrollRect;
+    static int? _currentPage = null;
+
     double _nextForceRepaint;
     double _heartbeatTimestamp;
+    Vector2? _scrollRect;
+    
+     /// <summary>
+     /// Get and sets current page from PlayerPrefs. It's handy for domain reloads.
+     /// </summary>
+     static int CurrentPage {
+       get {
+         if (_currentPage.HasValue == false) {
+           _currentPage = PlayerPrefs.GetInt(CurrentPagePlayerPrefsKey, 0);
+         }
+         return _currentPage.Value;
+       }
+       set {
+         if (_currentPage.HasValue == false || _currentPage.Value != value) {
+           PlayerPrefs.SetInt(CurrentPagePlayerPrefsKey, value);
+         }
+         _currentPage = value;
+       }
+     }
 
-    /// <summary>
-    /// Get and sets current page from PlayerPrefs. It's handy for domain reloads.
-    /// </summary>
-    static int CurrentPage {
+     /// <summary>
+     /// Get and sets current scrolling from PlayerPrefs. It's handy for domain reloads.
+     /// </summary>
+     Vector2 ScrollRect {
       get {
-        if (_currentPage.HasValue == false) {
-          _currentPage = PlayerPrefs.GetInt(CurrentPagePlayerPrefsKey, 0);
-        }
-        return _currentPage.Value;
-      }
-      set {
-        if (_currentPage.HasValue == false || _currentPage.Value != value) {
-          PlayerPrefs.SetInt(CurrentPagePlayerPrefsKey, value);
-        }
-        _currentPage = value;
-      }
-    }
+         if (_scrollRect.HasValue == false) {
+           try {
+             _scrollRect = JsonUtility.FromJson<Vector2>(PlayerPrefs.GetString(ScrollRectPlayerPrefsKey, ""));
+           } catch {
+             _scrollRect = Vector2.zero;
+           }
+         }
+         return _scrollRect.Value;
+       }
+       set {
+         if (_scrollRect.HasValue == false || _scrollRect.Value != value) {
+           PlayerPrefs.SetString(ScrollRectPlayerPrefsKey, JsonUtility.ToJson(value));
+         }
+         _scrollRect = value;
+       }
+     }
 
-    /// <summary>
-    /// Get and sets current scrolling from PlayerPrefs. It's handy for domain reloads.
-    /// </summary>
-    Vector2 ScrollRect {
-     get {
-        if (_scrollRect.HasValue == false) {
-          try {
-            _scrollRect = JsonUtility.FromJson<Vector2>(PlayerPrefs.GetString(ScrollRectPlayerPrefsKey, ""));
-          } catch {
-            _scrollRect = Vector2.zero;
-          }
-        }
-        return _scrollRect.Value;
-      }
-      set {
-        if (_scrollRect.HasValue == false || _scrollRect.Value != value) {
-          PlayerPrefs.SetString(ScrollRectPlayerPrefsKey, JsonUtility.ToJson(_scrollRect));
-        }
-        _scrollRect = value;
-      }
-    }
-
+     public static void FindPages(List<QuantumEditorHubPage> pages, string assetLabel) {
+       foreach (var c in AssetDatabase.FindAssets($"l:{assetLabel} t:{nameof(QuantumEditorHubPageSO)}")
+                  .Select(x => AssetDatabase.GUIDToAssetPath(x))
+                  .Select(path => AssetDatabase.LoadAssetAtPath<QuantumEditorHubPageSO>(path).Content)) {
+         pages.AddRange(c);
+       }
+     }
+     
     protected static List<QuantumEditorHubPage> Pages {
       get {
         if (_pagesInitialized == false) {
           // Cache all editor hub layouts founds in the project
           try {
             _pages = new List<QuantumEditorHubPage>();
-
-            foreach (var c in AssetDatabase.FindAssets($"l:{QuantumEditorHubPage.AssetLabel} t:{nameof(QuantumEditorHubPageSO)}")
-              .Select(x => AssetDatabase.GUIDToAssetPath(x))
-              .Select(path => AssetDatabase.LoadAssetAtPath<QuantumEditorHubPageSO>(path).Content)) {
-              _pages.AddRange(c);
+            FindPagesUser(_pages);
+            
+            if (_pages.Count == 0) {
+              FindPages(_pages, QuantumEditorHubPage.AssetLabel);
             }
 
             // Pages can overwrite each other by title
@@ -110,6 +120,8 @@ namespace Quantum.Editor {
     }
 
     public virtual string AppId { get; set; } = string.Empty;
+    
+    public virtual Object SdkAppSettingsAsset { get; }
 
     public Vector2 ContentSize => new Vector2(position.width - NavWidth - ContentMargin * 2, position.height);
 
@@ -121,7 +133,7 @@ namespace Quantum.Editor {
 
     [UnityEditor.Callbacks.DidReloadScripts]
     static void OnDidReloadScripts() {
-      CheckPopupCondition();
+      EditorApplication.delayCall += CheckPopupCondition;
     }
 
     /// <summary>
@@ -136,17 +148,11 @@ namespace Quantum.Editor {
       }
     }
 
-    /// <summary>
-    /// Open the Quantum Hub window.
-    /// </summary>
-    [MenuItem("Window/Quantum/Quantum Hub")]
-    [MenuItem("Tools/Quantum/Quantum Hub %H", false, (int)QuantumEditorMenuPriority.TOP)]
-    [MenuItem("Tools/Quantum/Window/Quantum Hub", false, (int)QuantumEditorMenuPriority.Window + 0)]
-    public static void Open() {
-      Open(CurrentPage);
+    protected static void OpenCurrentPage() {
+      OpenPage(CurrentPage);
     }
-
-    public static void Open(int page) {
+    
+    protected static void OpenPage(int page) {
       if (Application.isPlaying) {
         return;
       }
@@ -228,6 +234,10 @@ namespace Quantum.Editor {
       }
     }
 
+    void OnProjectChange() {
+      HubUtils.GlobalInstanceMissing.Clear();
+    }
+
     protected virtual void CustomDrawWidget(QuantumEditorHubPage page, QuantumEditorHubWidget widget) {
     }
 
@@ -255,7 +265,7 @@ namespace Quantum.Editor {
         return;
       }
 
-      EditorApplication.delayCall += () => Open(page);
+      EditorApplication.delayCall += () => OpenPage(page);
     }
 
     protected virtual void OnGuiHeartbeat() {
@@ -265,7 +275,7 @@ namespace Quantum.Editor {
   class QuantumEditorHubWindowAssetPostprocessor : AssetPostprocessor {
     static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths) {
       // Unity handling for post asset processing callback. Checks existence of settings assets every time assets change.
-      QuantumEditorHubWindowSdk.CheckPopupCondition();
+      QuantumEditorHubWindow.CheckPopupCondition();
     }
   }
 }

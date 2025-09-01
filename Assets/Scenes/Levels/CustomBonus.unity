@@ -2064,8 +2064,7 @@ PrefabInstance:
         type: 3}
       propertyPath: Asset
       value: 
-      objectReference: {fileID: 11400000, guid: bd5808d9e85ad8b4592ca36eaff24b8f,
-        type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: AssetRef.Id.Value
@@ -3542,7 +3541,7 @@ GameObject:
   m_Component:
   - component: {fileID: 994733591}
   - component: {fileID: 994733592}
-  m_Layer: 0
+  m_Layer: 21
   m_Name: BluePillarL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3660,7 +3659,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1017538730}
   - component: {fileID: 1017538731}
-  m_Layer: 0
+  m_Layer: 21
   m_Name: RedPillarL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3961,7 +3960,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1090718754}
   - component: {fileID: 1090718755}
-  m_Layer: 0
+  m_Layer: 21
   m_Name: RedPillarR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4814,7 +4813,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1371898792}
   - component: {fileID: 1371898793}
-  m_Layer: 0
+  m_Layer: 21
   m_Name: BluePillarR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
