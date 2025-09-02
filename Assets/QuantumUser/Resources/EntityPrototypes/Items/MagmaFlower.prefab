@@ -5024,6 +5024,11 @@ PrefabInstance:
       propertyPath: childAnimator
       value: 
       objectReference: {fileID: 3726716108760662804}
+    - target: {fileID: 473443410690841455, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+        type: 3}
+      propertyPath: retroRenderer
+      value: 
+      objectReference: {fileID: 1156746765783145888}
     - target: {fileID: 517697212848946230, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
         type: 3}
       propertyPath: Prototype.Scriptable.Id.Value

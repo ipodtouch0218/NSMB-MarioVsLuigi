@@ -4,7 +4,7 @@ using System.Reflection;
 using UnityEngine;
 
 public enum SoundEffect : int {
-    //CURRENT HIGHEST NUMBER: 124 (use 125 next)
+    //CURRENT HIGHEST NUMBER: 132 (use 133 next)
     //Enemy
     [SoundEffectData("{style}/enemy/freeze")] Enemy_Generic_Freeze = 0,
     [SoundEffectData("{style}/enemy/freeze_shatter")] Enemy_Generic_FreezeShatter = 1,
@@ -45,6 +45,8 @@ public enum SoundEffect : int {
     [SoundEffectData("{style}/player/walljump")] Player_Sound_WallJump = 29,
     [SoundEffectData("{style}/player/wallslide")] Player_Sound_WallSlide = 30,
     [SoundEffectData("{style}/player/pipe")] Player_Sound_PipeEnter = 119,
+    [SoundEffectData("{style}/player/throw")] Player_Sound_Throw = 129,
+    [SoundEffectData("{style}/player/pickup")] Player_Sound_PickUp = 130,
 
     [SoundEffectData("{style}/player/walk/grass", 2)] Player_Walk_Grass = 31,
     [SoundEffectData("{style}/player/walk/snow", 2)] Player_Walk_Snow = 32,
@@ -61,6 +63,12 @@ public enum SoundEffect : int {
     [SoundEffectData("{style}/character/{char}/mega_mushroom_collect")] Player_Sound_MegaMushroom_Collect = 40, //HARDCODED: DO NOT CHANGE WITHOUT CHANGING POWERUPS SCRIPTABLES
     [SoundEffectData("{style}/character/{char}/jump")] Player_Sound_Jump = 24,
     [SoundEffectData("{style}/character/{char}/jumpsmall")] Player_Sound_JumpSmall = 118,
+    [SoundEffectData("{style}/character/{char}/powerup")] Player_Voice_Powerup = 125,
+    [SoundEffectData("{style}/character/{char}/reserve")] Player_Voice_Reserve = 126,
+    [SoundEffectData("{style}/character/{char}/1up")] Player_Voice_1Up = 127,
+    [SoundEffectData("{style}/character/{char}/powerdown")] Player_Voice_Powerdown = 128,
+    [SoundEffectData("{style}/character/{char}/death")] Player_Voice_Death = 131,
+    [SoundEffectData("{style}/character/{char}/hahano")] Player_Voice_HahaNo = 132,
 
     //Powerup
     [SoundEffectData("{style}/powerup/1-up")] Powerup_1UP_Collect = 78, //HARDCODED: DO NOT CHANGE WITHOUT CHANGING POWERUPS SCRIPTABLES
@@ -94,6 +102,7 @@ public enum SoundEffect : int {
     [SoundEffectData("{style}/powerup/propellermushroom_start")] Powerup_PropellerMushroom_Start = 59,
     [SoundEffectData("{style}/powerup/hammer_throw")] Powerup_HammerSuit_Throw = 106, //HARDCODED: DO NOT CHANGE WITHOUT CHANGING POWERUPS SCRIPTABLES
     [SoundEffectData("{style}/powerup/hammersuit_bounce")] Powerup_HammerSuit_Bounce = 109,
+    [SoundEffectData("{style}/powerup/hahano")] Powerup_HahaNo = 133,
 
     //UI Sounds / Songs / Jingles
     [SoundEffectData("{style}/world/hurry_up")] UI_HurryUp = 60,

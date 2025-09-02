@@ -7,7 +7,7 @@ public class CharacterAsset : AssetObject {
     public AssetRef<EntityPrototype> Prototype;
 
     public string SoundFolder;
-    public string UiString;
+    public string[] UiStrings;
     public string TranslationString;
 
 #if QUANTUM_UNITY
@@ -32,6 +32,7 @@ public class CharacterAsset : AssetObject {
 public enum StageTheme {
     NSMB,
     SMBDX,
+    SMB2,
     //More later
 }
 
@@ -94,7 +95,9 @@ public enum CharacterState {
     HOLDSWIM, //
     DIEWATER, //
     PIPEENTER, //
-    SLIDE, 
+    SLIDE, //
+    FASTJUMP, //
+    KNOCKBACKGROUND,
 }
 
 [System.Serializable]

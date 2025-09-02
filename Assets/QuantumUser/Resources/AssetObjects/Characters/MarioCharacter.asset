@@ -20,7 +20,10 @@ MonoBehaviour:
     Id:
       Value: 1458876430339653767
   SoundFolder: mario
-  UiString: <sprite name=hud_mario>
+  UiStrings:
+  - hud_mario
+  - SMBDX_HUD_Blank
+  - SMBDX_HUD_Blank
   TranslationString: character.mario
   LoadingSmallSprite: {fileID: 1040450253486601905, guid: a7245cae141f3ee449147539ebd2a2c9,
     type: 3}
@@ -2638,76 +2641,76 @@ MonoBehaviour:
       - {fileID: -1216711016, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: -1163845124, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: 1482720901, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 36
       Item: 5
       Sprites:
       - {fileID: -1216711016, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: -1163845124, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: 1482720901, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 37
       Item: 5
       Sprites:
       - {fileID: -1216711016, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: -1163845124, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: 1482720901, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 38
       Item: 5
       Sprites:
       - {fileID: -1216711016, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: -1163845124, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: 1482720901, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 39
       Item: 5
       Sprites:
       - {fileID: -1216711016, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 40
       Item: 5
       Sprites:
       - {fileID: -1216711016, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 41
       Item: 5
       Sprites:
       - {fileID: -1163845124, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 42
       Item: 5
       Sprites:
       - {fileID: 120276795, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 43
       Item: 5
       Sprites:
       - {fileID: -147967196, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: 1362375198, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: -1311747877, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 44
       Item: 5
       Sprites:
       - {fileID: -147967196, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: 1362375198, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: -1311747877, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 45
       Item: 5
       Sprites:
       - {fileID: -147967196, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: 1362375198, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: -1311747877, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 46
       Item: 5
       Sprites:
       - {fileID: -147967196, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: 1362375198, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: -1311747877, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 47
       Item: 5
       Sprites:
@@ -5942,6 +5945,609 @@ MonoBehaviour:
       Sprites:
       - {fileID: -333496553, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       Fps: 10
+    - State: 59
+      Item: 0
+      Sprites:
+      - {fileID: 1359706785, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 59
+      Item: 1
+      Sprites:
+      - {fileID: -1478901932, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 59
+      Item: 2
+      Sprites:
+      - {fileID: -750844369, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 59
+      Item: 3
+      Sprites:
+      - {fileID: -840044208, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 59
+      Item: 4
+      Sprites:
+      - {fileID: -1472970986, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 59
+      Item: 5
+      Sprites:
+      - {fileID: -1659420518, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 59
+      Item: 6
+      Sprites:
+      - {fileID: -1543645526, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 59
+      Item: 7
+      Sprites:
+      - {fileID: -1659859391, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 59
+      Item: 8
+      Sprites:
+      - {fileID: -750844369, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 59
+      Item: 9
+      Sprites:
+      - {fileID: 434599561, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 59
+      Item: 10
+      Sprites:
+      - {fileID: 346462492, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 59
+      Item: 11
+      Sprites:
+      - {fileID: 1071934739, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 59
+      Item: 12
+      Sprites:
+      - {fileID: 1524584245, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 59
+      Item: 13
+      Sprites:
+      - {fileID: 1524890409, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 59
+      Item: 14
+      Sprites:
+      - {fileID: -268563438, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 60
+      Item: 0
+      Sprites:
+      - {fileID: -1586580355, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 60
+      Item: 1
+      Sprites:
+      - {fileID: 1817594689, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 60
+      Item: 2
+      Sprites:
+      - {fileID: 1351282422, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 60
+      Item: 3
+      Sprites:
+      - {fileID: -1502804956, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 60
+      Item: 4
+      Sprites:
+      - {fileID: 1080821002, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 60
+      Item: 5
+      Sprites:
+      - {fileID: -1245495357, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 60
+      Item: 6
+      Sprites:
+      - {fileID: 1324594780, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 60
+      Item: 7
+      Sprites:
+      - {fileID: 90905696, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 60
+      Item: 8
+      Sprites:
+      - {fileID: 1351282422, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 60
+      Item: 9
+      Sprites:
+      - {fileID: 273236192, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 60
+      Item: 10
+      Sprites:
+      - {fileID: 1942049425, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 60
+      Item: 11
+      Sprites:
+      - {fileID: 1054143979, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 60
+      Item: 12
+      Sprites:
+      - {fileID: 327632051, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 60
+      Item: 13
+      Sprites:
+      - {fileID: -1803941371, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 60
+      Item: 14
+      Sprites:
+      - {fileID: 1360441410, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+  - Theme: 2
+    States:
+    - State: 0
+      Item: 0
+      Sprites:
+      - {fileID: 647276572, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 1
+    - State: 1
+      Item: 0
+      Sprites:
+      - {fileID: 647276572, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 1374704186, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 2
+      Item: 0
+      Sprites:
+      - {fileID: 647276572, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 1374704186, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 3
+      Item: 0
+      Sprites:
+      - {fileID: 647276572, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 1374704186, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 4
+      Item: 0
+      Sprites:
+      - {fileID: 647276572, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 1374704186, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 5
+      Item: 0
+      Sprites:
+      - {fileID: 647276572, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 1374704186, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 6
+      Item: 0
+      Sprites:
+      - {fileID: 647276572, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 7
+      Item: 0
+      Sprites:
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 8
+      Item: 0
+      Sprites:
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 9
+      Item: 0
+      Sprites:
+      - {fileID: 1374704186, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 10
+      Item: 0
+      Sprites:
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 11
+      Item: 0
+      Sprites:
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 300084517, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 1726255770, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 792574401, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 10
+    - State: 12
+      Item: 0
+      Sprites:
+      - {fileID: 1552091400, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 10
+    - State: 13
+      Item: 0
+      Sprites:
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 10
+    - State: 14
+      Item: 0
+      Sprites:
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 10
+    - State: 15
+      Item: 0
+      Sprites:
+      - {fileID: 647276572, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 10
+    - State: 16
+      Item: 0
+      Sprites:
+      - {fileID: -1330946919, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 10
+    - State: 17
+      Item: 0
+      Sprites:
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 300084517, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 1726255770, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 792574401, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 20
+    - State: 18
+      Item: 0
+      Sprites:
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 20
+    - State: 19
+      Item: 0
+      Sprites:
+      - {fileID: -533103332, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 20
+    - State: 19
+      Item: 0
+      Sprites:
+      - {fileID: -533103332, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 20
+    - State: 20
+      Item: 0
+      Sprites:
+      - {fileID: -533103332, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 20
+    - State: 21
+      Item: 0
+      Sprites:
+      - {fileID: -533103332, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 20
+    - State: 22
+      Item: 0
+      Sprites:
+      - {fileID: -533103332, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 20
+    - State: 23
+      Item: 0
+      Sprites:
+      - {fileID: -533103332, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 20
+    - State: 24
+      Item: 0
+      Sprites:
+      - {fileID: 805128371, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 20
+    - State: 25
+      Item: 0
+      Sprites:
+      - {fileID: 511641755, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 20
+    - State: 26
+      Item: 0
+      Sprites:
+      - {fileID: 283708167, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 20
+    - State: 27
+      Item: 0
+      Sprites:
+      - {fileID: -1932936270, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 20
+    - State: 28
+      Item: 0
+      Sprites:
+      - {fileID: 805128371, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 20
+    - State: 29
+      Item: 0
+      Sprites:
+      - {fileID: 542259123, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 647276572, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -1637990812, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -157758996, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 15
+    - State: 30
+      Item: 0
+      Sprites:
+      - {fileID: 283708167, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 639925779, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -908266386, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 2022451610, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 15
+    - State: 31
+      Item: 0
+      Sprites:
+      - {fileID: 283708167, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 639925779, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -908266386, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 2022451610, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 15
+    - State: 32
+      Item: 0
+      Sprites:
+      - {fileID: 283708167, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 639925779, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -908266386, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 2022451610, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 15
+    - State: 33
+      Item: 0
+      Sprites:
+      - {fileID: 283708167, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 639925779, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -908266386, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 2022451610, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 15
+    - State: 34
+      Item: 0
+      Sprites:
+      - {fileID: 701557422, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 15
+    - State: 35
+      Item: 0
+      Sprites:
+      - {fileID: 701557422, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -2079617075, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 36
+      Item: 0
+      Sprites:
+      - {fileID: 701557422, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -2079617075, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 37
+      Item: 0
+      Sprites:
+      - {fileID: 701557422, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -2079617075, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 38
+      Item: 0
+      Sprites:
+      - {fileID: 701557422, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -2079617075, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 39
+      Item: 0
+      Sprites:
+      - {fileID: -2079617075, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 40
+      Item: 0
+      Sprites:
+      - {fileID: -2079617075, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 41
+      Item: 0
+      Sprites:
+      - {fileID: -2079617075, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 42
+      Item: 0
+      Sprites:
+      - {fileID: -1932936270, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 43
+      Item: 0
+      Sprites:
+      - {fileID: -1932936270, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 44
+      Item: 0
+      Sprites:
+      - {fileID: -1932936270, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 45
+      Item: 0
+      Sprites:
+      - {fileID: -1932936270, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 46
+      Item: 0
+      Sprites:
+      - {fileID: -1932936270, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 47
+      Item: 0
+      Sprites:
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 48
+      Item: 0
+      Sprites:
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 49
+      Item: 0
+      Sprites:
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 50
+      Item: 0
+      Sprites:
+      - {fileID: -1728225234, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -66073241, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -1932936270, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -1932936270, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -1932936270, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -1932936270, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -1932936270, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -1932936270, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -1932936270, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -1932936270, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -1932936270, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -1932936270, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 51
+      Item: 0
+      Sprites:
+      - {fileID: 511641755, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 4
+    - State: 52
+      Item: 0
+      Sprites:
+      - {fileID: 769930970, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 853869830, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 8
+    - State: 53
+      Item: 0
+      Sprites:
+      - {fileID: 769930970, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 853869830, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 8
+    - State: 54
+      Item: 0
+      Sprites:
+      - {fileID: 853869830, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: 934262959, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      - {fileID: -1404852313, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 8
+    - State: 55
+      Item: 0
+      Sprites:
+      - {fileID: 769930970, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 8
+    - State: 56
+      Item: 0
+      Sprites:
+      - {fileID: 805128371, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 8
+    - State: 57
+      Item: 0
+      Sprites:
+      - {fileID: -1330946919, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 8
+    - State: 58
+      Item: 0
+      Sprites:
+      - {fileID: -406515576, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 8
+    - State: 59
+      Item: 0
+      Sprites:
+      - {fileID: -695628464, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 8
+    - State: 60
+      Item: 0
+      Sprites:
+      - {fileID: -533103332, guid: 9c8cd32518b7ba54a8695816110cccd2, type: 3}
+      Fps: 8
   DefaultSprite:
     State: 0
     Item: 0

@@ -544,7 +544,7 @@ MonoBehaviour:
       RawValue: 65536
     Speed:
       RawValue: 0
-    DetonationFrames: 240
+    DetonationFrames: 90
     StartLit:
       Value: 1
     IsLitFromStart:

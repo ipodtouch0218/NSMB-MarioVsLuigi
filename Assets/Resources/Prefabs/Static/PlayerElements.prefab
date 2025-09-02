@@ -248,7 +248,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 84.35
+  m_fontSize: 92.1
   m_fontSizeBase: 42
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -612,7 +612,7 @@ MonoBehaviour:
   header: {fileID: 8245005616965016083}
   ui: {fileID: 8424660279480578062}
   fadeGroup: {fileID: 4560613397388048260}
-  musicData: {fileID: 11400000, guid: 581abbce6fedee34892b59f212834485, type: 2}
+  musicData: {fileID: 11400000, guid: 1a8d3071056997d43801c7214a341918, type: 2}
   delayUntilStart: 5.5
   delayPerEntry: 0.05
   replayDelayUntilStart: 3.25
@@ -24699,7 +24699,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 84.35
+  m_fontSize: 92.1
   m_fontSizeBase: 42
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -25306,7 +25306,9 @@ MonoBehaviour:
   replayUi: {fileID: 5010792486961259638}
   pauseMenu: {fileID: 8557534404386945108}
   spectationUI: {fileID: 2132084058800983948}
+  spectatingArrows: {fileID: 0}
   spectatingText: {fileID: 894115944895183549}
+  spectateModeSwitchPrompt: {fileID: 0}
   nametagPrefab: {fileID: 5954223862243588252}
   nametagCanvas: {fileID: 7861764344250076677}
 --- !u!114 &5431854351169236569

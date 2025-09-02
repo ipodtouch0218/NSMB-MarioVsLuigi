@@ -54,6 +54,7 @@ component MarioPlayer {
 	[ExcludeFromPrototype] byte PreRespawnFrames;
 	[ExcludeFromPrototype] byte RespawnFrames;
 	[ExcludeFromPrototype] byte NoLivesStarDirection;
+    [ExcludeFromPrototype] bool HadLives;
 
 	// Walk/Running
     [ExcludeFromPrototype] bool FacingRight;
@@ -269,6 +270,14 @@ event MarioPlayerPickedUpObject {
 event MarioPlayerThrewObject {
 	EntityRef Entity;
 	EntityRef OtherEntity;
+}
+
+event MarioPlayerGot1Up {
+	EntityRef Entity;
+}
+
+event MarioPlayerGotHahanoshroom {
+	EntityRef Entity;
 }
 
 synced event MarioPlayerMegaStart {

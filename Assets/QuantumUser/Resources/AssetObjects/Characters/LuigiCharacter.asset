@@ -20,7 +20,10 @@ MonoBehaviour:
     Id:
       Value: 1479918679323180618
   SoundFolder: luigi
-  UiString: <sprite name=hud_luigi>
+  UiStrings:
+  - hud_luigi
+  - SMBDX_HUD_Blank
+  - SMBDX_HUD_Blank
   TranslationString: character.luigi
   LoadingSmallSprite: {fileID: -3599161207798135845, guid: a7245cae141f3ee449147539ebd2a2c9,
     type: 3}
@@ -30,3 +33,9 @@ MonoBehaviour:
     type: 3}
   SmallOverrides: {fileID: 22100000, guid: a1854453357bb034e89ec419b0f57906, type: 2}
   LargeOverrides: {fileID: 22100000, guid: 671e2adc5dbd26a45abdf5c18398a86e, type: 2}
+  SpriteList: []
+  DefaultSprite:
+    State: 0
+    Item: 0
+    Sprites: []
+    Fps: 0

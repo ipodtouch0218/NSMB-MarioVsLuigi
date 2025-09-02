@@ -118,11 +118,11 @@ namespace NSMB.UI.Game {
             }
             stringBuilder.AppendLine(cachedNickname);
 
-            if (f.Global->Rules.IsLivesEnabled) {
-                stringBuilder.Append(character.UiString).Append(Utils.GetSymbolString("x" + mario->Lives)).Append(' ');
+            if (f.Global->Rules.IsLivesEnabled || mario->HadLives) {
+                stringBuilder.Append("<sprite name=" + character.UiStrings[0] + ">").Append(Utils.GetSymbolString("x" + mario->Lives, null, true)).Append(' ');
             }
 
-            stringBuilder.Append(Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + "x" + Mathf.Max(0, gamemode.GetObjectiveCount(f, mario))));
+            stringBuilder.Append(Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + "x" + Mathf.Max(0, gamemode.GetObjectiveCount(f, mario)), null, true));
 
             text.text = stringBuilder.ToString();
         }

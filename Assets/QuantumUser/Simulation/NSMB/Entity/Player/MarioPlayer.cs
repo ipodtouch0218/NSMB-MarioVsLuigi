@@ -161,11 +161,12 @@ namespace Quantum {
             IsDead = true;
             FireDeath = fire;
             f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = true;
+            bool canDie = Lives > 0;
 
             PreRespawnFrames = 180;
             RespawnFrames = 78;
 
-            if ((f.Global->Rules.IsLivesEnabled && QuantumUtils.Decrement(ref Lives)) || Disconnected) {
+            if (Disconnected || (canDie && QuantumUtils.Decrement(ref Lives))) {
                 f.Signals.OnMarioPlayerDropObjective(entity, 1, attacker);
                 DeathAnimationFrames = (GamemodeData.StarChasers->Stars > 0) ? (byte) 30 : (byte) 36;
             } else {
@@ -283,7 +284,7 @@ namespace Quantum {
             bool fastStars = amount > 2 && GamemodeData.StarChasers->Stars > 2;
             int starDirection = FacingRight ? 1 : 2;
 
-            if (f.Global->Rules.IsLivesEnabled && Lives == 0) {
+            if ((f.Global->Rules.IsLivesEnabled || HadLives) && Lives == 0) {
                 fastStars = true;
                 NoLivesStarDirection = (byte) ((NoLivesStarDirection + 1) % 4);
                 starDirection = NoLivesStarDirection;

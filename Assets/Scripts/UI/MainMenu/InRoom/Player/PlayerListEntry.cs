@@ -161,7 +161,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             var allCharacters = f.SimulationConfig.CharacterDatas;
             characterIndex %= allCharacters.Length;
             CharacterAsset character = f.FindAsset(allCharacters[characterIndex]);
-            builder.Append(character.UiString);
+            builder.Append("<sprite name=" + character.UiStrings[0] + ">");
 
             if (f.Global->Rules.TeamsEnabled && Settings.Instance.GraphicsColorblind && !playerData->ManualSpectator) {
                 TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[playerData->RequestedTeam]);

@@ -68,10 +68,10 @@ namespace NSMB.Sound {
 
             int playersWithOneLife = 0;
             while (allPlayers.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {
-                if (rules.IsLivesEnabled && mario->Lives == 0) {
+                if (mario->Lives == 0) {
                     continue;
                 }
-                if (rules.IsLivesEnabled && mario->Lives == 1) {
+                if (mario->Lives == 1) {
                     playersWithOneLife++;
                 }
 
@@ -87,7 +87,7 @@ namespace NSMB.Sound {
                     continue;
                 }
 
-                speedup |= rules.IsLivesEnabled && mario->Lives == 1;
+                speedup |= mario->Lives == 1;
                 mega |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.MegaMushroom) && ((mario->MegaMushroomFrames > 0) || (mario->MegaMushroomStartFrames > 0 && (int)Utils.GetStageTheme() == 1));
                 invincible |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.Starman) && mario->IsStarmanInvincible;
             }
@@ -99,7 +99,7 @@ namespace NSMB.Sound {
                 speedup |= gamemode.GetFirstPlaceObjectiveCount(f) >= rules.StarsToWin - 1;
             }
 
-            if (!speedup && rules.IsLivesEnabled) {
+            if (!speedup) {
                 // Also speed up the music if:
                 // A: two players left, at least one has one life
                 // B: three+ players left, all have one life

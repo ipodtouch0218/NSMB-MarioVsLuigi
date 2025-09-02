@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b75c95f34a00d4e8c04f76b73312e6, type: 3}
+  m_Name: SMB2_Underground_YellowPowerup
+  m_EditorClassIdentifier: 
+  m_AnimatedSprites:
+  - {fileID: 2108763084, guid: 3e93f9704b720d041aab6e1a5cbff35f, type: 3}
+  - {fileID: -1525709646, guid: 3e93f9704b720d041aab6e1a5cbff35f, type: 3}
+  - {fileID: -1731477505, guid: 3e93f9704b720d041aab6e1a5cbff35f, type: 3}
+  - {fileID: -1525709646, guid: 3e93f9704b720d041aab6e1a5cbff35f, type: 3}
+  - {fileID: 2108763084, guid: 3e93f9704b720d041aab6e1a5cbff35f, type: 3}
+  - {fileID: 2108763084, guid: 3e93f9704b720d041aab6e1a5cbff35f, type: 3}
+  - {fileID: 2108763084, guid: 3e93f9704b720d041aab6e1a5cbff35f, type: 3}
+  m_MinSpeed: 7.5
+  m_MaxSpeed: 7.5
+  m_AnimationStartTime: 0
+  m_AnimationStartFrame: 0
+  m_TileColliderType: 2
+  m_TileAnimationFlags: 0

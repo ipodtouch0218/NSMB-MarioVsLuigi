@@ -207,6 +207,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   graphicsRoot: {fileID: 7382415506076328421}
   renderer: {fileID: 5475970293224446295}
+  retroRenderer: {fileID: 5475970293224446295}
   childAnimator: {fileID: 0}
   childAnimation: {fileID: 0}
   blinkingRate: 4

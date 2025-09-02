@@ -94,6 +94,10 @@ namespace NSMB.Entities.Player {
         private static readonly int Param2DHatGradient = Shader.PropertyToID("HatGradient");
         private static readonly int Param2DOverallsGradient = Shader.PropertyToID("OverallsGradient");
         private static readonly int Param2DSkinGradient = Shader.PropertyToID("SkinGradient");
+        private static readonly int Param2DHatGray = Shader.PropertyToID("HatGray");
+        private static readonly int Param2DOverallsGray = Shader.PropertyToID("OverallsGray");
+        private static readonly int Param2DHatEnabled = Shader.PropertyToID("HatEnabled");
+        private static readonly int Param2DOverallsEnabled = Shader.PropertyToID("OverallsEnabled");
         #endregion
 
         //---Public Variables
@@ -893,6 +897,7 @@ namespace NSMB.Entities.Player {
             }
 
             PlaySound(SoundEffect.Player_Voice_WallJump, variant: 2);
+            PlaySound(SoundEffect.Player_Sound_Throw);
             animator.SetTrigger(ParamThrow);
             ThrowTimer = 30;
         }
@@ -908,6 +913,7 @@ namespace NSMB.Entities.Player {
             if (e.HoldAboveHead) {
                 animator.Play(ParamHeadPickup);
                 PlaySound(SoundEffect.Player_Voice_DoubleJump, variant: 2);
+                PlaySound(SoundEffect.Player_Sound_PickUp);
             }
             FireballTimer = 0;
             ThrowTimer = 0;
@@ -960,6 +966,7 @@ namespace NSMB.Entities.Player {
             }
 
             PlaySound(SoundEffect.Player_Sound_Powerdown);
+            PlaySound(SoundEffect.Player_Voice_Powerdown);
         }
 
         private void OnMarioPlayerCapeSpin(EventMarioPlayerCapeSpin e) {
@@ -1006,6 +1013,7 @@ namespace NSMB.Entities.Player {
                 if (e.IsLava) {
                     PlaySound(SoundEffect.Player_Sound_LavaHiss);
                 }
+                PlaySound(SoundEffect.Player_Voice_Death);
             }
         }
 
@@ -1166,6 +1174,7 @@ namespace NSMB.Entities.Player {
                 }
                 */
                 PlaySound(powerup.SoundEffect);
+                PlaySound(SoundEffect.Player_Voice_Powerup);
 
                 if (powerup.State == PowerupState.MegaMushroom) {
                     var mario = PredictedFrame.Unsafe.GetPointer<MarioPlayer>(EntityRef);
@@ -1179,6 +1188,12 @@ namespace NSMB.Entities.Player {
             case PowerupReserveResult.ReserveNewPowerup: {
                 // Reserve the new powerup
                 PlaySound(SoundEffect.Player_Sound_PowerupReserveStore);
+                PlaySound(SoundEffect.Player_Voice_Reserve);
+                break;
+            }
+            case PowerupReserveResult.Hahanoshroom: {
+                PlaySound(SoundEffect.Powerup_HahaNo);
+                PlaySound(SoundEffect.Player_Voice_HahaNo);
                 break;
             }
             }
@@ -1198,6 +1213,22 @@ namespace NSMB.Entities.Player {
             }
 
             PlaySound(SoundEffect.Player_Sound_GroundpoundStart);
+        }
+
+        private void OnMarioPlayerGot1Up(EventMarioPlayerGot1Up e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
+
+            PlaySound(SoundEffect.Player_Voice_1Up);
+        }
+
+        private void OnMarioPlayerGotHahanoshroom(EventMarioPlayerGotHahanoshroom e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
+
+            PlaySound(SoundEffect.Player_Voice_HahaNo);
         }
 
         private void OnMarioPlayerGroundpounded(EventMarioPlayerGroundpounded e) {
@@ -1536,6 +1567,9 @@ namespace NSMB.Entities.Player {
                                 currentAnimationState = CharacterState.HOLDUPJUMPRISE;
                             }
                         }
+                        if (AnimRunState >= physics.RunSpeedStage) {
+                            currentAnimationState = CharacterState.FASTJUMP;
+                        }
                     } else if (AnimDoubleJump) {
                         //Jumping double
                         currentAnimationState = CharacterState.DOUBLEJUMP;
@@ -1649,6 +1683,9 @@ namespace NSMB.Entities.Player {
                         //Strong knockback
                         currentAnimationState = CharacterState.STRONGKNOCKBACK;
                     }
+                    if (physicsObject->IsTouchingGround) {
+                        currentAnimationState = CharacterState.KNOCKBACKGROUND;
+                    }
                 }
                 if (AnimSwimming) {
                     //Water knockback
@@ -1734,9 +1771,22 @@ namespace NSMB.Entities.Player {
             //Custom colors
             float StarTime = (mario->InvincibilityFrames <= 120 ? (1f - (((mario->InvincibilityFrames / 240f) * 7.5f) % 1f)) : (1f - (((mario->InvincibilityFrames / 240f) * 30f) % 1f)));
             StarTime = (mario->MegaMushroomFrames < 240 && mario->CurrentPowerupState == PowerupState.MegaMushroom) ? (1f - (((mario->MegaMushroomFrames / 240f) * 7.5f) % 1f)) : StarTime;
+
+            var playerData = QuantumUtils.GetPlayerData(f, mario->PlayerRef);
+            float PrimaryHue = playerData->PrimaryHue.AsFloat;
+            float SecondaryHue = playerData->SecondaryHue.AsFloat;
+            bool PrimaryHueEnabled = ((playerData->HueSettings & 1) > 0);
+            bool PrimaryHueGray = ((playerData->HueSettings & 2) > 0);
+            bool SecondaryHueEnabled = ((playerData->HueSettings & 4) > 0);
+            bool SecondaryHueGray = ((playerData->HueSettings & 8) > 0);
+
             TryCreateMaterialBlock2D();
-            materialBlock2D.SetFloat(Param2DHatHue, 0f);
-            materialBlock2D.SetFloat(Param2DOverallsHue, 0.155555555555555555555555555555555555555555f);
+            materialBlock2D.SetFloat(Param2DHatHue, PrimaryHue);
+            materialBlock2D.SetFloat(Param2DOverallsHue, SecondaryHue);
+            materialBlock2D.SetFloat(Param2DHatEnabled, PrimaryHueEnabled ? 1f : 0f);
+            materialBlock2D.SetFloat(Param2DOverallsEnabled, SecondaryHueEnabled ? 1f : 0f);
+            materialBlock2D.SetFloat(Param2DHatGray, PrimaryHueGray ? 1f : 0f);
+            materialBlock2D.SetFloat(Param2DOverallsGray, SecondaryHueGray ? 1f : 0f);
             materialBlock2D.SetFloat(Param2DOverrideColor, mario->IsStarmanInvincible ? 1f : (mario->MegaMushroomFrames < 240 && mario->MegaMushroomStartFrames == 0 && mario->CurrentPowerupState == PowerupState.MegaMushroom) ? 1f : 0f);
             materialBlock2D.SetColor(Param2DHatGradient, StarmanGradients[(int) Utils.GetStageTheme()].HatGradient.Evaluate(StarTime));
             materialBlock2D.SetColor(Param2DOverallsGradient, StarmanGradients[(int) Utils.GetStageTheme()].OverallsGradient.Evaluate(StarTime));

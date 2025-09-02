@@ -39,4 +39,5 @@ enum PowerupReserveResult : Byte {
     NoneButPlaySound,
     ReserveOldPowerup,
     ReserveNewPowerup,
+    Hahanoshroom,
 }

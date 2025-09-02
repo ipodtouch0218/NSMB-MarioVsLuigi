@@ -5002,6 +5002,11 @@ PrefabInstance:
       propertyPath: Prototype.TerminalVelocity.RawValue
       value: -524288
       objectReference: {fileID: 0}
+    - target: {fileID: 2430762061877431945, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: AnimatorOutput
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4015015153016662925, guid: 9bcb5effadc837a45b61571768c543cf,
         type: 3}
       propertyPath: 'frames.Array.data[0]'
@@ -5103,6 +5108,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9121724411283337017, guid: 9bcb5effadc837a45b61571768c543cf,
         type: 3}
+      propertyPath: retroRenderer
+      value: 
+      objectReference: {fileID: 620297914641958131}
+    - target: {fileID: 9121724411283337017, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
       propertyPath: koopaSpawnParticles
       value: 
       objectReference: {fileID: 1414043243210303755}
@@ -5158,7 +5168,7 @@ MonoBehaviour:
   ListOfObject:
   - {fileID: 4140882670077451248}
   - {fileID: 4427797587850761262}
-  EveryFrame: 0
+  NoOfFrames: 0
 --- !u!4 &4772466204091643246 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8509900707630130969, guid: 9bcb5effadc837a45b61571768c543cf,

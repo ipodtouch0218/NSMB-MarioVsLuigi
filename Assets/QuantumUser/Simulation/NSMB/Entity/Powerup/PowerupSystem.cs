@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using static Quantum.PowerupSystem;
 
 namespace Quantum {
     public unsafe class PowerupSystem : SystemMainThreadEntityFilter<Powerup, PowerupSystem.Filter>, ISignalOnEntityBumped, ISignalOnEntityCrushed {
@@ -131,8 +132,16 @@ namespace Quantum {
                 return PowerupReserveResult.NoneButPlaySound;
             }
             if (newPowerup.Type == PowerupType.LetsGoGambling) {
-                if(mario->Lives > 0) {
-                    mario->Lives += 1;
+                if (f.RNG->NextInclusive(0, 1) == 0) {
+                    if (mario->Lives > 0) {
+                        mario->Lives += 1;
+                    }
+                    f.Events.MarioPlayerGot1Up(marioEntity);
+                } else {
+                    mario->Lives = 1;
+                    mario->HadLives = true;
+                    f.Events.MarioPlayerGotHahanoshroom(marioEntity);
+                    return PowerupReserveResult.Hahanoshroom;
                 }
                 return PowerupReserveResult.NoneButPlaySound;
             }

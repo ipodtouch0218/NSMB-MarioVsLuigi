@@ -93,7 +93,7 @@ namespace NSMB.UI.Game.Scoreboard {
 
             StringBuilder scoreBuilder = new();
             if (f.Global->Rules.IsLivesEnabled) {
-                scoreBuilder.Append(character.UiString).Append(Utils.GetSymbolString(lives.ToString(), null, true));
+                scoreBuilder.Append("<sprite name=" + character.UiStrings[0] + ">").Append(Utils.GetSymbolString(lives.ToString(), null, true));
             }
             scoreBuilder.Append(Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + objective.ToString(), null, true));
 

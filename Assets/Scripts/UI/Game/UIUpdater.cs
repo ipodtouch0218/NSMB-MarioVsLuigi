@@ -52,7 +52,7 @@ namespace NSMB.UI.Game {
         private PowerupAsset previousPowerup;
         private EntityRef previousTarget;
         private bool previousMarioExists;
-        private bool justResynced;
+        private bool justResynced, hadLivesOn = false;
 
         private Coroutine endGameSequenceCoroutine, reserveSummonCoroutine;
 
@@ -121,6 +121,7 @@ namespace NSMB.UI.Game {
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
             QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired);
             QuantumEvent.Subscribe<EventStartCameraFadeOut>(this, OnStartCameraFadeOut);
+            QuantumEvent.Subscribe<EventMarioPlayerGotHahanoshroom>(this, OnMarioPlayerGotHahanoshroom);
         }
 
         public void OnDestroy() {
@@ -142,7 +143,7 @@ namespace NSMB.UI.Game {
 
             bool marioExists = f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario);
             if (Target != previousTarget || marioExists != previousMarioExists) {
-                UpdateElementVisibility(f, marioExists);
+                UpdateElementVisibility(f, marioExists, mario);
             }
 
             UpdateStoredItemUI(mario, previousTarget == Target && !justResynced);
@@ -217,10 +218,10 @@ namespace NSMB.UI.Game {
             previousPowerup = powerup;
         }
 
-        private void UpdateElementVisibility(Frame f, bool marioExists) {
+        private void UpdateElementVisibility(Frame f, bool marioExists, MarioPlayer* mario) {
             teamsParent.SetActive(marioExists && f.Global->Rules.TeamsEnabled);
             starsParent.SetActive(marioExists);
-            livesParent.SetActive(marioExists && f.Global->Rules.IsLivesEnabled);
+            livesParent.SetActive(marioExists && (f.Global->Rules.IsLivesEnabled || mario->Lives > 0 || hadLivesOn));
             coinsParent.SetActive(marioExists);
             timerParent.SetActive(f.Global->Rules.IsTimerEnabled);
             reserveItemBox.SetActive(marioExists);
@@ -270,7 +271,7 @@ namespace NSMB.UI.Game {
             //int starRequirement = rules.StarsToWin;
             int coinRequirement = rules.CoinsForPowerup;
             bool teamsEnabled = rules.TeamsEnabled;
-            bool livesEnabled = rules.IsLivesEnabled;
+            bool livesEnabled = rules.IsLivesEnabled || mario->HadLives;
             bool timerEnabled = rules.TimerMinutes > 0;
 
             // TIMER
@@ -324,10 +325,11 @@ namespace NSMB.UI.Game {
             }
 
             // LIVES
-            if (livesEnabled) {
+            if (livesEnabled || mario->Lives > 0 || hadLivesOn) {
                 if (mario->Lives != cachedLives) {
                     cachedLives = mario->Lives;
-                    uiLives.text = QuantumUnityDB.GetGlobalAsset(mario->CharacterAsset).UiString + Utils.GetSymbolString("x" + cachedLives);
+                    string characterHead = "<sprite name=" + QuantumUnityDB.GetGlobalAsset(mario->CharacterAsset).UiStrings[(int)Utils.GetStageTheme()] + ">";
+                    uiLives.text = characterHead + Utils.GetSymbolString("x" + cachedLives);
                 }
             }
         }
@@ -511,7 +513,7 @@ namespace NSMB.UI.Game {
                 resultAnimationTrigger = "startNegative";
             }
 
-            endGameSequenceCoroutine = StartCoroutine(EndGameSequence(resultMusic, resultAnimationTrigger, e.EndedByHost ? 0.5f : 1f));
+            endGameSequenceCoroutine = StartCoroutine(EndGameSequence(resultMusic, resultAnimationTrigger, 0.5f));
         }
 
         private void OnLanguageChanged(TranslationManager tm) {
@@ -534,6 +536,18 @@ namespace NSMB.UI.Game {
             if (NetworkHandler.Game.Frames.Predicted.Global->GameState < GameState.Ended) {
                 toggler.alpha = (toggler.alpha > 0) ? 0 : 1;
             }
+        }
+
+        private void OnMarioPlayerGotHahanoshroom(EventMarioPlayerGotHahanoshroom e) {
+            if (e.Entity != Target) {
+                return;
+            }
+            QuantumGame game = e.Game;
+            Frame f = game.Frames.Predicted;
+            f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario);
+            hadLivesOn = true;
+            UpdateElementVisibility(f, true, mario);
+            UpdateTextUI(f, mario);
         }
     }
 }

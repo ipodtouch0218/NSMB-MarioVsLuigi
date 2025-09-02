@@ -237,6 +237,17 @@ MonoBehaviour:
     - {fileID: -1377096151969877323, guid: 8154a84b219ce474299d18054172a2b4, type: 3}
     - {fileID: -1727902059962220071, guid: 8154a84b219ce474299d18054172a2b4, type: 3}
     Fps: 8
+  - State: 0
+    Item: 0
+    Sprites:
+    - {fileID: -2045882784, guid: 5d2e01aad69661d4f94412cc76729771, type: 3}
+    - {fileID: -2045882784, guid: 5d2e01aad69661d4f94412cc76729771, type: 3}
+    - {fileID: -1305814697, guid: 5d2e01aad69661d4f94412cc76729771, type: 3}
+    - {fileID: -1305814697, guid: 5d2e01aad69661d4f94412cc76729771, type: 3}
+    - {fileID: -141496744, guid: 5d2e01aad69661d4f94412cc76729771, type: 3}
+    - {fileID: -141496744, guid: 5d2e01aad69661d4f94412cc76729771, type: 3}
+    - {fileID: -1305814697, guid: 5d2e01aad69661d4f94412cc76729771, type: 3}
+    Fps: 7.5
   UseSingleRenderer: 0
 --- !u!114 &8102884592893799085
 MonoBehaviour:

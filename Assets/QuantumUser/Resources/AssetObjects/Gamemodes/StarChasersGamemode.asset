@@ -40,6 +40,20 @@ MonoBehaviour:
       Value: 269903407669338010
   - Id:
       Value: 378514462062875007
+  - Id:
+      Value: 322899661718601242
+  - Id:
+      Value: 285548178290137776
+  - Id:
+      Value: 356659162481914639
+  - Id:
+      Value: 396168740877459959
+  - Id:
+      Value: 492920412872380536
+  - Id:
+      Value: 409967762302464846
+  - Id:
+      Value: 408182868449290730
   FallbackCoinItem:
     Id:
       Value: 390055422968795145
@@ -56,7 +70,7 @@ MonoBehaviour:
     StarsToWin: 10
     CoinsForPowerup: 8
     Lives: 0
-    TimerSeconds: 0
+    TimerMinutes: 0
     TeamsEnabled:
       Value: 0
     CustomPowerupsEnabled:

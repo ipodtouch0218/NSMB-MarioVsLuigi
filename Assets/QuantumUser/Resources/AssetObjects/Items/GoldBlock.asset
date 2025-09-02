@@ -22,7 +22,7 @@ MonoBehaviour:
   SpawnChance:
     RawValue: -65536
   LosingSpawnBonus:
-    RawValue: 262144
+    RawValue: -65536
   BlockSpawnSoundEffect: 69
   BigPowerup: 0
   VerticalPowerup: 0

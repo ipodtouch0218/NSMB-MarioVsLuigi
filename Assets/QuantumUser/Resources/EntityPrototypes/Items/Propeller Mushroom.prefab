@@ -365,6 +365,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   graphicsRoot: {fileID: 7382415506076328421}
   renderer: {fileID: 5475970293224446295}
+  retroRenderer: {fileID: 5738179009964229496}
   childAnimator: {fileID: 0}
   childAnimation: {fileID: 5475970293224446293}
   blinkingRate: 4
@@ -808,3 +809,4 @@ MonoBehaviour:
   ListOfObject:
   - {fileID: 3552150030264483580}
   - {fileID: 4687148268801153799}
+  NoOfFrames: 0

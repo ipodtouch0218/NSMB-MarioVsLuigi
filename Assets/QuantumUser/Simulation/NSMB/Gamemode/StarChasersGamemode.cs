@@ -84,7 +84,7 @@ namespace Quantum {
         }
 
         public override int GetObjectiveCount(Frame f, MarioPlayer* mario) {
-            if (mario == null || mario->Disconnected || (mario->Lives == 0 && f.Global->Rules.IsLivesEnabled)) {
+            if (mario == null || mario->Disconnected || (mario->Lives == 0 && (f.Global->Rules.IsLivesEnabled || mario->HadLives))) {
                 return -1;
             }
 

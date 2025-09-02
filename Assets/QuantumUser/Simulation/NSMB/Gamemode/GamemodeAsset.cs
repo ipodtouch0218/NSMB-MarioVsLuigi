@@ -145,7 +145,7 @@ namespace Quantum {
             }
 
             while (allPlayers.NextUnsafe(out _, out MarioPlayer* mario)) {
-                if (mario->Disconnected || (mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled)) {
+                if (mario->Disconnected || (mario->Lives <= 0 && (f.Global->Rules.IsLivesEnabled || mario->HadLives))) {
                     continue;
                 }
                 if (mario->GetTeam(f) is not byte team) {
@@ -175,7 +175,7 @@ namespace Quantum {
             allPlayers.UseCulling = false;
             while (allPlayers.NextUnsafe(out _, out MarioPlayer* mario)) {
                 if (mario->GetTeam(f) != team
-                    || (mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled)
+                    || (mario->Lives <= 0 && (f.Global->Rules.IsLivesEnabled || mario->HadLives))
                     || mario->Disconnected) {
                     continue;
                 }

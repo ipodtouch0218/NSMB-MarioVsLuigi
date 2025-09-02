@@ -9,6 +9,7 @@ namespace NSMB.Entities.CoinItems {
         //---Serialized
         [SerializeField] private Transform graphicsRoot;
         [SerializeField] private new Renderer renderer;
+        [SerializeField] private SpriteRenderer retroRenderer;
         [SerializeField] private Animator childAnimator;
         [SerializeField] private Animation childAnimation;
         [SerializeField] private float blinkingRate = 4, scaleRate = 0.1333f, scaleSize = 0.3f;
@@ -47,12 +48,14 @@ namespace NSMB.Entities.CoinItems {
             if (f.Exists(coinItem->ParentMarioPlayer)) {
                 // Following mario
                 renderer.sortingOrder = 15;
+                retroRenderer.sortingOrder = 15;
                 if (childAnimator) {
                     childAnimator.enabled = false;
                 }
             } else if (coinItem->BlockSpawn) {
                 // Block spawn
                 renderer.sortingOrder = -1000;
+                retroRenderer.sortingOrder = -1000;
                 if (!IsReplayFastForwarding) {
                     sfx.PlayOneShot(scriptable.BlockSpawnSoundEffect);
                 }
@@ -62,6 +65,7 @@ namespace NSMB.Entities.CoinItems {
             } else if (coinItem->LaunchSpawn) {
                 // Spawn with velocity
                 renderer.sortingOrder = -1000;
+                retroRenderer.sortingOrder = -1000;
                 if (!IsReplayFastForwarding) {
                     sfx.PlayOneShot(scriptable.BlockSpawnSoundEffect);
                 }
@@ -74,6 +78,7 @@ namespace NSMB.Entities.CoinItems {
                     childAnimation.Play();
                 }
                 renderer.sortingOrder = originalSortingOrder;
+                retroRenderer.sortingOrder = originalSortingOrder;
             }
         }
 
@@ -112,6 +117,7 @@ namespace NSMB.Entities.CoinItems {
                 renderer.transform.localScale = Vector3.one;
                 inSpawnAnimation = false;
                 renderer.sortingOrder = 15;
+                retroRenderer.sortingOrder = 15;
 
                 mpb.SetFloat("WaveEnabled", 1);
                 renderer.SetPropertyBlock(mpb);
@@ -130,6 +136,7 @@ namespace NSMB.Entities.CoinItems {
             }
 
             renderer.sortingOrder = originalSortingOrder;
+            retroRenderer.sortingOrder = originalSortingOrder;
             renderer.gameObject.transform.localScale = Vector3.one;
             if (childAnimator) {
                 childAnimator.enabled = true;

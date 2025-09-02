@@ -124,7 +124,7 @@ namespace NSMB.UI.Game.Scoreboard {
                     return starDiff;
                 }
 
-                if (f.Global->Rules.IsLivesEnabled && (marioA->Lives != marioB->Lives)) {
+                if ((f.Global->Rules.IsLivesEnabled || (marioA->Lives > 0 && marioB->Lives > 0)) && (marioA->Lives != marioB->Lives)) {
                     return marioB->Lives - marioA->Lives;
                 }
 
@@ -165,7 +165,7 @@ namespace NSMB.UI.Game.Scoreboard {
                 }
                 TeamAsset team = f.FindAsset(teamAssets[i]);
                 result.Append(Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal);
-                result.Append(Utils.GetSymbolString("x" + objectiveCount));
+                result.Append(Utils.GetSymbolString("x" + objectiveCount, null, true));
             }
 
             teamHeaderText.text = result.ToString();
@@ -181,7 +181,7 @@ namespace NSMB.UI.Game.Scoreboard {
             }
 
             if (spectators > 0) {
-                spectatorText.text = "<sprite name=room_spectator>" + Utils.GetSymbolString("x" + spectators.ToString());
+                spectatorText.text = "<sprite name=room_spectator>" + Utils.GetSymbolString("x" + spectators.ToString(), null, true);
             } else {
                 spectatorText.text = "";
             }

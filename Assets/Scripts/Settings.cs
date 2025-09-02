@@ -255,6 +255,14 @@ namespace NSMB {
             PlayerPrefs.SetInt("General_MaxTempReplays", generalMaxTempReplays);
             PlayerPrefs.SetInt("General_DiscordIntegration", GeneralDiscordIntegration ? 1 : 0);
 
+            //New palette
+            PlayerPrefs.SetFloat("General_PrimaryHue", primaryHue);
+            PlayerPrefs.SetFloat("General_SecondaryHue", secondaryHue);
+            PlayerPrefs.SetInt("General_PrimaryHueEnabled", primaryHueEnabled ? 1 : 0);
+            PlayerPrefs.SetInt("General_SecondaryHueEnabled", secondaryHueEnabled ? 1 : 0);
+            PlayerPrefs.SetInt("General_PrimaryHueGrayscale", primaryHueGrayscale ? 1 : 0);
+            PlayerPrefs.SetInt("General_SecondaryHueGrayscale", secondaryHueGrayscale ? 1 : 0);
+
             // Graphics
             PlayerPrefs.SetString("Graphics_FullscreenResolution", Screen.currentResolution.width + "," + Screen.currentResolution.height);
             PlayerPrefs.SetInt("Graphics_FullscreenMode", GraphicsFullscreenMode);
@@ -333,6 +341,13 @@ namespace NSMB {
             GeneralReplaysEnabled = true;
             generalMaxTempReplays = 20;
             _generalDiscordIntegration = true;
+
+            primaryHue = PlayerPrefs.GetFloat("General_PrimaryHue");
+            secondaryHue = PlayerPrefs.GetFloat("General_SecondaryHue");
+            primaryHueEnabled = PlayerPrefs.GetInt("General_PrimaryHueEnabled") != 0;
+            secondaryHueEnabled = PlayerPrefs.GetInt("General_SecondaryHueEnabled") != 0;
+            primaryHueGrayscale = PlayerPrefs.GetInt("General_PrimaryHueGrayscale") != 0;
+            secondaryHueGrayscale = PlayerPrefs.GetInt("General_SecondaryHueGrayscale") != 0;
 
             GraphicsFullscreenResolution = Screen.resolutions[^1].width + "," + Screen.resolutions[^1].height;
             GraphicsFullscreenMode = (int) Screen.fullScreenMode;

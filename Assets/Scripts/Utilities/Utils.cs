@@ -222,7 +222,7 @@ namespace NSMB.Utilities {
                 }
 
                 if (existingMario == null
-                    || (f.Global->GameState >= GameState.Playing && f.Global->Rules.IsLivesEnabled && existingMario->Lives <= 0)) {
+                    || (f.Global->GameState >= GameState.Playing && (f.Global->Rules.IsLivesEnabled || existingMario->HadLives) && existingMario->Lives <= 0)) {
                     return spectatorColor;
                 }
             }

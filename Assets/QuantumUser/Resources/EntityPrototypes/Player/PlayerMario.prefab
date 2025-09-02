@@ -155,7 +155,7 @@ Transform:
   m_GameObject: {fileID: 807487591277816165}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.9}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -225,7 +225,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 0
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -925,9 +925,14 @@ MonoBehaviour:
   spriteScale:
   - 0
   - 1
+  - 1
   megaSpriteScale:
   - 0
   - 1
+  - 1
+  currentAnimationState: 0
+  capeAnimationState: 0
+  TestFloat: 0
   StarmanGradients:
   - HatGradient:
       serializedVersion: 2
@@ -1108,6 +1113,96 @@ MonoBehaviour:
       m_Mode: 1
       m_ColorSpace: 0
       m_NumColorKeys: 4
+      m_NumAlphaKeys: 3
+  - HatGradient:
+      serializedVersion: 2
+      key0: {r: 0.84705883, g: 0, b: 0, a: 0}
+      key1: {r: 0.2, g: 0, b: 0.2, a: 0}
+      key2: {r: 0, g: 0, b: 0, a: 1}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 65535
+      ctime3: 65535
+      ctime4: 65535
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 16384
+      atime2: 65535
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 1
+      m_ColorSpace: 0
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 3
+    OverallsGradient:
+      serializedVersion: 2
+      key0: {r: 0, g: 0, b: 0, a: 0}
+      key1: {r: 0.4392157, g: 0.40784314, b: 0, a: 0}
+      key2: {r: 0.70980394, g: 0.19215687, b: 0.1254902, a: 1}
+      key3: {r: 0.99607843, g: 0.43137255, b: 0.8, a: 0}
+      key4: {r: 0.6784314, g: 0.6784314, b: 0.6784314, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 16384
+      ctime2: 32768
+      ctime3: 49151
+      ctime4: 65535
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 16384
+      atime2: 65535
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 1
+      m_ColorSpace: 0
+      m_NumColorKeys: 5
+      m_NumAlphaKeys: 3
+    SkinGradient:
+      serializedVersion: 2
+      key0: {r: 0, g: 0, b: 0, a: 0}
+      key1: {r: 0.972549, g: 0.6901961, b: 0.0627451, a: 0}
+      key2: {r: 0.972549, g: 0.972549, b: 0.972549, a: 1}
+      key3: {r: 0.972549, g: 0.972549, b: 0.972549, a: 0}
+      key4: {r: 0.89411765, g: 0.8980392, b: 0.5803922, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 16384
+      ctime2: 32768
+      ctime3: 49151
+      ctime4: 65535
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 16384
+      atime2: 65535
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 1
+      m_ColorSpace: 0
+      m_NumColorKeys: 5
       m_NumAlphaKeys: 3
 --- !u!114 &8832712012989740833
 MonoBehaviour:

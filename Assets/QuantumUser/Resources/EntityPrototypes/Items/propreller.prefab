@@ -18,6 +18,11 @@ PrefabInstance:
       propertyPath: childAnimator
       value: 
       objectReference: {fileID: 3726716108760662804}
+    - target: {fileID: 473443410690841455, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+        type: 3}
+      propertyPath: retroRenderer
+      value: 
+      objectReference: {fileID: 8637938864149294636}
     - target: {fileID: 517697212848946230, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
         type: 3}
       propertyPath: Prototype.Scriptable.Id.Value
@@ -206,3 +211,9 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!212 &8637938864149294636 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 1145319354374527610, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+    type: 3}
+  m_PrefabInstance: {fileID: 8648285965656749142}
+  m_PrefabAsset: {fileID: 0}
