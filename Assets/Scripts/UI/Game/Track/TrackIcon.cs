@@ -49,8 +49,11 @@ namespace NSMB.UI.Game.Track {
             transform.localPosition = new(percentage * trackWidth - trackMaxX, transform.localPosition.y, transform.localPosition.z);
 
             if (upArrow && downArrow) {
-                upArrow.enabled = Camera.main.transform.position.y +3.25 < targetTransform.position.y;
-                downArrow.enabled = Camera.main.transform.position.y -3.25 > targetTransform.position.y;
+                var camera = playerElements.Camera;
+                float offset = camera.orthographicSize - 0.25f;
+
+                upArrow.enabled = camera.transform.position.y + offset < targetTransform.position.y;
+                downArrow.enabled = camera.transform.position.y - offset > targetTransform.position.y;
             }
         }
     }

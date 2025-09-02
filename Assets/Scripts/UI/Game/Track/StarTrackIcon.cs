@@ -1,5 +1,6 @@
 using NSMB.Utilities.Extensions;
 using Quantum;
+using Quantum.Collections;
 using UnityEngine;
 
 namespace NSMB.UI.Game.Track {

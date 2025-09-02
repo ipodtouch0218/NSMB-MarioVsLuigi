@@ -100,6 +100,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Atwer *(fr-FR)*
 * Bilhal *(el-gr)*
 * Cecilia *(es-es)*
+* Cleeaf *(sv-SE)*
 * Davodio *(de-de)*
 * Filipianosol *(pl-pl)*
 * Floofdoge *(ar-eg)*
