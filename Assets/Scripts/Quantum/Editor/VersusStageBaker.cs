@@ -16,11 +16,11 @@ namespace NSMB.Quantum {
     public class VersusStageBaker : MapDataBakerCallback {
 
         private static readonly FPVector2[] GridCoords = new FPVector2[] {
-        new(FP._0_50, FP._0_50),
-        new(FP._0_50, -FP._0_50),
-        new(-FP._0_50, -FP._0_50),
-        new(-FP._0_50, FP._0_50),
-    };
+            new(FP._0_50, FP._0_50),
+            new(FP._0_50, -FP._0_50),
+            new(-FP._0_50, -FP._0_50),
+            new(-FP._0_50, FP._0_50),
+        };
 
         private QuantumMapData data;
 
@@ -51,7 +51,7 @@ namespace NSMB.Quantum {
                 LogError("Scene does not have a VersusStageData instance as the Map's UserAsset", data);
                 return;
             }
-
+            
             GameObject tilemapGo = GameObject.FindFirstObjectByType<TilemapAnimator>().gameObject;
             if (!tilemapGo || !tilemapGo.TryGetComponent(out Tilemap tilemap)) {
                 LogError("Could not find a main tilemap (one that has a TilemapAnimator component!)");
