@@ -27,7 +27,7 @@ namespace Quantum {
             
             // Parse lobby commands
             var playerDataDictionary = f.ResolveDictionary(f.Global->PlayerDatas);
-            for (int i = 0; i < f.PlayerCount; i++) {
+            for (int i = 0; i < f.MaxPlayerCount; i++) {
                 if (f.GetPlayerCommand(i) is ILobbyCommand lobbyCommand) {
                     var playerData = QuantumUtils.GetPlayerData(f, i, playerDataDictionary);
                     if (playerData == null) {

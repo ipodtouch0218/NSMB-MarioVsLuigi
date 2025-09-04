@@ -15,7 +15,7 @@ namespace Quantum {
             systems.Add(new MvLCullingSystem());
             systems.Add(new GameLogicSystem());
             systems.Add(
-                new StartDisabledSystemGroup("gameplay",
+                new StartDisabledSystemGroup(
                     new PrePhysicsObjectSystem(),
                     new InteractionPhysicsQuerySystem(),
                     new GenericMoverSystem(),

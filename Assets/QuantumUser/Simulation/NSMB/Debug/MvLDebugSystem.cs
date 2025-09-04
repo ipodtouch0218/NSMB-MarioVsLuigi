@@ -4,7 +4,7 @@ using static Quantum.CommandMvLDebugCmd;
 namespace Quantum {
     public unsafe class MvLDebugSystem : SystemMainThread {
         public override void Update(Frame f) {
-            for (int i = 0; i < f.PlayerCount; i++) {
+            for (int i = 0; i < f.MaxPlayerCount; i++) {
                 if (f.GetPlayerCommand(i) is CommandMvLDebugCmd cmd) {
                     ExecuteCommand(f, i, cmd);
                 }

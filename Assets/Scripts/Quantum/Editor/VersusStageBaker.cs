@@ -16,11 +16,11 @@ namespace NSMB.Quantum {
     public class VersusStageBaker : MapDataBakerCallback {
 
         private static readonly FPVector2[] GridCoords = new FPVector2[] {
-        new(FP._0_50, FP._0_50),
-        new(FP._0_50, -FP._0_50),
-        new(-FP._0_50, -FP._0_50),
-        new(-FP._0_50, FP._0_50),
-    };
+            new(FP._0_50, FP._0_50),
+            new(FP._0_50, -FP._0_50),
+            new(-FP._0_50, -FP._0_50),
+            new(-FP._0_50, FP._0_50),
+        };
 
         private QuantumMapData data;
 

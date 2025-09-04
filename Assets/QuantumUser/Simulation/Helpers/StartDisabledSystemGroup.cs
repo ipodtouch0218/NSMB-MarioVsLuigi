@@ -2,7 +2,7 @@ namespace Quantum {
     public class StartDisabledSystemGroup : SystemGroup {
         public override bool StartEnabled => false;
 
-        public StartDisabledSystemGroup(string name, params SystemBase[] children) : base(name, children) {
+        public StartDisabledSystemGroup(params SystemBase[] children) : base(children) {
 
         }
     }
