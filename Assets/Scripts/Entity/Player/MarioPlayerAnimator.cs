@@ -45,6 +45,8 @@ namespace NSMB.Entities.Player {
         private static readonly int StateMegaCancel = Animator.StringToHash("mega-cancel");
         private static readonly int StateJumplanding = Animator.StringToHash("jumplanding");
 
+        private static readonly int StateJumplandingEdge = Animator.StringToHash("jumplanding-edge");
+
         private static readonly int ParamVelocityX = Animator.StringToHash("velocityX");
         private static readonly int ParamVelocityY = Animator.StringToHash("velocityY");
         private static readonly int ParamVelocityMagnitude = Animator.StringToHash("velocityMagnitude");
@@ -770,7 +772,7 @@ namespace NSMB.Entities.Player {
             var marioTransform = f.Unsafe.GetPointer<Transform2D>(EntityRef);
 
             // CameraController.ScreenShake = 0.15f;
-            SpawnParticle(Enums.PrefabParticle.Player_Groundpound.GetGameObject(), marioTransform->Position.ToUnityVector2() + new Vector2(mario->FacingRight ? 0.5f : -0.5f, 0));
+            SpawnParticle(Enums.PrefabParticle.Player_MegaFootstep.GetGameObject(), marioTransform->Position.ToUnityVector2() + new Vector2(mario->FacingRight ? 0.5f : -0.5f, 0));
             PlaySound(SoundEffect.Powerup_MegaMushroom_Walk, variant: (byte) (footstepVariant ? 1 : 2));
             GlobalController.Instance.rumbleManager.RumbleForSeconds(0.5f, 0f, 0.1f, RumbleManager.RumbleSetting.High);
             CameraAnimator.TriggerScreenshake(0.15f);
@@ -1111,7 +1113,9 @@ namespace NSMB.Entities.Player {
             if (e.PowerupState == PowerupState.MegaMushroom) {
                 PlaySound(SoundEffect.Powerup_MegaMushroom_Groundpound);
 
-                SpawnParticle(Enums.PrefabParticle.Player_Groundpound.GetGameObject(), transform.position + (Vector3.back * 5));
+                SpawnParticle(Enums.PrefabParticle.Player_MegaGroundpoundStars.GetGameObject(), transform.position + (Vector3.back * 5));
+                SpawnParticle(Enums.PrefabParticle.Player_MegaGroundpoundDust.GetGameObject(), transform.position + (Vector3.back * 5));
+                SpawnParticle(Enums.PrefabParticle.Player_MegaGroundpoundImpact.GetGameObject(), transform.position + (Vector3.back * 5));
                 CameraAnimator.TriggerScreenshake(0.35f);
 
                 if (IsMarioLocal(e.Entity)) {
@@ -1235,8 +1239,15 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            if (animator.GetCurrentAnimatorStateInfo(0).shortNameHash == StateFalling) {
-                animator.Play(StateJumplanding);
+            if (animator.GetCurrentAnimatorStateInfo(0).shortNameHash == StateFalling || animator.GetCurrentAnimatorStateInfo(0).shortNameHash == ParamTripleJump)
+            {
+                if (animator.GetCurrentAnimatorStateInfo(0).shortNameHash == StateFalling) {
+                    animator.Play(StateJumplanding);
+                }
+                else if (animator.GetCurrentAnimatorStateInfo(0).shortNameHash == ParamTripleJump) {
+                    animator.Play(StateJumplandingEdge);
+                    SpawnParticle(Enums.PrefabParticle.Player_TripleJumpLandingDust.GetGameObject(), transform.position + Vector3.back * 5);
+                }
             }
         }
 
