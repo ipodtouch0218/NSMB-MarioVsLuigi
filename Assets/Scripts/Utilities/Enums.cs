@@ -18,7 +18,8 @@ public static class Enums {
         MegaMushroom = 1 << 1,
     }
 
-    public enum PrefabParticle : byte {
+    public enum PrefabParticle : byte
+    {
         [PrefabParticleData("Prefabs/Particle/GreenPipe")] Pipe_Break_Green,
         [PrefabParticleData("Prefabs/Particle/GreenPipe-D")] Pipe_Break_Green_Broken,
         [PrefabParticleData("Prefabs/Particle/BluePipe")] Pipe_Break_Blue,
@@ -34,8 +35,13 @@ public static class Enums {
 
         [PrefabParticleData("Prefabs/Particle/WalljumpParticle")] Player_WallJump,
         [PrefabParticleData("Prefabs/Particle/GroundpoundDust")] Player_Groundpound,
+        [PrefabParticleData("Prefabs/Particle/MegaGroundpoundStars")] Player_MegaGroundpoundStars,
+        [PrefabParticleData("Prefabs/Particle/MegaGroundpoundDust")] Player_MegaGroundpoundDust,
+        [PrefabParticleData("Prefabs/Particle/MegaGroundpoundImpact")] Player_MegaGroundpoundImpact,
         [PrefabParticleData("Prefabs/Particle/MegaMushroomGrow")] Player_MegaMushroom,
         [PrefabParticleData("Prefabs/Particle/WaterDust")] Player_WaterDust,
+        [PrefabParticleData("Prefabs/Particle/TripleJumpLandingDust")] Player_TripleJumpLandingDust,
+        [PrefabParticleData("Prefabs/Particle/MegaFootstep")] Player_MegaFootstep,
     }
 
     #endregion
