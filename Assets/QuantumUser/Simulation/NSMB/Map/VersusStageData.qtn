@@ -26,6 +26,7 @@ event TileBroken {
     IntVector2 Position;
     StageTileInstance Tile;
     bool BrokenByMega;
+    FP BreakSpeed;
 }
 
 event TimerExpired {

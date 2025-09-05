@@ -21,6 +21,9 @@ input {
 	button PowerupAction;
 	button FireballPowerupAction;
 	button PropellerPowerupAction;
+
+	// Buttons can be packed. And we want this to be packed.
+	button AllowGroundpoundWithLeftRight;
 }
 
 enum JumpState : Byte {

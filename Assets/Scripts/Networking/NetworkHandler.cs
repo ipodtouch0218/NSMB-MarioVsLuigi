@@ -413,7 +413,7 @@ namespace NSMB.Networking {
                 { Enums.NetRoomProperties.BoolProperties, (int) props }
             });
 
-            QuantumRunner.Default.Session.MaxVerifiedTicksPerUpdate = e.NewState == GameState.Playing ? 3 : int.MaxValue;
+            QuantumRunner.Default.Session.MaxVerifiedTicksPerUpdate = e.NewState == GameState.Playing ? 8 : int.MaxValue;
         }
 
         private unsafe void OnGameStarted(CallbackGameStarted e) {

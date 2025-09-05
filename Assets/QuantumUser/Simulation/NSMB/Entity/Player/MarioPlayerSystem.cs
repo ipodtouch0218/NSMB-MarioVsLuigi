@@ -920,11 +920,9 @@ namespace Quantum {
                 }
             }
 
-            /// * intentional: remove left/right requirement when groundpounding
-            if (!mario->IsPropellerFlying && !mario->IsSpinnerFlying && (inputs.Left.IsDown || inputs.Right.IsDown)) {
+            if (!mario->IsPropellerFlying && !mario->IsSpinnerFlying && !inputs.AllowGroundpoundWithLeftRight && (inputs.Left.IsDown || inputs.Right.IsDown)) {
                 return;
             }
-            // */
 
             if (mario->IsSpinnerFlying) {
                 // Start drill
@@ -2623,7 +2621,7 @@ namespace Quantum {
                     for (int i = 0; i < overlappingTiles; i++) {
                         StageTile stageTile = f.FindAsset(tiles[i].Tile.Tile);
                         if (stageTile is BreakableBrickTile bbt && bbt.BreakingRules.HasFlag(BreakableBrickTile.BreakableBy.LargeMario)) {
-                            f.Events.TileBroken(entity, tiles[i].Position, tiles[i].Tile, false);
+                            f.Events.TileBroken(entity, tiles[i].Position, tiles[i].Tile, false, FP._0);
                             stage.SetTileRelative(f, tiles[i].Position, default);
                         }
                     }

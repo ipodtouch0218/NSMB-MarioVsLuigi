@@ -1,12 +1,12 @@
 using Quantum;
 using System;
-using UnityEngine;
 using UnityEngine.Serialization;
 
 public class PaletteSet : AssetObject {
 
     public CharacterSpecificPalette[] colors = { new() };
     public string translationKey;
+    public int order;
 
     public CharacterSpecificPalette GetPaletteForCharacter(AssetRef<CharacterAsset> player) {
         CharacterSpecificPalette nullPlayer = null;

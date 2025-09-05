@@ -217,7 +217,7 @@ namespace NSMB {
         public bool audioMuteMusicOnUnfocus, audioMuteSFXOnUnfocus, audioPanning, audioRestartMusicOnDeath;
 
         public RumbleManager.RumbleSetting controlsRumble;
-        public bool controlsFireballSprint, controlsAutoSprint, controlsPropellerJump;
+        public bool controlsFireballSprint, controlsAutoSprint, controlsPropellerJump, controlsAllowGroundpoundWithLeftRight;
 
         public bool miscFilterFullRooms, miscFilterInProgressRooms;
 
@@ -281,6 +281,7 @@ namespace NSMB {
             PlayerPrefs.SetInt("Controls_AutoSprint", controlsAutoSprint ? 1 : 0);
             PlayerPrefs.SetInt("Controls_PropellerJump", controlsPropellerJump ? 1 : 0);
             PlayerPrefs.SetInt("Controls_Rumble", (int) controlsRumble);
+            PlayerPrefs.SetInt("Controls_AllowGroundpoundWithLeftRight", controlsAllowGroundpoundWithLeftRight ? 1 : 0);
             PlayerPrefs.SetString("Controls_Bindings", ControlsBindings);
 
             // Misc
@@ -361,6 +362,7 @@ namespace NSMB {
             controlsRumble = RumbleManager.RumbleSetting.None;
             controlsFireballSprint = PlayerPrefs.GetInt("FireballFromSprint", 1) == 1;
             controlsAutoSprint = false;
+            controlsAllowGroundpoundWithLeftRight = false;
             controlsPropellerJump = false;
 
             miscFilterFullRooms = false;
@@ -411,6 +413,7 @@ namespace NSMB {
             TryGetSetting("Controls_FireballFromSprint", ref controlsFireballSprint);
             TryGetSetting("Controls_AutoSprint", ref controlsAutoSprint);
             TryGetSetting("Controls_PropellerJump", ref controlsPropellerJump);
+            TryGetSetting("Controls_AllowGroundpoundWithLeftRight", ref controlsAllowGroundpoundWithLeftRight);
             TryGetSetting("Controls_Rumble", ref controlsRumble);
             TryGetSetting<string>("Controls_Bindings", nameof(ControlsBindings));
 

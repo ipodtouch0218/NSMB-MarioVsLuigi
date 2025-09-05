@@ -1,6 +1,7 @@
 using NSMB.UI.Elements;
 using Quantum;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -23,11 +24,10 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
         //---Private Variables
         private readonly List<PaletteButton> paletteButtons = new();
-        private readonly List<Button> buttons = new();
         private readonly List<Navigation> navigations = new();
         private GameObject blocker;
         private CharacterAsset character;
-        private int selected;
+        private int selectedPaletteIndex;
         private bool initialized;
 
         public void OnDisable() {
@@ -39,10 +39,15 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                 return;
             }
 
-            AssetRef<PaletteSet>[] palettes = GlobalController.Instance.config.Palettes;
+            int palettesPerRow = template.transform.parent.GetComponent<GridLayoutGroup>().constraintCount;
+
+            PaletteSet[] palettes = GlobalController.Instance.config.Palettes
+                .Select(QuantumUnityDB.GetGlobalAsset)
+                .OrderBy(ps => ps ? ps.order : int.MinValue)
+                .ToArray();
 
             for (int i = 0; i < palettes.Length; i++) {
-                PaletteSet palette = QuantumUnityDB.GetGlobalAsset(palettes[i]);
+                PaletteSet palette = palettes[i];
 
                 GameObject newButton = Instantiate(template, template.transform.parent);
                 PaletteButton cb = newButton.GetComponent<PaletteButton>();
@@ -56,28 +61,27 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                 }
 
                 newButton.SetActive(true);
-                buttons.Add(b);
 
                 Navigation navigation = new() { mode = Navigation.Mode.Explicit };
 
-                if (i > 0 && i % 4 != 0) {
+                if (i > 0 && i % palettesPerRow != 0) {
                     Navigation n = navigations[i - 1];
                     n.selectOnRight = b;
                     navigations[i - 1] = n;
-                    navigation.selectOnLeft = buttons[i - 1];
+                    navigation.selectOnLeft = paletteButtons[i - 1].button;
                 }
-                if (i >= 4) {
-                    Navigation n = navigations[i - 4];
+                if (i >= palettesPerRow) {
+                    Navigation n = navigations[i - palettesPerRow];
                     n.selectOnDown = b;
-                    navigations[i - 4] = n;
-                    navigation.selectOnUp = buttons[i - 4];
+                    navigations[i - palettesPerRow] = n;
+                    navigation.selectOnUp = paletteButtons[i - palettesPerRow].button;
                 }
 
                 navigations.Add(navigation);
             }
 
-            for (int i = 0; i < buttons.Count; i++) {
-                buttons[i].navigation = navigations[i];
+            for (int i = 0; i < paletteButtons.Count; i++) {
+                paletteButtons[i].button.navigation = navigations[i];
             }
             initialized = true;
 
@@ -91,11 +95,11 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                 b.Instantiate(data);
             }
             character = data;
-            ChangePaletteButton(selected);
+            ChangePaletteButton(selectedPaletteIndex);
         }
 
         public void ChangePaletteButton(int index) {
-            selected = index;
+            selectedPaletteIndex = index;
             AssetRef<PaletteSet>[] palettes = GlobalController.Instance.config.Palettes;
             PaletteSet palette = null;
 
@@ -117,8 +121,14 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
 
         public void SelectPalette(Button button) {
-            int newIndex = buttons.IndexOf(button);
+            PaletteButton selectedButton = paletteButtons.FirstOrDefault(pb => pb.button == button);
+            if (selectedButton == null) {
+                return;
+            }
+
             QuantumGame game = QuantumRunner.DefaultGame;
+            int newIndex = game.Configurations.Simulation.Palettes.IndexOf(pbar => pbar == selectedButton.palette);
+
             foreach (var slot in game.GetLocalPlayerSlots()) {
                 game.SendCommand(slot, new CommandChangePlayerData { 
                     EnabledChanges = CommandChangePlayerData.Changes.Palette,
@@ -127,9 +137,9 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
             
             Close(false);
-            selected = newIndex;
-            ChangePaletteButton(selected);
-            Settings.Instance.generalPalette = selected;
+            selectedPaletteIndex = newIndex;
+            ChangePaletteButton(selectedPaletteIndex);
+            Settings.Instance.generalPalette = selectedPaletteIndex;
             Settings.Instance.SaveSettings();
             canvas.PlayConfirmSound();
         }
@@ -142,7 +152,15 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             content.SetActive(true);
             canvas.PlayCursorSound();
 
-            EventSystem.current.SetSelectedGameObject(buttons[selected].gameObject);
+            QuantumGame game = QuantumRunner.DefaultGame;
+            var selectedPalette = game.Configurations.Simulation.Palettes[selectedPaletteIndex];
+            var selectedPaletteButton = paletteButtons.FirstOrDefault(pb => pb.palette == selectedPalette);
+
+            if (selectedPaletteButton == null) {
+                selectedPaletteButton = paletteButtons[0];
+            }
+
+            EventSystem.current.SetSelectedGameObject(selectedPaletteButton.gameObject);
         }
 
         public void Close(bool playSound) {

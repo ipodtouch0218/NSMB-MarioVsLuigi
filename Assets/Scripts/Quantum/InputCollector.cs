@@ -94,6 +94,7 @@ namespace NSMB.Quantum {
                     PowerupAction = powerupAction,
                     FireballPowerupAction = Settings.Instance.controlsFireballSprint && sprint,
                     PropellerPowerupAction = Settings.Instance.controlsPropellerJump && jump,
+                    AllowGroundpoundWithLeftRight = Settings.Instance.controlsAllowGroundpoundWithLeftRight,
                 };
             }
 

@@ -4,6 +4,7 @@ using Quantum;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Photon.Deterministic;
 using static NSMB.Utilities.QuantumViewUtils;
 
 namespace NSMB.Tiles {
@@ -166,6 +167,15 @@ namespace NSMB.Tiles {
 
                 sfx.PlayOneShot(e.BrokenByMega ? SoundEffect.Powerup_MegaMushroom_Break_Block : SoundEffect.World_Block_Break);
                 entityBreakBlockSounds[e.Entity] = sfx;
+            }
+
+            if (e.BrokenByMega && e.BreakSpeed != FP._0) {
+                var bazingaParticle = particle.velocityOverLifetime;
+                bazingaParticle.x = new ParticleSystem.MinMaxCurve(e.BreakSpeed.AsFloat);
+                bazingaParticle.enabled = true;
+                var bazongaParticle = particle.rotationOverLifetime;
+                bazongaParticle.x = new ParticleSystem.MinMaxCurve(e.BreakSpeed.AsFloat * 360f);
+                bazongaParticle.enabled = true;
             }
 
             particle.Play();

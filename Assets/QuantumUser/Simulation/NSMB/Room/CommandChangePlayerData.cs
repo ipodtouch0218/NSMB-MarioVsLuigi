@@ -29,6 +29,15 @@ namespace Quantum {
 
             Changes playerChanges = EnabledChanges;
 
+            if (f.Global->GameStartFrames > 0) {
+                // Cannot change team when game is in countdown
+                playerChanges &= ~Changes.Team;
+            }
+
+            if (playerChanges == 0) {
+                return;
+            }
+
             if (playerChanges.HasFlag(Changes.Character)) {
                 playerData->Character = Character;
             }

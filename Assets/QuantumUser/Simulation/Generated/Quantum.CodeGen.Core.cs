@@ -119,6 +119,7 @@ namespace Quantum {
     PowerupAction = 1 << 6,
     FireballPowerupAction = 1 << 7,
     PropellerPowerupAction = 1 << 8,
+    AllowGroundpoundWithLeftRight = 1 << 9,
   }
   public static unsafe partial class FlagsExtensions {
     public static Boolean IsFlagSet(this InputButtons self, InputButtons flag) {
@@ -960,26 +961,28 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Input {
-    public const Int32 SIZE = 108;
+    public const Int32 SIZE = 120;
     public const Int32 ALIGNMENT = 4;
-    [FieldOffset(96)]
+    [FieldOffset(108)]
     public Button Up;
-    [FieldOffset(0)]
-    public Button Down;
-    [FieldOffset(36)]
-    public Button Left;
-    [FieldOffset(72)]
-    public Button Right;
-    [FieldOffset(24)]
-    public Button Jump;
-    [FieldOffset(84)]
-    public Button Sprint;
-    [FieldOffset(48)]
-    public Button PowerupAction;
     [FieldOffset(12)]
-    public Button FireballPowerupAction;
+    public Button Down;
+    [FieldOffset(48)]
+    public Button Left;
+    [FieldOffset(84)]
+    public Button Right;
+    [FieldOffset(36)]
+    public Button Jump;
+    [FieldOffset(96)]
+    public Button Sprint;
     [FieldOffset(60)]
+    public Button PowerupAction;
+    [FieldOffset(24)]
+    public Button FireballPowerupAction;
+    [FieldOffset(72)]
     public Button PropellerPowerupAction;
+    [FieldOffset(0)]
+    public Button AllowGroundpoundWithLeftRight;
     public override readonly Int32 GetHashCode() {
       unchecked { 
         var hash = 19249;
@@ -992,6 +995,7 @@ namespace Quantum {
         hash = hash * 31 + PowerupAction.GetHashCode();
         hash = hash * 31 + FireballPowerupAction.GetHashCode();
         hash = hash * 31 + PropellerPowerupAction.GetHashCode();
+        hash = hash * 31 + AllowGroundpoundWithLeftRight.GetHashCode();
         return hash;
       }
     }
@@ -1009,6 +1013,7 @@ namespace Quantum {
         case InputButtons.PowerupAction: return PowerupAction.IsDown;
         case InputButtons.FireballPowerupAction: return FireballPowerupAction.IsDown;
         case InputButtons.PropellerPowerupAction: return PropellerPowerupAction.IsDown;
+        case InputButtons.AllowGroundpoundWithLeftRight: return AllowGroundpoundWithLeftRight.IsDown;
         default: return false;
       }
     }
@@ -1023,11 +1028,13 @@ namespace Quantum {
         case InputButtons.PowerupAction: return PowerupAction.WasPressed;
         case InputButtons.FireballPowerupAction: return FireballPowerupAction.WasPressed;
         case InputButtons.PropellerPowerupAction: return PropellerPowerupAction.WasPressed;
+        case InputButtons.AllowGroundpoundWithLeftRight: return AllowGroundpoundWithLeftRight.WasPressed;
         default: return false;
       }
     }
     static partial void SerializeCodeGen(void* ptr, FrameSerializer serializer) {
         var p = (Input*)ptr;
+        Button.Serialize(&p->AllowGroundpoundWithLeftRight, serializer);
         Button.Serialize(&p->Down, serializer);
         Button.Serialize(&p->FireballPowerupAction, serializer);
         Button.Serialize(&p->Jump, serializer);
@@ -1189,7 +1196,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct _globals_ {
-    public const Int32 SIZE = 2936;
+    public const Int32 SIZE = 3056;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public AssetRef<Map> Map;
@@ -1213,57 +1220,57 @@ namespace Quantum {
     public Int32 PlayerConnectedCount;
     [FieldOffset(604)]
     [FramePrinter.FixedArrayAttribute(typeof(Input), 10)]
-    private fixed Byte _input_[1080];
-    [FieldOffset(1688)]
+    private fixed Byte _input_[1200];
+    [FieldOffset(1808)]
     public BitSet10 PlayerLastConnectionState;
-    [FieldOffset(1704)]
+    [FieldOffset(1824)]
     public UInt16 BigStarSpawnTimer;
-    [FieldOffset(1752)]
+    [FieldOffset(1872)]
     public EntityRef MainBigStar;
-    [FieldOffset(1744)]
+    [FieldOffset(1864)]
     public BitSet64 UsedStarSpawns;
-    [FieldOffset(1720)]
+    [FieldOffset(1840)]
     public Int32 UsedStarSpawnCount;
-    [FieldOffset(1768)]
+    [FieldOffset(1888)]
     public GameRules Rules;
-    [FieldOffset(1698)]
+    [FieldOffset(1818)]
     public GameState GameState;
-    [FieldOffset(1712)]
+    [FieldOffset(1832)]
     public Int32 StartFrame;
-    [FieldOffset(1716)]
+    [FieldOffset(1836)]
     public Int32 TotalGamesPlayed;
-    [FieldOffset(1706)]
+    [FieldOffset(1826)]
     public UInt16 GameStartFrames;
-    [FieldOffset(1708)]
+    [FieldOffset(1828)]
     public UInt16 PlayerLoadFrames;
-    [FieldOffset(1700)]
+    [FieldOffset(1820)]
     public UInt16 AutomaticStageRefreshInterval;
-    [FieldOffset(1702)]
+    [FieldOffset(1822)]
     public UInt16 AutomaticStageRefreshTimer;
-    [FieldOffset(1816)]
+    [FieldOffset(1936)]
     [FramePrinter.FixedArrayAttribute(typeof(PlayerInformation), 10)]
     private fixed Byte _PlayerInfo_[1120];
-    [FieldOffset(1696)]
+    [FieldOffset(1816)]
     public Byte RealPlayers;
-    [FieldOffset(1697)]
+    [FieldOffset(1817)]
     public Byte TotalMarios;
-    [FieldOffset(1724)]
+    [FieldOffset(1844)]
     public Int32 WinningTeam;
-    [FieldOffset(1732)]
+    [FieldOffset(1852)]
     public QBoolean HasWinner;
-    [FieldOffset(1728)]
+    [FieldOffset(1848)]
     public PlayerRef Host;
-    [FieldOffset(1736)]
+    [FieldOffset(1856)]
     [AllocateOnComponentAdded()]
     public QDictionaryPtr<PlayerRef, EntityRef> PlayerDatas;
-    [FieldOffset(1740)]
+    [FieldOffset(1860)]
     [AllocateOnComponentAdded()]
     public QListPtr<BannedPlayerInfo> BannedPlayerIds;
-    [FieldOffset(1760)]
+    [FieldOffset(1880)]
     public FP Timer;
     public readonly FixedArray<Input> input {
       get {
-        fixed (byte* p = _input_) { return new FixedArray<Input>(p, 108, 10); }
+        fixed (byte* p = _input_) { return new FixedArray<Input>(p, 120, 10); }
       }
     }
     public readonly FixedArray<PlayerInformation> PlayerInfo {
@@ -3930,6 +3937,7 @@ namespace Quantum {
       i->PowerupAction = i->PowerupAction.Update(this.Number, input.PowerupAction);
       i->FireballPowerupAction = i->FireballPowerupAction.Update(this.Number, input.FireballPowerupAction);
       i->PropellerPowerupAction = i->PropellerPowerupAction.Update(this.Number, input.PropellerPowerupAction);
+      i->AllowGroundpoundWithLeftRight = i->AllowGroundpoundWithLeftRight.Update(this.Number, input.AllowGroundpoundWithLeftRight);
     }
     public Input* GetPlayerInput(PlayerRef player) {
       if ((int)player >= (int)_globals->input.Length) { throw new System.ArgumentOutOfRangeException("player"); }
