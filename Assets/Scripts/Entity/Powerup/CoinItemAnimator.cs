@@ -87,6 +87,10 @@ namespace NSMB.Entities.CoinItems {
                 return;
             }
 
+            if (childAnimator) {
+                childAnimator.SetBool("blockSpawn", coinItem->BlockSpawn && coinItem->SpawnAnimationFrames > 0);
+            }
+            
             if (f.Unsafe.TryGetPointer(EntityRef, out PhysicsObject* physicsObject)) {
                 if (childAnimator) {
                     childAnimator.SetBool("onGround", physicsObject->IsTouchingGround);
