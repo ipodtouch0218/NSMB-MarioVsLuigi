@@ -527,6 +527,7 @@ namespace Quantum.Prototypes {
     public Button PowerupAction;
     public Button FireballPowerupAction;
     public Button PropellerPowerupAction;
+    public Button AllowGroundpoundWithLeftRight;
     partial void MaterializeUser(Frame frame, ref Quantum.Input result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.Input result, in PrototypeMaterializationContext context = default) {
         result.Up = this.Up;
@@ -538,6 +539,7 @@ namespace Quantum.Prototypes {
         result.PowerupAction = this.PowerupAction;
         result.FireballPowerupAction = this.FireballPowerupAction;
         result.PropellerPowerupAction = this.PropellerPowerupAction;
+        result.AllowGroundpoundWithLeftRight = this.AllowGroundpoundWithLeftRight;
         MaterializeUser(frame, ref result, in context);
     }
   }

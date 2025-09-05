@@ -10,26 +10,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce8b0cb6c1d54e5428273c6662ede73f, type: 3}
-  m_Name: 18 Maroon
+  m_Name: 24 Yellow
   m_EditorClassIdentifier: 
   Identifier:
-    Path: QuantumUser/Resources/AssetObjects/Palettes/18 Maroon
+    Path: QuantumUser/Resources/AssetObjects/Palettes/24 Yellow
     Guid:
-      Value: 448831233412633846
+      Value: 438340492681313369
   colors:
   - Character:
       Id:
         Value: 0
     ShirtColor:
-      R: 126
-      G: 39
-      B: 57
+      R: 183
+      G: 143
+      B: 8
       A: 255
     OverallsColor:
-      R: 236
-      G: 171
-      B: 171
+      R: 246
+      G: 234
+      B: 38
       A: 255
     HatUsesOverallsColor: 0
-  translationKey: skin.maroon
-  order: 20
+  translationKey: skin.yellow
+  order: 4

@@ -51,10 +51,16 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
         }
 
-        public void SelectTeam(TeamButton team) {
+        public unsafe void SelectTeam(TeamButton team) {
             selected = team.index;
 
             var game = QuantumRunner.DefaultGame;
+
+            if (game.Frames.Predicted.Global->GameStartFrames > 0) {
+                canvas.PlaySound(SoundEffect.UI_Error);
+                return;
+            }
+
             foreach (int slot in game.GetLocalPlayerSlots()) {
                 game.SendCommand(slot, new CommandChangePlayerData {
                     EnabledChanges = CommandChangePlayerData.Changes.Team,

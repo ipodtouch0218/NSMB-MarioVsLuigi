@@ -17,7 +17,7 @@ MonoBehaviour:
     Guid:
       Value: 520065536123357703
   colors:
-  - character:
+  - Character:
       Id:
         Value: 0
     ShirtColor:
@@ -30,7 +30,6 @@ MonoBehaviour:
       G: 39
       B: 39
       A: 255
-    shirtColor: {r: 0.4056604, g: 0, b: 0, a: 1}
-    overallsColor: {r: 1, g: 0.15294118, b: 0.15294118, a: 1}
-    hatUsesOverallsColor: 0
+    HatUsesOverallsColor: 0
   translationKey: skin.red
+  order: 1

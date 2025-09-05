@@ -22,16 +22,18 @@ MonoBehaviour:
   SpawnChance:
     RawValue: 131072
   LosingSpawnBonus:
-    RawValue: -655360
+    RawValue: -262144
+  BlockSpawnSoundEffect: 69
   BigPowerup: 0
   VerticalPowerup: 0
   CustomPowerup: 0
   LivesOnlyPowerup: 0
+  CanSpawnFromBlock: 1
+  OnlyOneCanExist: 0
   Type: 0
   State: 1
   SoundPlaysEverywhere: 0
   SoundEffect: 45
-  BlockSpawnSoundEffect: 69
   ReserveSprite: {fileID: -1858463510, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}
   AvoidPlayers: 0
   Speed:

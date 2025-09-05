@@ -8,6 +8,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
         //---Public Variables
         public PaletteSet palette;
+        public Button button;
 
         //---Serialized Variables
         [SerializeField] private TMP_Text colorNameString;

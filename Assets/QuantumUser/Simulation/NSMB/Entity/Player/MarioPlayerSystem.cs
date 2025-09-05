@@ -920,11 +920,9 @@ namespace Quantum {
                 }
             }
 
-            /// * intentional: remove left/right requirement when groundpounding
-            if (!mario->IsPropellerFlying && !mario->IsSpinnerFlying && (inputs.Left.IsDown || inputs.Right.IsDown)) {
+            if (!mario->IsPropellerFlying && !mario->IsSpinnerFlying && !inputs.AllowGroundpoundWithLeftRight && (inputs.Left.IsDown || inputs.Right.IsDown)) {
                 return;
             }
-            // */
 
             if (mario->IsSpinnerFlying) {
                 // Start drill

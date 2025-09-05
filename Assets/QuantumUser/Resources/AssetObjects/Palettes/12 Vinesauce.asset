@@ -46,3 +46,4 @@ MonoBehaviour:
       A: 255
     HatUsesOverallsColor: 0
   translationKey: skin.vinesauce
+  order: 14

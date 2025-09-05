@@ -17,7 +17,7 @@ MonoBehaviour:
     Guid:
       Value: 410277434916936612
   colors:
-  - character:
+  - Character:
       Id:
         Value: 532063855470386108
     ShirtColor:
@@ -30,10 +30,8 @@ MonoBehaviour:
       G: 22
       B: 15
       A: 255
-    shirtColor: {r: 0.4392157, g: 0.4, b: 0.11372549, a: 1}
-    overallsColor: {r: 0.7490196, g: 0.08627451, b: 0.058823533, a: 1}
-    hatUsesOverallsColor: 1
-  - character:
+    HatUsesOverallsColor: 1
+  - Character:
       Id:
         Value: 485289843648077326
     ShirtColor:
@@ -46,7 +44,6 @@ MonoBehaviour:
       G: 172
       B: 48
       A: 255
-    shirtColor: {r: 0.4392157, g: 0.4, b: 0.11372549, a: 1}
-    overallsColor: {r: 0.3882353, g: 0.6745098, b: 0.1882353, a: 1}
-    hatUsesOverallsColor: 1
+    HatUsesOverallsColor: 1
   translationKey: skin.deluxe
+  order: 24
