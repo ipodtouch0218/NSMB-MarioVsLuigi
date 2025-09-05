@@ -66,7 +66,7 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
             if (direction is not InteractionDirection.Left or InteractionDirection.Right) {
                 BlockBumpSystem.Bump(f, QuantumUtils.RelativeTileToWorldRounded(stage, tilePosition), bumpOwner, allowSelfDamage, direction != InteractionDirection.Down);
             }
-            f.Events.TileBroken(entity, tilePosition, tileInstance, brokenByMega);
+            f.Events.TileBroken(entity, tilePosition, tileInstance, brokenByMega, brokenByMega ? (direction == InteractionDirection.Right ? FP.FromString("9.5") : FP.FromString("-9.5")) : FP._0);
             stage.SetTileRelative(f, tilePosition, default);
 
         } else if (BumpIfNotBroken && doBump) {
