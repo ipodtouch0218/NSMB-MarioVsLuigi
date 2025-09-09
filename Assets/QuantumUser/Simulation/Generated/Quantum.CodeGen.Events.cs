@@ -733,12 +733,13 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventTileBroken TileBroken(EntityRef Entity, IntVector2 Position, StageTileInstance Tile, QBoolean BrokenByMega) {
+      public EventTileBroken TileBroken(EntityRef Entity, IntVector2 Position, StageTileInstance Tile, QBoolean BrokenByMega, FP BreakSpeed) {
         var ev = _f.Context.AcquireEvent<EventTileBroken>(EventTileBroken.ID);
         ev.Entity = Entity;
         ev.Position = Position;
         ev.Tile = Tile;
         ev.BrokenByMega = BrokenByMega;
+        ev.BreakSpeed = BreakSpeed;
         _f.AddEvent(ev);
         return ev;
       }
@@ -2909,6 +2910,7 @@ namespace Quantum {
     public IntVector2 Position;
     public StageTileInstance Tile;
     public QBoolean BrokenByMega;
+    public FP BreakSpeed;
     protected EventTileBroken(Int32 id, EventFlags flags) : 
         base(id, flags) {
     }
@@ -2930,6 +2932,7 @@ namespace Quantum {
         hash = hash * 31 + Position.GetHashCode();
         hash = hash * 31 + Tile.GetHashCode();
         hash = hash * 31 + BrokenByMega.GetHashCode();
+        hash = hash * 31 + BreakSpeed.GetHashCode();
         return hash;
       }
     }
