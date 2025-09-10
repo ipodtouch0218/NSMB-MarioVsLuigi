@@ -182,3 +182,28 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1e8cb6f15363556449efe51933fd6756, type: 2}
   - {fileID: 11400000, guid: 7c908e9a73d2d4444a2a68b17a13d50f, type: 2}
   - {fileID: 11400000, guid: 11dcae9c03e20534e8a2039b550298ca, type: 2}
+--- !u!114 &3004932065778379374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d97847a2693b724f89fe1384eaa00a4, type: 3}
+  m_Name: DesertGroundStageTile
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: Resources/Tilemaps/Tiles/Desert/DesertGround|DesertGroundStageTile
+    Guid:
+      Value: 328240524793459333
+  Tile: {fileID: 11400000}
+  CollisionData:
+    IsFullTile: 1
+    Shapes: []
+  IsSlipperyGround: 0
+  IsSlideableGround: 0
+  IsPolygon: 1
+  FootstepSound: 93
+  FootstepParticle: 1

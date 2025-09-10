@@ -8,6 +8,38 @@ using UnityEditor.Tilemaps;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+public class StageTileMenuItems {
+    [MenuItem("MvLO/Convert standalone StageTiles to sub-assets")]
+    public static void ConvertStageTiles() {
+        var allStageTiles = AssetDatabase.FindAssets($"t:{typeof(StageTile).Name}")
+            .Select(AssetDatabase.GUIDToAssetPath)
+            .Select(AssetDatabase.LoadAssetAtPath<StageTile>);
+
+        int converted = 0;
+        foreach (var stageTile in allStageTiles) {
+            if (!stageTile.Tile
+                || (AssetDatabase.IsSubAsset(stageTile) && AssetDatabase.GetAssetPath(stageTile) == AssetDatabase.GetAssetPath(stageTile.Tile))) {
+                continue;
+            }
+
+            string oldPath = AssetDatabase.GetAssetPath(stageTile);
+
+            AssetDatabase.RemoveObjectFromAsset(stageTile);
+            AssetDatabase.AddObjectToAsset(stageTile, stageTile.Tile);
+
+            if (File.Exists(oldPath)) {
+                AssetDatabase.DeleteAsset(oldPath);
+            }
+
+            converted++;
+        }
+
+        Debug.Log($"Converted {converted} standalone StageTile(s) to sub-asset(s).");
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+    }
+}
+
 [CustomEditor(typeof(TileBase), editorForChildClasses: true)]
 public abstract class TileBaseMvLCustomEditor<TTarget, TInner> : Editor where TTarget : TileBase where TInner : Editor {
 
@@ -26,6 +58,8 @@ public abstract class TileBaseMvLCustomEditor<TTarget, TInner> : Editor where TT
             .ToArray();
 
         stageTileTypeNames = stageTileTypes.Select(t => t.Name).ToArray();
+
+        EnsureInnerEditor();
     }
 
     public override void OnInspectorGUI() {
@@ -52,6 +86,15 @@ public abstract class TileBaseMvLCustomEditor<TTarget, TInner> : Editor where TT
             if (sp.isExpanded) {
                 using (new EditorGUI.IndentLevelScope()) {
                     stageTileEditor.OnInspectorGUI();
+                    EditorGUILayout.Space();
+                    using (new QuantumEditorGUI.BackgroundColorScope(Color.red)) {
+                        if (GUILayout.Button("Delete StageTile")) {
+                            AssetDatabase.RemoveObjectFromAsset(stageTile);
+                            AssetDatabase.SaveAssets();
+                            AssetDatabase.Refresh();
+                            stageTile = null;
+                        }
+                    }
                 }
             }
         } else {
@@ -106,6 +149,49 @@ public abstract class TileBaseMvLCustomEditor<TTarget, TInner> : Editor where TT
             DestroyImmediate(innerEditor);
             innerEditor = null;
         }
+    }
+
+    // --- Forward PREVIEW handling so you keep thumbnails & previews ---
+    public override bool HasPreviewGUI() => innerEditor != null && innerEditor.HasPreviewGUI();
+    
+    public override void OnPreviewGUI(Rect r, GUIStyle background) {
+        if (innerEditor != null) innerEditor.OnPreviewGUI(r, background);
+    }
+
+    public override void OnPreviewSettings() {
+        if (innerEditor != null) innerEditor.OnPreviewSettings();
+    }
+
+    public override Texture2D RenderStaticPreview(string assetPath, UnityEngine.Object[] subAssets, int width, int height) {
+        EnsureInnerEditor();
+        return innerEditor != null
+            ? innerEditor.RenderStaticPreview(assetPath, subAssets, width, height)
+            : null;
+    }
+}
+
+public class TileRenameProcessor : AssetModificationProcessor {
+
+    public static AssetMoveResult OnWillMoveAsset(string sourcePath, string destinationPath) {
+        var tile = AssetDatabase.LoadMainAssetAtPath(sourcePath) as TileBase;
+        if (tile == null) {
+            return AssetMoveResult.DidNotMove;
+        }
+
+        var newName = Path.GetFileNameWithoutExtension(destinationPath);
+
+        var subs = AssetDatabase.LoadAllAssetsAtPath(sourcePath);
+        foreach (var sub in subs) {
+            if (sub is StageTile st && st.Tile == tile) {
+                var desired = newName + "StageTile";
+                if (st.name != desired) {
+                    st.name = desired;
+                    EditorUtility.SetDirty(st);
+                }
+            }
+        }
+
+        return AssetMoveResult.DidNotMove;
     }
 }
 

@@ -5,7 +5,6 @@ using Quantum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEditor;
@@ -202,11 +201,10 @@ namespace NSMB.Quantum {
             }
 
             string existingTilePath = AssetDatabase.GetAssetPath(tile);
-            string newTilePath = Regex.Replace(existingTilePath, @"\..+", "") + "StageTile.asset";
-            AssetDatabase.CreateAsset(newTile, newTilePath);
+            AssetDatabase.AddObjectToAsset(newTile, existingTilePath);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            QuantumUnityDB.Global.AddAsset(newTile);
+            //QuantumUnityDB.Global.AddAsset(newTile);
 
             return newTile;
         }

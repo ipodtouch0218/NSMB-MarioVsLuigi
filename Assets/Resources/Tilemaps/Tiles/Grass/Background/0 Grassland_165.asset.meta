@@ -1,5 +1,7 @@
 fileFormatVersion: 2
 guid: 4aa6381ae093f0c48b07643a22a071c1
+labels:
+- QuantumAsset
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 11400000
