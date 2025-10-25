@@ -277,9 +277,9 @@ namespace Quantum {
             bool fastStars = amount > 2 && GamemodeData.StarChasers->Stars > 2;
             int starDirection = FacingRight ? 1 : 2;
 
-            // If DropStarsOnDeath rule is enabled and player has no lives, drop all stars
+            // If DropStarsOnDeath rule is enabled and player has no lives, drop only 1 star
             if (f.Global->Rules.DropStarsOnDeath && f.Global->Rules.IsLivesEnabled && Lives == 0) {
-                amount = GamemodeData.StarChasers->Stars; // Drop all stars
+                amount = 1;
                 fastStars = true;
                 NoLivesStarDirection = (byte) ((NoLivesStarDirection + 1) % 4);
                 starDirection = NoLivesStarDirection;
@@ -290,7 +290,7 @@ namespace Quantum {
                     _ => starDirection
                 };
             } else if (f.Global->Rules.IsLivesEnabled && Lives == 0) {
-                // DropStarsOnDeath is disabled, so use the original amount (1 star for regular deaths)
+                amount = GamemodeData.StarChasers->Stars; // Drop all stars
                 fastStars = true;
                 NoLivesStarDirection = (byte) ((NoLivesStarDirection + 1) % 4);
                 starDirection = NoLivesStarDirection;
