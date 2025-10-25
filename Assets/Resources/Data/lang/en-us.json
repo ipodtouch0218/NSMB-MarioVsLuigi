@@ -231,6 +231,8 @@
   "ui.inroom.settings.game.friendlyfire.description": "Allows players on the same team to attack one another, dropping stars in the process. This includes direct attacks (such as stomps or the Propeller Suit's drill), along with projectiles from powerups such as the Fire Flower.",
   "ui.inroom.settings.game.powerups": "Custom powerups",
   "ui.inroom.settings.game.powerups.description": "Enables the spawning of the powerups that are not native to New Super Mario Bros (DS), such as the Ice Flower and Propeller Mushroom.",
+  "ui.inroom.settings.game.dropallstars": "Drop all stars on death",  
+  "ui.inroom.settings.game.dropallstars.description": "When enabled, players that lose all their lives will drop all stars they are carrying. When disabled, they will only drop 1 star.",
   "ui.inroom.settings.map.header": "Map Selection",
   "ui.inroom.settings.room.header": "Room Settings",
   "ui.inroom.settings.room.players": "Max Players",

@@ -6,6 +6,7 @@ namespace Quantum {
 
         public readonly bool IsLivesEnabled => Lives > 0;
         public readonly bool IsTimerEnabled => TimerMinutes > 0;
+        public readonly bool IsDropStarsOnDeathEnabled => DropStarsOnDeath;
 
     }
 }

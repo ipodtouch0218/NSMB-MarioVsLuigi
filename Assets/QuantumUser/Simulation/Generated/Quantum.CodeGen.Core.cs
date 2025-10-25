@@ -799,12 +799,14 @@ namespace Quantum {
     public Int32 Lives;
     [FieldOffset(12)]
     public Int32 TimerMinutes;
-    [FieldOffset(24)]
+    [FieldOffset(28)]
     public QBoolean TeamsEnabled;
     [FieldOffset(16)]
     public QBoolean CustomPowerupsEnabled;
     [FieldOffset(20)]
     public QBoolean DrawOnTimeUp;
+    [FieldOffset(24)]
+    public QBoolean DropStarsOnDeath;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 443;
@@ -817,6 +819,7 @@ namespace Quantum {
         hash = hash * 31 + TeamsEnabled.GetHashCode();
         hash = hash * 31 + CustomPowerupsEnabled.GetHashCode();
         hash = hash * 31 + DrawOnTimeUp.GetHashCode();
+        hash = hash * 31 + DropStarsOnDeath.GetHashCode();
         return hash;
       }
     }
@@ -828,6 +831,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->TimerMinutes);
         QBoolean.Serialize(&p->CustomPowerupsEnabled, serializer);
         QBoolean.Serialize(&p->DrawOnTimeUp, serializer);
+        QBoolean.Serialize(&p->DropStarsOnDeath, serializer);
         QBoolean.Serialize(&p->TeamsEnabled, serializer);
         AssetRef.Serialize(&p->Gamemode, serializer);
         AssetRef.Serialize(&p->Stage, serializer);
