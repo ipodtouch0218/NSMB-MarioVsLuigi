@@ -51,6 +51,7 @@ ArianLust <color=#AAAAAA>(de-de)</color>
 Atwer <color=#AAAAAA>(fr-FR)</color>
 Bilhal <color=#AAAAAA>(el-gr)</color>
 Cecilia <color=#AAAAAA>(es-es)</color>
+rm13 (rm1300) <color=#AAAAAA>(cs-cz)</color>
 Davodio <color=#AAAAAA>(de-de)</color>
 Filipianosol <color=#AAAAAA>(pl-pl)</color>
 Floofdoge <color=#AAAAAA>(ar-eg)</color>
@@ -151,4 +152,5 @@ Treeki (UI)
 VentureSonic (Background)
 vlco_o (Sound)
 xFrostyCake123 (Sound)
+
 
