@@ -64,7 +64,7 @@ MonoBehaviour:
     DrawOnTimeUp:
       Value: 0
     DropStarsOnDeath:
-      Value: 0
+      Value: 1
   BigStarPrototype:
     Id:
       Value: 1295981493910502871
