@@ -38315,7 +38315,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 0}
   canvas: {fileID: 2030938839}
   label: {fileID: 2058506060}
-  labelPrefix: <sprite name=room_stars>
+  labelPrefix: 
   ruleType: 512
   clickToEdit: 0
   dontAutosave: 0
@@ -107548,7 +107548,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 0}
   canvas: {fileID: 2030938839}
   label: {fileID: 662574825}
-  labelPrefix: <sprite name=room_stars>
+  labelPrefix: 
   ruleType: 512
   clickToEdit: 1
   dontAutosave: 0
