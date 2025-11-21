@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using LayerMask = UnityEngine.LayerMask;
 
 namespace NSMB.Cameras {
     public unsafe class CameraAnimator : ResizingCamera {
@@ -189,7 +190,9 @@ namespace NSMB.Cameras {
                     playerElements.Canvas.GetComponent<GraphicRaycaster>().Raycast(new PointerEventData(EventSystem.current) {
                         position = pointerScreen
                     }, results);
-                    freecamMouseDragging = (results.Count == 0);
+                    freecamMouseDragging = (results.Count == 0) || (results.Count == 1 &&
+                                                                    results[0].gameObject.layer ==
+                                                                    LayerMask.NameToLayer("Ignore Raycast"));
                     clickHeld = true;
                 }
             } else {
