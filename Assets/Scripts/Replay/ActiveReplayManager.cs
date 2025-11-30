@@ -36,6 +36,7 @@ namespace NSMB.Replay {
 
         //---Public Variables
         public readonly List<byte[]> ReplayFrameCache = new();
+        public List<int> Markers = new();
 
         //---Private Variables
         private bool _isReplayFastForwarding;
@@ -170,7 +171,8 @@ namespace NSMB.Replay {
                     WinningTeam = winner,
                     AddonGuids = GlobalController.Instance.addonManager.LoadedAddons
                         .Select(la => la.Definition.Guid)
-                        .ToList()
+                        .ToList(),
+                    Markers = Markers.ToArray(),
                 };
 
                 BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay, header);
@@ -250,6 +252,7 @@ namespace NSMB.Replay {
 
             ReplayFrameCache.Clear();
             ReplayFrameCache.Add(arguments.FrameData);
+            Markers = replay.Header.Markers.ToList();
 
             try {
                 NetworkHandler.Runner = await QuantumRunner.StartGameAsync(arguments);

@@ -30,7 +30,7 @@ namespace NSMB.UI.Game.Replay {
         [SerializeField] private TMP_Text replayTimecode;
         [SerializeField] private TMP_Text replayPauseButton;
         [SerializeField] private CanvasGroup replayCanvasGroup;
-        [SerializeField] private GameObject defaultSelection;
+        [SerializeField] private GameObject defaultSelection, markerTemplate;
 
         [SerializeField] private GameObject tabBlocker;
 
@@ -48,6 +48,7 @@ namespace NSMB.UI.Game.Replay {
         private ReplayUITab activeTab;
         private bool gameEnded;
         private Frame resetFrame;
+        private int markerCount = -1;
 
         public void OnValidate() {
             this.SetIfNull(ref playerElements, UnityExtensions.GetComponentType.Parent);
@@ -139,6 +140,17 @@ namespace NSMB.UI.Game.Replay {
                 replayTimecode.text = builder.ToString();
 
                 previousTimestampSeconds = currentSeconds;
+            }
+
+            var markers = ActiveReplayManager.Instance.Markers;
+            if (markerCount < markers.Count) {
+                foreach (var marker in markers) {
+                    var markerObj = Instantiate(markerTemplate, trackArrow.parent);
+                    float markerPercentage = (marker - ActiveReplayManager.Instance.ReplayStart) / (float)ActiveReplayManager.Instance.ReplayLength;
+                    markerObj.transform.localPosition = new Vector3(markerPercentage * (maxTrackX - minTrackX) + minTrackX, 0, 0);
+                    markerObj.SetActive(true);
+                }
+                markerCount = markers.Count;
             }
 
             float bufferPercentage = (float) ActiveReplayManager.Instance.ReplayFrameCache.Count * f.UpdateRate * 5 / ActiveReplayManager.Instance.ReplayLength;

@@ -34,6 +34,9 @@ namespace NSMB.Replay {
 
         // Addons
         public List<Guid> AddonGuids = new();
+        
+        // Markers
+        public int[] Markers = Array.Empty<int>();
 
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -66,6 +69,12 @@ namespace NSMB.Replay {
             writer.Write(AddonGuids.Count);
             for (int i = 0; i < AddonGuids.Count; i++) {
                 writer.Write(AddonGuids[i].ToByteArray());
+            }
+            
+            // Markers
+            writer.Write((byte) Markers.Length);
+            foreach (var marker in Markers) {
+                writer.Write(marker);
             }
 
             return writer.BaseStream.Length;
@@ -109,6 +118,12 @@ namespace NSMB.Replay {
                     for (int i = 0; i < guids; i++) {
                         result.AddonGuids.Add(new Guid(reader.ReadBytes(16)));
                     }
+                }
+                
+                // Markers
+                result.Markers = new int[reader.ReadByte()];
+                for (int i = 0; i < result.Markers.Length; i++) {
+                    result.Markers[i] = reader.ReadInt32();
                 }
             } catch {
                 return ReplayParseResult.ParseFailure;
