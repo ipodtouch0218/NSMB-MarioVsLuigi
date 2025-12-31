@@ -3,7 +3,8 @@ Photon Realtime C# Client - Changelog
 www.photonengine.com  -  Join our Discord Server: https://dashboard.photonengine.com/account/profile
 
 
-Version 5.1.9
+Version 5.1.9 (10. November 2025 - rev8152)
+    Changed: RegionHandler to check if a RegionPinger started successfully before adding it to the list of RegionPingers to finish.
 
 Version 5.1.8 (25. August 2025 - rev8056)
     Fixed: Potential NullReference of AuthValues in OnStatusChanged() case StatusCode.Disconnect / ClientState.ConnectWithFallbackProtocol.

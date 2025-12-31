@@ -29,7 +29,7 @@
 
   <ItemGroup>
     <Reference Include="Quantum.Log">
-      <HintPath>../Lib/Release/Quantum.Log.dll</HintPath>
+      <HintPath>../Lib/$(Configuration)/Quantum.Log.dll</HintPath>
     </Reference>
     <Reference Include="Quantum.Engine">
       <HintPath>../Lib/$(Configuration)/Quantum.Engine.dll</HintPath>

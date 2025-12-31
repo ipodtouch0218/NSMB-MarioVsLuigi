@@ -36,10 +36,14 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 privateToggle.isOn = false;
             }
 
-            int addons = GlobalController.Instance.addonManager.LoadedAddons.Count;
-            addonsText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements(
-                addons == 0 ? "ui.rooms.create.addons.notenabled" : "ui.rooms.create.addons.enabled",
-                "addons", addons.ToString());
+            if (GlobalController.Instance.addonManager.isActiveAndEnabled) {
+                int addons = GlobalController.Instance.addonManager.LoadedAddons.Count;
+                addonsText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements(
+                    addons == 0 ? "ui.rooms.create.addons.notenabled" : "ui.rooms.create.addons.enabled",
+                    "addons", addons.ToString());
+            } else {
+
+            }
         }
 
         public override bool TryGoBack(out bool playSound) {

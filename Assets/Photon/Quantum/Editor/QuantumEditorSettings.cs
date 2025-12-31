@@ -57,7 +57,7 @@ namespace Quantum {
     }
     
     /// <summary>
-    /// Locations that the QuantumUnityDB disovers Quantum assets.
+    /// Locations that the QuantumUnityDB discovers Quantum assets.
     /// Changing this requires reimporting all Unity (Quantum) assets manually.
     /// </summary>
     [Header("Editor Features")]

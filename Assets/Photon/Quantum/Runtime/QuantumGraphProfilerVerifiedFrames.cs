@@ -10,10 +10,15 @@ namespace Quantum.Profiling {
       int verifiedFramesSimulated = 0;
 
       QuantumRunner quantumRunner = QuantumRunner.Default;
-      if (quantumRunner != null && quantumRunner.Game != null) {
+      if (quantumRunner?.Game?.Session != null) {
         Frame verifiedFrame = quantumRunner.Game.Frames.Verified;
         if (verifiedFrame != null) {
+          if (_lastVerifiedFrameNumber == 0) {
+            _lastVerifiedFrameNumber = quantumRunner.Game.Session.RollbackWindow - 1;
+          }
+
           verifiedFramesSimulated = verifiedFrame.Number - _lastVerifiedFrameNumber;
+
           _lastVerifiedFrameNumber = verifiedFrame.Number;
         }
       }

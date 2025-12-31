@@ -1,48 +1,50 @@
 namespace Quantum.Profiling {
+  using Photon.Client;
 
   /// <summary>
   /// Gathers bandwidth statistics, uses an accumulator for feed averages into the graphs.
   /// </summary>
-  public sealed class QuantumGraphProfilerBandwidth : QuantumGraphProfilerAccumulator {
+  public sealed class QuantumGraphProfilerBandwidth : QuantumGraphProfilerValueSeries {
+
     /// <summary>
-    /// Type of bandwidth collected.
+    /// This profiler records two values: Incoming and Outgoing bandwidth in bytes per second.
     /// </summary>
-    public enum BandwidthType {
-      /// <summary>
-      /// Incoming and outgoing bandwidth.
-      /// </summary>
-      Total,
-      /// <summary>
-      /// Only incoming bandwidth.
-      /// </summary>
-      Incoming,
-      /// <summary>
-      /// Only outgoing bandwidth.
-      /// </summary>
-      Outgoing
+    protected override int ValueDimensions => 2;
+
+    TrafficStatsSnapshot _snapshotDelta;
+
+    /// <inheritdoc/>
+    protected override void OnActivated() {
+      base.OnActivated();
+
+      var peer = QuantumGraphProfilersUtility.GetNetworkPeer();
+
+      if (peer != null) {
+        _snapshotDelta = peer.Stats.ToSnapshot();
+      }
     }
 
     /// <summary>
-    /// Bandwidth type to be collected.
-    /// </summary>
-    public BandwidthType Type;
-
-    /// <summary>
-    /// Sample a value.
+    /// Sample the values from the network peer.
     /// </summary>
     protected override void OnUpdate() {
       var peer = QuantumGraphProfilersUtility.GetNetworkPeer();
 
-      if (peer != null) {
-        var bytes = 0L;
-        switch (Type) {
-          case BandwidthType.Incoming: bytes = peer.Stats.BytesIn; break;
-          case BandwidthType.Outgoing: bytes = peer.Stats.BytesOut; break;
-          case BandwidthType.Total: bytes = peer.Stats.BytesIn + peer.Stats.BytesOut; break;
-        }
+      var bytesIn = 0f;
+      var bytesOut = 0f;
 
-        AddValue(bytes);
+      if (peer != null) {
+        if (_snapshotDelta != null) {
+          var snapShotDelta = peer.Stats.ToDelta(_snapshotDelta);
+          if (snapShotDelta.DeltaTime > 0) {
+            bytesIn = snapShotDelta.BytesIn / snapShotDelta.DeltaTime * 1000f;
+            bytesOut = snapShotDelta.BytesOut / snapShotDelta.DeltaTime * 1000f;
+          }
+        }
+        _snapshotDelta = peer.Stats.ToSnapshot();
       }
+
+      AddValues(bytesIn, bytesOut);
     }
   }
 }

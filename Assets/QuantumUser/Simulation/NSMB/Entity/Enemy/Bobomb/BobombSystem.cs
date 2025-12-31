@@ -247,7 +247,7 @@ namespace Quantum {
             }
             }
 
-            f.Signals.OnProjectileHitEntity(f, projectileEntity, bobombEntity);
+            f.Signals.OnProjectileHitEntity(projectileEntity, bobombEntity);
         }
 
         public static bool OnBobombIceBlockInteraction(Frame f, EntityRef bobombEntity, EntityRef iceBlockEntity, PhysicsContact contact) {

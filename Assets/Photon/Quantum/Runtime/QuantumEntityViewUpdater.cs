@@ -280,7 +280,7 @@ namespace Quantum {
         return;
       }
 
-      using var profilerScope = HostProfiler.Start("QuantumEntityView.OnObservedGameUpdated");
+      using var profilerScope = HostProfiler.Markers.EntityViewOnObservedGameUpdated();
       var verifiedFrame = game.Frames.Verified;
       
       if (verifiedFrame != null) {

@@ -941,7 +941,7 @@ namespace Quantum {
       param.PositionErrorTeleport = positionErrorTeleport;
       param.RotationErrorTeleport = rotationErrorTeleport;
 
-      using (HostProfiler.Start("QuantumEntityView.ApplyTransform")) {
+      using (HostProfiler.Markers.EntityViewApplyTransform()) {
         ApplyTransform(ref param);
       }
 

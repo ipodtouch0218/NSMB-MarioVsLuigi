@@ -509,7 +509,7 @@ namespace NSMB.UI.Game {
             QuantumGame game = QuantumRunner.DefaultGame;
             int slotIndex = game.GetLocalPlayers().IndexOf(playerElements.Player);
             if (slotIndex != -1) {
-                game.SendCommand(game.GetLocalPlayerSlots()[slotIndex], new CommandSpawnReserveItem());
+                game.AddCommand(game.GetLocalPlayerSlots()[slotIndex], new CommandSpawnReserveItem());
             }
         }
 

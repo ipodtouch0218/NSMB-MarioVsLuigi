@@ -57,11 +57,10 @@ table component MarioPlayer {
 	[ExcludeFromPrototype] byte PreRespawnFrames;
 	[ExcludeFromPrototype] byte RespawnFrames;
 	[ExcludeFromPrototype] byte NoLivesStarDirection;
+	
+	[ExcludeFromPrototype] bitset[21] Flags;
 
 	// Walk/Running
-    [ExcludeFromPrototype] bool FacingRight;
-    [ExcludeFromPrototype] bool IsSkidding;
-    [ExcludeFromPrototype] bool IsTurnaround;
     [ExcludeFromPrototype] byte FastTurnaroundFrames;
     [ExcludeFromPrototype] byte SlowTurnaroundFrames;
 	[ExcludeFromPrototype] int LastPushingFrame;
@@ -74,41 +73,24 @@ table component MarioPlayer {
 	[ExcludeFromPrototype] byte JumpBufferFrames;
 	[ExcludeFromPrototype] byte CoyoteTimeFrames;
 	[ExcludeFromPrototype] int LandedFrame;
-	[ExcludeFromPrototype] bool DoEntityBounce;
 	[ExcludeFromPrototype] byte ForceJumpTimer;
 	[ExcludeFromPrototype] byte CantJumpTimer;
 
 	// Wallslide
-	[ExcludeFromPrototype] bool WallslideLeft;
-	[ExcludeFromPrototype] bool WallslideRight;
 	[ExcludeFromPrototype] byte WallslideEndFrames;
     [ExcludeFromPrototype] byte WalljumpFrames;
 
 	// Groundpound
-    [ExcludeFromPrototype] bool IsGroundpounding;
-	[ExcludeFromPrototype] bool IsGroundpoundActive;
 	[ExcludeFromPrototype] byte GroundpoundStartFrames;
 	[ExcludeFromPrototype] byte GroundpoundCooldownFrames;
 	[ExcludeFromPrototype] byte GroundpoundStandFrames;
 
 	// Knockback
     [ExcludeFromPrototype] KnockbackStrength CurrentKnockback;
-	[ExcludeFromPrototype] bool IsInWeakKnockback;
-	[ExcludeFromPrototype] bool KnockForwards;
-	[ExcludeFromPrototype] bool KnockbackWasOriginallyFacingRight;
 	[ExcludeFromPrototype] int KnockbackTick;
 	[ExcludeFromPrototype] byte DamageInvincibilityFrames;
 	[ExcludeFromPrototype] byte KnockbackGetupFrames;
 	[ExcludeFromPrototype] byte CrushDamageInvincibilityFrames;
-
-	// Crouching
-    [ExcludeFromPrototype] bool IsCrouching;
-    [ExcludeFromPrototype] bool IsSliding;
-
-	// Block Interactions
-    [ExcludeFromPrototype] bool IsSpinnerFlying;
-	[ExcludeFromPrototype] bool IsDrilling;
-	[ExcludeFromPrototype] bool IsStuckInBlock;
 
 	// Powerups
     [ExcludeFromPrototype] ushort InvincibilityFrames;
@@ -116,7 +98,6 @@ table component MarioPlayer {
 	[ExcludeFromPrototype] byte MegaMushroomStartFrames;
 	[ExcludeFromPrototype] ushort MegaMushroomFrames;
 	[ExcludeFromPrototype] byte MegaMushroomEndFrames;
-	[ExcludeFromPrototype] bool MegaMushroomStationaryEnd;
 	[ExcludeFromPrototype] byte MegaMushroomFootstepFrames;
 
 	[ExcludeFromPrototype] byte ProjectileDelayFrames;
@@ -124,13 +105,10 @@ table component MarioPlayer {
 	[ExcludeFromPrototype] byte CurrentProjectiles;
 	[ExcludeFromPrototype] byte CurrentVolley;
 
-    [ExcludeFromPrototype] bool IsInShell;
     [ExcludeFromPrototype] byte ShellSlowdownFrames;
 
-    [ExcludeFromPrototype] bool IsPropellerFlying;
 	[ExcludeFromPrototype] byte PropellerLaunchFrames;
 	[ExcludeFromPrototype] byte PropellerSpinFrames;
-	[ExcludeFromPrototype] bool UsedPropellerThisJump;
 	[ExcludeFromPrototype] byte PropellerDrillCooldown;
 	[ExcludeFromPrototype] byte PropellerDrillHoldFrames;
 
@@ -139,7 +117,6 @@ table component MarioPlayer {
 
     [ExcludeFromPrototype] EntityRef CurrentPipe;
 	[ExcludeFromPrototype] FPVector2 PipeDirection;
-	[ExcludeFromPrototype] bool PipeEntering;
 	[ExcludeFromPrototype] byte PipeFrames;
 	[ExcludeFromPrototype] byte PipeCooldownFrames;
 

@@ -189,6 +189,9 @@
         <member name="T:Photon.Client.Encryption.IPhotonEncryptor">
             <summary>Interface for DatagramEncryptor implementations.</summary>
         </member>
+        <member name="P:Photon.Client.Encryption.IPhotonEncryptor.LogLevel">
+            <summary>Get/set the logging level. OFF = 0, ERRORS = 1, WARNINGS = 2, INFO = 3, ALL = 4, </summary>
+        </member>
         <member name="M:Photon.Client.Encryption.IPhotonEncryptor.Init(System.Byte[],System.Byte[],System.Byte[],System.Boolean,System.Int32)">
             <summary>Initialize the encryptor.</summary>
         </member>
@@ -246,9 +249,6 @@
         </member>
         <member name="F:Photon.Client.EnetChannel.ReceiveTrackingValues.receivedReliableSequenceNumbers">
             <summary>Stores the sequence numbers to ACK at some point. May include duplicates and is unordered. A bit-stream may be more effective here.</summary>
-        </member>
-        <member name="F:Photon.Client.EnetPeer.QUICK_RESEND_QUEUELIMIT">
-            <summary>Quick Resends are suspended if the sent queue is this size or larger.</summary>
         </member>
         <member name="F:Photon.Client.EnetPeer.sentReliableCommands">
             <summary>One list for all channels keeps sent commands (for re-sending).</summary>
@@ -1229,30 +1229,34 @@
             <summary>Obsolete. Use SendWindowSize instead.</summary>
         </member>
         <member name="P:Photon.Client.PhotonPeer.QuickResendAttempts">
-            <summary>
-            Up to 4 resend attempts for a reliable command can be done in quick succession (after RTT+4*Variance).
-            </summary>
-            <remarks>
-            By default 0. Any later resend attempt will then double the time before the next resend.
-            Max value = 4;
-            Make sure to adjust MaxResends to a slightly higher value, as more repeats will get done.
-            </remarks>
+             <summary>
+             Up to 4 resend attempts for a reliable command can be done with minimal ack-wait timing (after RTT+4*Variance).
+             </summary>
+             <remarks>
+             If a command needs to be resent multiple times, the wait time for ACKs gets increased.
+             Any resend within the QuickResendAttempts will use the initial timing for resending (RTT+4*Variance).
+            
+             Default: 2. Range: 1 to 4.
+             
+             Make sure to adjust MaxResends to a slightly higher value, as more repeats happen.
+             </remarks>
         </member>
         <member name="F:Photon.Client.PhotonPeer.MaxResends">
              <summary>
-             How often any reliable command can be repeated before it triggers a disconnect (in case there is no acknowledgement). Default: 7.
+             Maximum number of resends for any reliable command. If no ack arrives for this many attempts, the connection is timed out. Default: 15.
              </summary>
              <remarks>
              The initial timeout countdown of a command is calculated by the current roundTripTime + 4 * roundTripTimeVariance.
+             
              Please note that the timeout span until a command will be resent is not constant, but based on
-             the roundtrip time at the initial sending, which will be doubled with every failed retry.
+             the roundtrip time at the initial sending, which (after the QuickResends) will be doubled with every failed retry.
             
-             DisconnectTimeout and MaxResends are competing settings: either might trigger a disconnect on the
+             DisconnectTimeout and MaxResends are related settings: either might trigger a disconnect on the
              client first, depending on the values and Roundtrip Time.
              </remarks>
         </member>
         <member name="P:Photon.Client.PhotonPeer.SentCountAllowance">
-            <summary>How often any reliable command can be repeated before it triggers a disconnect (in case there is no acknowledgement). Default: 7.</summary>
+            <summary>How often any reliable command can be repeated before it triggers a disconnect (in case there is no acknowledgement)..</summary>
         </member>
         <member name="F:Photon.Client.PhotonPeer.InitialResendTimeMax">
              <summary>
@@ -1672,7 +1676,7 @@
             
              The PhotonPeer will not signal a disconnect to the server.
              For the duration of the server's timeout time, this peer will be considered connected.
-             
+            
              Continue to call DispatchIncomingCommands() to get the associated callbacks - more than one state change is possible.
             
              On a release build of the PhotonClient dll, this method will not do anything!
@@ -2623,6 +2627,9 @@
         <member name="P:Photon.Client.TrafficStatsBase.UdpFragmentsOut">
             <summary>Count of outgoing Fragment commands (data split into multiple commands due to being larger than mtu size).</summary>
         </member>
+        <member name="P:Photon.Client.TrafficStatsBase.UdpUnreliableCommandsSent">
+            <summary>Count of unreliable commands sent so far (total on all channels).</summary>
+        </member>
         <member name="P:Photon.Client.TrafficStatsBase.UdpReliableCommandsSent">
             <summary>Count of reliable commands sent so far (total on all channels). Does not include resends.</summary>
         </member>
@@ -2651,7 +2658,7 @@
              </remarks>
         </member>
         <member name="P:Photon.Client.TrafficStatsBase.RoundtripTimeVariance">
-            <summary>Changes of the roundtriptime as variance value. Gives a hint about how much the time is changing.</summary>
+            <summary>Changes of the roundtrip time as variance value. Gives a hint about how much the roundtrip time jitters.</summary>
         </member>
         <member name="P:Photon.Client.TrafficStatsBase.LastRoundtripTime">
             <summary>The last measured roundtrip time for this connection.</summary>
@@ -2665,6 +2672,16 @@
         </member>
         <member name="T:Photon.Client.TrafficStatsDelta">
             <summary>Delta values for TrafficStats, compared to some TrafficStatsSnapshot.</summary>
+        </member>
+        <member name="P:Photon.Client.TrafficStatsDelta.RoundtripTime">
+            <summary>This is the delta RoundtripTime of two TrafficStatsSnapshots (now.RoundtripTime - reference.RoundtripTime).</summary>
+        </member>
+        <member name="P:Photon.Client.TrafficStatsDelta.RoundtripTimeVariance">
+            <summary>This is the delta RoundtripTimeVariance of two TrafficStatsSnapshots (now.RoundtripTimeVariance - reference.RoundtripTimeVariance).</summary>
+        </member>
+        <member name="P:Photon.Client.TrafficStatsDelta.LastRoundtripTime">
+            <summary>This is the delta RoundtripTime of two TrafficStatsSnapshots (now.LastRoundtripTime - reference.LastRoundtripTime).</summary>
+            <remarks>Comparing the very last roundtrip time of any two snapshots likely has limited usefulness.</remarks>
         </member>
         <member name="F:Photon.Client.TrafficStatsDelta.DeltaTime">
             <summary>Timespan / delta time between the two snapshots.</summary>

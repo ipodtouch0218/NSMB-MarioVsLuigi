@@ -3,6 +3,7 @@ using NSMB.Networking;
 using NSMB.UI.Translation;
 using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
+using Photon.Deterministic;
 using Quantum;
 using System.Collections;
 using System.Collections.Generic;
@@ -235,7 +236,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             if (game.PlayerIsLocal(host)) {
                 // Start (or cancel) the game countdown
                 int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)];
-                game.SendCommand(slot, new CommandToggleCountdown());
+                game.AddCommand(slot, new CommandToggleCountdown());
             } else {
                 // Ready (or unready) up
                 bool ready = false;
@@ -245,9 +246,9 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                 }
 
                 foreach (int slot in game.GetLocalPlayerSlots()) {
-                    game.SendCommand(slot, new CommandToggleReady());
+                    game.AddCommand(slot, new CommandToggleReady());
                 }
-
+                
                 Canvas.PlaySound(ready ? SoundEffect.UI_Back : SoundEffect.UI_Decide);
             }
         }

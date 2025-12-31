@@ -5,7 +5,7 @@ namespace Quantum {
     [Serializable]
     public unsafe partial struct StageTileInstance : IEquatable<StageTileInstance> {
 
-        public bool HasWorldPolygons(Frame f) {
+        public readonly bool HasWorldPolygons(Frame f) {
             return Tile != default && HasWorldPolygons(f.FindAsset(Tile));
         }
         
@@ -13,11 +13,11 @@ namespace Quantum {
             return Tile != default && stageTile != null && ((stageTile.CollisionData.Shapes != null && stageTile.CollisionData.Shapes.Length > 0) || stageTile.CollisionData.IsFullTile);
         }
         
-        public bool GetWorldPolygons(Frame f, Span<FPVector2> vertexBuffer, Span<int> shapeVertexCountBuffer, out StageTile tile, FPVector2? worldPos = null) {
+        public readonly bool GetWorldPolygons(Frame f, Span<FPVector2> vertexBuffer, Span<int> shapeVertexCountBuffer, out StageTile tile, in FPVector2? worldPos = null) {
             return GetWorldPolygons(f, f.FindAsset<VersusStageData>(f.Map.UserAsset), vertexBuffer, shapeVertexCountBuffer, out tile, worldPos ?? FPVector2.Zero);
         }
 
-        public bool GetWorldPolygons(Frame f, VersusStageData stage, Span<FPVector2> vertexBuffer, Span<int> shapeVertexCountBuffer, out StageTile tile, FPVector2? worldPos = null) {
+        public readonly bool GetWorldPolygons(Frame f, VersusStageData stage, Span<FPVector2> vertexBuffer, Span<int> shapeVertexCountBuffer, out StageTile tile, in FPVector2? worldPos = null) {
             if (Tile == default) {
                 tile = null;
                 return false;

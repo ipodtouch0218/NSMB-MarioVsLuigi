@@ -89,6 +89,11 @@
             A Quantum graph profiler that shows the simulation time.
             </summary>
         </member>
+        <member name="P:Quantum.Profiling.QuantumGraphProfilerSimulationTime.ValueDimensions">
+            <summary>
+            Adding three value dimensions: Update time, Verification time, Prediction time.
+            </summary>
+        </member>
         <member name="M:Quantum.Profiling.QuantumGraphProfilerSimulationTime.OnUpdate">
             <inheritdoc/>
         </member>
@@ -134,39 +139,33 @@
             </summary>
             <param name="colors">Color parameter</param>
         </member>
+        <member name="T:Quantum.Profiling.QuantumGraphProfilerUpdateTime">
+            <summary>
+            A Quantum graph profiler that records the frame time.
+            </summary>
+        </member>
+        <member name="M:Quantum.Profiling.QuantumGraphProfilerUpdateTime.OnUpdate">
+            <inheritdoc/>
+        </member>
+        <member name="M:Quantum.Profiling.QuantumGraphProfilerUpdateTime.OnTargetFPSChanged(System.Int32)">
+            <inheritdoc/>
+        </member>
         <member name="T:Quantum.Profiling.QuantumGraphProfilerBandwidth">
             <summary>
             Gathers bandwidth statistics, uses an accumulator for feed averages into the graphs.
             </summary>
         </member>
-        <member name="T:Quantum.Profiling.QuantumGraphProfilerBandwidth.BandwidthType">
+        <member name="P:Quantum.Profiling.QuantumGraphProfilerBandwidth.ValueDimensions">
             <summary>
-            Type of bandwidth collected.
+            This profiler records two values: Incoming and Outgoing bandwidth in bytes per second.
             </summary>
         </member>
-        <member name="F:Quantum.Profiling.QuantumGraphProfilerBandwidth.BandwidthType.Total">
-            <summary>
-            Incoming and outgoing bandwidth.
-            </summary>
-        </member>
-        <member name="F:Quantum.Profiling.QuantumGraphProfilerBandwidth.BandwidthType.Incoming">
-            <summary>
-            Only incoming bandwidth.
-            </summary>
-        </member>
-        <member name="F:Quantum.Profiling.QuantumGraphProfilerBandwidth.BandwidthType.Outgoing">
-            <summary>
-            Only outgoing bandwidth.
-            </summary>
-        </member>
-        <member name="F:Quantum.Profiling.QuantumGraphProfilerBandwidth.Type">
-            <summary>
-            Bandwidth type to be collected.
-            </summary>
+        <member name="M:Quantum.Profiling.QuantumGraphProfilerBandwidth.OnActivated">
+            <inheritdoc/>
         </member>
         <member name="M:Quantum.Profiling.QuantumGraphProfilerBandwidth.OnUpdate">
             <summary>
-            Sample a value.
+            Sample the values from the network peer.
             </summary>
         </member>
         <member name="T:Quantum.Profiling.QuantumGraphPlayerLoopUtility">
@@ -363,10 +362,10 @@
             <param name="threshold2Color">Threshold two color</param>
             <param name="threshold3Color">Threshold three color</param>
         </member>
-        <member name="M:Quantum.Profiling.QuantumGraphSeriesValue.SetValues(System.Single[],System.Int32,System.Int32)">
+        <member name="M:Quantum.Profiling.QuantumGraphSeriesValue.SetValues(System.Single[][],System.Int32,System.Int32)">
             <inheritdoc/>
         </member>
-        <member name="M:Quantum.Profiling.QuantumGraphSeriesValue.SetValues(System.Single[],System.Int32,System.Single,System.Single,System.Single)">
+        <member name="M:Quantum.Profiling.QuantumGraphSeriesValue.SetValues(System.Single[][],System.Int32,System.Single,System.Single,System.Single)">
             <summary>
             Set the values to render
             </summary>
@@ -395,6 +394,16 @@
             Add a value to the series.
             </summary>
             <param name="value">Value to record</param>
+        </member>
+        <member name="M:Quantum.Profiling.QuantumGraphProfilerValueSeries.AddValues(System.Single,System.Nullable{System.Single},System.Nullable{System.Single},System.Nullable{System.Single})">
+            <summary>
+            Add multiple values to the series.
+            Requires ValueDimensions to be set accordingly."/>
+            </summary>
+            <param name="value1">Default value</param>
+            <param name="value2">Extra value</param>
+            <param name="value3">Extra value</param>
+            <param name="value4">Extra value</param>
         </member>
         <member name="T:Quantum.Profiling.QuantumGraphProfilers">
             <summary>
@@ -655,6 +664,11 @@
             Is the profiler active and visible.
             </summary>
         </member>
+        <member name="P:Quantum.Profiling.QuantumGraphProfiler`1.ValueDimensions">
+            <summary>
+            The number of different value dimensions recorded. Default is 1.
+            </summary>
+        </member>
         <member name="M:Quantum.Profiling.QuantumGraphProfiler`1.ToggleVisibility">
             <summary>
             Toggle the visibility of the profiler.
@@ -696,6 +710,19 @@
             </summary>
             <param name="fps"></param>
         </member>
+        <member name="T:Quantum.Profiling.QuantumGraphProfilerSimulatedFrames">
+            <summary>
+            A Quantum graph profiler that shows how many verified frames have been simulated during the last update.
+            </summary>
+        </member>
+        <member name="P:Quantum.Profiling.QuantumGraphProfilerSimulatedFrames.ValueDimensions">
+            <summary>
+            Using two value dimensions: one for verified frames, one for predicted frames.
+            </summary>
+        </member>
+        <member name="M:Quantum.Profiling.QuantumGraphProfilerSimulatedFrames.OnUpdate">
+            <inheritdoc/>
+        </member>
         <member name="T:Quantum.Profiling.QuantumGraphProfilingStatistics">
             <summary>
             A Unity script that renders additional statistics to the graph UI.
@@ -721,6 +748,41 @@
             A graph series is the base class to render graphs in Unity.
             </summary>
         </member>
+        <member name="F:Quantum.Profiling.QuantumGraphSeries.MaxValueDimensions">
+            <summary>
+            The maximum number of supported value dimensions.
+            </summary>
+        </member>
+        <member name="T:Quantum.Profiling.QuantumGraphSeries.ValueDimensionFlag">
+            <summary>
+            Profiler can record different values to be shown in one graph.
+            </summary>
+        </member>
+        <member name="F:Quantum.Profiling.QuantumGraphSeries.ValueDimensionFlag.Default">
+            <summary>
+            The default value is collected and shown.
+            </summary>
+        </member>
+        <member name="F:Quantum.Profiling.QuantumGraphSeries.ValueDimensionFlag.Second">
+            <summary>
+            The second value is collected and shown.
+            </summary>
+        </member>
+        <member name="F:Quantum.Profiling.QuantumGraphSeries.ValueDimensionFlag.Third">
+            <summary>
+            The third value is collected and shown.
+            </summary>
+        </member>
+        <member name="F:Quantum.Profiling.QuantumGraphSeries.ValueDimensionFlag.Forth">
+            <summary>
+            The third value is collected and shown.
+            </summary>
+        </member>
+        <member name="F:Quantum.Profiling.QuantumGraphSeries.ValueDimensionFlag.All">
+            <summary>
+            All values are collected and shown.
+            </summary>
+        </member>
         <member name="P:Quantum.Profiling.QuantumGraphSeries.Samples">
             <summary>
             Returns the number of samples that can be displayed.
@@ -734,6 +796,16 @@
         <member name="F:Quantum.Profiling.QuantumGraphSeries._samples">
             <summary>
             The number of samples that are displayed.
+            </summary>
+        </member>
+        <member name="F:Quantum.Profiling.QuantumGraphSeries._valueDimensionEnabled">
+            <summary>
+            The value dimensions that are enabled to be rendered.
+            </summary>
+        </member>
+        <member name="F:Quantum.Profiling.QuantumGraphSeries._valueDimensions">
+            <summary>
+            The number of value dimensions that this series supports, is set during <see cref="M:Quantum.Profiling.QuantumGraphSeries.Initialize(System.Int32)"/>.
             </summary>
         </member>
         <member name="F:Quantum.Profiling.QuantumGraphSeries._values">
@@ -751,16 +823,50 @@
             Cache shared property.
             </summary>
         </member>
+        <member name="M:Quantum.Profiling.QuantumGraphSeries.IsValueDimensionEnabled(System.Int32)">
+            <summary>
+            Is a value dimension enabled to be rendered.
+            </summary>
+            <param name="dimension">Dimension as integer as a value from 0 to <see cref="F:Quantum.Profiling.QuantumGraphSeries.MaxValueDimensions"/></param>
+            <returns>True, if the value dimension will be rendered</returns>
+        </member>
+        <member name="M:Quantum.Profiling.QuantumGraphSeries.IsValueDimensionEnabled(Quantum.Profiling.QuantumGraphSeries.ValueDimensionFlag)">
+            <summary>
+            Is a value dimension enabled to be rendered.
+            </summary>
+            <param name="dimension">ValueDimensionFlag enum value</param>
+            <returns>True, if the value dimension will be rendered</returns>
+        </member>
+        <member name="M:Quantum.Profiling.QuantumGraphSeries.SetValueDimensionEnabled(System.Int32,System.Boolean)">
+            <summary>
+            Enable or disable a value dimension to be rendered.
+            </summary>
+            <param name="dimension">Dimension as integer as a value from 0 to <see cref="F:Quantum.Profiling.QuantumGraphSeries.MaxValueDimensions"/></param>
+            <param name="enabled">Enabled or disable the rendering</param>
+        </member>
+        <member name="M:Quantum.Profiling.QuantumGraphSeries.SetValueDimensionEnabled(Quantum.Profiling.QuantumGraphSeries.ValueDimensionFlag,System.Boolean)">
+            <summary>
+            Enable or disable a value dimension to be rendered.
+            </summary>
+            <param name="dimension">ValueDimensionFlag enum value</param>
+            <param name="enabled">Enabled or disable the rendering</param>
+        </member>
+        <member name="M:Quantum.Profiling.QuantumGraphSeries.ToggleValueDimensionEnabled(System.Int32)">
+            <summary>
+            Toggle a value dimension to be rendered. Typically used from a UI action.
+            </summary>
+            <param name="dimension">Dimension as integer as a value from 0 to <see cref="F:Quantum.Profiling.QuantumGraphSeries.MaxValueDimensions"/></param>
+        </member>
         <member name="M:Quantum.Profiling.QuantumGraphSeries.OnInitialize">
             <inheritdoc/>
         </member>
         <member name="M:Quantum.Profiling.QuantumGraphSeries.OnRestore">
             <inheritdoc/>
         </member>
-        <member name="M:Quantum.Profiling.QuantumGraphSeries.Initialize">
+        <member name="M:Quantum.Profiling.QuantumGraphSeries.Initialize(System.Int32)">
             <inheritdoc/>
         </member>
-        <member name="M:Quantum.Profiling.QuantumGraphSeries.SetValues(System.Single[],System.Int32,System.Int32)">
+        <member name="M:Quantum.Profiling.QuantumGraphSeries.SetValues(System.Single[][],System.Int32,System.Int32)">
             <summary>
             Set the values to render
             </summary>
@@ -2440,6 +2546,64 @@
         <member name="P:Quantum.QuantumAssetSourceAddressable`1.EditorInstance">
             <inheritdoc cref="P:Quantum.QuantumAssetSourceResource`1.EditorInstance"/>
         </member>
+        <member name="T:Quantum.QuantumAssetSourceAssetBundle`1">
+            <summary>
+            An AssetBundle-based implementation of the asset source pattern. The asset is loaded from AssetBundles.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="F:Quantum.QuantumAssetSourceAssetBundle`1.AssetBundleName">
+            <summary>
+            Name of the asset bundle.
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumAssetSourceAssetBundle`1.AssetName">
+            <summary>
+            Name of the asset in the bundle.
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumAssetSourceAssetBundle`1.NestedAssetName">
+            <summary>
+            Nested asset name, for sub assets.
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumAssetSourceAssetBundle`1.Acquire(System.Boolean)">
+            <inheritdoc cref="M:Quantum.QuantumAssetSourceResource`1.Acquire(System.Boolean)"/>
+        </member>
+        <member name="M:Quantum.QuantumAssetSourceAssetBundle`1.Release">
+            <inheritdoc cref="M:Quantum.QuantumAssetSourceResource`1.Release"/>
+        </member>
+        <member name="P:Quantum.QuantumAssetSourceAssetBundle`1.IsCompleted">
+            <inheritdoc cref="P:Quantum.QuantumAssetSourceResource`1.IsCompleted"/>
+        </member>
+        <member name="M:Quantum.QuantumAssetSourceAssetBundle`1.WaitForResult">
+            <inheritdoc cref="M:Quantum.QuantumAssetSourceResource`1.WaitForResult"/>
+        </member>
+        <member name="P:Quantum.QuantumAssetSourceAssetBundle`1.Description">
+            <summary>
+            The description of the asset source. Used for debugging.
+            </summary>
+        </member>
+        <member name="P:Quantum.QuantumAssetSourceAssetBundle`1.EditorInstance">
+            <summary>
+            Returns the asset instance for Editor purposes. Does not call <see cref="M:Quantum.QuantumAssetSourceAssetBundle`1.Acquire(System.Boolean)"/>.
+            </summary>
+        </member>
+        <member name="T:Quantum.QuantumAssetSourceAssetBundle">
+            <summary>
+            Utility for <see cref="T:Quantum.QuantumAssetSourceAssetBundle`1"/>.
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumAssetSourceAssetBundle.AssetBundleRequested">
+            <summary>
+            Global callback that allows for custom AssetBundle loading.
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumAssetSourceAssetBundle.AssetUnloaded">
+            <summary>
+            Global callback invoked when an asset is being unloaded.
+            </summary>
+        </member>
         <member name="T:Quantum.QuantumAssetSourceResource`1">
             <summary>
             Resources-based implementation of the asset source pattern.
@@ -2684,6 +2848,58 @@
             <param name="actorId">Photon actor id</param>
             <returns>A nickname or null</returns>
         </member>
+        <member name="T:Quantum.QuantumUnityDBScope">
+             <summary>
+             A collection of <see cref="T:Quantum.IQuantumAssetObjectSource"/>. At edit time, when placed in a folder, will break the link between assets and the DB. The DB does not reference scopes;
+             instead, it assumes a scope is going to be loaded with <see cref="M:Quantum.QuantumUnityDB.AddScope(Quantum.QuantumUnityDBScope)"/> at runtime.
+             One of the possible use cases is compartmentalizing assets that are statically references by Addressable/Asset Bundle scenes. Without scopes, such assets would be
+             referenced statically by the DB. If a scope is used, it can be marked to be included in the same bundle as the scene and no static references should leak out.
+            
+             Scopes can't be nested.
+             </summary>
+        </member>
+        <member name="F:Quantum.QuantumUnityDBScope.Id">
+            <summary>
+            The unique id of this scope.
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumUnityDBScope.Entries">
+            <summary>
+            All nested asset sources.
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumUnityDBScope._guidToIndex">
+            <summary>
+            AssetGuid to index in <see cref="F:Quantum.QuantumUnityDBScope.Entries"/> mapping.
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumUnityDBScope._pathToIndex">
+            <summary>
+            Path to index in <see cref="F:Quantum.QuantumUnityDBScope.Entries"/> mapping.
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumUnityDBScope.AddSource(Quantum.IQuantumAssetObjectSource,Quantum.AssetGuid,System.String)">
+            <summary>
+            Adds a new scoped asset source.
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumUnityDBScope.AddToGlobalDB">
+            <summary>
+            Adds the current scope to <see cref="P:Quantum.QuantumUnityDB.Global"/>
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumUnityDBScope.RemoveFromGlobalDB">
+            <summary>
+            Removes the current scope from <see cref="P:Quantum.QuantumUnityDB.Global"/>
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumUnityDBScope.GetAssetSource(Quantum.AssetGuid)">
+            <summary>
+            Returns the asset source with the given <paramref name="assetGuid"/>. Asset does not get loaded in the process.
+            </summary>
+            <param name="assetGuid"></param>
+            <returns>Asset source or <c>null</c> if the asset is not found</returns>
+        </member>
         <member name="T:Quantum.QuantumStats">
             <summary>
             Measures and display basic Quantum statistics on a UI element.
@@ -2822,6 +3038,11 @@
             Character used to separate nested assets names from their parents path.
             </summary>
         </member>
+        <member name="F:Quantum.QuantumUnityDB.Scopes">
+            <summary>
+            Scope IDs known at build time.
+            </summary>
+        </member>
         <member name="F:Quantum.QuantumUnityDB._entries">
             <summary>
             All the assets that are managed by this DB.
@@ -2855,6 +3076,11 @@
         <member name="F:Quantum.QuantumUnityDB._version">
             <summary>
             Increased every time the DB is updated.
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumUnityDB._scopesLoaded">
+            <summary>
+            A set of all the loaded scopes.
             </summary>
         </member>
         <member name="P:Quantum.QuantumUnityDB.Entries">
@@ -2943,6 +3169,46 @@
             </summary>
             <param name="guid"></param>
             <returns><c>true</c> if there was a matching source to remove</returns>
+        </member>
+        <member name="M:Quantum.QuantumUnityDB.IsScopeLoaded(Quantum.QuantumUnityDBScope)">
+            <summary>
+            Returns true if <paramref name="scope"/> is already loaded.
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumUnityDB.IsScopeLoaded(System.String)">
+            <summary>
+            Returns true if <paramref name="scopeId"/> is already loaded.
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumUnityDB.AddScope(Quantum.QuantumUnityDBScope)">
+            <summary>
+            Adds assets from scope. If the scope is already loaded, throws an exception. Consider using <see cref="M:Quantum.QuantumUnityDB.TryAddScope(Quantum.QuantumUnityDBScope)"/> instead.
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumUnityDB.TryAddScope(Quantum.QuantumUnityDBScope)">
+            <summary>
+            Adds assets from scope. If the scope is already loaded, returns false. For each asset that is already present in the db,
+            a warning is logged.
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumUnityDB.RemoveScope(System.String,System.Boolean)">
+            <summary>
+            Removes all scope asset sources previously loaded with <see cref="M:Quantum.QuantumUnityDB.AddScope(Quantum.QuantumUnityDBScope)"/>
+            </summary>
+            <param name="unloadAssets">If true, assets will also be unloaded (if they have been acquired)</param>
+        </member>
+        <member name="M:Quantum.QuantumUnityDB.RemoveScope(Quantum.QuantumUnityDBScope,System.Boolean)">
+            <summary>
+            Removes all scope asset sources previously loaded with <see cref="M:Quantum.QuantumUnityDB.AddScope(Quantum.QuantumUnityDBScope)"/>
+            </summary>
+            <param name="scope"></param>
+            <param name="unloadAssets">If true, assets will also be unloaded (if they have been acquired)</param>
+        </member>
+        <member name="M:Quantum.QuantumUnityDB.RemoveAllScopes(System.Boolean)">
+            <summary>
+            Calls <see cref="M:Quantum.QuantumUnityDB.RemoveScope(System.String,System.Boolean)"/> for all the loaded scopes
+            </summary>
+            <param name="unloadAssets"></param>
         </member>
         <member name="M:Quantum.QuantumUnityDB.CreateRuntimeDeterministicGuid(System.String)">
             <summary>
@@ -3101,6 +3367,11 @@
         <member name="M:Quantum.QuantumUnityDB.FindNextAssetGuid(Quantum.AssetObjectQuery@,Quantum.AssetGuid@)">
             <inheritdoc cref="M:Quantum.IResourceManager.FindNextAssetGuid(Quantum.AssetObjectQuery@,Quantum.AssetGuid@)"/>
         </member>
+        <member name="M:Quantum.QuantumUnityDB.HasAsset(Quantum.AssetGuid)">
+            <summary>
+            Returns true if there's an asset with matching GUID.
+            </summary>
+        </member>
         <member name="M:Quantum.QuantumUnityDB.GetAssetState(Quantum.AssetGuid)">
             <inheritdoc cref="M:Quantum.IResourceManager.GetAssetState(Quantum.AssetGuid)"/>
         </member>
@@ -3144,6 +3415,14 @@
         <member name="M:Quantum.QuantumUnityDB.Entry.ToString">
             <inheritdoc/>
         </member>
+        <member name="P:Quantum.QuantumUnityDB.EditorScopedAssets">
+            <summary>
+            Returns a list of scoped assets known at the time of the DB baking. Only available in edit mode.
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumUnityDB.IsGlobalAssetScoped(Quantum.AssetRef,Quantum.QuantumUnityDBScope@)">
+            <inheritdoc cref="M:Quantum.QuantumUnityDB.IsAssetScoped(Quantum.AssetRef,Quantum.QuantumUnityDBScope@)"/>
+        </member>
         <member name="M:Quantum.QuantumUnityDB.GetGlobalAssetEditorInstance(Quantum.AssetRef)">
             <inheritdoc cref="M:Quantum.QuantumUnityDB.GetAssetEditorInstance(Quantum.AssetRef)"/>
         </member>
@@ -3173,6 +3452,29 @@
             </summary>
             <param name="assetRef"></param>
             <returns>Asset instance or <c>null</c> if not found or the type does not match.</returns>
+        </member>
+        <member name="M:Quantum.QuantumUnityDB.GetGlobalAssetSourceEditorInstance(Quantum.AssetGuid,Quantum.QuantumUnityDBScope@)">
+            <inheritdoc cref="M:Quantum.QuantumUnityDB.GetAssetSourceEditorInstance(Quantum.AssetGuid,Quantum.QuantumUnityDBScope@)"/>
+        </member>
+        <member name="M:Quantum.QuantumUnityDB.GetAssetSourceEditorInstance(Quantum.AssetGuid,Quantum.QuantumUnityDBScope@)">
+            <summary>
+            Returns the editor instance of the asset source wit the given <paramref name="guid"/>. Compared to <see cref="M:Quantum.QuantumUnityDB.GetAssetSource(Quantum.AssetGuid)"/>,
+            this method also takes scopes under consideration, even if they haven't been loaded yet. 
+            </summary>
+            <param name="guid"></param>
+            <param name="scope"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Quantum.QuantumUnityDB.IsAssetScoped(Quantum.AssetRef,Quantum.QuantumUnityDBScope@)">
+            <summary>
+            Returns true if the asset is scoped and known at edit time.
+            </summary>
+            <param name="assetRef"></param>
+            <param name="scope"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Quantum.QuantumUnityDB.TryGetGlobalAssetEditorInstance(Quantum.AssetRef,Quantum.AssetObject@)">
+            <inheritdoc cref="M:Quantum.QuantumUnityDB.TryGetGlobalAssetEditorInstance``1(Quantum.AssetRef,``0@)"/>
         </member>
         <member name="M:Quantum.QuantumUnityDB.TryGetGlobalAssetEditorInstance``1(Quantum.AssetRef,``0@)">
             <inheritdoc cref="M:Quantum.QuantumUnityDB.TryGetGlobalAssetEditorInstance``1(Quantum.AssetRef,``0@)"/>
@@ -3925,64 +4227,6 @@
             Obsolete attribute for Quantum 2 compatibility. Non functional in Quantum 3.
             </summary>
         </member>
-        <member name="T:Quantum.QuantumAssetSourceAssetBundle`1">
-            <summary>
-            An AssetBundle-based implementation of the asset source pattern. The asset is loaded from AssetBundles.
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="F:Quantum.QuantumAssetSourceAssetBundle`1.AssetBundleName">
-            <summary>
-            Name of the asset bundle.
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumAssetSourceAssetBundle`1.AssetName">
-            <summary>
-            Name of the asset in the bundle.
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumAssetSourceAssetBundle`1.NestedAssetName">
-            <summary>
-            Nested asset name, for sub assets.
-            </summary>
-        </member>
-        <member name="M:Quantum.QuantumAssetSourceAssetBundle`1.Acquire(System.Boolean)">
-            <inheritdoc cref="M:Quantum.QuantumAssetSourceResource`1.Acquire(System.Boolean)"/>
-        </member>
-        <member name="M:Quantum.QuantumAssetSourceAssetBundle`1.Release">
-            <inheritdoc cref="M:Quantum.QuantumAssetSourceResource`1.Release"/>
-        </member>
-        <member name="P:Quantum.QuantumAssetSourceAssetBundle`1.IsCompleted">
-            <inheritdoc cref="P:Quantum.QuantumAssetSourceResource`1.IsCompleted"/>
-        </member>
-        <member name="M:Quantum.QuantumAssetSourceAssetBundle`1.WaitForResult">
-            <inheritdoc cref="M:Quantum.QuantumAssetSourceResource`1.WaitForResult"/>
-        </member>
-        <member name="P:Quantum.QuantumAssetSourceAssetBundle`1.Description">
-            <summary>
-            The description of the asset source. Used for debugging.
-            </summary>
-        </member>
-        <member name="P:Quantum.QuantumAssetSourceAssetBundle`1.EditorInstance">
-            <summary>
-            Returns the asset instance for Editor purposes. Does not call <see cref="M:Quantum.QuantumAssetSourceAssetBundle`1.Acquire(System.Boolean)"/>.
-            </summary>
-        </member>
-        <member name="T:Quantum.QuantumAssetSourceAssetBundle">
-            <summary>
-            Utility for <see cref="T:Quantum.QuantumAssetSourceAssetBundle`1"/>.
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumAssetSourceAssetBundle.AssetBundleRequested">
-            <summary>
-            Global callback that allows for custom AssetBundle loading.
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumAssetSourceAssetBundle.AssetUnloaded">
-            <summary>
-            Global callback invoked when an asset is being unloaded.
-            </summary>
-        </member>
         <member name="T:Quantum.QuantumGlobalScriptableObject`1">
             <inheritdoc cref="T:Quantum.QuantumGlobalScriptableObject`1"/>
         </member>
@@ -4458,6 +4702,13 @@
             are loaded is driven by usages of <see cref="T:Quantum.QuantumGlobalScriptableObjectSourceAttribute"/> attributes. 
             </summary>
         </member>
+        <member name="F:Quantum.QuantumGlobalScriptableObject._typesFailedToLoad">
+            <summary>
+            Types that failed to load. Used to limit attempts until a reimport happens. Also, there's a nasty bug
+            at least in some Unity versions (verified on 2021), where if there's a type of the same name in multiple assemblies,
+            AssetDatabase.GetMainAssetPath may return the wrong one.
+            </summary>
+        </member>
         <member name="T:Quantum.QuantumGlobalScriptableObjectAttribute">
             <summary>
             Provides additional information for a global scriptable object.
@@ -4914,6 +5165,11 @@
         <member name="F:Quantum.QuantumRunnerLocalDebug.DatabaseFile">
             <summary>
             Optionally starting the game using an asset db from a file.
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumRunnerLocalDebug.DBScopes">
+            <summary>
+            DB scopes to preload.
             </summary>
         </member>
         <member name="M:Quantum.QuantumRunnerLocalDebug.Start">
@@ -5726,6 +5982,12 @@
             All conversions between Unity float into Quantum FP (e.g. Vector2 to FPVector2) 
             are considered non-deterministic and should never be used in the Quantum simulation directly.
             </summary>
+        </member>
+        <member name="M:Quantum.FPMathUtils.TryLoadLookupTables(System.Boolean)">
+            <summary>
+            Attempts to the lookup tables. By default, loaded from Resources.
+            </summary>
+            <param name="force">Will reload the table if set to true</param>
         </member>
         <member name="M:Quantum.FPMathUtils.LoadLookupTables(System.Boolean)">
             <summary>

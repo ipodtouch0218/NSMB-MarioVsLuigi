@@ -85,7 +85,7 @@ namespace Quantum {
             }
             }
 
-            f.Signals.OnProjectileHitEntity(f, projectileEntity, piranhaPlantEntity);
+            f.Signals.OnProjectileHitEntity(projectileEntity, piranhaPlantEntity);
         }
 
         public void OnPiranhaPlantMarioInteraction(Frame f, EntityRef piranhaPlantEntity, EntityRef marioEntity) {

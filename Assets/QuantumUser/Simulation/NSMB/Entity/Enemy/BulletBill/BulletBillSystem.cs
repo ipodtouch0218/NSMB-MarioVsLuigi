@@ -123,7 +123,7 @@ namespace Quantum
                 f.Unsafe.GetPointer<BulletBill>(bulletBillEntity)->Kill(f, bulletBillEntity, projectileEntity, KillReason.Special);
             }
 
-            f.Signals.OnProjectileHitEntity(f, projectileEntity, bulletBillEntity);
+            f.Signals.OnProjectileHitEntity(projectileEntity, bulletBillEntity);
         }
         #endregion
 

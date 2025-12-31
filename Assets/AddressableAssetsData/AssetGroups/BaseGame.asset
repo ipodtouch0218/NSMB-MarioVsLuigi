@@ -15,28 +15,8 @@ MonoBehaviour:
   m_GroupName: BaseGame
   m_GUID: 4d087ae4c291a7147b2c19263ae6576d
   m_SerializeEntries:
-  - m_GUID: 017d859ae3b5f93419c6b106d9683cf3
-    m_Address: Assets/QuantumUser/Resources/EntityPrototypes/Enemy/KoopaEntityPrototype.qprototype
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 028ea2b4220896e4c8e9cf26fe044c86
-    m_Address: Resources/EntityPrototypes/Enemy/BobombEntityPrototype.qprototype
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 064b8b0757e22124f9eecde170f132b0
-    m_Address: Resources/EntityPrototypes/Enemy/PiranhaPlantEntityPrototype.qprototype
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 11d0cb89c67de8241922a37e92a1b4dd
     m_Address: Materials
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 16d06c0e5edd1fa4392b1ca6df2367e0
-    m_Address: Resources/EntityPrototypes/Enemy/BooEntityPrototype.qprototype
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -45,33 +25,13 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 338d137db932aad45b8d78a8cd23b001
-    m_Address: Resources/EntityPrototypes/World/WaterEntityPrototype.qprototype
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3b58d65b123c6954b8edc77ca3964b95
     m_Address: Assets/Scenes/Levels
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 53471ca92650f81418ea065361d96227
-    m_Address: Resources/EntityPrototypes/Enemy/SpinyEntityPrototype.qprototype
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 5d2ac75e854cf5242b33d3dd6f2cb64a
-    m_Address: Assets/QuantumUser/Resources/EntityPrototypes/Items/Mega MushroomEntityPrototype.qprototype
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7c6bca3b7186f2c4294461cfadb2be8b
     m_Address: Shaders
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 82fa1271b2a98fc41baa6fbcaab3bbca
-    m_Address: Resources/EntityPrototypes/Enemy/GoombaEntityPrototype.qprototype
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -82,11 +42,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9fc8cd35cca1bf3439437a5d6ed80722
     m_Address: ScriptableObjects
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: a1204836dc78cd648be74a25476288cc
-    m_Address: Resources/EntityPrototypes/Enemy/BulletBillEntityPrototype.qprototype
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -102,16 +57,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: dce119c0e907a0640ab217b5c3f5eb10
     m_Address: Animations
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: e7ce079f9e02aaf498d81eb08e138d59
-    m_Address: Assets/QuantumUser/Resources/EntityPrototypes/World/DonutBlockEntityPrototype.qprototype
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: f4614a9d678f440429280d54866b33cc
-    m_Address: Resources/EntityPrototypes/BigStarEntityPrototype.qprototype
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

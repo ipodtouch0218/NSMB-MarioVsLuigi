@@ -1,0 +1,81 @@
+<#@ template language="C#" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+<#
+  var sdks = new[] { "BotSDK", "NavigationSDK" };
+#>
+
+namespace Quantum {
+  using UnityEngine;
+
+  /// <summary>
+  /// Static type registry is completed by code generation.
+  /// </summary>
+  partial class Statics {
+<#foreach (var sdk in sdks) {#>
+    static partial void InitStaticDelegates<#=sdk#>();  
+    static partial void RegisterSimulationTypes<#=sdk#>(TypeRegistry typeRegistry);
+    static partial void EnsureNotStripped<#=sdk#>();  
+<#}#>
+
+    static void InitStaticDelegatesAddons() {
+<#foreach (var sdk in sdks) {#>
+      InitStaticDelegates<#=sdk#>();
+<#}#>
+    }
+
+    static void RegisterSimulationTypesAddons(TypeRegistry typeRegistry) {
+<#foreach (var sdk in sdks) {#>
+      RegisterSimulationTypes<#=sdk#>(typeRegistry);
+<#}#>
+    }
+
+    static void EnsureNotStrippedAddons() {
+<#foreach (var sdk in sdks) {#>
+      EnsureNotStripped<#=sdk#>();
+<#}#>
+    }
+  }
+
+  partial class FrameContextUser {
+<#foreach (var sdk in sdks) {#>
+    partial void Construct<#=sdk#>(Args args, IRuntimeConfig runtimeConfig);
+    partial void Dispose<#=sdk#>();  
+<#}#>
+
+    void ConstructAddons(Args args, IRuntimeConfig runtimeConfig) {
+<#foreach (var sdk in sdks) {#>
+      Construct<#=sdk#>(args, runtimeConfig);
+<#}#>
+    }
+
+    void DisposeAddons() {
+<#foreach (var sdk in sdks) {#>
+      Dispose<#=sdk#>();
+<#}#>
+    }
+  }
+
+  partial class Frame {
+
+<#foreach (var sdk in sdks) {#>
+    partial void Init<#=sdk#>();
+    partial void Free<#=sdk#>();    
+<#}#>
+
+
+
+    void InitAddons() {
+<#foreach (var sdk in sdks) {#>
+      Init<#=sdk#>();
+<#}#>
+    }
+
+    void FreeAddons() {
+<#foreach (var sdk in sdks) {#>
+      Free<#=sdk#>();
+<#}#>
+    }
+  }
+}

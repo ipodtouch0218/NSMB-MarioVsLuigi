@@ -8,7 +8,7 @@ namespace Quantum {
             f.Context.RegisterPreContactCallback(f, OnMarioBreakableObjectPreContact);
         }
 
-        private static bool TryInteraction(Frame f, EntityRef marioEntity, EntityRef breakableObjectEntity, PhysicsContact? contact = null) {
+        private static bool TryInteraction(Frame f, EntityRef marioEntity, EntityRef breakableObjectEntity, in PhysicsContact? contact = null) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
             if (mario->CurrentPowerupState != PowerupState.MegaMushroom || mario->IsDead) {
                 return true;

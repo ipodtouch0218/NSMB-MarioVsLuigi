@@ -9,7 +9,6 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEditor;
 using AssetObjectQuery = Quantum.AssetObjectQuery;
-using Quantum.Editor;
 
 [assembly: QuantumMapBakeAssembly]
 namespace NSMB.Quantum { 
@@ -103,11 +102,11 @@ namespace NSMB.Quantum {
 
             // --- Bake Star Spawns
             GameObject[] starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
-            stage.BigStarSpawnpoints = starSpawns.Select(go => go.transform.position.ToFPVector2()).Take(64).ToArray();
-            if (starSpawns.Length <= 64) {
+            stage.BigStarSpawnpoints = starSpawns.Select(go => go.transform.position.ToFPVector2()).Take(Constants.MaxStarSpawns).ToArray();
+            if (starSpawns.Length <= Constants.MaxStarSpawns) {
                 LogInfo($"Automatically found big star spawns: {stage.BigStarSpawnpoints.Length}");
             } else {
-                LogError($"The stage has a hard limit of 64 star spawns! (Found {starSpawns.Length})");
+                LogError($"The stage data has a limit of {Constants.MaxStarSpawns} star spawns! (Found {starSpawns.Length}). To change this, modify '#define MaxStarSpawns' in BigStar.qtn");
             }
 
             // --- Bake Enemies(' spawnpoints)

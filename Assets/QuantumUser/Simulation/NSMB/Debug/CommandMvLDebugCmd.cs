@@ -1,4 +1,3 @@
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
 using Photon.Deterministic;
 
 namespace Quantum {
@@ -24,4 +23,3 @@ namespace Quantum {
         }
     }
 }
-#endif

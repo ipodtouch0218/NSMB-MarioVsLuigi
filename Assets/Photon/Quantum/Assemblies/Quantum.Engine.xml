@@ -4091,7 +4091,7 @@
             <summary>
             When "remove component" and "destroy entity" commands should be committed, effectively cleaning and freeing the data from components' buffers.
             <remarks>Both commands still take immediate effect from a semantic perspective, e.g.: checking if the entity exists will return <see langword="false"/> as soon as the "destroy entity" method is called.</remarks>
-            <remarks>Commiting commands on <see cref="F:Quantum.CommitCommandsModes.OnFrameSimulationBegin"/> will ensure that performing Physics Queries is safe, even after the frame simulation ends (from Unity),
+            <remarks>Committing commands on <see cref="F:Quantum.CommitCommandsModes.OnFrameSimulationBegin"/> will ensure that performing Physics Queries is safe, even after the frame simulation ends (from Unity),
             but might result in a larger total amount of memory reserved in case many entities are destroyed AND created in the same frame (analogous for "component removal").</remarks>
             </summary>
         </member>
@@ -5918,25 +5918,25 @@
             An auxiliary command that can be used to send multiple commands in one. Nested compound commands are accepted.
             </summary>
         </member>
-        <member name="F:Quantum.Core.CompoundCommand.Commands">
+        <member name="T:Quantum.Core.DeterministicCommandWrapper">
             <summary>
-            A list of the commands that are part of this compound.
+            An auxiliary command that is used internally to send commands to the server.
             </summary>
         </member>
-        <member name="M:Quantum.Core.CompoundCommand.Serialize(Photon.Deterministic.BitStream,Photon.Deterministic.DeterministicCommandSerializer)">
+        <member name="M:Quantum.Core.DeterministicCommandWrapper.Serialize(Photon.Deterministic.BitStream,Photon.Deterministic.DeterministicCommandSerializer)">
             <summary>
             Write or read a command from the raw input stream.
             </summary>
             <param name="stream">Bit stream</param>
             <param name="cmdSerializer">Command serializer</param>
         </member>
-        <member name="M:Quantum.Core.CompoundCommand.Serialize(Photon.Deterministic.BitStream)">
+        <member name="M:Quantum.Core.DeterministicCommandWrapper.Serialize(Photon.Deterministic.BitStream)">
             <summary>
             Not implemented, use the other overload instead.
             </summary>
             <param name="stream">Bitstream</param>
         </member>
-        <member name="M:Quantum.Core.CompoundCommand.Dispose">
+        <member name="M:Quantum.Core.DeterministicCommandWrapper.Dispose">
             <summary>
             Disposes all the commands in the compound.
             </summary>
@@ -16267,17 +16267,16 @@
             The contact normal.
             </summary>
         </member>
-        <member name="M:Quantum.Physics2D.CollisionResultInfo2D.ContactPoints(Quantum.Physics2D.CollisionResultInfo2D*)">
+        <member name="M:Quantum.Physics2D.CollisionResultInfo2D.GetContactPoints">
             <summary>
-            Gets a pointer from the contact points buffer. Use this pointer to get the other contact points in a for loop.
+            Gets a span of the contact points in the collision.
             </summary>
-            <param name="CollisionResultInfo2D">The <see cref="T:Quantum.Physics2D.CollisionResultInfo2D"/> reference.</param>
             <returns>A pointer to the beginning of the contact points vector buffer.</returns>
             <example>
             How to iterate over the contact points:
             <code>
-            for (int i = 0; i &lt; result->ContactPointsCount; i++) {
-                FPVector2 contactPoint = CollisionResultInfo2D.ContactPoints(result)[i];
+            for (int i = 0; i &lt; span.Length; i++) {
+              ref var cp = span[i];
             }
             </code>
             </example>
@@ -16289,6 +16288,15 @@
             <param name="result">The <see cref="T:Quantum.Physics2D.CollisionResultInfo2D"/> reference.</param>
             <param name="contactPointIndex">Index of the contact point.</param>
             <returns>Returns a specified contact point as <see cref="T:Photon.Deterministic.FPVector2"/>.</returns>
+        </member>
+        <member name="M:Quantum.Physics2D.CollisionResultInfo2D.GetPoint(System.Int32)">
+            <summary>
+            Gets a reference to the contact point at the given index.
+            </summary>
+            <param name="contactPointIndex">Index of the contact point.</param>
+            <returns></returns>
+            <exception cref="T:System.IndexOutOfRangeException">In case the <paramref name="contactPointIndex"/>
+            is out of the [0, <see cref="P:Quantum.Physics2D.CollisionResultInfo2D.ContactPointsCount"/>) range.</exception>
         </member>
         <member name="P:Quantum.Physics2D.CollisionResultInfo2D.ContactPointsCount">
             <summary>
@@ -16311,7 +16319,7 @@
             Gets the average point between all the contact points computed.
             </summary>
             <param name="result">The <see cref="T:Quantum.Physics2D.CollisionResultInfo2D"/> reference.</param>
-            <returns>The mid point of all contact points.</returns>
+            <returns>The average point of all contact points.</returns>
         </member>
         <member name="M:Quantum.Physics2D.CollisionResultInfo2D.UpdateHitWithResult(Quantum.Physics2D.CollisionResultInfo2D*,Quantum.Physics2D.Hit@)">
             <summary>
@@ -17422,6 +17430,19 @@
             The shape to be used by this collider. If the provided shape is a <see cref="T:Quantum.Shape2D.CompoundShape2D"/>, this
             collider will create a deep, persistent copy of the provided compound, which will be disposed automatically when
             this component is removed from an entity.
+            </param>
+            <param name="material">The physics material asset object. If null, it will use the default physics material.</param>
+            <param name="isTrigger">If the collider is trigger. False by default.</param>
+            <param name="layer">The index of the layer the collider belongs to.</param>
+            <returns>An instance of physics collider component.</returns>
+        </member>
+        <member name="M:Quantum.PhysicsCollider2D.Create(Quantum.Shape2D@,Quantum.PhysicsMaterial,System.Boolean,System.Int32)">
+            <summary>
+            Creates a physics collider component with a primitive <see cref="T:Quantum.Shape2D"/>.
+            </summary>
+            <param name="shape">
+            The shape to be used by this collider. Must not be a <see cref="T:Quantum.Shape2D.CompoundShape2D"/>.
+            For compound shapes, use <see cref="M:Quantum.PhysicsCollider2D.Create(Quantum.Core.FrameBase,Quantum.Shape2D,Quantum.PhysicsMaterial,System.Boolean,System.Int32)"/>.
             </param>
             <param name="material">The physics material asset object. If null, it will use the default physics material.</param>
             <param name="isTrigger">If the collider is trigger. False by default.</param>
@@ -19434,6 +19455,219 @@
             3D Physics' space-partitioning structure for static meshes and their triangles. 
             </summary>
         </member>
+        <member name="M:Quantum.Physics3D.CollisionSolver.Solve(Quantum.Core.FrameBase,Quantum.EntityRef,Quantum.EntityRef,Quantum.Physics3D.CollisionResultInfo3D*,System.Nullable{System.Int32})">
+            <summary>
+            Solves a collision between two entities.
+            This method does not apply the resolution impulses to the entities, but the returned struct can be used to do so.
+            </summary>
+            <remarks>At least one of the entities must have a dynamic (non-kinematic) physics body.</remarks>
+            <param name="f">
+            The frame in which the collision occurs, used to retrieve components from the entities and other settings
+            like delta-time and physics scene settings.
+            </param>
+            <param name="entityA">A valid entity with at least a <see cref="T:Quantum.Transform3D"/> and <see cref="T:Quantum.PhysicsCollider3D"/> components.</param>
+            <param name="entityB">A valid entity with at least a <see cref="T:Quantum.Transform3D"/> and <see cref="T:Quantum.PhysicsCollider3D"/> components.</param>
+            <param name="collision">
+            A <see cref="T:Quantum.Physics3D.CollisionResultInfo3D"/> that defines the collision between entities A and B.
+            Retrievable from the <see cref="T:Quantum.Physics3D.CollisionChecks"/> API.
+            </param>
+            <param name="solverIterationsOverride">
+            The number of iterations performed by the solver.
+            If null, the <see cref="F:Quantum.PhysicsSceneSettings.SolverIterations"/> will be used.
+            </param>
+            <returns>A <see cref="T:Quantum.Physics3D.CollisionResolution3D"/> with the resolution impulses for each body involved in the collision.</returns>
+        </member>
+        <member name="M:Quantum.Physics3D.CollisionSolver.Solve(Quantum.Core.FrameBase,Quantum.EntityRef,System.Int32,Quantum.Physics3D.CollisionResultInfo3D*,System.Nullable{System.Int32})">
+            <summary>
+            Solves a collision between an entity and a static collider.
+            This method does not apply the resolution impulses to the entity, but the returned struct can be used to do so.
+            </summary>
+            <param name="f">
+            The frame in which the collision occurs, used to retrieve components from the entity and other settings
+            like delta-time and physics scene settings.
+            </param>
+            <param name="entityA">A valid entity with a <see cref="T:Quantum.Transform3D"/>, <see cref="T:Quantum.PhysicsCollider3D"/>
+            and <see cref="T:Quantum.PhysicsBody3D"/> components, the latter being a non-kinematic body.</param>
+            <param name="staticColliderIndex">The index of the static collider in the frame <see cref="P:Quantum.Core.FrameBase.Map">Map</see>.</param>
+            <param name="collision">
+            A <see cref="T:Quantum.Physics3D.CollisionResultInfo3D"/> that defines the collision between entity A and the static collider B.
+            Retrievable from the <see cref="T:Quantum.Physics3D.CollisionChecks"/> API.
+            </param>
+            <param name="solverIterationsOverride">
+            The number of iterations performed by the solver.
+            If null, the <see cref="F:Quantum.PhysicsSceneSettings.SolverIterations"/> will be used.
+            </param>
+            <returns>A <see cref="T:Quantum.Physics3D.CollisionResolution3D"/> with the resolution impulses for each body involved in the collision.</returns>
+        </member>
+        <member name="M:Quantum.Physics3D.CollisionSolver.Solve(Quantum.Core.FrameBase,Quantum.EntityRef,Quantum.EntityRef,System.ReadOnlySpan{Photon.Deterministic.FPVector3},Photon.Deterministic.FPVector3,System.Nullable{System.Int32})">
+            <summary>
+            Solves a collision between two entities.
+            This method does not apply the resolution impulses to the entities, but the returned struct can be used to do so.
+            </summary>
+            <remarks>At least one of the entities must have a dynamic (non-kinematic) physics body.</remarks>
+            <param name="f">
+            The frame in which the collision occurs, used to retrieve components from the entities and other settings
+            like delta-time and physics scene settings.
+            </param>
+            <param name="entityA">A valid entity with at least a <see cref="T:Quantum.Transform3D"/> and <see cref="T:Quantum.PhysicsCollider3D"/> components.</param>
+            <param name="entityB">A valid entity with at least a <see cref="T:Quantum.Transform3D"/> and <see cref="T:Quantum.PhysicsCollider3D"/> components.</param>
+            <param name="contactPoints">A span of vectors representing the contact points of the collision in world space.</param>
+            <param name="normal">The direction of separation between the colliders, from collider B to collider A.</param>
+            <param name="solverIterationsOverride">
+            The number of iterations performed by the solver.
+            If null, the <see cref="F:Quantum.PhysicsSceneSettings.SolverIterations"/> will be used.
+            </param>
+            <returns>A <see cref="T:Quantum.Physics3D.CollisionResolution3D"/> with the resolution impulses for each body involved in the collision.</returns>
+        </member>
+        <member name="M:Quantum.Physics3D.CollisionSolver.Solve(Quantum.Core.FrameBase,Quantum.EntityRef,System.Int32,System.ReadOnlySpan{Photon.Deterministic.FPVector3},Photon.Deterministic.FPVector3,System.Nullable{System.Int32})">
+            <summary>
+            Solves a collision between an entity and a static collider.
+            This method does not apply the resolution impulses to the entity, but the returned struct can be used to do so.
+            </summary>
+            <param name="f">
+            The frame in which the collision occurs, used to retrieve components from the entity and other settings
+            like delta-time and physics scene settings.
+            </param>
+            <param name="entityA">A valid entity with a <see cref="T:Quantum.Transform3D"/>, <see cref="T:Quantum.PhysicsCollider3D"/>
+            and <see cref="T:Quantum.PhysicsBody3D"/> components, the latter being a non-kinematic body.</param>
+            <param name="staticColliderIndex">The index of the static collider in the frame <see cref="P:Quantum.Core.FrameBase.Map">Map</see>.</param>
+            <param name="contactPoints">A span of vectors representing the contact points of the collision in world space.</param>
+            <param name="normal">The direction of separation between the colliders, from collider B to collider A.</param>
+            <param name="solverIterationsOverride">
+            The number of iterations performed by the solver.
+            If null, the <see cref="F:Quantum.PhysicsSceneSettings.SolverIterations"/> will be used.
+            </param>
+            <returns>A <see cref="T:Quantum.Physics3D.CollisionResolution3D"/> with the resolution impulses for each body involved in the collision.</returns>
+        </member>
+        <member name="M:Quantum.Physics3D.CollisionSolver.Solve(Quantum.Core.FrameBase,Quantum.CollisionInfo3D@,System.Nullable{System.Int32})">
+            <summary>
+            Solves a collision between two colliders.
+            This method does not apply the resolution impulses to the entities, but the returned struct can be used to do so.
+            </summary>
+            <param name="f">
+            The frame in which the collision occurs, used to retrieve components from the entities and other settings
+            like delta-time and physics scene settings.
+            </param>
+            <param name="collisionInfo">Information about a collision, usually retrieved from collision callbacks.</param>
+            <param name="solverIterationsOverride">
+            The number of iterations performed by the solver.
+            If null, the <see cref="F:Quantum.PhysicsSceneSettings.SolverIterations"/> will be used.
+            </param>
+            <returns>A <see cref="T:Quantum.Physics3D.CollisionResolution3D"/> with the resolution impulses for each body involved in the collision.</returns>
+        </member>
+        <member name="M:Quantum.Physics3D.CollisionSolver.Solve(Quantum.Transform3D*,Quantum.PhysicsCollider3D*,Quantum.PhysicsBody3D*,Quantum.Map,System.Int32,Quantum.Physics3D.CollisionResultInfo3D*,Quantum.IResourceManager,Quantum.PhysicsSceneSettings*,Photon.Deterministic.FP,System.Nullable{System.Int32})">
+            <summary>
+            Solves a collision between an entity and a static collider.
+            This method does not apply the resolution impulses to the entity, but the returned struct can be used to do so.
+            </summary>
+            <param name="transformA">The entity transform component. Must be non-null.</param>
+            <param name="colliderA">The entity collider component. Must be non-null.</param>
+            <param name="bodyA">The entity body component. Must be non-null and non-kinematic.</param>
+            <param name="map">The map asset that contains the static collider.</param>
+            <param name="staticColliderIndex">The index of the static collider in the <paramref name="map"/> asset.</param>
+            <param name="collision">
+            A <see cref="T:Quantum.Physics3D.CollisionResultInfo3D"/> that defines the collision between entity A and the static collider B.
+            Retrievable from the <see cref="T:Quantum.Physics3D.CollisionChecks"/> API.
+            </param>
+            <param name="resourceManager">An instance of a resource manager, used to retrieve assets like physics materials.</param>
+            <param name="settings">The physics scene settings.</param>
+            <param name="deltaTime">The duration of a frame.</param>
+            <param name="solverIterationsOverride">
+            The number of iterations performed by the solver.
+            If null, the <see cref="F:Quantum.PhysicsSceneSettings.SolverIterations"/> will be used.
+            </param>
+            <returns>A <see cref="T:Quantum.Physics3D.CollisionResolution3D"/> with the resolution impulses for each body involved in the collision.</returns>
+        </member>
+        <member name="M:Quantum.Physics3D.CollisionSolver.Solve(Quantum.Transform3D*,Quantum.PhysicsCollider3D*,Quantum.PhysicsBody3D*,Quantum.Map,System.Int32,System.ReadOnlySpan{Photon.Deterministic.FPVector3},Photon.Deterministic.FPVector3,Quantum.IResourceManager,Quantum.PhysicsSceneSettings*,Photon.Deterministic.FP,System.Nullable{System.Int32})">
+            <summary>
+            Solves a collision between an entity and a static collider.
+            This method does not apply the resolution impulses to the entity, but the returned struct can be used to do so.
+            </summary>
+            <param name="transformA">The entity transform component. Must be non-null.</param>
+            <param name="colliderA">The entity collider component. Must be non-null.</param>
+            <param name="bodyA">The entity body component. Must be non-null and non-kinematic.</param>
+            <param name="map">The map asset that contains the static collider.</param>
+            <param name="staticColliderIndex">The index of the static collider in the <paramref name="map"/> asset.</param>
+            <param name="contactPoints">A span of vectors representing the contact points of the collision in world space.</param>
+            <param name="normal">The direction of separation between the colliders, from collider B to collider A.</param>
+            <param name="resourceManager">An instance of a resource manager, used to retrieve assets like physics materials.</param>
+            <param name="settings">The physics scene settings.</param>
+            <param name="deltaTime">The duration of a frame.</param>
+            <param name="solverIterationsOverride">
+            The number of iterations performed by the solver.
+            If null, the <see cref="F:Quantum.PhysicsSceneSettings.SolverIterations"/> will be used.
+            </param>
+            <returns>A <see cref="T:Quantum.Physics3D.CollisionResolution3D"/> with the resolution impulses for each body involved in the collision.</returns>
+        </member>
+        <member name="M:Quantum.Physics3D.CollisionSolver.Solve(Quantum.Transform3D*,Quantum.PhysicsCollider3D*,Quantum.PhysicsBody3D*,Quantum.Transform3D*,Quantum.PhysicsCollider3D*,Quantum.PhysicsBody3D*,Quantum.Physics3D.CollisionResultInfo3D*,Quantum.IResourceManager,Quantum.PhysicsSceneSettings*,Photon.Deterministic.FP,System.Nullable{System.Int32})">
+            <summary>
+            Solves a collision between two colliders.
+            This method does not apply the resolution impulses to the entities, but the returned struct can be used to do so.
+            </summary>
+            <remarks>At least one of the entities must have a dynamic (non-kinematic) physics body.</remarks>
+            <param name="transformA">The transform component of entity A. Must be non-null.</param>
+            <param name="colliderA">The collider component of entity A. Must be non-null.</param>
+            <param name="bodyA">The body component of entity A. Can be null.</param>
+            <param name="transformB">The transform component of entity B. Must be non-null.</param>
+            <param name="colliderB">The collider component of entity B. Must be non-null.</param>
+            <param name="bodyB">The body component of entity B. Can be null.</param>
+            <param name="collision">
+            A <see cref="T:Quantum.Physics3D.CollisionResultInfo3D"/> that defines the collision between entity A and the entity B.
+            Retrievable from the <see cref="T:Quantum.Physics3D.CollisionChecks"/> API.
+            </param>
+            <param name="resourceManager">An instance of a resource manager, used to retrieve assets like physics materials.</param>
+            <param name="settings">The physics scene settings.</param>
+            <param name="deltaTime">The duration of a frame.</param>
+            <param name="solverIterationsOverride">
+            The number of iterations performed by the solver.
+            If null, the <see cref="F:Quantum.PhysicsSceneSettings.SolverIterations"/> will be used.
+            </param>
+            <returns>A <see cref="T:Quantum.Physics3D.CollisionResolution3D"/> with the resolution impulses for each body involved in the collision.</returns>
+        </member>
+        <member name="M:Quantum.Physics3D.CollisionSolver.Solve(Quantum.Transform3D*,Quantum.PhysicsCollider3D*,Quantum.PhysicsBody3D*,Quantum.Transform3D*,Quantum.PhysicsCollider3D*,Quantum.PhysicsBody3D*,System.ReadOnlySpan{Photon.Deterministic.FPVector3},Photon.Deterministic.FPVector3,Quantum.IResourceManager,Quantum.PhysicsSceneSettings*,Photon.Deterministic.FP,System.Nullable{System.Int32})">
+            <summary>
+            Solves a collision between two colliders.
+            This method does not apply the resolution impulses to the entities, but the returned struct can be used to do so.
+            </summary>
+            <remarks>At least one of the entities must have a dynamic (non-kinematic) physics body.</remarks>
+            <param name="transformA">The transform component of entity A. Must be non-null.</param>
+            <param name="colliderA">The collider component of entity A. Must be non-null.</param>
+            <param name="bodyA">The body component of entity A. Can be null.</param>
+            <param name="transformB">The transform component of entity B. Must be non-null.</param>
+            <param name="colliderB">The collider component of entity B. Must be non-null.</param>
+            <param name="bodyB">The body component of entity B. Can be null.</param>
+            <param name="contactPoints">A span of vectors representing the contact points of the collision in world space.</param>
+            <param name="normal">The direction of separation between the colliders, from collider B to collider A.</param>
+            <param name="resourceManager">An instance of a resource manager, used to retrieve assets like physics materials.</param>
+            <param name="settings">The physics scene settings.</param>
+            <param name="deltaTime">The duration of a frame.</param>
+            <param name="solverIterationsOverride">
+            The number of iterations performed by the solver.
+            If null, the <see cref="F:Quantum.PhysicsSceneSettings.SolverIterations"/> will be used.
+            </param>
+            <returns>A <see cref="T:Quantum.Physics3D.CollisionResolution3D"/> with the resolution impulses for each body involved in the collision.</returns>
+        </member>
+        <member name="M:Quantum.Physics3D.CollisionSolver.Solve(Quantum.Transform3D*,Quantum.PhysicsBody3D*,Quantum.Transform3D*,Quantum.PhysicsBody3D*,Quantum.PhysicsMaterialData@,System.ReadOnlySpan{Photon.Deterministic.FPVector3},Photon.Deterministic.FPVector3,Quantum.PhysicsSceneSettings*,Photon.Deterministic.FP,System.Nullable{System.Int32})">
+            <summary>
+            Solves a collision between two colliders.
+            This method does not apply the resolution impulses to the entities, but the returned struct can be used to do so.
+            </summary>
+            <remarks>At least one of the entities must have a dynamic (non-kinematic) physics body.</remarks>
+            <param name="transformA">The transform component of entity A. Must be non-null.</param>
+            <param name="bodyA">The body component of entity A. Can be null.</param>
+            <param name="transformB">The transform component of entity B. Must be non-null.</param>
+            <param name="bodyB">The body component of entity B. Can be null.</param>
+            <param name="combinedMaterialData">The combined material data of the two colliders. See <see cref="M:Quantum.PhysicsMaterialData.GetCombinedMaterialData(Quantum.PhysicsMaterialData*,Quantum.PhysicsMaterialData*)"/>.</param>
+            <param name="contactPoints">A span of vectors representing the contact points of the collision in world space.</param>
+            <param name="normal">The direction of separation between the colliders, from collider B to collider A.</param>
+            <param name="settings">The physics scene settings.</param>
+            <param name="deltaTime">The duration of a frame.</param>
+            <param name="solverIterationsOverride">
+            The number of iterations performed by the solver.
+            If null, the <see cref="F:Quantum.PhysicsSceneSettings.SolverIterations"/> will be used.
+            </param>
+            <returns>A <see cref="T:Quantum.Physics3D.CollisionResolution3D"/> with the resolution impulses for each body involved in the collision.</returns>
+        </member>
         <member name="M:Quantum.Physics3D.Gjk3D.GetSignedTetrahedronVolume6(Photon.Deterministic.FPVector3@,Photon.Deterministic.FPVector3@,Photon.Deterministic.FPVector3@,Photon.Deterministic.FPVector3@)">
             <summary>
             Computes the signed volume, multiplied by 6, of a tetrahedron by calculating the scalar triple product of
@@ -19958,17 +20192,16 @@
             The contact normal.
             </summary>
         </member>
-        <member name="M:Quantum.Physics3D.CollisionResultInfo3D.ContactPoints(Quantum.Physics3D.CollisionResultInfo3D*)">
+        <member name="M:Quantum.Physics3D.CollisionResultInfo3D.GetContactPoints">
             <summary>
-            Gets a pointer from the contact points buffer. Use this pointer to get the other contact points in a for loop.
+            Gets a span of the contact points in the collision.
             </summary>
-            <param name="collisionResultInfo">The <see cref="T:Quantum.Physics3D.CollisionResultInfo3D"/> reference.</param>
             <returns>A pointer to the beginning of the contact points vector buffer.</returns>
             <example>
             How to iterate over the contact points:
             <code>
-            for (int i = 0; i &lt; result->ContactPointsCount; i++) {
-                FPVector3 contactPoint = CollisionResultInfo3D.ContactPoints(result)[i];
+            for (int i = 0; i &lt; span.Length; i++) {
+              ref var cp = span[i];
             }
             </code>
             </example>
@@ -19994,7 +20227,7 @@
             Gets the average point between all the contact points computed.
             </summary>
             <param name="collisionResultInfo">The <see cref="T:Quantum.Physics3D.CollisionResultInfo3D"/> reference.</param>
-            <returns>The mid point of all contact points.</returns>
+            <returns>The average point of all contact points.</returns>
         </member>
         <member name="M:Quantum.Physics3D.CollisionResultInfo3D.GetPoint(Quantum.Physics3D.CollisionResultInfo3D*,System.Int32)">
             <summary>
@@ -20003,6 +20236,15 @@
             <param name="collisionResultInfo">The <see cref="T:Quantum.Physics3D.CollisionResultInfo3D"/> reference.</param>
             <param name="contactPointIndex">Index of the contact point.</param>
             <returns>Returns a specified contact point as <see cref="T:Photon.Deterministic.FPVector3"/>.</returns>
+        </member>
+        <member name="M:Quantum.Physics3D.CollisionResultInfo3D.GetPoint(System.Int32)">
+            <summary>
+            Gets a reference to the contact point at the given index.
+            </summary>
+            <param name="contactPointIndex">Index of the contact point.</param>
+            <returns></returns>
+            <exception cref="T:System.IndexOutOfRangeException">In case the <paramref name="contactPointIndex"/>
+            is out of the [0, <see cref="P:Quantum.Physics3D.CollisionResultInfo3D.ContactPointsCount"/>) range.</exception>
         </member>
         <member name="M:Quantum.Physics3D.CollisionResultInfo3D.UpdateHitWithResult(Quantum.Physics3D.CollisionResultInfo3D*,Quantum.Physics3D.Hit3D@)">
             <summary>
@@ -20879,6 +21121,22 @@
             </remarks>
             </summary>
         </member>
+        <member name="M:Quantum.PhysicsBody3D.ComputeWorldInertiaTensorInverse(Photon.Deterministic.FPQuaternion@)">
+            <summary>
+            Computes the matrix of inverted inertia tensor factors for a rotated body in world space.
+            The multiplication of this returned matrix by an angular impulse results in the produced variation in angular velocity.
+            </summary>
+            <param name="rotation">The body rotation.</param>
+            <returns>A 3x3 matrix representing the inverted inertia tensor in world space.</returns>
+        </member>
+        <member name="M:Quantum.PhysicsBody3D.ComputeWorldInertiaTensorInverse(Photon.Deterministic.FPMatrix3x3@)">
+            <summary>
+            Computes the matrix of inverted inertia tensor factors for a rotated body in world space.
+            The multiplication of this returned matrix by an angular impulse results in the produced variation in angular velocity.
+            </summary>
+            <param name="rotMatrix">The body rotation.</param>
+            <returns>A 3x3 matrix representing the inverted inertia tensor in world space.</returns>
+        </member>
         <member name="M:Quantum.PhysicsBody3D.Serialize(System.Void*,Quantum.FrameSerializer)">
             <summary>
             Serializes a <see cref="T:Quantum.PhysicsBody3D"/> into a <see cref="T:Quantum.FrameSerializer"/>.
@@ -20968,6 +21226,19 @@
             The shape to be used by this collider. If the provided shape is a <see cref="T:Quantum.Shape3D.CompoundShape3D"/>, this
             collider will create a deep, persistent copy of the provided compound, which will be disposed automatically when
             this component is removed from an entity.
+            </param>
+            <param name="material">The physics material asset object. If null, it will use the default physics material.</param>
+            <param name="isTrigger">If the collider is trigger. False by default.</param>
+            <param name="layer">The index of the layer the collider belongs to.</param>
+            <returns>An instance of physics collider component.</returns>
+        </member>
+        <member name="M:Quantum.PhysicsCollider3D.Create(Quantum.Shape3D@,Quantum.PhysicsMaterial,System.Boolean,System.Int32)">
+            <summary>
+            Creates a physics collider component with a primitive <see cref="T:Quantum.Shape3D"/>.
+            </summary>
+            <param name="shape">
+            The shape to be used by this collider. Must not be a <see cref="T:Quantum.Shape3D.CompoundShape3D"/>.
+            For compound shapes, use <see cref="M:Quantum.PhysicsCollider3D.Create(Quantum.Core.FrameBase,Quantum.Shape3D,Quantum.PhysicsMaterial,System.Boolean,System.Int32)"/>.
             </param>
             <param name="material">The physics material asset object. If null, it will use the default physics material.</param>
             <param name="isTrigger">If the collider is trigger. False by default.</param>
@@ -23094,9 +23365,28 @@
         </member>
         <member name="M:Quantum.PhysicsMaterialData.GetDefaultPhysicsMaterialData">
             <summary>
-            Returns a <see cref="T:Quantum.PhysicsMaterialData"/> with default values. The restituition is 0 and the friction is 0.6.
+            Returns a <see cref="T:Quantum.PhysicsMaterialData"/> with default values. The restitition is 0 and the friction is 0.6.
             The default combination mode is the <see cref="F:Quantum.PhysicsCombineFunction.Average"/> for all functions.
             </summary>
+        </member>
+        <member name="M:Quantum.PhysicsMaterialData.GetCombinedRestitution(Quantum.PhysicsMaterialData*,Quantum.PhysicsMaterialData*)">
+            <summary>
+            Computed the resultant restitution factor between two physics materials. 
+            </summary>
+            <param name="aMaterial"></param>
+            <param name="bMaterial"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">In case one of the materials has an invalid combine function.</exception>
+        </member>
+        <member name="M:Quantum.PhysicsMaterialData.GetCombinedFriction(Quantum.PhysicsMaterialData*,Quantum.PhysicsMaterialData*,Photon.Deterministic.FP@,Photon.Deterministic.FP@)">
+            <summary>
+            Computed the resultant static and dynamic friction coefficients between two physics materials. 
+            </summary>
+            <param name="aMaterial"></param>
+            <param name="bMaterial"></param>
+            <param name="staticFriction"></param>
+            <param name="dynamicFriction"></param>
+            <exception cref="T:System.ArgumentOutOfRangeException">In case one of the materials has an invalid combine function.</exception>
         </member>
         <member name="M:Quantum.PhysicsMaterialData.#ctor(Photon.Deterministic.FP,Quantum.PhysicsCombineFunction,Photon.Deterministic.FP,Photon.Deterministic.FP,Quantum.PhysicsCombineFunction)">
             <summary>
@@ -23107,6 +23397,19 @@
             <param name="frictionStatic">How much friction applied against two colliders in movement.</param>
             <param name="frictionDynamic">How much friction applied against two stopped colliders.</param>
             <param name="frictionCombine">The combination mode for the friction between two bodies.</param>
+        </member>
+        <member name="M:Quantum.PhysicsMaterialData.GetHashCode">
+            <summary>
+            Overrides the hash code generation of this type.
+            </summary>
+            <returns>A hash code of the current state of this instance.</returns>
+        </member>
+        <member name="M:Quantum.PhysicsMaterialData.Serialize(Quantum.PhysicsMaterialData*,Quantum.FrameSerializer)">
+            <summary>
+            Serializes a <see cref="T:Quantum.PhysicsMaterialData"/> into a <see cref="T:Quantum.FrameSerializer"/>.
+            </summary>
+            <param name="ptr">The pointer to the <see cref="T:Quantum.PhysicsMaterialData"/>.</param>
+            <param name="serializer">The <see cref="T:Quantum.FrameSerializer"/> instance into which the struct will be serialized.</param>
         </member>
         <member name="F:Quantum.PhysicsSceneSettings.SIZE">
             <summary>
@@ -23435,6 +23738,11 @@
         <member name="M:Quantum.DecoratingPropertyAttribute.#ctor(System.Int32,System.Boolean)">
             <summary>
             Initializes a new instance with the specified order.
+            </summary>
+        </member>
+        <member name="T:Quantum.DirectoryPathAttribute">
+            <summary>
+            Specifies that the string field represents a path to directory.
             </summary>
         </member>
         <member name="T:Quantum.DisplayAsEnumAttribute">
@@ -24022,6 +24330,24 @@
         <member name="P:Quantum.SerializeReferenceTypePickerAttribute.Types">
             <summary>
             Gets the types to be picked.
+            </summary>
+        </member>
+        <member name="T:Quantum.SpaceAfterAttribute">
+            <summary>
+            Similar to UnityEngine.SpaceAttribute, but adds space after the property.
+            </summary>
+        </member>
+        <member name="F:Quantum.SpaceAfterAttribute.DefaultOrder">
+            <summary>
+            The default order for this attribute.
+            </summary>
+        </member>
+        <member name="M:Quantum.SpaceAfterAttribute.#ctor(System.Single)">
+            <summary/>
+        </member>
+        <member name="F:Quantum.SpaceAfterAttribute.Height">
+            <summary>
+            Height of the space.
             </summary>
         </member>
         <member name="T:Quantum.ToggleLeftAttribute">
@@ -26242,21 +26568,6 @@
             Create the color blue.
             </summary>
         </member>
-        <member name="P:Quantum.ColorRGBA.Gray">
-            <summary>
-            Create the color grey.
-            </summary>
-        </member>
-        <member name="P:Quantum.ColorRGBA.Cyan">
-            <summary>
-            Create the color cyan.
-            </summary>
-        </member>
-        <member name="P:Quantum.ColorRGBA.White">
-            <summary>
-            Create the color white.
-            </summary>
-        </member>
         <member name="P:Quantum.ColorRGBA.Green">
             <summary>
             Create the color green.
@@ -26277,9 +26588,24 @@
             Create the color black.
             </summary>
         </member>
+        <member name="P:Quantum.ColorRGBA.Gray">
+            <summary>
+            Create the color grey.
+            </summary>
+        </member>
         <member name="P:Quantum.ColorRGBA.Lightgray">
             <summary>
             Create the color light grey.
+            </summary>
+        </member>
+        <member name="P:Quantum.ColorRGBA.Cyan">
+            <summary>
+            Create the color cyan.
+            </summary>
+        </member>
+        <member name="P:Quantum.ColorRGBA.White">
+            <summary>
+            Create the color white.
             </summary>
         </member>
         <member name="P:Quantum.ColorRGBA.ColliderGreen">
@@ -31882,7 +32208,7 @@
         </member>
         <member name="M:Photon.Deterministic.FPMatrix2x2.FromColumns(Photon.Deterministic.FP,Photon.Deterministic.FP,Photon.Deterministic.FP,Photon.Deterministic.FP)">
             <summary>
-            Create from columns - first two values set the first colunn, second two values - second column.
+            Create from columns - first two values set the first column, second two values - second column.
             </summary>
         </member>
         <member name="M:Photon.Deterministic.FPMatrix2x2.FromColumns(Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2)">
@@ -31918,6 +32244,24 @@
             Transforms a direction by this matrix.
             </summary>
         </member>
+        <member name="M:Photon.Deterministic.FPMatrix2x2.GetColumn(Photon.Deterministic.FPMatrix2x2*,System.Int32)">
+            <inheritdoc cref="M:Photon.Deterministic.FPMatrix2x2.GetColumnUnchecked(Photon.Deterministic.FPMatrix2x2*,System.Int32)"/>
+            <exception cref="T:System.ArgumentNullException">In case <paramref name="matrix"/> is null.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">In case <paramref name="n"/> is smaller than 0 or greater than 1.</exception>
+        </member>
+        <member name="M:Photon.Deterministic.FPMatrix2x2.GetColumns(Photon.Deterministic.FPMatrix2x2*,Photon.Deterministic.FPVector2@,Photon.Deterministic.FPVector2@)">
+            <inheritdoc cref="M:Photon.Deterministic.FPMatrix2x2.GetColumnsUnchecked(Photon.Deterministic.FPMatrix2x2*,Photon.Deterministic.FPVector2@,Photon.Deterministic.FPVector2@)"/>
+            <exception cref="T:System.ArgumentNullException">In case <paramref name="matrix"/> is null.</exception>
+        </member>
+        <member name="M:Photon.Deterministic.FPMatrix2x2.GetRow(Photon.Deterministic.FPMatrix2x2*,System.Int32)">
+            <inheritdoc cref="M:Photon.Deterministic.FPMatrix2x2.GetRowUnchecked(Photon.Deterministic.FPMatrix2x2*,System.Int32)"/>
+            <exception cref="T:System.ArgumentNullException">In case <paramref name="matrix"/> is null.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">In case <paramref name="n"/> is smaller than 0 or greater than 1.</exception>
+        </member>
+        <member name="M:Photon.Deterministic.FPMatrix2x2.GetRows(Photon.Deterministic.FPMatrix2x2*,Photon.Deterministic.FPVector2@,Photon.Deterministic.FPVector2@)">
+            <inheritdoc cref="M:Photon.Deterministic.FPMatrix2x2.GetRowsUnchecked(Photon.Deterministic.FPMatrix2x2*,Photon.Deterministic.FPVector2@,Photon.Deterministic.FPVector2@)"/>
+            <exception cref="T:System.ArgumentNullException">In case <paramref name="matrix"/> is null.</exception>
+        </member>
         <member name="M:Photon.Deterministic.FPMatrix2x2.Serialize(System.Void*,Photon.Deterministic.IDeterministicFrameSerializer)">
             <summary>
             Serializes the FPMatrix2x2 instance into a byte stream using the specified serializer.
@@ -31938,6 +32282,36 @@
             Calculates the hash code for the FPMatrix2x2 object.
             </summary>
             <returns>The hash code value for the current instance.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.FPMatrix2x2.GetColumnUnchecked(Photon.Deterministic.FPMatrix2x2*,System.Int32)">
+            <summary>
+            Gets the <paramref name="n"/>-th column in the <paramref name="matrix"/>.
+            </summary>
+            <param name="matrix"></param>
+            <param name="n">Must be either 0 or 1.</param>
+        </member>
+        <member name="M:Photon.Deterministic.FPMatrix2x2.GetColumnsUnchecked(Photon.Deterministic.FPMatrix2x2*,Photon.Deterministic.FPVector2@,Photon.Deterministic.FPVector2@)">
+            <summary>
+            Outputs both columns from a 2x2 <paramref name="matrix"/>.
+            </summary>
+            <param name="matrix"></param>
+            <param name="column0"></param>
+            <param name="column1"></param>
+        </member>
+        <member name="M:Photon.Deterministic.FPMatrix2x2.GetRowUnchecked(Photon.Deterministic.FPMatrix2x2*,System.Int32)">
+            <summary>
+            Gets the <paramref name="n"/>-th row in the <paramref name="matrix"/>.
+            </summary>
+            <param name="matrix"></param>
+            <param name="n">Must be either 0 or 1.</param>
+        </member>
+        <member name="M:Photon.Deterministic.FPMatrix2x2.GetRowsUnchecked(Photon.Deterministic.FPMatrix2x2*,Photon.Deterministic.FPVector2@,Photon.Deterministic.FPVector2@)">
+            <summary>
+            Outputs both rows from a 2x2 <paramref name="matrix"/>.
+            </summary>
+            <param name="matrix"></param>
+            <param name="row0"></param>
+            <param name="row1"></param>
         </member>
         <member name="M:Photon.Deterministic.FPMatrix2x2.op_Addition(Photon.Deterministic.FPMatrix2x2,Photon.Deterministic.FPMatrix2x2)">
             <summary>
@@ -31982,7 +32356,7 @@
         <member name="T:Photon.Deterministic.FPMatrix3x3">
             <summary>
             Represents 3x3 column major matrix.
-            Each cell can be individually accessed as a field (M&lt;row&gt;&lt;column&gt;), with indexing
+            Each cell can be individually accessed as a field (M&lt;row&gt;&lt;column&gt;), with
             indexing property[row, column] or with indexing property[index].
             </summary>
             \ingroup MathAPI
@@ -32082,6 +32456,24 @@
             <param name="scale"></param>
             <returns></returns>
         </member>
+        <member name="M:Photon.Deterministic.FPMatrix3x3.GetColumn(Photon.Deterministic.FPMatrix3x3*,System.Int32)">
+            <inheritdoc cref="M:Photon.Deterministic.FPMatrix3x3.GetColumnUnchecked(Photon.Deterministic.FPMatrix3x3*,System.Int32)"/>
+            <exception cref="T:System.ArgumentNullException">In case <paramref name="matrix"/> is null.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">In case <paramref name="n"/> is smaller than 0 or greater than 2.</exception>
+        </member>
+        <member name="M:Photon.Deterministic.FPMatrix3x3.GetColumns(Photon.Deterministic.FPMatrix3x3*,Photon.Deterministic.FPVector3@,Photon.Deterministic.FPVector3@,Photon.Deterministic.FPVector3@)">
+            <inheritdoc cref="M:Photon.Deterministic.FPMatrix3x3.GetColumnsUnchecked(Photon.Deterministic.FPMatrix3x3*,Photon.Deterministic.FPVector3@,Photon.Deterministic.FPVector3@,Photon.Deterministic.FPVector3@)"/>
+            <exception cref="T:System.ArgumentNullException">In case <paramref name="matrix"/> is null.</exception>
+        </member>
+        <member name="M:Photon.Deterministic.FPMatrix3x3.GetRow(Photon.Deterministic.FPMatrix3x3*,System.Int32)">
+            <inheritdoc cref="M:Photon.Deterministic.FPMatrix3x3.GetRowUnchecked(Photon.Deterministic.FPMatrix3x3*,System.Int32)"/>
+            <exception cref="T:System.ArgumentNullException">In case <paramref name="matrix"/> is null.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">In case <paramref name="n"/> is smaller than 0 or greater than 2.</exception>
+        </member>
+        <member name="M:Photon.Deterministic.FPMatrix3x3.GetRows(Photon.Deterministic.FPMatrix3x3*,Photon.Deterministic.FPVector3@,Photon.Deterministic.FPVector3@,Photon.Deterministic.FPVector3@)">
+            <inheritdoc cref="M:Photon.Deterministic.FPMatrix3x3.GetRowsUnchecked(Photon.Deterministic.FPMatrix3x3*,Photon.Deterministic.FPVector3@,Photon.Deterministic.FPVector3@,Photon.Deterministic.FPVector3@)"/>
+            <exception cref="T:System.ArgumentNullException">In case <paramref name="matrix"/> is null.</exception>
+        </member>
         <member name="M:Photon.Deterministic.FPMatrix3x3.Serialize(System.Void*,Photon.Deterministic.IDeterministicFrameSerializer)">
             <summary>
             Serializes an instance of FPMatrix3x3 using the given IDeterministicFrameSerializer.
@@ -32102,6 +32494,38 @@
             Calculates the hash code for the current FPMatrix3x3 instance.
             </summary>
             <returns>The calculated hash code.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.FPMatrix3x3.GetColumnUnchecked(Photon.Deterministic.FPMatrix3x3*,System.Int32)">
+            <summary>
+            Gets the <paramref name="n"/>-th column in the <paramref name="matrix"/>.
+            </summary>
+            <param name="matrix"></param>
+            <param name="n">Must be either 0, 1 or 2.</param>
+        </member>
+        <member name="M:Photon.Deterministic.FPMatrix3x3.GetColumnsUnchecked(Photon.Deterministic.FPMatrix3x3*,Photon.Deterministic.FPVector3@,Photon.Deterministic.FPVector3@,Photon.Deterministic.FPVector3@)">
+            <summary>
+            Outputs all columns from a 3x3 <paramref name="matrix"/>.
+            </summary>
+            <param name="matrix"></param>
+            <param name="column0"></param>
+            <param name="column1"></param>
+            <param name="column2"></param>
+        </member>
+        <member name="M:Photon.Deterministic.FPMatrix3x3.GetRowUnchecked(Photon.Deterministic.FPMatrix3x3*,System.Int32)">
+            <summary>
+            Gets the <paramref name="n"/>-th row in the <paramref name="matrix"/>.
+            </summary>
+            <param name="matrix"></param>
+            <param name="n">Must be either 0, 1 or 2.</param>
+        </member>
+        <member name="M:Photon.Deterministic.FPMatrix3x3.GetRowsUnchecked(Photon.Deterministic.FPMatrix3x3*,Photon.Deterministic.FPVector3@,Photon.Deterministic.FPVector3@,Photon.Deterministic.FPVector3@)">
+            <summary>
+            Outputs all rows from a 3x3 <paramref name="matrix"/>.
+            </summary>
+            <param name="matrix"></param>
+            <param name="row0"></param>
+            <param name="row1"></param>
+            <param name="row2"></param>
         </member>
         <member name="M:Photon.Deterministic.FPMatrix3x3.op_Addition(Photon.Deterministic.FPMatrix3x3,Photon.Deterministic.FPMatrix3x3)">
             <summary>
@@ -32772,6 +33196,13 @@
             <param name="magnitude">The original vector's magnitude.</param>
             <returns>A normalized vector.</returns>
         </member>
+        <member name="M:Photon.Deterministic.FPVector2.Average(System.ReadOnlySpan{Photon.Deterministic.FPVector2})">
+            <summary>
+            Computes the average vector in a span of vectors.
+            </summary>
+            <param name="vectors"></param>
+            <returns></returns>
+        </member>
         <member name="F:Photon.Deterministic.FPVector2.SIZE">
             <summary>
             The size of the component (or struct/type) in-memory inside the Frame data-buffers or stack (when passed as value parameter).
@@ -33419,6 +33850,12 @@
             <param name="s"></param>
             <returns></returns>
         </member>
+        <member name="P:Photon.Deterministic.FPVector2.Item(System.Int32)">
+            <summary>
+            Gets or sets <see cref="F:Photon.Deterministic.FPVector2.X"/> and <see cref="F:Photon.Deterministic.FPVector2.Y"/> components by index.
+            </summary>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when index is not 0 or 1.</exception>
+        </member>
         <member name="P:Photon.Deterministic.FPVector2.XXX">
             <summary>
             Returns a new FPVector3 using the X, X and X components of this vector.
@@ -33499,6 +33936,13 @@
             <param name="value">The vector which should be normalized.</param>
             <param name="magnitude">The original vector's magnitude.</param>
             <returns>A normalized vector.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.FPVector3.Average(System.ReadOnlySpan{Photon.Deterministic.FPVector3})">
+            <summary>
+            Computes the average vector in a span of vectors.
+            </summary>
+            <param name="vectors"></param>
+            <returns></returns>
         </member>
         <member name="F:Photon.Deterministic.FPVector3.SIZE">
             <summary>
@@ -33906,6 +34350,12 @@
             <param name="b"></param>
             <returns></returns>
         </member>
+        <member name="P:Photon.Deterministic.FPVector3.Item(System.Int32)">
+            <summary>
+            Gets or sets <see cref="F:Photon.Deterministic.FPVector3.X"/>, <see cref="F:Photon.Deterministic.FPVector3.Y"/> and <see cref="F:Photon.Deterministic.FPVector3.X"/> components by index.
+            </summary>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when index is not 0, 1 or 2.</exception>
+        </member>
         <member name="T:Photon.Deterministic.Plane">
             <summary>
             Represents a plane in three-dimensional space.
@@ -34208,6 +34658,12 @@
             </summary>
             <param name="obj">The object to compare with the current IntVector2.</param>
             <returns>true if the specified object is equal to the current IntVector2; otherwise, false.</returns>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.Item(System.Int32)">
+            <summary>
+            Gets or sets <see cref="F:Photon.Deterministic.IntVector2.X"/> and <see cref="F:Photon.Deterministic.IntVector2.Y"/> components by index.
+            </summary>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when index is not 0 or 1.</exception>
         </member>
         <member name="T:Photon.Deterministic.IntVector2.EqualityComparer">
             <summary>
@@ -34537,6 +34993,12 @@
         </member>
         <member name="M:Photon.Deterministic.IntVector3.Equals(System.Object)">
             <inheritdoc cref="M:Photon.Deterministic.IntVector3.Equals(Photon.Deterministic.IntVector3)"/>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector3.Item(System.Int32)">
+            <summary>
+            Gets or sets <see cref="F:Photon.Deterministic.IntVector3.X"/>, <see cref="F:Photon.Deterministic.IntVector3.Y"/> and <see cref="F:Photon.Deterministic.IntVector3.X"/> components by index.
+            </summary>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when index is not 0, 1 or 2.</exception>
         </member>
         <member name="T:Photon.Deterministic.IntVector3.EqualityComparer">
             <summary>
@@ -35115,7 +35577,7 @@
         </member>
         <member name="F:Photon.Deterministic.DeterministicSessionContextInitArguments.AssetSerializer">
             <summary>
-            The asset serializer object (IAssetSerializer).
+            The asset serializer object.
             </summary>
         </member>
         <member name="T:Photon.Deterministic.DeterministicSessionContextStartArguments">
@@ -35862,7 +36324,7 @@
         <member name="T:Photon.Deterministic.DeterministicCommand">
             <summary>
             The base class for deterministic commands.
-            Always override  <see cref="M:Photon.Deterministic.DeterministicCommand.Serialize(Photon.Deterministic.BitStream)"/> to add additional data.
+            Always override <see cref="M:Photon.Deterministic.DeterministicCommand.Serialize(Photon.Deterministic.BitStream)"/> to add additional data.
             </summary>
         </member>
         <member name="F:Photon.Deterministic.DeterministicCommand.Pool">
@@ -35897,7 +36359,7 @@
         <member name="M:Photon.Deterministic.DeterministicCommand.GetCommandInstance">
             <summary>
             The object can be used as a <see cref="T:Photon.Deterministic.IDeterministicCommandFactory"/> and it 
-            will try to creates an instance of the command using the pool, otherwise it will use reflection.
+            will try to create an instance of the command using the pool, otherwise it will use reflection.
             </summary>
             <returns></returns>
         </member>
@@ -35906,6 +36368,12 @@
             Disposing commands is done internally and does not need to be called manually.
             The method is public because of the <see cref="T:System.IDisposable"/> interface and to be able to derive it.
             </summary>
+        </member>
+        <member name="T:Photon.Deterministic.DeterministicCommandEnumerable`1">
+            <summary>
+            An enumerable that filters a list of commands by a specified type and returns only the correctly cast commands.
+            </summary>
+            <typeparam name="T">Command type to enumerate</typeparam>
         </member>
         <member name="T:Photon.Deterministic.DeterministicCommandPool`1">
             <summary>
@@ -35972,14 +36440,13 @@
             </summary>
             <param name="factories">Factory params</param>
         </member>
-        <member name="M:Photon.Deterministic.DeterministicCommandSerializer.TryDecodeCommand``1(System.Byte[],``0@)">
+        <member name="M:Photon.Deterministic.DeterministicCommandSerializer.TryDecodeCommand(System.Byte[],Quantum.Core.DeterministicCommandWrapper@)">
             <summary>
-            Decodes command message byte array into a specific command type.
+            Decodes command message byte array into a wrapper command containing user commands.
             </summary>
-            <typeparam name="T">Command type to cast to</typeparam>
             <param name="data">Serialized command data.</param>
-            <param name="result">Resulting command instance.</param>
-            <returns>Returns <see langword="true"/> when successfully decoded and casted.</returns>
+            <param name="result">Resulting wrapper command instance.</param>
+            <returns>Returns <see langword="true"/> when successfully decoded.</returns>
         </member>
         <member name="M:Photon.Deterministic.DeterministicCommandSerializer.EncodeCommand(Photon.Deterministic.DeterministicCommand,System.Byte[]@)">
             <summary>
@@ -36087,29 +36554,46 @@
             <param name="player">Player</param>
             <returns>Input flags.</returns>
         </member>
-        <member name="M:Photon.Deterministic.DeterministicFrame.GetPlayerCommand(Quantum.PlayerRef)">
+        <member name="M:Photon.Deterministic.DeterministicFrame.GetPlayerCommandCount(Quantum.PlayerRef)">
             <summary>
-            Get the player command for this frame.
+            Get count of available commands for this frame.
             </summary>
             <param name="player">Player</param>
-            <returns>A command if one is available.</returns>
         </member>
-        <member name="M:Photon.Deterministic.DeterministicFrame.GetPlayerCommand``1(Quantum.PlayerRef)">
+        <member name="M:Photon.Deterministic.DeterministicFrame.GetPlayerCommand(Quantum.PlayerRef,System.Int32)">
             <summary>
-            Get player command and cast to specific type.
+            Get a player command for this frame.
+            </summary>
+            <param name="player">Player</param>
+            <param name="index">Index of the command in this frame's command list</param>
+            <returns>Available command or null if there is no command.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.DeterministicFrame.GetPlayerCommand``1(Quantum.PlayerRef,System.Int32)">
+            <summary>
+            Get a player command for this frame and cast to specific type.
             </summary>
             <typeparam name="T">Command type</typeparam>
             <param name="player">Player</param>
+            <param name="index">Index of the command in this frame's command list</param>
             <returns>Available command of concrete type or null if there is no command or that command is of a different type.</returns>
         </member>
-        <member name="M:Photon.Deterministic.DeterministicFrame.TryGetPlayerCommand``1(Quantum.PlayerRef,``0@)">
+        <member name="M:Photon.Deterministic.DeterministicFrame.TryGetPlayerCommand``1(Quantum.PlayerRef,System.Int32,``0@)">
             <summary>
-            Get player command and cast to specific type.
+            Try get a player command for this frame and cast to specific type.
             </summary>
             <typeparam name="T">Command type</typeparam>
             <param name="player">Player</param>
+            <param name="index">Index of the command in this frame's command list</param>
             <param name="command">Available command of concrete type or null if there is no command or that command is of a different type.</param>
-            <returns><see langword="true"/> if a command of this type was found.</returns>
+            <returns><see langword="true"/> if a command of this type at this index is available.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.DeterministicFrame.GetPlayerCommands``1(Quantum.PlayerRef)">
+            <summary>
+            Get all commands for this frame that can be cast to specific type.
+            </summary>
+            <typeparam name="T">Command type</typeparam>
+            <param name="player">Player</param>
+            <returns>Enumerable of available commands of concrete type.</returns>
         </member>
         <member name="M:Photon.Deterministic.DeterministicFrame.DumpFrame(System.Int32)">
             <summary>
@@ -38109,6 +38593,11 @@
             Get the deterministic session.
             </summary>
         </member>
+        <member name="M:Photon.Deterministic.IDeterministicGame.SendBufferedCommands">
+            <summary>
+            Sends commands queued during the last frame to the server.
+            </summary>
+        </member>
         <member name="M:Photon.Deterministic.IDeterministicGame.GetInputSerializedFixedSize">
             <summary>
             Returns the serialized input size.
@@ -38197,7 +38686,7 @@
             <summary>
             The callback is called when the actual simulation starts after the online protocol start sequence was successful.
             </summary>
-            <param name="state">Intitial deterministic frame</param>
+            <param name="state">Initial deterministic frame</param>
         </member>
         <member name="M:Photon.Deterministic.IDeterministicGame.OnGameResync">
             <summary>
@@ -38236,7 +38725,7 @@
         </member>
         <member name="M:Photon.Deterministic.IDeterministicGame.OnUpdateDone">
             <summary>
-            The callback is called when when the session completed its <see cref="M:Photon.Deterministic.DeterministicSession.Update(System.Nullable{System.Double})"/> loop.
+            The callback is called when the session completed its <see cref="M:Photon.Deterministic.DeterministicSession.Update(System.Nullable{System.Double})"/> loop.
             </summary>
         </member>
         <member name="M:Photon.Deterministic.IDeterministicGame.OnChecksumError(Photon.Deterministic.DeterministicTickChecksumError,Photon.Deterministic.DeterministicFrame[])">
@@ -38248,7 +38737,7 @@
         </member>
         <member name="M:Photon.Deterministic.IDeterministicGame.OnChecksumErrorFrameDump(System.Int32,System.Int32,Photon.Deterministic.DeterministicSessionConfig,System.Byte[],System.Byte[],System.Byte[])">
             <summary>
-            The callback is called when the clients receives a frame dump of another client from the server.
+            The callback is called when the clients receive a frame dump of another client from the server.
             </summary>
             <param name="actorId">The Photon actor id that the dump belongs to</param>
             <param name="frameNumber">The frame number of the dump</param>
@@ -38276,7 +38765,7 @@
             The callback is called when the local checksum was computed.
             </summary>
             <param name="frame">The frame the checksum belongs to</param>
-            <param name="checksum">The checksum that will be send to the server</param>
+            <param name="checksum">The checksum that will be sent to the server</param>
         </member>
         <member name="M:Photon.Deterministic.IDeterministicGame.OnSimulationBegin">
             <summary>
@@ -40293,7 +40782,17 @@
         </member>
         <member name="P:Photon.Deterministic.DeterministicStats.UpdateTime">
             <summary>
-            The total time of the last update.
+            The total time of the last update in seconds.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.DeterministicStats.PredictionTime">
+            <summary>
+            The total time spent in simulating predicted frames in seconds.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.DeterministicStats.VerificationTime">
+            <summary>
+            The total time spent in simulating verified frames in seconds.
             </summary>
         </member>
         <member name="T:Photon.Deterministic.StopwatchTimer">

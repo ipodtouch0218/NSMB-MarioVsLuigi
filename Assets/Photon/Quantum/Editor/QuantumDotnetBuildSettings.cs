@@ -47,16 +47,6 @@ namespace Quantum.Editor {
     }
 
     /// <summary>
-    /// If true, opens and highlights the DLL after compilation.
-    /// </summary>
-    public bool ShowCompiledDllAfterBuild = true;
-
-    /// <summary>
-    /// Open a popup of the location of the generated project.
-    /// </summary>
-    public bool ShowFolderAfterGeneration = false;
-
-    /// <summary>
     /// The project settings to use for the generated csproj.
     /// </summary>
     public QuantumDotnetProjectSettings ProjectSettings;
@@ -169,8 +159,8 @@ namespace Quantum.Editor {
     /// <param name="settings"></param>
     public static void SynchronizePluginSdk(QuantumDotnetBuildSettings settings) {
       ExportPluginSdkData(settings);
-      GenerateProject(settings, disablePopup: true);
-      BuildProject(settings, Path.GetFullPath($"{settings.PluginSdkPath}/{PluginSdkLibPath}"), disablePopup: true);
+      GenerateProject(settings);
+      BuildProject(settings, Path.GetFullPath($"{settings.PluginSdkPath}/{PluginSdkLibPath}"));
     }
 
     /// <summary>
@@ -186,8 +176,8 @@ namespace Quantum.Editor {
     /// Generate a csproj file from the ProjectSettings and ProjectTemplate.
     /// </summary>
     /// <param name="settings">Settings instance</param>
-    /// <param name="disablePopup">Disable all popups.</param>
-    public static void GenerateProject(QuantumDotnetBuildSettings settings, bool disablePopup = false) {
+    /// <param name="showPopup">Show a folder popups.</param>
+    public static void GenerateProject(QuantumDotnetBuildSettings settings, bool showPopup = false) {
       if (RunDotnetCommand("--version", settings.DotnetCommandPath) == false) {
         QuantumEditorLog.Error("Dotnet installation not found");
         return;
@@ -225,11 +215,8 @@ namespace Quantum.Editor {
         RunDotnetCommand($" sln {settings.ProjectBasePath}/{settings.ProjectBasePath}.sln add {settings.ProjectBasePath}/Quantum.Runner.Dotnet", settings.DotnetCommandPath);
       }
 
-      if (settings.ShowFolderAfterGeneration && disablePopup == false) {
-        var projectPath = $"{Path.GetFullPath(settings.ProjectBasePath)}/Quantum.Simulation.Dotnet";
-        if (Directory.Exists(projectPath)) {
-          EditorUtility.RevealInFinder(projectPath);
-        }
+      if (showPopup) {
+        OpenDotnetSolution(settings);
       }
     }
 
@@ -238,8 +225,8 @@ namespace Quantum.Editor {
     /// </summary>
     /// <param name="settings">Settings instance</param>
     /// <param name="copyOutputDir">Copy result to output dir</param>
-    /// <param name="disablePopup">Disable file explorer popup</param>
-    public static void BuildProject(QuantumDotnetBuildSettings settings, string copyOutputDir = null, bool disablePopup = false) {
+    /// <param name="showPopup">Show file explorer popup</param>
+    public static void BuildProject(QuantumDotnetBuildSettings settings, string copyOutputDir = null, bool showPopup = false) {
       if (RunDotnetCommand("--version", settings.DotnetCommandPath) == false) {
         QuantumEditorLog.Error("Dotnet installation not found");
         return;
@@ -256,11 +243,8 @@ namespace Quantum.Editor {
       }
 
       if (RunDotnetCommand(arguments, settings.DotnetCommandPath)) {
-        if (settings.ShowCompiledDllAfterBuild && disablePopup == false) {
-          var simulationDllPath = $"{Path.GetFullPath(settings.ProjectBasePath)}/Quantum.Simulation.Dotnet/bin/Quantum.Simulation.dll";
-          if (File.Exists(simulationDllPath)) {
-            EditorUtility.RevealInFinder(simulationDllPath);
-          }
+        if (showPopup) {
+          OpenDotnetLibrary(settings);
         }
       }
     }
@@ -392,6 +376,50 @@ namespace Quantum.Editor {
     }
 
     /// <summary>
+    /// Open the project folder in the file explorer.
+    /// </summary>
+    public static void OpenDotnetSolution(QuantumDotnetBuildSettings settings, bool openAsUrl = false) {
+      var path = $"{Path.GetFullPath(settings.ProjectBasePath)}/Quantum.Dotnet.sln";
+      if (File.Exists(path)) {
+        if (openAsUrl) {
+          Application.OpenURL(new Uri(path).AbsoluteUri);
+        } else {
+          EditorUtility.RevealInFinder(path);
+        }
+      } else {
+        QuantumEditorLog.Warn($"Project folder {path} not found. Generate it first.");
+      }
+    }
+
+    /// <summary>
+    /// Open the library folder in the file explorer.
+    /// </summary>
+    public static void OpenDotnetLibrary(QuantumDotnetBuildSettings settings) {
+      var path = $"{Path.GetFullPath(settings.ProjectBasePath)}/Quantum.Simulation.Dotnet/bin/Quantum.Simulation.dll";
+      if (File.Exists(path)) {
+        EditorUtility.RevealInFinder(path);
+      } else {
+        QuantumEditorLog.Warn($"Library {path} not found. Build it first.");
+      }
+    }
+
+    /// <summary>
+    /// Open the library folder in the file explorer.
+    /// </summary>
+    public static void OpenPluginSDKSolution(QuantumDotnetBuildSettings settings, bool openAsUrl = false) {
+      var path = $"{Path.GetFullPath(settings.PluginSolutionPath)}";
+      if (File.Exists(path)) {
+        if (openAsUrl) {
+          Application.OpenURL(new Uri(path).AbsoluteUri);
+        } else {
+          EditorUtility.RevealInFinder(path);
+        }
+      } else {
+        QuantumEditorLog.Warn($"SDK {path} not found.");
+      }
+    }
+
+    /// <summary>
     /// Launches PhotonServer.exe from the Plugin SDK folder.
     /// If <see cref="PluginSolutionPath"/> exists the solution will be compiled first.
     /// </summary>
@@ -500,7 +528,7 @@ namespace Quantum.Editor {
     [MenuItem("Tools/Quantum/Export/Dotnet Quantum.Simulation - Build", false, (int)QuantumEditorMenuPriority.Export + 22)]
     public static void BuildDefaultProject() {
       if (TryGetGlobal(out var settings)) {
-        GenerateProject(settings, disablePopup: true);
+        GenerateProject(settings);
         BuildProject(settings);
       }
     }

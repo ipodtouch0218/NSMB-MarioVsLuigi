@@ -46,7 +46,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         public void OnCharacterClicked(AssetRef<CharacterAsset> character) {
             var game = NetworkHandler.Runner.Game;
             foreach (int slot in game.GetLocalPlayerSlots()) {
-                game.SendCommand(slot, new CommandChangePlayerData {
+                game.AddCommand(slot, new CommandChangePlayerData {
                     EnabledChanges = CommandChangePlayerData.Changes.Character,
                     Character = character,
                 });
@@ -57,7 +57,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         public void OnSpectateToggled() {
             QuantumGame game = NetworkHandler.Runner.Game;
             foreach (var slot in game.GetLocalPlayerSlots()) {
-                game.SendCommand(slot, new CommandChangePlayerData {
+                game.AddCommand(slot, new CommandChangePlayerData {
                     EnabledChanges = CommandChangePlayerData.Changes.Spectating,
                     Spectating = spectateToggle.isOn,
                 });

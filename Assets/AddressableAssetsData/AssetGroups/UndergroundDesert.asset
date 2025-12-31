@@ -14,12 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_GroupName: UndergroundDesert
   m_GUID: 4ad53973409d6b448abff323a2093bc7
-  m_SerializeEntries:
-  - m_GUID: c2a7c10c1d695484fb3d7dd82f460bf1
-    m_Address: Assets/Addons/UndergroundDesert
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
+  m_SerializeEntries: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 1bed88ed79bf8f74fb164b168fd35146, type: 2}
   m_SchemaSet:

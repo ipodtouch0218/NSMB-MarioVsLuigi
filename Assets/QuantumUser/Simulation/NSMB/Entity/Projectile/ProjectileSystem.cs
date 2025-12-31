@@ -99,7 +99,7 @@ namespace Quantum {
             f.Destroy(entity);
         }
 
-        public void OnProjectileHitEntity(Frame f, Frame frame, EntityRef projectileEntity, EntityRef hitEntity) {
+        public void OnProjectileHitEntity(Frame f, EntityRef projectileEntity, EntityRef hitEntity) {
             var projectile = f.Unsafe.GetPointer<Projectile>(projectileEntity);
             var projectileAsset = f.FindAsset(projectile->Asset);
 

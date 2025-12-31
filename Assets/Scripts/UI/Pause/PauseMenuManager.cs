@@ -234,12 +234,10 @@ namespace NSMB.UI.Pause {
             } else {
                 var game = QuantumRunner.DefaultGame;
                 Frame f = game.Frames.Predicted;
-                PlayerRef hostPlayer = f.Global->Host;
+                PlayerRef host = f.Global->Host;
 
-                int index = game.GetLocalPlayers().IndexOf(hostPlayer);
-                if (index != -1) {
-                    int slot = game.GetLocalPlayerSlots()[index];
-                    game.SendCommand(slot, new CommandHostEndGame());
+                if (game.PlayerIsLocal(host)) {
+                    game.AddCommand(game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)], new CommandHostEndGame());
                 }
             }
             Unpause(false);

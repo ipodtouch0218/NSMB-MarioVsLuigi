@@ -858,7 +858,7 @@ MonoBehaviour:
       Asset: {fileID: 0}
       Id: 
       StepElements: []
-    - Text: Upgrade SDK 3.0.3
+    - Text: Apply migrations for Quantum SDK 3.0.3
       Subtext: Create QuantumLookupTables global scriptable asset inside the QuantumUser
         folder
       WidgetMode:

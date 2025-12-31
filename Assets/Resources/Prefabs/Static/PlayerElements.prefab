@@ -14345,7 +14345,7 @@ MonoBehaviour:
   playerElements: {fileID: 2058053739306675502}
   secondaryPositioners:
   - {fileID: 5933699861429858116}
-  zoomSpeed: 2
+  zoomSpeed: 0.5
   moveSpeed: 2
   zoomSfx: {fileID: 8859060311520427125}
 --- !u!114 &3464307077645618015

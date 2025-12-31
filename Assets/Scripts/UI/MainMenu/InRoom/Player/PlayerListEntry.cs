@@ -272,7 +272,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             PlayerRef host = game.Frames.Predicted.Global->Host;
             if (game.PlayerIsLocal(host)) {
                 int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)];
-                game.SendCommand(slot, new CommandBanPlayer {
+                game.AddCommand(slot, new CommandBanPlayer {
                     Target = player
                 });
             }
@@ -284,7 +284,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             PlayerRef host = game.Frames.Predicted.Global->Host;
             if (game.PlayerIsLocal(host)) {
                 int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)];
-                game.SendCommand(slot, new CommandKickPlayer {
+                game.AddCommand(slot, new CommandKickPlayer {
                     Target = player
                 });
             }
@@ -312,16 +312,21 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             HideDropdown(true);
         }
 
-        public void PromotePlayer() {
+        public unsafe void PromotePlayer() {
             QuantumGame game = QuantumRunner.DefaultGame;
-            game.SendCommand(new CommandChangeHost {
-                NewHost = player,
-            });
             Frame f = game.Frames.Predicted;
-            RuntimePlayer runtimePlayer = f.GetPlayerData(player);
-            if (runtimePlayer != null) {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promoted", ChatManager.Blue, "playername", runtimePlayer.PlayerNickname.ToValidNickname(f, player));
+            PlayerRef host = f.Global->Host;
+
+            if (game.PlayerIsLocal(host)) {
+                game.AddCommand(game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)], new CommandChangeHost {
+                    NewHost = player,
+                });
+                RuntimePlayer runtimePlayer = f.GetPlayerData(player);
+                if (runtimePlayer != null) {
+                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promoted", ChatManager.Blue, "playername", runtimePlayer.PlayerNickname.ToValidNickname(f, player));
+                }
             }
+
             HideDropdown(true);
         }
 

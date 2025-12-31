@@ -10,6 +10,7 @@
         "Quantum.Engine.dll",
         "Quantum.Log.dll",
         "Quantum.BotSDK.Core.dll",
+        "Quantum.Navigation.dll",
         "Sirenix.Serialization.dll",
         "Sirenix.OdinInspector.Attributes.dll",
         "Sirenix.Serialization.Config.dll"

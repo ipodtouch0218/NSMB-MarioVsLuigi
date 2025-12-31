@@ -58,6 +58,11 @@
             </summary>
             <param name="path">Output path.</param>
         </member>
+        <member name="M:Quantum.Editor.QuantumUnityDBUtilities.IterateAssets">
+            <summary>
+            Enumerates <see cref="T:Quantum.AssetObject"/> assets with <see cref="F:Quantum.Editor.QuantumUnityDBUtilities.AssetLabel"/> label.
+            </summary>
+        </member>
         <member name="M:Quantum.Editor.QuantumUnityDBUtilities.IterateAssets(System.String)">
             <summary>
             Enumerates <see cref="T:Quantum.AssetObject"/> assets with <see cref="F:Quantum.Editor.QuantumUnityDBUtilities.AssetLabel"/> label.
@@ -330,20 +335,6 @@
             Moves PhotonLibs, PhotonRealtime and Quantum folders into the project folder and adds them as local packages.
             </summary>
         </member>
-        <member name="T:Quantum.Editor.QuantumAssetSourceFactoryAssetBundle">
-            <summary>
-            A <see cref="T:Quantum.Editor.IQuantumAssetSourceFactory"/> implementation that creates <see cref="T:Quantum.QuantumAssetSourceAssetBundle`1"/>
-            if the asset is an Addressable.
-            </summary>
-        </member>
-        <member name="F:Quantum.Editor.QuantumAssetSourceFactoryAssetBundle.Order">
-            <inheritdoc cref="P:Quantum.Editor.IQuantumAssetSourceFactory.Order"/>
-        </member>
-        <member name="M:Quantum.Editor.QuantumAssetSourceFactoryAssetBundle.TryCreateInternal``2(Quantum.Editor.QuantumAssetSourceFactoryContext@,``0@)">
-            <summary>
-            Creates <see cref="T:Quantum.QuantumAssetSourceAssetBundle`1"/> if the asset is an Addressable.
-            </summary>
-        </member>
         <member name="T:Quantum.Editor.QuantumEditorMapGizmoStylePopup">
             <summary>
             Popup window for the map gizmo style.
@@ -415,6 +406,36 @@
             Create a xml serializer with the necessary overrides.
             </summary>
             <returns>Xml serializer for SerializableEnterRoomArgs.</returns>
+        </member>
+        <member name="F:Quantum.Editor.QuantumUnityDBScopeImporter.Verify">
+            <summary>
+            If enabled, performs an additional step during import to verify the imported assets have correct GUIDs and paths.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumUnityDBScopeImporter.LogImportTimes">
+            <summary>
+            If enabled, logs the time it took to import assets. 
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumUnityDBScopeImporter.IsUnique">
+            <summary>
+            If true, <see cref="T:Quantum.QuantumUnityDB"/> will emit an edit-time warning if there are assets that also exists in other scopes.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumUnityDBScopeImporter.IncludeSubfolders">
+            <summary>
+            If true, include all <see cref="T:Quantum.AssetObject"/> in the current folder and all the subfolders.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumUnityDBScopeImporter.AssetBundles">
+            <summary>
+            Include <see cref="T:Quantum.AssetObject"/> being a part of specific Asset Bundles.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumUnityDBScopeImporter.ExplicitAssets">
+            <summary>
+            Assets included explicitly.
+            </summary>
         </member>
         <member name="T:Quantum.Editor.QuantumEditorMenuCreateScene">
             <summary>
@@ -768,6 +789,20 @@
         <member name="M:Quantum.Editor.QuantumAssetSourceFactoryResource.TryCreateInternal``2(Quantum.Editor.QuantumAssetSourceFactoryContext@,``0@)">
             <summary>
             Creates <see cref="T:Quantum.QuantumAssetSourceResource`1"/> if the asset is in the Resources folder.
+            </summary>
+        </member>
+        <member name="T:Quantum.Editor.QuantumAssetSourceFactoryAssetBundle">
+            <summary>
+            A <see cref="T:Quantum.Editor.IQuantumAssetSourceFactory"/> implementation that creates <see cref="T:Quantum.QuantumAssetSourceAssetBundle`1"/>
+            if the asset is an Addressable.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumAssetSourceFactoryAssetBundle.Order">
+            <inheritdoc cref="P:Quantum.Editor.IQuantumAssetSourceFactory.Order"/>
+        </member>
+        <member name="M:Quantum.Editor.QuantumAssetSourceFactoryAssetBundle.TryCreateInternal``2(Quantum.Editor.QuantumAssetSourceFactoryContext@,``0@)">
+            <summary>
+            Creates <see cref="T:Quantum.QuantumAssetSourceAssetBundle`1"/> if the asset is an Addressable.
             </summary>
         </member>
         <member name="T:Quantum.Editor.QuantumAssetSourceFactoryAddressable">
@@ -1190,6 +1225,11 @@
             <param name="label">The optional label</param>
             <param name="type">The optional type</param>
         </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.IsPathWritable(System.String)">
+            <summary>
+            Checks if given path is read only. This can happen e.g. for non-local and non-embedded packages.
+            </summary>
+        </member>
         <member name="T:Quantum.Editor.AssetDatabaseUtils.AssetEnumerator">
             <summary>
             Enumerates assets in the project that match the given search criteria using <see cref="T:UnityEditor.HierarchyProperty"/> API.
@@ -1243,6 +1283,16 @@
             <summary>
             Sends out <see cref="T:Quantum.QuantumMppmRegisterCustomDependencyCommand"/> command to virtual peers
             before calling <see cref="M:UnityEditor.AssetDatabase.RegisterCustomDependency(System.String,UnityEngine.Hash128)"/>.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.GetAddress(UnityEngine.Object)">
+            <summary>
+            Returns the address of an asset or an empty string, if either Addressables are disabled or the asset is not addressable.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.GetAddress(System.String)">
+            <summary>
+            Returns the address of an asset or an empty string, if either Addressables are disabled or the asset is not addressable.
             </summary>
         </member>
         <member name="M:Quantum.Editor.HashCodeUtilities.GetHashDeterministic(System.String,System.Int32)">
@@ -1436,6 +1486,16 @@
             exception is thrown. If there are no such assets, empty string is returned.
             </summary>
         </member>
+        <member name="M:Quantum.Editor.QuantumGlobalScriptableObjectUtils.GetGlobalAssetPath(System.Type)">
+            <inheritdoc cref="M:Quantum.Editor.QuantumGlobalScriptableObjectUtils.GetGlobalAssetPath``1"/>
+        </member>
+        <member name="M:Quantum.Editor.QuantumGlobalScriptableObjectUtils.TryImportGlobal``1">
+            <summary>
+            Attempts to import the global asset for the given type.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns><see langword="true"/> if the asset was found and reimported</returns>
+        </member>
         <member name="M:Quantum.Editor.QuantumGlobalScriptableObjectUtils.TryGetGlobalAssetPath``1(System.String@)">
             <summary>
             A wrapper around <see cref="M:Quantum.Editor.QuantumGlobalScriptableObjectUtils.GetGlobalAssetPath``1"/> that returns a value indicating if
@@ -1445,6 +1505,9 @@
             <typeparam name="T"></typeparam>
             <returns><see langword="true"/> if the asset was found</returns>
         </member>
+        <member name="M:Quantum.Editor.QuantumGlobalScriptableObjectUtils.TryGetGlobalAssetPath(System.Type,System.String@)">
+            <inheritdoc cref="M:Quantum.Editor.QuantumGlobalScriptableObjectUtils.TryGetGlobalAssetPath``1(System.String@)"/>
+        </member>
         <member name="M:Quantum.Editor.QuantumGlobalScriptableObjectUtils.EnsureAssetExists``1">
             <summary>
             If the global asset does not exist, creates it based on the type's <see cref="T:Quantum.QuantumGlobalScriptableObjectAttribute"/>.
@@ -1452,12 +1515,8 @@
             <typeparam name="T"></typeparam>
             <returns><see langword="true"/> If the asset already existed.</returns>
         </member>
-        <member name="M:Quantum.Editor.QuantumGlobalScriptableObjectUtils.TryImportGlobal``1">
-            <summary>
-            Attempts to import the global asset for the given type.
-            </summary>
-            <typeparam name="T"></typeparam>
-            <returns><see langword="true"/> if the asset was found and reimported</returns>
+        <member name="M:Quantum.Editor.QuantumGlobalScriptableObjectUtils.EnsureAssetExists(System.Type)">
+            <inheritdoc cref="M:Quantum.Editor.QuantumGlobalScriptableObjectUtils.EnsureAssetExists``1"/>
         </member>
         <member name="T:Quantum.Editor.QuantumDotnetBuildSettings">
             <summary>
@@ -1497,16 +1556,6 @@
         <member name="F:Quantum.Editor.QuantumDotnetBuildSettings.DotnetConfiguration.Debug">
             <summary>
             Debug mode
-            </summary>
-        </member>
-        <member name="F:Quantum.Editor.QuantumDotnetBuildSettings.ShowCompiledDllAfterBuild">
-            <summary>
-            If true, opens and highlights the DLL after compilation.
-            </summary>
-        </member>
-        <member name="F:Quantum.Editor.QuantumDotnetBuildSettings.ShowFolderAfterGeneration">
-            <summary>
-            Open a popup of the location of the generated project.
             </summary>
         </member>
         <member name="F:Quantum.Editor.QuantumDotnetBuildSettings.ProjectSettings">
@@ -1591,7 +1640,7 @@
             Generate a csproj file from the ProjectSettings and ProjectTemplate.
             </summary>
             <param name="settings">Settings instance</param>
-            <param name="disablePopup">Disable all popups.</param>
+            <param name="showPopup">Show a folder popups.</param>
         </member>
         <member name="M:Quantum.Editor.QuantumDotnetBuildSettings.BuildProject(Quantum.Editor.QuantumDotnetBuildSettings,System.String,System.Boolean)">
             <summary>
@@ -1599,7 +1648,7 @@
             </summary>
             <param name="settings">Settings instance</param>
             <param name="copyOutputDir">Copy result to output dir</param>
-            <param name="disablePopup">Disable file explorer popup</param>
+            <param name="showPopup">Show file explorer popup</param>
         </member>
         <member name="M:Quantum.Editor.QuantumDotnetBuildSettings.RunDotnetCommand(System.String,System.String)">
             <summary>
@@ -1634,6 +1683,21 @@
             Export the Quantum DB to the destination path.
             </summary>
             <param name="destinationPath">The path to export the files.</param>
+        </member>
+        <member name="M:Quantum.Editor.QuantumDotnetBuildSettings.OpenDotnetSolution(Quantum.Editor.QuantumDotnetBuildSettings,System.Boolean)">
+            <summary>
+            Open the project folder in the file explorer.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumDotnetBuildSettings.OpenDotnetLibrary(Quantum.Editor.QuantumDotnetBuildSettings)">
+            <summary>
+            Open the library folder in the file explorer.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumDotnetBuildSettings.OpenPluginSDKSolution(Quantum.Editor.QuantumDotnetBuildSettings,System.Boolean)">
+            <summary>
+            Open the library folder in the file explorer.
+            </summary>
         </member>
         <member name="M:Quantum.Editor.QuantumDotnetBuildSettings.LaunchPhotonServer(System.Boolean)">
             <summary>
@@ -1747,7 +1811,7 @@
         </member>
         <member name="F:Quantum.QuantumEditorSettings.AssetSearchPaths">
             <summary>
-            Locations that the QuantumUnityDB disovers Quantum assets.
+            Locations that the QuantumUnityDB discovers Quantum assets.
             Changing this requires reimporting all Unity (Quantum) assets manually.
             </summary>
         </member>

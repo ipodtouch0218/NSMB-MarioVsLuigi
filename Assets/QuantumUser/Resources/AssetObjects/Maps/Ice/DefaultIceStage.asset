@@ -627,8 +627,6 @@ MonoBehaviour:
           RawValue: 39322
         MaximumShootRadius:
           RawValue: 458752
-        BulletBillCount: 0
-        TimeToShootFrames: 0
     - rid: 1649462287150350336
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -701,8 +699,6 @@ MonoBehaviour:
           RawValue: 39322
         MaximumShootRadius:
           RawValue: 458752
-        BulletBillCount: 0
-        TimeToShootFrames: 0
     - rid: 1759927271897956352
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:

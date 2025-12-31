@@ -192,7 +192,6 @@ namespace Quantum {
               _lastTime = _networkTimer.Elapsed.TotalSeconds;
             }
           } else {
-            QuantumRunner.Default.NetworkClient.RealtimePeer.Stats.ToSnapshot();
             NetworkIn.text = FormatBandwidth(QuantumRunner.Default.NetworkClient.RealtimePeer.Stats.BytesIn / _networkTimer.Elapsed.TotalSeconds);
             NetworkOut.text = FormatBandwidth(QuantumRunner.Default.NetworkClient.RealtimePeer.Stats.BytesOut / _networkTimer.Elapsed.TotalSeconds);
           }

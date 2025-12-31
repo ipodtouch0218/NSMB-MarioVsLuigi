@@ -862,7 +862,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BindBehaviour: 1
   ManualDisposal: 0
-  ViewFlags: 0
+  ViewFlags: 4
   InterpolationMode: 0
   ErrorCorrectionRateMin: 10
   ErrorCorrectionRateMax: 30
@@ -1019,7 +1019,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
     type: 2}
-  m_audioClip: {fileID: 8300000, guid: 08141aacc2b968a419a9c775bdcbdf8d, type: 3}
+  m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 08141aacc2b968a419a9c775bdcbdf8d, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.33333334
@@ -6167,7 +6167,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
     type: 2}
-  m_audioClip: {fileID: 8300000, guid: 95360a672a4824d4fb69690ee7c591ff, type: 3}
+  m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 95360a672a4824d4fb69690ee7c591ff, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
@@ -9130,7 +9130,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_audioClip
       value: 
-      objectReference: {fileID: 8300000, guid: 95360a672a4824d4fb69690ee7c591ff, type: 3}
+      objectReference: {fileID: 0}
     - target: {fileID: 5505468501837578399, guid: 93d9711d25974674a8196b3204b10e6a,
         type: 3}
       propertyPath: m_Layer

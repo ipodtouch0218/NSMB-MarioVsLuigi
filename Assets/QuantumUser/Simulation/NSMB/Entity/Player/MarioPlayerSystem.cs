@@ -52,8 +52,9 @@ namespace Quantum {
                 return;
             }
 
-            if (f.GetPlayerCommand(player) is CommandSpawnReserveItem) {
+            foreach (var _ in f.GetPlayerCommands<CommandSpawnReserveItem>(player)) {
                 SpawnReserveItem(f, ref filter);
+                break;
             }
 
             if (HandleMegaMushroom(f, ref filter, physics, stage)) {
@@ -2071,7 +2072,7 @@ namespace Quantum {
             }
 
             if (damageable || projectileAsset.DestroyOnHit || ((mario->IsCrouchedInShell || mario->IsInShell) && projectileAsset.DoesntEffectBlueShell)) {
-                f.Signals.OnProjectileHitEntity(f, projectileEntity, marioEntity);
+                f.Signals.OnProjectileHitEntity(projectileEntity, marioEntity);
             }
         }
 

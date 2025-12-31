@@ -1199,7 +1199,7 @@ namespace Quantum {
 
     private object UnloadSceneAsync(string sceneName) {
 #if QUANTUM_ENABLE_ADDRESSABLES && !QUANTUM_DISABLE_ADDRESSABLES
-      if (_addressableOperations.TryGetValue(sceneName, out var asyncOp)) {
+      if (_addressableOperations.Remove(sceneName, out var asyncOp)) {
         VerboseLog($"Unloading addressable scene {sceneName}");
         return Addressables.UnloadSceneAsync(asyncOp);
       } else
@@ -1215,7 +1215,18 @@ namespace Quantum {
           foreach (var (name, path) in addressableScenes) {
             if (string.Equals(name, sceneName, StringComparison.OrdinalIgnoreCase)) {
               VerboseLog($"Loading addressable scene {sceneName} ({path})");
-              return Addressables.LoadSceneAsync(path, loadSceneMode);
+              var op = Addressables.LoadSceneAsync(path, loadSceneMode);
+              Assert.Check(op.IsValid());
+              _addressableOperations.Add(sceneName, op);
+              
+              op.Destroyed += _ => {
+                // make sure the tracking is cleaned up properly when other means of loading scenes are used
+                if (_addressableOperations.Remove(sceneName)) {
+                  VerboseLog($"Removed {sceneName} ({path}) tracking in Destroyed handler");
+                }
+              };
+              
+              return op;
             }
           }
         }
@@ -1362,7 +1373,7 @@ namespace Quantum {
     /// </summary>
     const string AddressableScenesLabel = "QuantumScenes";
     
-    public System.Threading.Tasks.Task LoadAddressableScenePathsAsync() {
+    public static System.Threading.Tasks.Task LoadAddressableScenePathsAsync() {
       return _addressableScenesTask.Value.Task;
     }
     
@@ -1451,7 +1462,7 @@ namespace Quantum {
       }
     }
 
-    Lazy<GetAddressableScenesResult>                        _addressableScenesTask = new(() => GetAddressableScenes());
+    static Lazy<GetAddressableScenesResult>                 _addressableScenesTask = new(() => GetAddressableScenes());
     Dictionary<string, AsyncOperationHandle<SceneInstance>> _addressableOperations = new();
 #endif
   }
@@ -2815,7 +2826,7 @@ namespace Quantum {
     /// Is only called internally.
     /// </summary>
     public void UpdateView() {
-      using var profilerScope = HostProfiler.Start("QuantumViewComponent.UpdateView");
+      using var profilerScope = HostProfiler.Markers.EntityViewComponentOnUpdateView();
       OnUpdateView();
     }
 
@@ -2823,7 +2834,7 @@ namespace Quantum {
     /// Is only called internally.
     /// </summary>
     public void LateUpdateView() {
-      using var profilerScope = HostProfiler.Start("QuantumViewComponent.OnLateUpdateView");
+      using var profilerScope = HostProfiler.Markers.EntityViewComponentOnLateUpdateView();
       OnLateUpdateView();
     }
 
@@ -5652,16 +5663,16 @@ namespace Quantum {
       }
     }
 
-    private static unsafe void DrawCompoundShape2D(Frame f, Shape2D* compoundShape, Transform2D* transform,
+    private static unsafe void DrawCompoundShape2D(Frame frame, Shape2D* compoundShape, Transform2D* transform,
       Transform2DVertical* transformVertical, Color color, float height, QuantumGizmoStyle style = default) {
       Debug.Assert(compoundShape->Type == Shape2DType.Compound);
 
-      if (compoundShape->Compound.GetShapes(f, out var shapesBuffer, out var count)) {
+      if (compoundShape->Compound.GetShapes(frame, out var shapesBuffer, out var count)) {
         for (var i = 0; i < count; i++) {
           var shape = shapesBuffer + i;
 
           if (shape->Type == Shape2DType.Compound) {
-            DrawCompoundShape2D(f, shape, transform, transformVertical, color, height, style);
+            DrawCompoundShape2D(frame, shape, transform, transformVertical, color, height, style);
           } else {
             var pos = transform->Position.ToUnityVector3();
             var rot = transform->Rotation.ToUnityQuaternion();
@@ -5676,7 +5687,7 @@ namespace Quantum {
             }
 #endif
 
-            DrawShape2DGizmo(*shape, pos, rot, color, height, f, style);
+            DrawShape2DGizmo(*shape, pos, rot, color, height, frame, style);
           }
         }
       }
@@ -6190,16 +6201,16 @@ namespace Quantum {
     }
 
 
-    private static unsafe void DrawCompoundShape3D(Frame f, Shape3D* compoundShape, Transform3D* transform, Color color,
+    private static unsafe void DrawCompoundShape3D(Frame frame, Shape3D* compoundShape, Transform3D* transform, Color color,
       QuantumGizmoStyle style = default) {
       Debug.Assert(compoundShape->Type == Shape3DType.Compound);
 
-      if (compoundShape->Compound.GetShapes(f, out var shapesBuffer, out var count)) {
+      if (compoundShape->Compound.GetShapes(frame, out var shapesBuffer, out var count)) {
         for (var i = 0; i < count; i++) {
           var shape = shapesBuffer + i;
 
           if (shape->Type == Shape3DType.Compound) {
-            DrawCompoundShape3D(f, shape, transform, color, style);
+            DrawCompoundShape3D(frame, shape, transform, color, style);
           } else {
             DrawShape3DGizmo(*shape, transform->Position.ToUnityVector3(), transform->Rotation.ToUnityQuaternion(),
               color, style);
@@ -6511,6 +6522,15 @@ namespace Quantum {
 
     public Type AssetType => SerializableAssetType;
   }
+  
+#if !QUANTUM_DISABLE_ASSET_BUNDLE_ASSET_SOURCE
+  [Serializable]
+  public class QuantumAssetObjectSourceAssetBundle: QuantumAssetSourceAssetBundle<Quantum.AssetObject>, IQuantumAssetObjectSource {
+    public SerializableType<Quantum.AssetObject> SerializableAssetType;
+
+    public Type AssetType => SerializableAssetType;
+  }
+#endif
   
 #if (QUANTUM_ADDRESSABLES || QUANTUM_ENABLE_ADDRESSABLES) && !QUANTUM_DISABLE_ADDRESSABLES
   [Serializable]
@@ -7242,6 +7262,264 @@ namespace Quantum {
     /// <inheritdoc cref="QuantumAssetSourceResource{T}.EditorInstance"/>
     public T EditorInstance => (T)QuantumAddressablesUtils.LoadEditorInstance(RuntimeKey);
 #endif
+  }
+}
+#endif
+
+#endregion
+
+
+#region QuantumAssetSourceAssetBundle.cs
+
+#if !QUANTUM_DISABLE_ASSET_BUNDLE_ASSET_SOURCE
+namespace Quantum {
+  using System;
+  using System.IO;
+  using System.Runtime.ExceptionServices;
+  using UnityEditor;
+  using UnityEngine;
+  using Object = UnityEngine.Object;
+  
+  /// <summary>
+  /// An AssetBundle-based implementation of the asset source pattern. The asset is loaded from AssetBundles.
+  /// </summary>
+  /// <typeparam name="T"></typeparam>
+  [Serializable]
+  public partial class QuantumAssetSourceAssetBundle<T> where T : Object {
+    /// <summary>
+    /// Name of the asset bundle.
+    /// </summary>
+    public string AssetBundleName;
+    /// <summary>
+    /// Name of the asset in the bundle.
+    /// </summary>
+    public string AssetName;
+    /// <summary>
+    /// Nested asset name, for sub assets.
+    /// </summary>
+    public string NestedAssetName;
+    
+    [NonSerialized]
+    object _state;
+    [NonSerialized]
+    int _acquireCount;
+    
+    /// <inheritdoc cref="QuantumAssetSourceResource{T}.Acquire"/>
+    public void Acquire(bool synchronous) {
+      if (_acquireCount == 0) {
+        LoadInternal(synchronous);
+      }
+      _acquireCount++;
+    }
+
+    /// <inheritdoc cref="QuantumAssetSourceResource{T}.Release"/>
+    public void Release() {
+      if (_acquireCount <= 0) {
+        throw new Exception("Asset is not loaded");
+      }
+      if (--_acquireCount == 0) {
+        UnloadInternal();
+      }
+    }
+
+    /// <inheritdoc cref="QuantumAssetSourceResource{T}.IsCompleted"/>
+    public bool IsCompleted {
+      get {
+        if (_state == null) {
+          // hasn't started
+          return false;
+        }
+        
+        if (_state is AssetBundleRequest asyncOp && !asyncOp.isDone) {
+          // still loading, wait
+          return false;
+        }
+
+        return true;
+      }
+    }
+
+    /// <inheritdoc cref="QuantumAssetSourceResource{T}.WaitForResult"/>
+    public T WaitForResult() {
+      Assert.Check(_state != null);
+      if (_state is AssetBundleRequest asyncOp) {
+        if (asyncOp.isDone) {
+          if (string.IsNullOrEmpty(NestedAssetName)) {
+            _state = asyncOp.asset;  
+          } else {
+            _state = QuantumAssetSourceAssetBundle.FindAsset(asyncOp.allAssets, NestedAssetName);
+          }
+        } else {
+          // just load synchronously, then pass through
+          _state = null;
+          LoadInternal(synchronous: true);
+        }
+      }
+      
+      return ValidateResult(_state);
+    }
+    
+    private void LoadInternal(bool synchronous) {
+      Assert.Check(_state == null);
+      try {
+        // load the bundle, if not yet loaded
+        var bundle = GetAssetBundle(AssetBundleName);
+        if (bundle == null) {
+          throw new InvalidOperationException($"Unable to load asset bundle {AssetBundleName}");
+        }
+
+        if (typeof(T).IsSubclassOf(typeof(Component))) {
+          _state = QuantumAssetSourceAssetBundle.LoadAssetFromBundle<GameObject>(bundle, AssetName, NestedAssetName, synchronous);
+        } else {
+          _state = QuantumAssetSourceAssetBundle.LoadAssetFromBundle<T>(bundle, AssetName, NestedAssetName, synchronous);
+        }
+        
+      } catch (Exception ex) {
+        _state = ExceptionDispatchInfo.Capture(ex);
+      }
+    }
+
+    private void UnloadInternal() {
+      if (_state is AssetBundleRequest asyncOp) {
+        asyncOp.completed += op => {
+          // unload stuff
+          var asset = ((AssetBundleRequest)op).asset;
+          if (asset) {
+            QuantumAssetSourceAssetBundle.AssetUnloaded?.Invoke(asset);
+          }
+        };
+      } else if (_state is Object obj) {
+        QuantumAssetSourceAssetBundle.AssetUnloaded?.Invoke(obj);
+      }
+
+      _state = null;
+    }
+
+    static AssetBundle GetAssetBundle(string bundleName) {
+      // first, try to locate from loaded bundles
+      foreach (var assetBundle in AssetBundle.GetAllLoadedAssetBundles()) {
+        if (string.Equals(assetBundle.name, bundleName, StringComparison.Ordinal)) {
+          return assetBundle;
+        }
+      }
+
+      if (QuantumAssetSourceAssetBundle.AssetBundleRequested != null) {
+        return QuantumAssetSourceAssetBundle.AssetBundleRequested(bundleName);
+      }
+      
+      // try to load from filesystem as fallback
+      var bundlePath = Path.Combine(Application.streamingAssetsPath, bundleName);
+      return AssetBundle.LoadFromFile(bundlePath);  
+    }
+    
+    private T ValidateResult(object result) {
+      if (_state == null) {
+        throw new InvalidOperationException($"Missing AssetBundle {AssetBundleName} asset: {AssetName}{(string.IsNullOrEmpty(NestedAssetName) ? "" : $"[{NestedAssetName}]" )}");
+      }
+      if (result is ExceptionDispatchInfo exception) {
+        exception.Throw();
+        throw new NotSupportedException();
+      }
+      if (result == null) {
+        throw new InvalidOperationException($"Failed to load asset: {AssetBundleName}[{AssetName}]; asset is null");
+      }
+      if (typeof(T).IsSubclassOf(typeof(Component))) {
+        if (result is GameObject == false) {
+          throw new InvalidOperationException($"Failed to load asset: {AssetBundleName}[{AssetName}]; asset is not a GameObject, but a {result.GetType()}");
+        }
+        
+        var component = ((GameObject)result).GetComponent<T>();
+        if (!component) {
+          throw new InvalidOperationException($"Failed to load asset: {AssetBundleName}[{AssetName}]; asset does not contain component {typeof(T)}");
+        }
+
+        return component;
+      }
+
+      if (result is T asset) {
+        return asset;
+      }
+      
+      throw new InvalidOperationException($"Failed to load asset: {AssetBundleName}[{AssetName}]; asset is not of type {typeof(T)}, but {result.GetType()}");
+    }
+    
+    /// <summary>
+    /// The description of the asset source. Used for debugging.
+    /// </summary>
+    public string Description => $"AssetBundle: {AssetBundleName}, {AssetName}{(string.IsNullOrEmpty(NestedAssetName) ? "" : $"[{NestedAssetName}]")}";
+    
+#if UNITY_EDITOR
+    /// <summary>
+    /// Returns the asset instance for Editor purposes. Does not call <see cref="Acquire"/>.
+    /// </summary>
+    public T EditorInstance {
+      get {
+        if (string.IsNullOrEmpty(AssetBundleName) || string.IsNullOrEmpty(AssetName)) {
+          return null;
+        }
+        
+        var paths = AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(AssetBundleName, Path.GetFileNameWithoutExtension(AssetName));
+        foreach (var path in paths) {
+          if (!path.EndsWith(AssetName, StringComparison.OrdinalIgnoreCase)) {
+            continue;
+          }
+          var assets = AssetDatabase.LoadAllAssetsAtPath(path);
+          foreach (var potentialAsset in assets) {
+            if (potentialAsset is not T obj) {
+              continue;
+            }
+
+            if (string.IsNullOrEmpty(NestedAssetName) || NestedAssetName.Equals(potentialAsset.name, StringComparison.OrdinalIgnoreCase)) {
+              return obj;
+            }
+          }
+        }
+
+        return null;
+      }
+    }
+#endif
+  }
+ 
+  /// <summary>
+  /// Utility for <see cref="QuantumAssetSourceAssetBundle{T}"/>.
+  /// </summary>
+  public static class QuantumAssetSourceAssetBundle {
+    /// <summary>
+    /// Global callback that allows for custom AssetBundle loading.
+    /// </summary>
+    public static Func<string, AssetBundle> AssetBundleRequested;
+    /// <summary>
+    /// Global callback invoked when an asset is being unloaded.
+    /// </summary>
+    public static Action<Object> AssetUnloaded;
+
+    internal static object LoadAssetFromBundle<T>(AssetBundle bundle, string assetName, string nestedAssetName, bool synchronous) where T : Object {
+      if (synchronous) {
+        if (string.IsNullOrEmpty(nestedAssetName)) {
+          return bundle.LoadAsset<T>(assetName);
+        } else {
+          var allAssets = bundle.LoadAssetWithSubAssets<T>(assetName);
+          return allAssets != null ? FindAsset(allAssets, nestedAssetName) : null;
+        }
+      } else {
+        if (string.IsNullOrEmpty(nestedAssetName)) {
+          return bundle.LoadAssetAsync<T>(assetName);
+        } else {
+          return bundle.LoadAssetWithSubAssetsAsync<T>(assetName);
+        }
+      }
+    }
+
+    internal static T FindAsset<T>(T[] assets, string assetName) where T : Object {
+      foreach (var asset in assets) {
+        if (asset && asset.name == assetName) {
+          return asset;
+        }
+      }
+
+      return default;
+    }
   }
 }
 #endif
@@ -19458,7 +19736,7 @@ namespace Quantum {
 
 #if QUANTUM_ENABLE_AI && !QUANTUM_DISABLE_AI
 
-    public static IEnumerable<Quantum.NavMesh> BakeNavMeshes(QuantumMapData data, Boolean inEditor) {
+    public static IEnumerable<Quantum.NavMesh> BakeNavMeshes(QuantumMapData data, Boolean inEditor, Boolean importUnityNavmesh = true) {
       FPMathUtils.LoadLookupTables();
 
       var asset = data.GetAsset(inEditor);
@@ -19467,7 +19745,7 @@ namespace Quantum {
 
       InvokeCallbacks("OnBeforeBakeNavMesh", data);
 
-      var navmeshes = BakeNavMeshesLoop(data, asset).ToList();
+      var navmeshes = BakeNavMeshesLoop(data, asset, importUnityNavmesh).ToList();
 
       InvokeCallbacks("OnCollectNavMeshes", data, navmeshes);
 
@@ -20122,7 +20400,7 @@ namespace Quantum {
 
 #if QUANTUM_ENABLE_AI && !QUANTUM_DISABLE_AI
 
-    static IEnumerable<Quantum.NavMesh> BakeNavMeshesLoop(QuantumMapData data, Map asset) {
+    static IEnumerable<Quantum.NavMesh> BakeNavMeshesLoop(QuantumMapData data, Map asset, Boolean importUnityNavmesh = true) {
 
 #if UNITY_EDITOR
       QuantumGameGizmos.InvalidateGizmos();
@@ -20134,7 +20412,7 @@ namespace Quantum {
       var allBakeData = new List<NavMeshBakeData>();
 
       // Collect unity navmeshes
-      {
+      if (importUnityNavmesh) {
         var unityNavmeshes = data.GetComponentsInChildren<QuantumMapNavMeshUnity>().ToList();
 
         // The sorting is important to always generate the same order of regions name list.
@@ -23611,7 +23889,11 @@ namespace Quantum {
 #if QUANTUM_ENABLE_ASYNC_LUT_LOADING
       _ = FPMathUtils.LoadLookupTablesAsync(true);
 #else
-      FPMathUtils.LoadLookupTables();
+      if (Application.isEditor) {
+        FPMathUtils.TryLoadLookupTables();
+      } else {
+        FPMathUtils.LoadLookupTables();
+      }
 #endif
       
 #if QUANTUM_ENABLE_SHARPZIPLIB && !QUANTUM_DISABLE_SHARPZIPLIB
@@ -24075,6 +24357,31 @@ namespace Quantum {
     private static readonly Lazy<QuantumGlobalScriptableObjectSourceAttribute[]> s_sourceAttributes = new Lazy<QuantumGlobalScriptableObjectSourceAttribute[]>(() => {
       return GetAssemblyAttributes<QuantumGlobalScriptableObjectSourceAttribute>().OrderBy(x => x.Order).ToArray();
     });
+
+    /// <summary>
+    /// Types that failed to load. Used to limit attempts until a reimport happens. Also, there's a nasty bug
+    /// at least in some Unity versions (verified on 2021), where if there's a type of the same name in multiple assemblies,
+    /// AssetDatabase.GetMainAssetPath may return the wrong one.
+    /// </summary>
+    internal static readonly HashSet<Type> _typesFailedToLoad = new(new TypeFullNameComparer());
+    
+    class TypeFullNameComparer : IEqualityComparer<Type> {
+      public bool Equals(Type x, Type y) {
+        if (x == y) {
+          return true;
+        }
+
+        if (x == null) {
+          return false;
+        }
+
+        return string.Equals(x.FullName, y.FullName, StringComparison.Ordinal);
+      }
+
+      public int GetHashCode(Type obj) {
+        return obj?.FullName?.GetHashCode() ?? 0;
+      }
+    }
   }
   
   /// <inheritdoc cref="QuantumGlobalScriptableObject{T}"/>
@@ -24231,15 +24538,22 @@ namespace Quantum {
       if (s_instance) {
         return s_instance;
       }
+
+      if (_typesFailedToLoad.Contains(typeof(T))) {
+        LogTrace?.Log($"Type {typeof(T).FullName} is in the failed list, early out with null");
+        return null;
+      }
       
       foreach (var sourceAttribute in SourceAttributes) {
         if (Application.isEditor) {
           if (!Application.isPlaying && !sourceAttribute.AllowEditMode) {
+            LogTrace?.Log($"{LogPrefix} Loader {sourceAttribute} failed to load {typeof(T).FullName}: edit mode");
             continue;
           }
         }
 
         if (sourceAttribute.ObjectType != typeof(T) && !typeof(T).IsSubclassOf(sourceAttribute.ObjectType)) {
+          LogTrace?.Log($"{LogPrefix} Loader {sourceAttribute} not compatible with {typeof(T).FullName}");
           continue;
         }
         
@@ -24258,15 +24572,24 @@ namespace Quantum {
           LogTrace?.Log($"{LogPrefix} Loader {sourceAttribute} was used to load {AsId(instance)}, has unloader: {result.Unloader != null}");
           SetGlobalInternal(instance, result.Unloader);
           return instance;
+        } else {
+          LogTrace?.Log($"{LogPrefix} Loader {sourceAttribute} failed to load {typeof(T).FullName}");
         }
 
         if (!sourceAttribute.AllowFallback) {
           // no fallback allowed
+          LogTrace?.Log($"{LogPrefix} Loader {sourceAttribute} failed to load {typeof(T).FullName} and disallows fallback");
           break;
         }
       }
-
-      LogTrace?.Log($"{LogPrefix} No source attribute was able to load the global instance");
+      
+      if (Application.isEditor) {
+        LogTrace?.Log($"{LogPrefix} No source attribute was able to load the global instance, adding to the failed list: {typeof(T).FullName}");
+        _typesFailedToLoad.Add(typeof(T));
+      } else {
+        LogTrace?.Log($"{LogPrefix} No source attribute was able to load the global instance: {typeof(T).FullName}");
+      }
+      
       return null;
     }
 
@@ -24340,6 +24663,18 @@ namespace Quantum {
         s_instance.OnLoadedAsGlobal();
       }
     }
+    
+#if UNITY_EDITOR && QUANTUM_EDITOR_TRACE_IMPORT
+    class LogTraceAdapter {
+      public void Log(string value) {
+        QuantumEditorLog.TraceImport(value);
+        InternalLogStreams.LogTrace?.Log(value);
+      }
+    }
+
+    // ReSharper disable once InconsistentNaming
+    static readonly LogTraceAdapter LogTrace = new LogTraceAdapter();
+#endif
   }
 }
 
@@ -25205,6 +25540,7 @@ namespace Quantum {
       LogLevel logLevel = QuantumLogConstants.DefinedLogLevel;
       TraceChannels traceChannels = QuantumLogConstants.DefinedTraceChannels;
       InitializeUser(ref logLevel, ref traceChannels);
+      InitializePartial(logLevel, traceChannels);
 
       if (Log.IsInitialized) {
         return;
@@ -25216,6 +25552,7 @@ namespace Quantum {
     }
     
     static partial void InitializeUser(ref LogLevel logLevel, ref TraceChannels traceChannels);
+    static partial void InitializePartial(LogLevel logLevel, TraceChannels traceChannels);
   }
 }
 
@@ -25980,10 +26317,63 @@ namespace Quantum {
 
 namespace Quantum {
   using System;
+  using System.Collections.Generic;
+  using Task;
+  using UnityEditor;
   using UnityEngine;
 
   partial class QuantumUnityDB {
+
+    partial void OnEnableEditor();
+    
 #if UNITY_EDITOR
+    /// <summary>
+    /// Returns a list of scoped assets known at the time of the DB baking. Only available in edit mode.
+    /// </summary>
+    public IReadOnlyList<Entry> EditorScopedAssets => _editorScopedAssetsList;
+
+    [NonSerialized]
+    readonly Dictionary<AssetGuid, (QuantumUnityDBScope Scope, IQuantumAssetObjectSource Source)> _editorScopedAssetsScopeMapping = new();
+    
+    [NonSerialized]
+    readonly List<Entry> _editorScopedAssetsList = new();
+    
+    partial void OnEnableEditor() {
+      _editorScopedAssetsScopeMapping.Clear();
+      _editorScopedAssetsList.Clear();
+      
+      if (Scopes == null) {
+        return;
+      }
+      
+      foreach (var scopeId in Scopes) {
+        var assetPath = AssetDatabase.GUIDToAssetPath(scopeId);
+      
+        if (string.IsNullOrEmpty(assetPath)) {
+          Log.TraceAssetsWarn($"Failed to find the path of scope: {scopeId}");
+          continue;
+        }
+      
+        var scope = AssetDatabase.LoadAssetAtPath<QuantumUnityDBScope>(assetPath);
+      
+        if (!scope) {
+          Log.TraceAssetsWarn($"Failed to load scope {scopeId} (path: {assetPath})");
+          continue;
+        }
+
+        foreach (var entry in scope.Entries) {
+          if (!_editorScopedAssetsScopeMapping.TryAdd(entry.Guid, (scope, entry.Source))) {
+            continue;
+          }
+          _editorScopedAssetsList.Add(entry);
+        }
+      }
+    }
+    
+
+    /// <inheritdoc cref="QuantumUnityDB.IsAssetScoped"/>
+    public static bool IsGlobalAssetScoped(AssetRef assetRef, out QuantumUnityDBScope scope) => Global.IsAssetScoped(assetRef, out scope);
+    
     /// <inheritdoc cref="QuantumUnityDB.GetAssetEditorInstance(AssetRef)"/>
     public static AssetObject GetGlobalAssetEditorInstance(AssetRef assetRef) => Global.GetAssetEditorInstance(assetRef);
     
@@ -26013,27 +26403,85 @@ namespace Quantum {
     /// <param name="assetRef"></param>
     /// <returns>Asset instance or <c>null</c> if not found or the type does not match.</returns>
     public T GetAssetEditorInstance<T>(AssetRef assetRef) where T : AssetObject => GetAssetEditorInstanceInternal(assetRef.Id) as T;
+
+    /// <inheritdoc cref="GetAssetSourceEditorInstance"/>
+    public static IQuantumAssetObjectSource GetGlobalAssetSourceEditorInstance(AssetGuid guid, out QuantumUnityDBScope scope) => Global.GetAssetSourceEditorInstance(guid, out scope);
     
-    private AssetObject GetAssetEditorInstanceInternal(AssetGuid guid) {
+    /// <summary>
+    /// Returns the editor instance of the asset source wit the given <paramref name="guid"/>. Compared to <see cref="GetAssetSource(Quantum.AssetGuid)"/>,
+    /// this method also takes scopes under consideration, even if they haven't been loaded yet. 
+    /// </summary>
+    /// <param name="guid"></param>
+    /// <param name="scope"></param>
+    /// <returns></returns>
+    public IQuantumAssetObjectSource GetAssetSourceEditorInstance(AssetGuid guid, out QuantumUnityDBScope scope) {
       var assetSource = GetAssetSource(guid);
-      if (assetSource == null) {
-        // not mapped in the resource container
-        return default;
+
+      if (assetSource != null) {
+        scope = default;
+        return assetSource;
+      }
+        
+      if (_editorScopedAssetsScopeMapping.TryGetValue(guid, out var entry)) {
+        scope = entry.Scope;
+        return entry.Source;
       }
 
+      scope = default;
+      return null;
+    }
+    
+    /// <summary>
+    /// Returns true if the asset is scoped and known at edit time.
+    /// </summary>
+    /// <param name="assetRef"></param>
+    /// <param name="scope"></param>
+    /// <returns></returns>
+    public bool IsAssetScoped(AssetRef assetRef, out QuantumUnityDBScope scope) {
+      if (_editorScopedAssetsScopeMapping.TryGetValue(assetRef.Id, out var t)) {
+        scope = t.Scope;
+        return true;
+      }
+
+      scope = default;
+      return false;
+    }
+    
+    private AssetObject GetAssetEditorInstanceInternal(AssetGuid guid) {
+      var assetSource = GetAssetSourceEditorInstance(guid, out _);
+      
+      if (assetSource == null) {
+        return null;
+      }
+      
       return assetSource.EditorInstance;
+    }
+    
+    /// <inheritdoc cref="TryGetGlobalAssetEditorInstance{T}(Quantum.AssetRef,out T)"/>
+    public static bool TryGetGlobalAssetEditorInstance(AssetRef assetRef, out AssetObject result) {
+      return TryGetGlobalAssetEditorInstance<AssetObject>(assetRef, out result);
     }
     
     /// <inheritdoc cref="TryGetGlobalAssetEditorInstance{T}(Quantum.AssetRef,out T)"/>
     public static bool TryGetGlobalAssetEditorInstance<T>(AssetRef assetRef, out T result)
       where T : AssetObject {
-      return Global.TryGetAssetObjectEditorInstance(assetRef, out result);
+      if (TryGetGlobal(out var global)) {
+        return global.TryGetAssetObjectEditorInstance(assetRef, out result);
+      }
+
+      result = null;
+      return false;
     }
     
     /// <inheritdoc cref="TryGetGlobalAssetEditorInstance{T}(Quantum.AssetRef{T},out T)"/>
     public static bool TryGetGlobalAssetEditorInstance<T>(AssetRef<T> assetRef, out T result)
       where T : AssetObject {
-      return Global.TryGetAssetObjectEditorInstance(assetRef, out result);
+      if (TryGetGlobal(out var global)) {
+        return global.TryGetAssetObjectEditorInstance(assetRef, out result);
+      }
+
+      result = null;
+      return false;
     }
     
     /// <inheritdoc cref="TryGetAssetObjectEditorInstance{T}(Quantum.AssetRef,out T)"/>
@@ -26054,7 +26502,7 @@ namespace Quantum {
     public bool TryGetAssetObjectEditorInstance<T>(AssetRef assetRef, out T result)
       where T : AssetObject {
 
-      var assetReference = GetAssetSource(assetRef.Id);
+      var assetReference = GetAssetSourceEditorInstance(assetRef.Id, out _);
       if (assetReference == null) {
         result = null;
         return false;
@@ -26118,6 +26566,7 @@ namespace Quantum {
 #endif
   }
 }
+
 
 #endregion
 
@@ -27229,17 +27678,16 @@ namespace Quantum {
   /// </summary>
   public static class FPMathUtils {
     /// <summary>
-    /// Load the lookup tables. By default, loaded from Resources.
+    /// Attempts to the lookup tables. By default, loaded from Resources.
     /// </summary>
     /// <param name="force">Will reload the table if set to true</param>
-    public static void LoadLookupTables(Boolean force = false) {
-      if (FPLut.IsLoaded && force == false) {
-        return;
+    public static bool TryLoadLookupTables(bool force = false) {
+      if (FPLut.IsLoaded && !force) {
+        return true;
       }
       
       if (!QuantumLookupTables.TryGetGlobal(out var global)) {
-        Log.Error($"Failed to load {nameof(QuantumLookupTables)}");
-        return;
+        return false;
       }
       
       FPLut.Init(
@@ -27249,6 +27697,18 @@ namespace Quantum {
         acos: global.TableAcos != null ? global.TableAcos.bytes : null,
         atan: global.TableAtan != null ? global.TableAtan.bytes : null,
         sqrt: global.TableSqrt != null ? global.TableSqrt.bytes : null);
+      
+      return true;
+    }
+    
+    /// <summary>
+    /// Load the lookup tables. By default, loaded from Resources.
+    /// </summary>
+    /// <param name="force">Will reload the table if set to true</param>
+    public static void LoadLookupTables(Boolean force = false) {
+      if (!TryLoadLookupTables(force)) {
+        Log.Error($"Failed to load {nameof(QuantumLookupTables)}");
+      }
     }
 
     /// <summary>

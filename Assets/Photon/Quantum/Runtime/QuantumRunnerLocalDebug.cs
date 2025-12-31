@@ -88,6 +88,10 @@ namespace Quantum {
     /// </summary>
     [InlineHelp]
     public TextAsset DatabaseFile;
+    /// <summary>
+    /// DB scopes to preload.
+    /// </summary>
+    public QuantumUnityDBScope[] DBScopes;
 
     QuantumRunner _runner;
     
@@ -130,6 +134,14 @@ namespace Quantum {
       }
 #endif
 
+      if (DBScopes != null) {
+        foreach (var scope in DBScopes) {
+          if (!QuantumUnityDB.Global.TryAddScope(scope)) {
+            Log.Error($"Scope already loaded: {scope.Id}");
+          }
+        }
+      }
+      
       var arguments = default(SessionRunner.Arguments);
       var serializer = new QuantumUnityJsonSerializer();
       var assets = default(byte[]);

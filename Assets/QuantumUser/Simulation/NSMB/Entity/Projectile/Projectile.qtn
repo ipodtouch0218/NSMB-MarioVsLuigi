@@ -11,7 +11,7 @@ table component Projectile {
 	[ExcludeFromPrototype] byte Combo;
 }
 
-signal OnProjectileHitEntity(Frame frame, EntityRef projectile, EntityRef hitEntity);
+signal OnProjectileHitEntity(EntityRef projectile, EntityRef hitEntity);
 
 event ProjectileDestroyed {
 	EntityRef Entity;

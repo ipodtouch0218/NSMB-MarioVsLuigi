@@ -1,5 +1,8 @@
 using Newtonsoft.Json;
+using NSMB.Networking;
 using NSMB.Sound;
+using Photon.Client;
+using Photon.Realtime;
 using Quantum;
 using System;
 using System.Collections.Generic;
@@ -15,11 +18,14 @@ using UnityEngine.Networking;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace NSMB.Addons {
-    public class AddonManager : MonoBehaviour {
+    public class AddonManager : MonoBehaviour, IOnEventCallback, IMatchmakingCallbacks {
 
         //---Static Variables
         public static event Action<LoadedAddon> OnAddonLoaded, OnAddonUnloaded;
         public static event Action OnAvailableAddonListLoaded;
+
+        private static readonly byte EventBroadcastAddonList = 101;
+        public static readonly DisconnectCause DisconnectCauseMissingAddon = (DisconnectCause) 101;
 
         private static readonly string RemoteRepoUrl = "https://raw.githubusercontent.com/ipodtouch0218/NSMB-MarioVsLuigi-AddonRepository/main/";
         private static readonly string RemoteAddonsFile = RemoteRepoUrl + "addons.json";
@@ -36,11 +42,14 @@ namespace NSMB.Addons {
 
         //---Private Variables
         private List<Addon> _availableAddons = new();
+        private bool waitingForAddons;
 
         public void Start() {
             AddonCachePath = Path.Combine(Application.persistentDataPath, "addoncache");
             PlatformFolder = GetFolderForPlatform();
             _ = FindAvailableAddons();
+
+            NetworkHandler.Client.AddCallbackTarget(this);
         }
 
         public async Awaitable FindAvailableAddons() {
@@ -178,16 +187,20 @@ namespace NSMB.Addons {
             await Awaitable.MainThreadAsync();
             var catalogHandle = Addressables.LoadContentCatalogAsync(catalogPath);
             var resourceLocator = await catalogHandle.Task;
-
             if (catalogHandle.Status != AsyncOperationStatus.Succeeded) {
                 Debug.LogError($"[Addon] Failed to load addon {addonDef.FullName} ({addonDef.Guid}): {catalogHandle.Status} - {catalogHandle.OperationException.Message}");
                 return null;
             }
 
-            var loadAssetObjectsHandle = Addressables.LoadAssetsAsync<AssetObject>(resourceLocator.Keys, _ => {}, Addressables.MergeMode.Union);
-            var assetObjects = await loadAssetObjectsHandle.Task;
-            if (loadAssetObjectsHandle.Status == AsyncOperationStatus.Succeeded) {
-                foreach (var assetObject in assetObjects) {
+            var loadScriptableObjectsHandle = Addressables.LoadAssetsAsync<ScriptableObject>(resourceLocator.Keys, _ => { }, Addressables.MergeMode.Union);
+            var scriptableObjects = await loadScriptableObjectsHandle.Task;
+            if (catalogHandle.Status != AsyncOperationStatus.Succeeded) {
+                Debug.LogError($"[Addon] Failed to load addon {addonDef.FullName} ({addonDef.Guid}): {catalogHandle.Status} - {loadScriptableObjectsHandle.OperationException.Message}");
+                return null;
+            }
+
+            foreach (var so in scriptableObjects) {
+                if (so is AssetObject assetObject) {
                     try {
                         QuantumUnityDB.Global.AddAsset(assetObject);
                         Debug.Log($"[Addon] Successfully registered asset {assetObject.name} ({assetObject.Guid})");
@@ -195,12 +208,7 @@ namespace NSMB.Addons {
                         // Already added? Doesn't matter... ignore.
                         Debug.Log($"[Addon] Failed to register asset {assetObject.name} ({assetObject.Guid})");
                     }
-                }
-            }
-
-            var loadGlobalOverridesHandle = Addressables.LoadAssetsAsync<GlobalSoundEffectOverrides>(resourceLocator.Keys, _ => { }, Addressables.MergeMode.Union);
-            if (loadGlobalOverridesHandle.Status == AsyncOperationStatus.Succeeded) {
-                foreach (var sfxOverride in loadGlobalOverridesHandle.Result) {
+                } else if (so is GlobalSoundEffectOverrides sfxOverride) {
                     SoundEffectResolver.Instance.GlobalProviders.Add(sfxOverride);
                 }
             }
@@ -208,8 +216,7 @@ namespace NSMB.Addons {
             var newAddon = new LoadedAddon {
                 Definition = addonDef,
                 CatalogHandle = catalogHandle,
-                AllAssetObjectsHandle = loadAssetObjectsHandle,
-                AllGlobalOverridesHandle = loadGlobalOverridesHandle,
+                AllScriptableObjectsHandle = loadScriptableObjectsHandle,
             };
             LoadedAddons.Add(newAddon);
             OnAddonLoaded?.Invoke(newAddon);
@@ -306,20 +313,20 @@ namespace NSMB.Addons {
             }
             */
 
-            foreach (var assetObject in addon.AllAssetObjectsHandle.Result) {
-                QuantumUnityDB.Global.DisposeAsset(assetObject.Guid, true);
-                QuantumUnityDB.Global.RemoveSource(assetObject.Guid);
-                Debug.Log($"[Addon] Unloaded asset {assetObject.name} ({assetObject.Guid})");
-            }
-
-            foreach (var globalSfxOverride in addon.AllGlobalOverridesHandle.Result) {
-                SoundEffectResolver.Instance.GlobalProviders.Remove(globalSfxOverride);
+            foreach (var so in addon.AllScriptableObjectsHandle.Result) {
+                if (so is AssetObject assetObject) {
+                    QuantumUnityDB.Global.DisposeAsset(assetObject.Guid, true);
+                    QuantumUnityDB.Global.RemoveSource(assetObject.Guid);
+                    Debug.Log($"[Addon] Unloaded asset {assetObject.name} ({assetObject.Guid})");
+                } else if (so is GlobalSoundEffectOverrides globalSfxOverride) {
+                    SoundEffectResolver.Instance.GlobalProviders.Remove(globalSfxOverride);
+                    Debug.Log($"[Addon] Unloaded global sound effect provider");
+                }
             }
 
             LoadedAddons.Remove(addon);
             OnAddonUnloaded?.Invoke(addon);
-            addon.AllAssetObjectsHandle.Release();
-            addon.AllGlobalOverridesHandle.Release();
+            addon.AllScriptableObjectsHandle.Release();
             addon.CatalogHandle.Release();
         }
 
@@ -407,13 +414,62 @@ namespace NSMB.Addons {
 
             return $"{url1}/{url2}";
         }
+
+        public async void OnEvent(EventData photonEvent) {
+            if (photonEvent.Code == EventBroadcastAddonList && waitingForAddons) {
+                waitingForAddons = false;
+                try {
+                    List<Guid> guids = ((string[]) photonEvent.CustomData).Select(Guid.Parse).ToList();
+                    Debug.Log($"[Addon] Got addon list of {guids.Count} addons: [{string.Join(", ", guids)}]");
+                    var loadAddonResult = await GlobalController.Instance.addonManager.LoadAllAddons(guids);
+                    if (loadAddonResult == LoadAllAddonsResult.Success) {
+                        _ = NetworkHandler.Instance.StartQuantum();
+                    } else {
+                        NetworkHandler.ThrowError(
+                            loadAddonResult == LoadAllAddonsResult.FailureDownloadsDisabled
+                                ? "ui.error.join.addons.downloadsdisabled"
+                                : "ui.error.join.addons.downloadfailed",
+                            false);
+                        NetworkHandler.Client.Disconnect(DisconnectCauseMissingAddon);
+                    }
+                } catch (Exception e) {
+                    Debug.LogError($"[Addon] Failed to activate proper addons! Disconnecting. ({e.Message})");
+                    NetworkHandler.Client.Disconnect(DisconnectCauseMissingAddon);
+                    throw;
+                }
+            }
+        }
+
+        public void OnFriendListUpdate(List<FriendInfo> friendList) { }
+
+        public void OnCreatedRoom() {
+            // Send addon list
+            NetworkHandler.Client.OpRaiseEvent(EventBroadcastAddonList,
+                GlobalController.Instance.addonManager.LoadedAddons.Select(la => la.Definition.Guid.ToString()).ToArray(),
+                new RaiseEventArgs {
+                    CachingOption = EventCaching.AddToRoomCacheGlobal
+                }, SendOptions.SendReliable);
+        }
+
+        public void OnCreateRoomFailed(short returnCode, string message) { }
+
+        public void OnJoinedRoom() {
+            waitingForAddons = true;
+        }
+
+        public void OnJoinRoomFailed(short returnCode, string message) { }
+
+        public void OnJoinRandomFailed(short returnCode, string message) { }
+
+        public void OnLeftRoom() {
+            waitingForAddons = false;
+        }
     }
 
     public class LoadedAddon {
         public AddonDefinition Definition;
         public AsyncOperationHandle<IResourceLocator> CatalogHandle;
-        public AsyncOperationHandle<IList<AssetObject>> AllAssetObjectsHandle;
-        public AsyncOperationHandle<IList<GlobalSoundEffectOverrides>> AllGlobalOverridesHandle;
+        public AsyncOperationHandle<IList<ScriptableObject>> AllScriptableObjectsHandle;
     }
 
     public class Addon {

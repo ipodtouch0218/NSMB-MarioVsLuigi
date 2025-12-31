@@ -58,7 +58,8 @@ namespace Quantum.Editor {
     });
     
     public static readonly LazyGUIStyle RawDataStyle = LazyGUIStyle.Create(_ => new GUIStyle(EditorStyles.textArea) { wordWrap = true });
-    
+    public static readonly LazyGUIStyle DropDownListStyle = LazyGUIStyle.Create(_ => FindBuiltInStyleOrThrow("DropDownButton"));
+
     private static Texture2D FindTextureOrThrow(string id) {
       var texture = EditorGUIUtility.FindTexture(id);
       if (texture) {
@@ -71,6 +72,16 @@ namespace Quantum.Editor {
       }
       
       throw new ArgumentOutOfRangeException($"Could not find texture with id {id}");
+    }
+
+    private static GUIStyle FindBuiltInStyleOrThrow(string styleName) {
+      var style = GUI.skin.FindStyle(styleName) ?? EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector).FindStyle(styleName);
+
+      if (style == null) {
+        throw new ArgumentOutOfRangeException("Missing built-in guistyle " + styleName);
+      }
+
+      return style;
     }
 
     private Dictionary<ScriptHeaderBackColor, Color> _scriptHeaderStyles = new() {

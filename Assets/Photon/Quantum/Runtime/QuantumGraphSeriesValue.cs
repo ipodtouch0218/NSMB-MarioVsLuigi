@@ -8,7 +8,7 @@ namespace Quantum.Profiling {
   /// The series value graph is used format, average values add graphical features to the graph rendering.
   /// </summary>
   public sealed class QuantumGraphSeriesValue : QuantumGraphSeries {
-    private const string SHADER_PROPERTY_COLOR_NORMAL = "_NormalColor";
+    private const string SHADER_PROPERTY_COLOR_NORMAL = "_BaseColor";
     private const string SHADER_PROPERTY_COLOR_AVERAGE = "_AverageColor";
     private const string SHADER_PROPERTY_COLOR_THRESHOLD_1 = "_Threshold1Color";
     private const string SHADER_PROPERTY_COLOR_THRESHOLD_2 = "_Threshold2Color";
@@ -107,9 +107,16 @@ namespace Quantum.Profiling {
     }
 
     /// <inheritdoc/>
-    public override void SetValues(float[] values, int offset, int samples) {
-      if (_values == null || values == null || _values.Length != values.Length)
+    public override void SetValues(float[][] values, int offset, int samples) {
+      if (values == null || values.Length != _valueDimensions) {
         return;
+      }
+
+      for (int i = 0; i < _valueDimensions; ++i) {
+        if (values[i] == null || values[i].Length != _samples) {
+          return;
+        }
+      }
 
       float minValue = float.MaxValue;
       float maxValue = float.MinValue;
@@ -117,8 +124,14 @@ namespace Quantum.Profiling {
       int averageCount = 0;
 
       if (_ignoreZeroValuesInAverage == true) {
-        for (int i = 0; i < values.Length; ++i) {
-          float value = values[i];
+        for (int j = 0; j < values[0].Length; ++j) {
+
+          float value = 0.0f;
+          for (int i = 0; i < _valueDimensions; ++i) {
+            if (IsValueDimensionEnabled(i)) {
+              value += values[i][j];
+            }
+          }
 
           if (value != 0.0f) {
             averageValue += value;
@@ -135,8 +148,13 @@ namespace Quantum.Profiling {
 
         averageCount = Mathf.Clamp(Mathf.Min(samples, averageCount), 1, _samples);
       } else {
-        for (int i = 0; i < values.Length; ++i) {
-          float value = values[i];
+        for (int j = 0; j < values[0].Length; ++j) {
+          float value = 0.0f;
+          for (int i = 0; i < _valueDimensions; ++i) {
+            if (IsValueDimensionEnabled(i)) {
+              value += values[i][j];
+            }
+          }
 
           averageValue += value;
 
@@ -165,9 +183,16 @@ namespace Quantum.Profiling {
     /// <param name="minValue">Min value </param>
     /// <param name="maxValue">Max value</param>
     /// <param name="averageValue">Average value</param>
-    public void SetValues(float[] values, int offset, float minValue, float maxValue, float averageValue) {
-      if (_values == null || values == null || _values.Length != values.Length)
+    public void SetValues(float[][] values, int offset, float minValue, float maxValue, float averageValue) {
+      if (_values == null || values == null || _values.Length != values.Length || _values.Length != _valueDimensions || values.Length != _valueDimensions) {
         return;
+      }
+
+      for (int i = 0; i < _valueDimensions; ++i) {
+        if (_values[i] == null || values[i] == null || _values[i].Length < values[i].Length) {
+          return;
+        }
+      }
 
       _minValue = minValue;
       _maxValue = maxValue;
@@ -184,14 +209,20 @@ namespace Quantum.Profiling {
       _maxRenderValue = Mathf.Max(0.000001f, _maxRenderValue);
 
       float invertedMaxValue = 1.0f / _maxRenderValue;
-      for (int i = 0; i < _samples; ++i, ++offset) {
-        offset %= _samples;
+      
+      for (int i = 0; i < _valueDimensions; ++i) {
+        for (int j = 0; j < _samples; ++j, ++offset) {
+          offset %= _samples;
+          if (IsValueDimensionEnabled(i)) {
+            _values[i][j] = values[i][offset] * invertedMaxValue;
+          } else {
+            _values[i][j] = 0f;
+          }
+        }
 
-        _values[i] = values[offset] * invertedMaxValue;
+        _material.SetFloat(_averageShaderPropertyID, _averageValue / _maxRenderValue);
+        _material.SetFloatArray(_valuesShaderPropertyID[i], _values[i]);
       }
-
-      _material.SetFloat(_averageShaderPropertyID, _averageValue / _maxRenderValue);
-      _material.SetFloatArray(_valuesShaderPropertyID, _values);
 
       OnSetValues();
     }
@@ -287,6 +318,7 @@ namespace Quantum.Profiling {
 
     private void UpdateThresholdPosition(Text text, float threshold, float thresholdNormalized) {
       try {
+        text.gameObject.SetActive(thresholdNormalized <= 1f);
         Vector3 position = text.rectTransform.anchoredPosition3D;
         position.y = _targetImage.rectTransform.offsetMin.y + _targetImage.rectTransform.rect.height * thresholdNormalized;
         text.rectTransform.anchoredPosition3D = position;

@@ -62,7 +62,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
 
             foreach (int slot in game.GetLocalPlayerSlots()) {
-                game.SendCommand(slot, new CommandChangePlayerData {
+                game.AddCommand(slot, new CommandChangePlayerData {
                     EnabledChanges = CommandChangePlayerData.Changes.Team,
                     Team = (byte) selected,
                 });

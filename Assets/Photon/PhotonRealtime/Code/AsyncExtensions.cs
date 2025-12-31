@@ -11,13 +11,15 @@
 #define SUPPORTED_UNITY
 #endif
 
+
 namespace Photon.Realtime
 {
-    using System;
     using System.Threading;
     #if SUPPORTED_UNITY
     using UnityEngine;
-
+    #if UNITY_EDITOR
+    using UnityEditor;
+    #endif
     /// <summary>
     /// Does vital initialization to make TPL work in Unity. Should be automatically called by Unity based on the RuntimeInitializeOnLoadMethod attribute.
     /// </summary>
@@ -27,7 +29,7 @@ namespace Photon.Realtime
         /// A cancellation token that is used for all tasks related to the Realtime connection.
         /// </summary>
         #if UNITY_2022_3_OR_NEWER
-        [Obsolete("Replaced by Application.exitCancellationToken")]
+        [System.Obsolete("Replaced by Application.exitCancellationToken")]
         #endif
         public static CancellationTokenSource GlobalCancellationSource = new CancellationTokenSource();
 
@@ -63,9 +65,8 @@ namespace Photon.Realtime
             // Unlike coroutines Unity does not stop any task when switching the play mode in the Editor.
             // The global AsyncConfig has a cancellation that will stop all tasks there were created for the connection handling.
             AsyncConfig.Global.CancellationToken = GlobalCancellationSource.Token;
-
-            UnityEditor.EditorApplication.playModeStateChanged += (change) => {
-                if (change == UnityEditor.PlayModeStateChange.ExitingPlayMode || change == UnityEditor.PlayModeStateChange.ExitingEditMode) {
+            EditorApplication.playModeStateChanged += (change) => {
+                if (change == PlayModeStateChange.ExitingPlayMode || change == PlayModeStateChange.ExitingEditMode) {
                     GlobalCancellationSource?.Cancel();
                     GlobalCancellationSource?.Dispose();
                     GlobalCancellationSource = new CancellationTokenSource();

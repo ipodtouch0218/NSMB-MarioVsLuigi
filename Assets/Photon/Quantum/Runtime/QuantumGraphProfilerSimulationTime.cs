@@ -3,29 +3,30 @@ namespace Quantum.Profiling {
   /// A Quantum graph profiler that shows the simulation time.
   /// </summary>
   public sealed class QuantumGraphProfilerSimulationTime : QuantumGraphProfilerValueSeries {
-    private int _lastVerifiedFrameNumber;
-    private int _lastPredictedFrameNumber;
+
+    /// <summary>
+    /// Adding three value dimensions: Update time, Verification time, Prediction time.
+    /// </summary>
+    protected override int ValueDimensions => 3;
 
     /// <inheritdoc/>
     protected override void OnUpdate() {
-      float updateTime = 0.0f;
+      var updateTime = 0f;
+      var predictionTime = 0f;
+      var verificationTime = 0f;
 
-      QuantumRunner quantumRunner = QuantumRunner.Default;
-      if (quantumRunner != null && quantumRunner.Game != null) {
-        Frame verifiedFrame = quantumRunner.Game.Frames.Verified;
-        if (verifiedFrame != null && verifiedFrame.Number != _lastVerifiedFrameNumber) {
-          updateTime = (float)quantumRunner.Game.Session.Stats.UpdateTime;
-          _lastVerifiedFrameNumber = verifiedFrame.Number;
-        }
+      var session = QuantumRunner.Default?.Game?.Session;
 
-        Frame predictedFrame = quantumRunner.Game.Frames.Predicted;
-        if (predictedFrame != null && predictedFrame.Number != _lastPredictedFrameNumber) {
-          updateTime = (float)quantumRunner.Game.Session.Stats.UpdateTime;
-          _lastPredictedFrameNumber = predictedFrame.Number;
-        }
+      if (session != null) {
+        updateTime = (float)session.Stats.UpdateTime;
+        predictionTime = (float)session.Stats.PredictionTime;
+        verificationTime = (float)session.Stats.VerificationTime;
       }
 
-      AddValue(updateTime);
+      AddValues(
+        value1: updateTime - verificationTime - predictionTime,
+        value2: verificationTime,
+        value3: predictionTime);
     }
 
     /// <inheritdoc/>

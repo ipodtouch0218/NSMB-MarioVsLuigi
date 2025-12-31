@@ -39,8 +39,11 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
 
             QuantumGame game = QuantumRunner.DefaultGame;
-            int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
-            game.SendCommand(slot, cmd);
+            PlayerRef host = game.Frames.Predicted.Global->Host;
+            
+            if (game.PlayerIsLocal(host)) {
+                game.AddCommand(game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)], cmd);
+            }
         }
 
         protected override void UpdateLabel() {

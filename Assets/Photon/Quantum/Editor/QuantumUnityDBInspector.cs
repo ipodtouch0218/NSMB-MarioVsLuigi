@@ -60,7 +60,7 @@ namespace Quantum.Editor {
     
     class GridItem : QuantumGridItem {
 
-      private int _entryIndex;
+      int    _entryIndex;
       
       public GridItem(int entryIndex) {
         _entryIndex = entryIndex;
@@ -70,7 +70,11 @@ namespace Quantum.Editor {
       private QuantumUnityDB.Entry Entry {
         get {
           if (_entryIndex < 0) {
-            return null;
+            var index = ~_entryIndex;
+            if (index >= QuantumUnityDB.Global.EditorScopedAssets.Count) {
+              return null;
+            }
+            return QuantumUnityDB.Global.EditorScopedAssets[index];
           }
           
           if (_entryIndex >= QuantumUnityDB.Global.Entries.Count) {
@@ -97,13 +101,16 @@ namespace Quantum.Editor {
         }
       }
 
-      public string Name => (TargetObject != null ? TargetObject.name : null) ?? "";
-      public string QuantumPath => Entry?.Path ?? "";
-      public string AssetType => Entry?.Source.AssetType?.Name ?? "";
-      public AssetObjectState LoadState => Entry != null ? QuantumUnityDB.GetGlobalAssetState(QuantumGuid) : AssetObjectState.NotFound;
-      public bool IsQuantumGuidOverriden => IsPersistent && QuantumUnityDBUtilities.IsAssetGuidOverriden(TargetObject);
-      public string SourceDescription => Entry?.Source.Description ?? "";
-      public bool IsPersistent => Entry != null && EditorUtility.IsPersistent(TargetObject);
+      public string                    Name                   => (TargetObject != null ? TargetObject.name : null);
+      public string                    QuantumPath            => Entry?.Path ?? "";
+      public string                    AssetType              => Entry?.Source.AssetType?.Name ?? "";
+      public AssetObjectState          LoadState              => Entry != null ? QuantumUnityDB.GetGlobalAssetState(QuantumGuid) : AssetObjectState.NotFound;
+      public bool                      IsQuantumGuidOverriden => IsPersistent && QuantumUnityDBUtilities.IsAssetGuidOverriden(TargetObject);
+      public string                    SourceDescription      => Entry?.Source.Description ?? "";
+      public Type                      SourceType             => Entry?.Source.GetType();
+      public IQuantumAssetObjectSource Source                 => Entry?.Source;
+      public bool                      IsPersistent           => Entry != null && EditorUtility.IsPersistent(TargetObject);
+      public string                    ScopeId                => (Entry != null && QuantumUnityDB.IsGlobalAssetScoped(Entry.Guid, out var scope)) ? scope.Id : default;
     }
 
     [Serializable]
@@ -198,17 +205,62 @@ namespace Quantum.Editor {
         });
         yield return MakeSimpleColumn(x => x.SourceDescription, new() {
           headerContent    = new GUIContent("Source"),
+          width = 200,
+          initiallyVisible = true,
+          cellGUI = (item, rect, selected, focused) => {
+            var source = item.Source;
+
+            if (source == null) {
+              return;
+            }
+
+            string colorKey = source.GetType().FullName;
+            using (new QuantumEditorGUI.ContentColorScope(QuantumEditorUtility.GetPersistentColor(colorKey, 192))) {
+              TreeView.DefaultGUI.Label(rect, source.Description, selected, focused);
+            }
+          }
+        });
+        yield return MakeSimpleColumn(x => x.ScopeId, new() {
+          headerContent    = new GUIContent("Scope"),
+          width = 150,
           initiallyVisible = false,
+          cellGUI = (item, rect, selected, focused) => {
+            if (string.IsNullOrEmpty(item.ScopeId)) {
+              return;
+            }
+
+            var textRect = rect;
+            if (rect.width > 40) {
+              textRect = rect.AddWidth(-40);
+              if (GUI.Button(rect.SetXMin(rect.xMax - 40), "Ping", EditorStyles.miniButton)) {
+                var path = AssetDatabase.GUIDToAssetPath(item.ScopeId);
+                EditorGUIUtility.PingObject(AssetDatabase.LoadMainAssetAtPath(path));
+              } 
+            }
+            
+            TreeView.DefaultGUI.Label(textRect, item.ScopeId, selected, focused);
+          }
         });
       }
 
       protected override IEnumerable<GridItem> CreateRows() {
-        for (int i = 0; i < QuantumUnityDB.Global.Entries.Count; i++) {
-          if (QuantumUnityDB.Global.Entries[i] == null) {
+        var db = QuantumUnityDB.Global;
+        var entries = db.Entries;
+        for (int i = 0; i < entries.Count; i++) {
+          if (entries[i] == null) {
             continue;
           }
           yield return new GridItem(i) { id = i+1 };
         }
+
+        var scopedEntries = db.EditorScopedAssets;
+        for (int i = 0; i < scopedEntries.Count; i++) {
+          var entry = scopedEntries[i];
+          if (db.HasAsset(entry.Guid)) {
+            continue;
+          }
+          yield return new GridItem(~i) { id = i + 1 + entries.Count };
+        } 
       }
 
       protected override GenericMenu CreateContextMenu(GridItem item, TreeView treeView) {

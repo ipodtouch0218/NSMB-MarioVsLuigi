@@ -3,12 +3,35 @@ Photon C# Client Library - Changelog
 www.photonengine.com  -  Join our Discord Server: https://dashboard.photonengine.com/account/profile
 
 
-Version 5.1.9
+Version 5.1.9 (10. November 2025 - rev8152)
+    Changed:  Unity defaults to using the PhotonClient.dll release builds. Add PHOTON_LIBS_DEBUG to your project to use the debug builds. PHOTON_LIBS_RELEASE is no longer used.
     Added: PhotonPeer.SimulateTimeoutDisconnect() to immediately trigger a local timeout-disconnect (without informing the server) for debug purposes. This is only implemented in the debug builds of the PhotonClient dll.
+    Added: TrafficStats.UdpUnreliableCommandsSent to provide a count of unreliable commands, too.
+    Changed: TrafficStatsDelta values RoundtripTime, RoundtripTimeVariance and LastRoundtripTime now reflect the difference between the "now" and "reference" traffic stats, when you create a TrafficStatsDelta between two snapshots. This shows how these values changed.
+    Changed: Some formatting within the TrafficStats classes to make the numbers better readable.
+    Changed: Log output in VitalStatsToString() to show kB and kB/sec and changed to number formatting with dots for thousands.
+    Changed: Datagram Encryption.
+    Added: IPhotonEncryptor.LogLevel int. This is a (minor) breaking change to allow setting the log level for the Datagram Encryption native library (not in SDKs but provided on demand). Requires an update of DatagramEncryptorNative.cs, which is typically available in source.
+    Changed: Error handling and logging in PhotonPeer.InitDatagramEncryption(). It now disconnects the client with a respective status callback (in case there is no Datagram Encryption implementation, etc.).
+    Fixed: When using Datagram Encryption, outgoing bytes and datagrams were not counted. This required a minimal change on where these are counted. Internally changed where outoing bytes and datagrams are counted.
+    Fixed: Sequence limiting in SerializeToBuffer(). Non-fragmented commands were never limited because their startSequenceNumber is always 0 and below the limit.
+    Note: Commands are not sent if their sequence number is larger than the limit to avoid sending commands that are unlikely to be queued and acknowledged.
+    Internal: ApplySequenceNumberModifier() applies the sequence number randomization of GCM to the various values in a channel (some parts were done in EnetPeer).
+    Added: "ReliableSendWindowFeatureFlag" which asks the server to send the length of its reliable receive buffer. This helps avoid sending reliable commands which would get ignored for being out of the reliable buffers.
+    Changed: Reading of VerifyConnect command to read the new Feature Flag and (if provided) the servers serverMaxQueueableReliableCommands. The client may adjust it's SendWindowSize to the server's value.
+    Changed: Resending.
+    Changed: There are now 15 resends allowed, which means more attempts to pass through a bad network.
+    Changed: Default QuickResendAttempts = 2.
+    Changed: The resend-time per command is being capped via the InitialResendTimeMax * 2 (currently == 800ms). This means more attempts in the time we got.
+    Internal: QUICK_RESEND_QUEUELIMIT = 50 (was 25). This is a better initial send window to use the server's reliable incoming queue.
+    Fixed: Logging for "Command was received before!" in QueueIncomingCommand().
+    Changed: Error handling for WSAENOBUFS "No buffer space available" and WSAEMSGSIZE "Message too long." to just skip over these. These should be temporary and anything reliable would be re-sent. These will no longer end a connection but log on INFO level.
+    Changed: QueueSentCommand() check of QuickResendAttempts. As the first resend has "quick" timing, QuickResendAttempts now has a minimum value of 1.
+    Changed: QuickResendAttempts are now in the range of 1 - 4 and default to 2.
+    Updated: Reference for QuickResendAttempts and MaxResends (and obsolete SentCountAllowance).
 
 Version 5.1.8 (25. August 2025 - rev8056)
     Changed: Protocol 1.8. iteration over PhotonHashtable entries to achieve non-alloc serialization for the container.
-    No notable changes.
 
 Version 5.1.7 (31. July 2025 - rev8015)
     Added: FeatureFlags for UDP connections to communicate which features a client / server has.
@@ -19,13 +42,13 @@ Version 5.1.7 (31. July 2025 - rev8015)
 Version 5.1.6 (01. July 2025 - rev7991)
     Added: SupportClass overload for CalculateCrc() with offset.
     Changed: CalculateCrc() without offset is now obsolete.
-	Internal: Worked on sequential acknowledgements (a.k.a. ACK2). Some refactoring and internal implentation details apply to all command handling, even if this feature is not released yet.
-	Changed: Send Window in SerializeToBuffer(). If a fragment's start-sequence number is inside the Send Window, related fragments can be sent.
-	Changed: Channel outgoingReliableCommandsList and outgoingUnreliableCommandsList are now of type List<NCommand>. Allows skip over individual entries.
-	Added: PeerBase.bestRoundtripTimeout to track the session's best resend-timeout.
-	Added: PeerBase.throttledBySendWindow debug value to count how often reliable sequenced commands are not sent due to lacking acknowledgements.
-	Added: PeerBase.rttVarString property to provide a formatted rtt/variance string. This is updated on access.
-	Changed: EnetPeer SendWindow is only applied to sequenced reliable commands. It does not apply to unsequenced reliable commands, because the server has a longer queue for those.
+    Internal: Worked on sequential acknowledgements (a.k.a. ACK2). Some refactoring and internal implentation details apply to all command handling, even if this feature is not released yet.
+    Changed: Send Window in SerializeToBuffer(). If a fragment's start-sequence number is inside the Send Window, related fragments can be sent.
+    Changed: Channel outgoingReliableCommandsList and outgoingUnreliableCommandsList are now of type List<NCommand>. Allows skip over individual entries.
+    Added: PeerBase.bestRoundtripTimeout to track the session's best resend-timeout.
+    Added: PeerBase.throttledBySendWindow debug value to count how often reliable sequenced commands are not sent due to lacking acknowledgements.
+    Added: PeerBase.rttVarString property to provide a formatted rtt/variance string. This is updated on access.
+    Changed: EnetPeer SendWindow is only applied to sequenced reliable commands. It does not apply to unsequenced reliable commands, because the server has a longer queue for those.
 
 Version 5.1.5 (24. April 2025 - rev7920)
     Fixed: Bug in QueueIncomingCommand() which allowed duplicates of commands being queued. This affected fragment reassembly, leading to exceptions and disconnects. This bug has been in v5.1.3 and v5.1.4.
@@ -44,18 +67,18 @@ Version 5.1.3 (06. March 2025 - rev7864)
     Changed: PreserveAttribute in SupportClass.cs is now public, so it can be used in WebSocket code as needs be.
 
 Version 5.1.2 (19. November 2024 - rev7770)
-	Fixed: Some allocations that can be avoided. For example the EventData.Sender is no longer allocating anything, if the Sender of an event was not set (it is considered ActorNumber 0).
+    Fixed: Some allocations that can be avoided. For example the EventData.Sender is no longer allocating anything, if the Sender of an event was not set (it is considered ActorNumber 0).
 
 Version 5.1.1 (22. Oktober 2024 - rev7739)
     Changed: Internal TryParseAddress method, which failed for URLs without a port. This did not work well with the Realtime API's AddressRewriter and URLs for Discord Activities (which typically use a scheme but not a port).
 
 Version 5.1.0 (01. Oktober 2024 - rev7714)
-	Added: Folders "debug" and "release" in "PhotonLibs\netstandard2.0\" for Unity SDKs. There are compile constraints on the dlls to make "debug" the default. Define "PHOTON_LIBS_RELEASE" for your project to select the release dlls.
-	Note: The difference between debug and release dlls is minimal. Performance may be a bit better in the release builds. The feature "Network Simulation" is only available in the debug builds to prevent accidental release with it.
-	Changed: Release build of dll can now capture the traffic.
+    Added: Folders "debug" and "release" in "PhotonLibs\netstandard2.0\" for Unity SDKs. There are compile constraints on the dlls to make "debug" the default. Define "PHOTON_LIBS_RELEASE" for your project to select the release dlls.
+    Note: The difference between debug and release dlls is minimal. Performance may be a bit better in the release builds. The feature "Network Simulation" is only available in the debug builds to prevent accidental release with it.
+    Changed: Release build of dll can now capture the traffic.
     Internal: Removed NETFX_CORE compile defines mostly.
-	Updated: WebSocket for WebGL exports (WebSocket\WebSocket.jslib) to support Unity's (experimental) option to "Enable Native C/C++ Multithreading".
-	Added: Debugger attributes to improve debug view for classes ParameterDictionary, NonAllocDictionary and Node.
+    Updated: WebSocket for WebGL exports (WebSocket\WebSocket.jslib) to support Unity's (experimental) option to "Enable Native C/C++ Multithreading".
+    Added: Debugger attributes to improve debug view for classes ParameterDictionary, NonAllocDictionary and Node.
 
 Version 5.0.11 (28. August 2024 - rev7655)
     No notable changes.

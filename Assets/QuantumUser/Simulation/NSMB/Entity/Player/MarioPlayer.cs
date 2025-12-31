@@ -1,10 +1,93 @@
 using Photon.Deterministic;
-using Quantum.Collections;
-using Quantum.Core;
 using System;
 
 namespace Quantum {
     public unsafe partial struct MarioPlayer {
+
+        public bool FacingRight {
+            readonly get => Flags.IsSet(0); 
+            set => SetValue(ref Flags, 0, value); 
+        }
+        public bool IsSkidding {
+            readonly get => Flags.IsSet(1);
+            set => SetValue(ref Flags, 1, value);
+        }
+        public bool IsTurnaround {
+            readonly get => Flags.IsSet(2);
+            set => SetValue(ref Flags, 2, value);
+        }
+        public bool DoEntityBounce {
+            readonly get => Flags.IsSet(3);
+            set => SetValue(ref Flags, 3, value);
+        }
+        public bool WallslideLeft {
+            readonly get => Flags.IsSet(4);
+            set => SetValue(ref Flags, 4, value);
+        }
+        public bool WallslideRight {
+            readonly get => Flags.IsSet(5);
+            set => SetValue(ref Flags, 5, value);
+        }
+        public bool IsGroundpounding {
+            readonly get => Flags.IsSet(6);
+            set => SetValue(ref Flags, 6, value);
+        }
+        public bool IsGroundpoundActive {
+            readonly get => Flags.IsSet(7);
+            set => SetValue(ref Flags, 7, value);
+        }
+        public bool IsInWeakKnockback {
+            readonly get => Flags.IsSet(8);
+            set => SetValue(ref Flags, 8, value);
+        }
+        public bool KnockForwards {
+            readonly get => Flags.IsSet(9);
+            set => SetValue(ref Flags, 9, value);
+        }
+        public bool KnockbackWasOriginallyFacingRight {
+            readonly get => Flags.IsSet(10);
+            set => SetValue(ref Flags, 10, value);
+        }
+        public bool IsCrouching {
+            readonly get => Flags.IsSet(11);
+            set => SetValue(ref Flags, 11, value);
+        }
+        public bool IsSliding {
+            readonly get => Flags.IsSet(12);
+            set => SetValue(ref Flags, 12, value);
+        }
+        public bool IsSpinnerFlying {
+            readonly get => Flags.IsSet(13);
+            set => SetValue(ref Flags, 13, value);
+        }
+        public bool IsDrilling {
+            readonly get => Flags.IsSet(14);
+            set => SetValue(ref Flags, 14, value);
+        }
+        public bool IsStuckInBlock {
+            readonly get => Flags.IsSet(15);
+            set => SetValue(ref Flags, 15, value);
+        }
+        public bool MegaMushroomStationaryEnd {
+            readonly get => Flags.IsSet(16);
+            set => SetValue(ref Flags, 16, value);
+        }
+        public bool IsInShell {
+            readonly get => Flags.IsSet(17);
+            set => SetValue(ref Flags, 17, value);
+        }
+        public bool IsPropellerFlying {
+            readonly get => Flags.IsSet(18);
+            set => SetValue(ref Flags, 18, value);
+        }
+        public bool UsedPropellerThisJump {
+            readonly get => Flags.IsSet(19);
+            set => SetValue(ref Flags, 19, value);
+        }
+        public bool PipeEntering {
+            readonly get => Flags.IsSet(20);
+            set => SetValue(ref Flags, 20, value);
+        }
 
         public readonly bool IsStarmanInvincible => InvincibilityFrames > 0;
         public readonly bool IsWallsliding => WallslideLeft || WallslideRight;
@@ -549,6 +632,14 @@ namespace Quantum {
             }
 
             f.Events.MarioPlayerEnteredPipe(mario, CurrentPipe);
+        }
+
+        private static void SetValue(ref BitSet21 bitset, int index, bool value) {
+            if (value) {
+                bitset.Set(index);
+            } else {
+                bitset.Clear(index);
+            }
         }
     }
 }
