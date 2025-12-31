@@ -1,4 +1,6 @@
-﻿namespace Quantum {
+﻿using Unity.Collections.LowLevel.Unsafe;
+
+namespace Quantum {
     public unsafe partial class Frame {
 
         public StageTileInstance* StageTiles;
@@ -6,7 +8,7 @@
 
         partial void FreeUser() {
             if (StageTiles != null) {
-                QuantumUnsafe.Free(StageTiles);
+                UnsafeUtility.Free(StageTiles, Unity.Collections.Allocator.Persistent);
                 StageTiles = null;
             }
         }
@@ -28,7 +30,7 @@
 
         partial void CopyFromUser(Frame frame) {
             ReallocStageTiles(frame.StageTilesLength);
-            QuantumUnsafe.Copy(StageTiles, frame.StageTiles, StageTileInstance.SIZE * frame.StageTilesLength);
+            UnsafeUtility.MemCpy(StageTiles, frame.StageTiles, StageTileInstance.SIZE * frame.StageTilesLength);
         }
 
         public void ReallocStageTiles(int newSize) {
@@ -37,12 +39,12 @@
             }
 
             if (StageTiles != null) {
-                QuantumUnsafe.Free(StageTiles);
+                UnsafeUtility.Free(StageTiles, Unity.Collections.Allocator.Persistent);
                 StageTiles = null;
             }
             
             if (newSize > 0) {
-                StageTiles = (StageTileInstance*) QuantumUnsafe.Alloc(StageTileInstance.SIZE * newSize, StageTileInstance.ALIGNMENT);
+                StageTiles = (StageTileInstance*) UnsafeUtility.Malloc(StageTileInstance.SIZE * newSize, StageTileInstance.ALIGNMENT, Unity.Collections.Allocator.Persistent);
             }
 
             StageTilesLength = newSize;

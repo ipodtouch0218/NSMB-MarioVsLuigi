@@ -27,15 +27,14 @@ namespace Quantum {
 
             // Parse lobby commands
             var playerDataDictionary = f.ResolveDictionary(f.Global->PlayerDatas);
-            for (PlayerRef player = 0; player < f.MaxPlayerCount; player++) {
-                for (int i = 0; i < f.GetPlayerCommandCount(player); i++) {
-                    if (f.GetPlayerCommand(player, i) is ILobbyCommand lobbyCommand) {
-                        var playerData = QuantumUtils.GetPlayerData(f, player, playerDataDictionary);
-                        if (playerData == null) {
-                            break;
-                        }
-                        lobbyCommand.Execute(f, player, playerData);
+            for (int i = 0; i < f.MaxPlayerCount; i++) {
+                if (f.GetPlayerCommand(i) is ILobbyCommand lobbyCommand) {
+                    var playerData = QuantumUtils.GetPlayerData(f, i, playerDataDictionary);
+                    if (playerData == null) {
+                        continue;
                     }
+
+                    lobbyCommand.Execute(f, i, playerData);
                 }
             }
 
@@ -141,9 +140,8 @@ namespace Quantum {
                     }
                 }
 
-                foreach (var _ in f.GetPlayerCommands<CommandHostEndGame>(f.Global->Host)) {
+                if (f.GetPlayerCommand(f.Global->Host) is CommandHostEndGame) {
                     EndGame(f, true, null);
-                    break;
                 }
                 break;
 
@@ -430,6 +428,7 @@ namespace Quantum {
                 f.Global->PlayerInfo[i] = default;
             }
             f.Global->UsedStarSpawns.ClearAll();
+            f.Global->UsedStarSpawnCount = 0;
 
             foreach (var (_, data) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
                 data->IsLoaded = false;

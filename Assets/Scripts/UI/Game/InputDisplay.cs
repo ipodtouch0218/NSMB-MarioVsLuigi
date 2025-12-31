@@ -62,9 +62,8 @@ namespace NSMB.UI.Game {
 
             PlayerRef player = mario->PlayerRef;
 
-            foreach (var _ in f.GetPlayerCommands<CommandSpawnReserveItem>(player)) {
+            if (f.GetPlayerCommand(player) is CommandSpawnReserveItem) {
                 commandFrame = f.Number;
-                break;
             }
         }
 

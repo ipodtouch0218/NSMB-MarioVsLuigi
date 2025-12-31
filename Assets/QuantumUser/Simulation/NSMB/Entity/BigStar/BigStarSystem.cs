@@ -31,12 +31,12 @@ namespace Quantum {
             bool spawnedStar = false;
             for (int i = 0; i < spawnpoints; i++) {
                 // Find a spot...
-                int bitsSet = usedSpawnpoints.GetSetCount();
-                if (bitsSet >= spawnpoints) {
+                if (f.Global->UsedStarSpawnCount >= spawnpoints) {
                     usedSpawnpoints.ClearAll();
+                    f.Global->UsedStarSpawnCount = 0;
                 }
 
-                int count = f.RNG->Next(0, spawnpoints - bitsSet);
+                int count = f.RNG->Next(0, spawnpoints - f.Global->UsedStarSpawnCount);
                 int index = 0;
                 for (int j = 0; j < spawnpoints; j++) {
                     if (!usedSpawnpoints.IsSet(j)) {
@@ -48,6 +48,7 @@ namespace Quantum {
                     }
                 }
                 usedSpawnpoints.Set(index);
+                f.Global->UsedStarSpawnCount++;
 
                 // Spawn a star.
                 FPVector2 position = stage.BigStarSpawnpoints[index];
@@ -85,29 +86,13 @@ namespace Quantum {
             }
 
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
-            if (QuantumUtils.Decrement(ref bigStar->Lifetime)) {
-                // Timer despawn
+            if (QuantumUtils.Decrement(ref bigStar->Lifetime) || (transform->Position.Y < stage.StageWorldMin.Y && bigStar->UncollectableFrames == 0)) {
                 f.Events.CollectableDespawned(entity, transform->Position, false);
                 f.Destroy(entity);
                 return;
             }
 
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-            if (transform->Position.Y < stage.StageWorldMin.Y && bigStar->UncollectableFrames == 0 && physicsObject->Velocity.Y <= 0) {
-                // Below world
-                if (physicsObject->DisableCollision) {
-                    // Bounce
-                    physicsObject->Velocity.Y = Constants._8_50 + 3;
-                    physicsObject->IsTouchingGround = false;
-                } else {
-                    // Despawn
-                    f.Events.CollectableDespawned(entity, transform->Position, false);
-                    f.Destroy(entity);
-                    return;
-                }
-            }
-
-
             if (physicsObject->IsTouchingGround) {
                 physicsObject->Velocity.Y = bigStar->BounceForce;
                 physicsObject->IsTouchingGround = false;
@@ -129,10 +114,7 @@ namespace Quantum {
                 bigStar->FacingRight = physicsObject->IsTouchingLeftWall;
             }
 
-            if (physicsObject->DisableCollision
-                && QuantumUtils.Decrement(ref bigStar->UncollectableFrames)
-                && transform->Position.Y < FPMath.Max(stage.StageWorldMin.Y + 7, stage.StageWorldMax.Y)) {
-
+            if (physicsObject->DisableCollision && QuantumUtils.Decrement(ref bigStar->UncollectableFrames) && transform->Position.Y < FPMath.Max(stage.StageWorldMin.Y + 7, stage.StageWorldMax.Y)) {
                 var physicsCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
                 if (!PhysicsObjectSystem.BoxInGround(f, transform->Position, physicsCollider->Shape, true, stage)) {
                     physicsObject->DisableCollision = false;
@@ -176,6 +158,7 @@ namespace Quantum {
         public void OnReturnToRoom(Frame f) {
             f.Global->MainBigStar = EntityRef.None;
             f.Global->BigStarSpawnTimer = 0;
+            f.Global->UsedStarSpawnCount = 0;
             f.Global->UsedStarSpawns.ClearAll();
         }
 

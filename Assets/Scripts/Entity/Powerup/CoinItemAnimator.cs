@@ -1,6 +1,5 @@
 using NSMB.Utilities.Extensions;
 using Quantum;
-using Quantum.Prototypes;
 using UnityEngine;
 using static NSMB.Utilities.QuantumViewUtils;
 
@@ -89,7 +88,7 @@ namespace NSMB.Entities.CoinItems {
             }
 
             if (childAnimator) {
-                childAnimator.SetBool("blockSpawn", coinItem->BlockSpawn && coinItem->SpawnAnimationFrames > 0);
+            childAnimator.SetBool("blockSpawn", coinItem->BlockSpawn && coinItem->SpawnAnimationFrames > 0);
             }
             
             if (f.Unsafe.TryGetPointer(EntityRef, out PhysicsObject* physicsObject)) {

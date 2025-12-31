@@ -98,7 +98,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
             QuantumGame game = QuantumRunner.DefaultGame;
             foreach (var slot in game.GetLocalPlayerSlots()) {
-                game.AddCommand(slot, new CommandChangePlayerData {
+                game.SendCommand(slot, new CommandChangePlayerData {
                     EnabledChanges = CommandChangePlayerData.Changes.Character,
                     Character = selectedButton.character,
                 });

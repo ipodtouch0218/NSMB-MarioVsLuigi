@@ -191,7 +191,7 @@ MonoBehaviour:
     VelocityObstacleTruncationFactor:
       RawValue: 72090
   Heap:
-    TrackingMode: 0
+    TrackingMode: 1
     Management: 2
     PageSize: 3
     SegmentSize: 4

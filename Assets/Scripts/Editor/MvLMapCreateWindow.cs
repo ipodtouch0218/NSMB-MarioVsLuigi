@@ -20,7 +20,7 @@ public class MvLMapCreateWindow : EditorWindow {
     public static void FindStageData() {
         QuantumMapData qmd = GameObject.FindFirstObjectByType<QuantumMapData>();
         if (!qmd) {
-            Debug.LogWarning("Not within an MvLO stage scene.");
+            Debug.LogWarning("Not within a stage!");
             return;
         }
 
@@ -29,13 +29,9 @@ public class MvLMapCreateWindow : EditorWindow {
 
     [MenuItem("Tools/MvLO/Compress Selected Tilemap")]
     public static void CompressTilemap() {
-        if (Selection.activeGameObject
-            && Selection.activeGameObject.TryGetComponent(out Tilemap tilemap)) {
-
+        if (Selection.activeGameObject.TryGetComponent(out Tilemap tilemap)) {
             tilemap.CompressBounds();
             EditorUtility.SetDirty(tilemap);
-        } else {
-            Debug.LogWarning("Not selecting a tilemap.");
         }
     }
 

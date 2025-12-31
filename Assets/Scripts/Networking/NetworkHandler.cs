@@ -17,13 +17,15 @@ using UnityEngine.Networking;
 using static NSMB.Utilities.NetworkUtils;
 
 namespace NSMB.Networking {
-    public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
+    public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks, IOnEventCallback {
 
         //---Events
         public static event Action<ClientState, ClientState> StateChanged;
         public static event Action<string, bool> OnError;
 
         //---Constants
+        private static readonly byte EventAddonList = 101;
+        public static readonly DisconnectCause DisconnectCauseAddon = (DisconnectCause) 101;
         public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
         public static readonly int RoomIdLength = 4;
         private static readonly List<DisconnectCause> NonErrorDisconnectCauses = new() {
@@ -41,6 +43,7 @@ namespace NSMB.Networking {
 
         //---Private Variables
         private RealtimeClient realtimeClient;
+        private bool waitingForAddons;
         private string lastRegion;
         private Coroutine pingUpdateCoroutine;
 
@@ -53,7 +56,7 @@ namespace NSMB.Networking {
                 StateChanged?.Invoke(oldState, newState);
             };
             realtimeClient.AddCallbackTarget(this);
-            
+
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
             QuantumCallback.Subscribe<CallbackPluginDisconnect>(this, OnPluginDisconnect);
             QuantumCallback.Subscribe<CallbackChecksumError>(this, OnChecksumError);
@@ -105,7 +108,7 @@ namespace NSMB.Networking {
                 if (Runner && (game = Runner.Game) != null) {
                     pingCommand.PingMs = (int) Ping.Value;
                     foreach (int slot in game.GetLocalPlayerSlots()) {
-                        game.AddCommand(slot, pingCommand);
+                        game.SendCommand(slot, pingCommand);
                     }
                 }
                 yield return seconds;
@@ -286,7 +289,19 @@ namespace NSMB.Networking {
 
         public void OnFriendListUpdate(List<FriendInfo> friendList) { }
 
-        public void OnCreatedRoom() { }
+        public void OnCreatedRoom() {
+            if (pingUpdateCoroutine != null) {
+                StopCoroutine(pingUpdateCoroutine);
+            }
+            pingUpdateCoroutine = StartCoroutine(PingUpdateCoroutine());
+
+            // Send addon list
+            waitingForAddons = false;
+            Client.OpRaiseEvent(EventAddonList, GlobalController.Instance.addonManager.LoadedAddons.Select(la => la.Definition.Guid.ToString()).ToArray(), new RaiseEventArgs {
+                CachingOption = EventCaching.AddToRoomCacheGlobal
+            }, SendOptions.SendReliable);
+            _ = StartQuantum();
+        }
 
         public void OnCreateRoomFailed(short returnCode, string message) { }
 
@@ -296,12 +311,9 @@ namespace NSMB.Networking {
             }
             pingUpdateCoroutine = StartCoroutine(PingUpdateCoroutine());
 
-            if (Client.CurrentRoom.PlayerCount == 1 || !GlobalController.Instance.addonManager.isActiveAndEnabled) {
-                _ = StartQuantum();
-            } else {
-                // Don't start quantum immediately,
-                // Wait for the room list event instead.
-            }
+            // Don't start quantum immediately,
+            // Wait for the room list event instead.
+            waitingForAddons = true;
         }
 
         public void OnJoinRoomFailed(short returnCode, string message) {
@@ -448,6 +460,7 @@ namespace NSMB.Networking {
             if (Runner) {
                 Runner.Shutdown(ShutdownCause.Error, cause.ToString());
             }
+            waitingForAddons = false;
         }
 
         public void OnRegionListReceived(RegionHandler regionHandler) { }
@@ -463,5 +476,30 @@ namespace NSMB.Networking {
         }
 
         public void OnCustomAuthenticationFailed(string debugMessage) { }
+
+        public async void OnEvent(EventData photonEvent) { 
+            if (photonEvent.Code == EventAddonList && waitingForAddons) {
+                waitingForAddons = false;
+                try {
+                    List<Guid> guids = ((string[]) photonEvent.CustomData).Select(Guid.Parse).ToList();
+                    Debug.Log($"[Addon] Got addon list of {guids.Count} addons: [{string.Join(", ", guids)}]");
+                    var loadAddonResult = await GlobalController.Instance.addonManager.LoadAllAddons(guids);
+                    if (loadAddonResult == Addons.AddonManager.LoadAllAddonsResult.Success) {
+                        _ = StartQuantum();
+                    } else {
+                        ThrowError(
+                            loadAddonResult == Addons.AddonManager.LoadAllAddonsResult.FailureDownloadsDisabled
+                                ? "ui.error.join.addons.downloadsdisabled"
+                                : "ui.error.join.addons.downloadfailed",
+                            false);
+                        Client.Disconnect(DisconnectCauseAddon);
+                    }
+                } catch (Exception e) {
+                    Debug.LogError($"[Addon] Failed to activate proper addons! Disconnecting. ({e.Message})");
+                    Client.Disconnect(DisconnectCauseAddon);
+                    throw;
+                }
+            }
+        }
     }
 }

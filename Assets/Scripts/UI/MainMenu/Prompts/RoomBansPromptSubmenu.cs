@@ -104,9 +104,8 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_Error);
                 return;
             }
-
-            int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)];
-            game.AddCommand(slot, new CommandUnbanPlayer() {
+            int slot = game.GetLocalPlayerSlots().IndexOf(host);
+            game.SendCommand(slot, new CommandUnbanPlayer() {
                 TargetUserId = entry.UserId,
             });
 

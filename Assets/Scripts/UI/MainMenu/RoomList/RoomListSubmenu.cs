@@ -59,7 +59,6 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
             if (!overlayed) {
                 Reconnect();
             }
-            overlayed = false;
             
             filterInProgressRooms.SetIsOnWithoutNotify(Settings.Instance.miscFilterInProgressRooms);
             roomManager.FilterInProgressRooms = Settings.Instance.miscFilterInProgressRooms;
@@ -84,7 +83,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         public override void Hide(SubmenuHideReason hideReason) {
             base.Hide(hideReason);
 
-            overlayed = (hideReason == SubmenuHideReason.Overlayed);
+            overlayed = hideReason == SubmenuHideReason.Overlayed;
             if (hideReason == SubmenuHideReason.Closed) {
                 // Disconnect
                 _ = NetworkHandler.Disconnect();

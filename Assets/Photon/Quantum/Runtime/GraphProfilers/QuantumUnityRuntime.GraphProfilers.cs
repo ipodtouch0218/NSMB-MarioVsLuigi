@@ -299,16 +299,11 @@ namespace Quantum.Profiling {
     /// <summary>
     /// Recorded values.
     /// </summary>
-    protected float[][] Values { get; private set; }
+    protected float[] Values { get; private set; }
     /// <summary>
     /// Is the profiler active and visible.
     /// </summary>
     protected bool IsActive { get; private set; }
-
-    /// <summary>
-    /// The number of different value dimensions recorded. Default is 1.
-    /// </summary>
-    protected virtual int ValueDimensions => 1;
 
     [SerializeField]
     private bool _enableOnAwake;
@@ -355,15 +350,10 @@ namespace Quantum.Profiling {
     protected virtual void OnTargetFPSChanged(int fps) { }
 
     private void Awake() {
-      Assert.Always(ValueDimensions > 0 && ValueDimensions <= QuantumGraphSeries.MaxValueDimensions, "Only one to {0} value dimensions are supported", QuantumGraphSeries.MaxValueDimensions);
-
       Graph = GetComponentInChildren<TGraph>(true);
-      Graph.Initialize(ValueDimensions);
+      Values = new float[Graph.Samples];
 
-      Values = new float[ValueDimensions][];
-      for (int i = 0; i < ValueDimensions; ++i) {
-        Values[i] = new float[Graph.Samples];
-      }
+      Graph.Initialize();
 
       OnInitialize();
 
@@ -385,12 +375,7 @@ namespace Quantum.Profiling {
     }
 
     private void OnApplicationFocus(bool focus) {
-#if UNITY_EDITOR
-      // Restoring causes clitches in the Editor
-      return;
-#else 
       Graph.Restore();
-#endif
     }
 
     private void SetState(bool isActive) {
@@ -409,14 +394,12 @@ namespace Quantum.Profiling {
 
     private void Restore() {
       if (Values != null) {
-        for (int i = 0; i < Values.Length; ++i) {
-          if (Values[i] != null) {
-            System.Array.Clear(Values[i], 0, Values.Length);
-          }
-        }
+        System.Array.Clear(Values, 0, Values.Length);
       }
 
-      Graph?.Restore();
+      if (Graph != null) {
+        Graph.Restore();
+      }
 
       OnRestore();
     }
@@ -455,12 +438,13 @@ namespace Quantum.Profiling {
         }
       }
 
-      Values[0][_offset] = value;
+      float[] values = Values;
+      values[_offset] = value;
 
-      _offset = (_offset + 1) % Values[0].Length;
+      _offset = (_offset + 1) % values.Length;
       ++_samples;
 
-      Graph.SetValues(Values, _offset, _samples);
+      Graph.SetValues(values, _offset, _samples);
     }
   }
 }
@@ -605,47 +589,13 @@ namespace Quantum.Profiling {
       if (IsActive == false)
         return;
 
-      Values[0][_offset] = value;
+      float[] values = Values;
+      values[_offset] = value;
 
-      _offset = (_offset + 1) % Values[0].Length;
+      _offset = (_offset + 1) % values.Length;
       ++_samples;
 
-      Graph.SetValues(Values, _offset, _samples);
-    }
-
-    /// <summary>
-    /// Add multiple values to the series.
-    /// Requires ValueDimensions to be set accordingly."/>
-    /// </summary>
-    /// <param name="value1">Default value</param>
-    /// <param name="value2">Extra value</param>
-    /// <param name="value3">Extra value</param>
-    /// <param name="value4">Extra value</param>
-    protected virtual void AddValues(float value1, float? value2 = null, float? value3 = null, float? value4 = null) {
-      if (IsActive == false)
-        return;
-
-      Values[0][_offset] = value1;
-
-      if (value2.HasValue) {
-        Assert.Always(ValueDimensions >= 2, "At least 2 value dimensions are required to add a second value");
-        Values[1][_offset] = value2.Value;
-      }
-
-      if (value3.HasValue) {
-        Assert.Always(ValueDimensions >= 3, "At least 3 value dimensions are required to add a third value");
-        Values[2][_offset] = value3.Value;
-      }
-
-      if (value4.HasValue) {
-        Assert.Always(ValueDimensions >= 3, "At least 4 value dimensions are required to add a forth value");
-        Values[3][_offset] = value4.Value;
-      }
-
-      _offset = (_offset + 1) % Values[0].Length;
-      ++_samples;
-
-      Graph.SetValues(Values, _offset, _samples);
+      Graph.SetValues(values, _offset, _samples);
     }
   }
 }
@@ -656,7 +606,6 @@ namespace Quantum.Profiling {
 #region Assets/Photon/Quantum/Runtime/GraphProfilers/QuantumGraphSeries.cs
 
 namespace Quantum.Profiling {
-  using System;
   using UnityEngine;
   using UnityEngine.UI;
 
@@ -664,45 +613,14 @@ namespace Quantum.Profiling {
   /// A graph series is the base class to render graphs in Unity.
   /// </summary>
   public abstract class QuantumGraphSeries : QuantumMonoBehaviour {
-    private static readonly string[] SHADER_PROPERTY_VALUES = new string[]{ "_Values" , "_Values2", "_Values3", "_Values4" };
+    private const string SHADER_PROPERTY_VALUES = "_Values";
     private const string SHADER_PROPERTY_SAMPLES = "_Samples";
-
-    /// <summary>
-    /// The maximum number of supported value dimensions.
-    /// </summary>
-    public const int MaxValueDimensions = 4;
-
-    /// <summary>
-    /// Profiler can record different values to be shown in one graph.
-    /// </summary>
-    [Serializable, Flags]
-    public enum ValueDimensionFlag {
-      /// <summary>
-      /// The default value is collected and shown.
-      /// </summary>
-      Default = 1,
-      /// <summary>
-      /// The second value is collected and shown.
-      /// </summary>
-      Second = 1 << 1,
-      /// <summary>
-      /// The third value is collected and shown.
-      /// </summary>
-      Third = 1 << 2,
-      /// <summary>
-      /// The third value is collected and shown.
-      /// </summary>
-      Forth = 1 << 4,
-      /// <summary>
-      /// All values are collected and shown.
-      /// </summary>
-      All = Default | Second | Third | Forth,
-    }
 
     /// <summary>
     /// Returns the number of samples that can be displayed.
     /// </summary>
-    public int Samples => _samples;
+    public int Samples =>  _samples;
+
     /// <summary>
     /// The target image to render the graphs in.
     /// </summary>
@@ -712,21 +630,12 @@ namespace Quantum.Profiling {
     /// The number of samples that are displayed.
     /// </summary>
     [SerializeField]
-    [Range(60, 500)]
+    [Range(60, 540)]
     protected int _samples = 300;
-    /// <summary>
-    /// The value dimensions that are enabled to be rendered.
-    /// </summary>
-    [SerializeField]
-    protected ValueDimensionFlag _valueDimensionEnabled = ValueDimensionFlag.Default;
-    /// <summary>
-    /// The number of value dimensions that this series supports, is set during <see cref="Initialize(int)"/>.
-    /// </summary>
-    protected int _valueDimensions = 1;
     /// <summary>
     /// The values to render.
     /// </summary>
-    protected float[][] _values;
+    protected float[] _values;
     /// <summary>
     /// The material to render the graph.
     /// </summary>
@@ -734,67 +643,17 @@ namespace Quantum.Profiling {
     /// <summary>
     /// Cache shared property.
     /// </summary>
-    protected int[] _valuesShaderPropertyID;
-
-    /// <summary>
-    /// Is a value dimension enabled to be rendered.
-    /// </summary>
-    /// <param name="dimension">Dimension as integer as a value from 0 to <see cref="MaxValueDimensions"/></param>
-    /// <returns>True, if the value dimension will be rendered</returns>
-    public bool IsValueDimensionEnabled(int dimension) => IsValueDimensionEnabled((ValueDimensionFlag)(1 << dimension));
-
-    /// <summary>
-    /// Is a value dimension enabled to be rendered.
-    /// </summary>
-    /// <param name="dimension">ValueDimensionFlag enum value</param>
-    /// <returns>True, if the value dimension will be rendered</returns>
-    public bool IsValueDimensionEnabled(ValueDimensionFlag dimension) => (_valueDimensionEnabled & dimension) != 0;
-
-    /// <summary>
-    /// Enable or disable a value dimension to be rendered.
-    /// </summary>
-    /// <param name="dimension">Dimension as integer as a value from 0 to <see cref="MaxValueDimensions"/></param>
-    /// <param name="enabled">Enabled or disable the rendering</param>
-    public void SetValueDimensionEnabled(int dimension, bool enabled) {
-      Assert.Always(dimension < _valueDimensions, "Value dimension {0} not possible, max {1} was set", dimension, _valueDimensions);
-      SetValueDimensionEnabled((ValueDimensionFlag)(1 << dimension), enabled);
-    }
-
-    /// <summary>
-    /// Enable or disable a value dimension to be rendered.
-    /// </summary>
-    /// <param name="dimension">ValueDimensionFlag enum value</param>
-    /// <param name="enabled">Enabled or disable the rendering</param>
-    public void SetValueDimensionEnabled(ValueDimensionFlag dimension, bool enabled) {
-      if (enabled) {
-        _valueDimensionEnabled |= dimension;
-      } else {
-        _valueDimensionEnabled &= ~dimension;
-      }
-    }
-
-    /// <summary>
-    /// Toggle a value dimension to be rendered. Typically used from a UI action.
-    /// </summary>
-    /// <param name="dimension">Dimension as integer as a value from 0 to <see cref="MaxValueDimensions"/></param>
-    public void ToggleValueDimensionEnabled(int dimension) {
-      SetValueDimensionEnabled(dimension, !IsValueDimensionEnabled(dimension));
-    }
+    protected int _valuesShaderPropertyID;
 
     /// <inheritdoc/>
     protected virtual void OnInitialize() { }
     /// <inheritdoc/>
     protected virtual void OnRestore() { }
-
     /// <inheritdoc/>
-    public void Initialize(int valueDimensions) {
-      _valueDimensions = Mathf.Clamp(valueDimensions, 1, MaxValueDimensions);
-      _valuesShaderPropertyID = new int[_valueDimensions];
-      _values = new float[_valueDimensions][];
-      for (int i = 0; i < _valueDimensions; ++i) {
-        _valuesShaderPropertyID[i] = Shader.PropertyToID(SHADER_PROPERTY_VALUES[i]);
-        _values[i] = new float[_samples];
-      }
+    public void Initialize() {
+      _valuesShaderPropertyID = Shader.PropertyToID(SHADER_PROPERTY_VALUES);
+
+      _values = new float[_samples];
 
       _material = new Material(_targetImage.material);
       _targetImage.material = _material;
@@ -810,38 +669,24 @@ namespace Quantum.Profiling {
     /// <param name="values">Values array</param>
     /// <param name="offset">Offset to start reading values from the array</param>
     /// <param name="samples">Number of samples to display</param>
-    public virtual void SetValues(float[][] values, int offset, int samples) {
-      if (_values == null || values == null || _values.Length != values.Length || _values.Length != _valueDimensions || values.Length != _valueDimensions) {
+    public virtual void SetValues(float[] values, int offset, int samples) {
+      if (_values == null || values == null || _values.Length != values.Length)
         return;
+
+      for (int i = 0; i < _samples; ++i, ++offset) {
+        offset %= _samples;
+
+        _values[i] = values[offset];
       }
 
-      for (int i = 0; i < _valueDimensions; ++i) {
-        if (_values[i] == null || values[i] == null || _values[i].Length < values[i].Length) {
-          return;
-        }
-      }
-
-      for (int i = 0; i < _valueDimensions; ++i) {
-        for (int j = 0; j < _samples; ++j, ++offset) {
-          offset %= _samples;
-          if (IsValueDimensionEnabled(i)) {
-            _values[i][j] = values[i][offset];
-          }
-        }
-      }
-
-      for (int i = 0; i < _valueDimensions; ++i) {
-        _material.SetFloatArray(_valuesShaderPropertyID[i], _values[i]);
-      }
+      _material.SetFloatArray(_valuesShaderPropertyID, _values);
     }
 
     /// <inheritdoc/>
     public void Restore() {
       if (_material != null) {
         _material.SetInt(SHADER_PROPERTY_SAMPLES, _samples);
-        for (int i = 0; i < _valueDimensions; ++i) {
-          _material.SetFloatArray(_valuesShaderPropertyID[i], _values[i]);
-        }
+        _material.SetFloatArray(_valuesShaderPropertyID, _values);
       }
 
       OnRestore();

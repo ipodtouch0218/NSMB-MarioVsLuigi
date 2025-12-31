@@ -58,17 +58,16 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             CommandChangeRules cmd = new CommandChangeRules {
                 EnabledChanges = ruleType,
             };
+
+            QuantumGame game = QuantumRunner.DefaultGame;
             switch (ruleType) {
             case CommandChangeRules.Rules.Stage:
                 cmd.Stage = (AssetRef<Map>) value;
                 break;
             }
 
-            QuantumGame game = QuantumRunner.DefaultGame;
-            PlayerRef host = game.Frames.Predicted.Global->Host;
-            if (game.PlayerIsLocal(host)) {
-                game.AddCommand(game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)], cmd);
-            }
+            int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
+            game.SendCommand(slot, cmd);
         }
 
         protected override void UpdateLabel() {

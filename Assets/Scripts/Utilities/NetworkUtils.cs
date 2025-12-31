@@ -1,4 +1,3 @@
-using NSMB.Addons;
 using NSMB.Networking;
 using Photon.Client;
 using Photon.Realtime;
@@ -35,7 +34,7 @@ namespace NSMB.Utilities {
             [DisconnectCause.ClientTimeout] = "ui.error.timeout",
             [DisconnectCause.Exception] = "ui.error.unknown",
             [DisconnectCause.DisconnectByServerLogic] = "ui.error.plugin",
-            [AddonManager.DisconnectCauseMissingAddon] = "ui.error.join.addons.downloadfailed"
+            [NetworkHandler.DisconnectCauseAddon] = "ui.error.join.addons.downloadfailed"
         };
 
         public struct IntegerProperties {

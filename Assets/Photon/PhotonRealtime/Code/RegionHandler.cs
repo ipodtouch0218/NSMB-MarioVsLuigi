@@ -398,18 +398,15 @@ namespace Photon.Realtime
             lock (this.pingerList)
             {
                 this.pingerList.Clear();
+
                 foreach (Region region in this.EnabledRegions)
                 {
                     RegionPinger rp = new RegionPinger(region, this.OnRegionDone);
-                    bool started = rp.Start();
-                    if (started)
-                    {
-                        this.pingerList.Add(rp);
-                    }
+                    this.pingerList.Add(rp);
+                    rp.Start(); // TODO: check return value
                 }
             }
 
-            // TODO: might return pingerList.Count > 0?!
             return true;
         }
 

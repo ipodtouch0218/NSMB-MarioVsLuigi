@@ -45,12 +45,12 @@ namespace Quantum {
             bool spawnedStarCoin = false;
             for (int i = 0; i < spawnpoints; i++) {
                 // Find a spot...
-                int setBits = usedSpawnpoints.GetSetCount();
-                if (setBits >= spawnpoints) {
+                if (f.Global->UsedStarSpawnCount >= spawnpoints) {
                     usedSpawnpoints.ClearAll();
+                    f.Global->UsedStarSpawnCount = 0;
                 }
 
-                int count = f.RNG->Next(0, spawnpoints - setBits);
+                int count = f.RNG->Next(0, spawnpoints - f.Global->UsedStarSpawnCount);
                 int index = 0;
                 for (int j = 0; j < spawnpoints; j++) {
                     if (!usedSpawnpoints.IsSet(j)) {
@@ -62,6 +62,7 @@ namespace Quantum {
                     }
                 }
                 usedSpawnpoints.Set(index);
+                f.Global->UsedStarSpawnCount++;
 
                 // Spawn a coin.
                 FPVector2 position = stage.BigStarSpawnpoints[index];

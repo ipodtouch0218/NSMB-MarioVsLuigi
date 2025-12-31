@@ -334,7 +334,7 @@ namespace NSMB.UI.Options {
             QuantumGame game = QuantumRunner.DefaultGame;
             if (game != null) {
                 foreach (var slot in game.GetLocalPlayerSlots()) {
-                    game.AddCommand(slot, new CommandSetInSettings { InSettings = true });
+                    game.SendCommand(slot, new CommandSetInSettings { InSettings = true });
                 }
             }
             return true;
@@ -356,7 +356,7 @@ namespace NSMB.UI.Options {
             QuantumGame game = QuantumRunner.DefaultGame;
             if (game != null) {
                 foreach (var slot in game.GetLocalPlayerSlots()) {
-                    game.AddCommand(slot, new CommandSetInSettings { InSettings = false });
+                    game.SendCommand(slot, new CommandSetInSettings { InSettings = false });
                 }
             }
             closeTime = Time.unscaledTimeAsDouble;

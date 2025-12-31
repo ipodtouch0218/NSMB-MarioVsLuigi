@@ -109,7 +109,7 @@ namespace NSMB.Chat {
         }
 
         public void SendChatMessage(string text) {
-            QuantumRunner.DefaultGame.AddCommand(new CommandSendChatMessage {
+            QuantumRunner.DefaultGame.SendCommand(new CommandSendChatMessage {
                 Message = text
             });
         }

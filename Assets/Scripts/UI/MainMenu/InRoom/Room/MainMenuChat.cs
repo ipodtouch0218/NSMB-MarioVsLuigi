@@ -179,8 +179,8 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
 
             var startTypingCommand = new CommandStartTyping();
-            foreach (var slot in game.GetLocalPlayerSlots()) {
-                game.AddCommand(slot, startTypingCommand);
+            foreach (var player in game.GetLocalPlayerSlots()) {
+                game.SendCommand(player, startTypingCommand);
             }
         }
 

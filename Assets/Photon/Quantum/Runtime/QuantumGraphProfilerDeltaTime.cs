@@ -7,7 +7,6 @@ namespace Quantum.Profiling {
   public sealed class QuantumGraphProfilerDeltaTime : QuantumGraphProfilerValueSeries {
     /// <inheritdoc/>
     protected override void OnUpdate() {
-      //AddValues(Time.unscaledDeltaTime, Time.unscaledDeltaTime * 0.4f);
       AddValue(Time.unscaledDeltaTime);
     }
 

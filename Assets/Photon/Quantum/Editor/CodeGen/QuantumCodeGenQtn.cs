@@ -48,19 +48,6 @@ namespace Quantum.Editor {
     /// <param name="verbose">Log verbose output</param>
     /// <param name="options">CodeGen options</param>
     public static void Run(string[] qtnFiles, bool verbose, GeneratorOptions options) {
-      Run(qtnFiles, verbose, options, QuantumCodeGenSettings.CodeGenQtnFolderPath, QuantumCodeGenSettings.CodeGenUnityRuntimeFolderPath);
-    }
-
-    /// <summary>
-    /// Runs the Quantum CodeGen for specific Qtn files with custom settings.
-    /// </summary>
-    /// <param name="qtnFiles">Qtn files to be analyzed</param>
-    /// <param name="verbose">Log verbose output</param>
-    /// <param name="options">CodeGen options</param>
-    /// <param name="simulationOutputFolder"></param>
-    /// <param name="unityRuntimeOutputFolder"></param>
-    /// <param name="deleteOrphanedFiles">If true, all files in target folder(s) that have not been generated will be removed</param>
-    public static void Run(string[] qtnFiles, bool verbose, GeneratorOptions options, string simulationOutputFolder, string unityRuntimeOutputFolder, bool deleteOrphanedFiles = true) {
       if (qtnFiles == null) {
         throw new ArgumentNullException(nameof(qtnFiles));
       }
@@ -78,9 +65,12 @@ namespace Quantum.Editor {
 
       var stopwatch = Stopwatch.StartNew();
 
-      if (Directory.Exists(simulationOutputFolder) == false) {
-        Directory.CreateDirectory(simulationOutputFolder);
+      if (Directory.Exists(Path.GetDirectoryName(QuantumCodeGenSettings.CodeGenQtnFolderPath)) == false) {
+        Directory.CreateDirectory(Path.GetDirectoryName(QuantumCodeGenSettings.CodeGenQtnFolderPath));
       }
+      
+      var outputFolder = QuantumCodeGenSettings.CodeGenQtnFolderPath;
+      var unityOutputFolder = QuantumCodeGenSettings.CodeGenUnityRuntimeFolderPath;
       
       IEnumerable<GeneratorOutputFile> outputFiles;
       try {
@@ -102,8 +92,8 @@ namespace Quantum.Editor {
         throw ex;
       }
       
-      if (simulationOutputFolder == unityRuntimeOutputFolder) {
-        UpdateScriptsDirectory(simulationOutputFolder, outputFiles, logVerbose, deleteOrphanedFiles);  
+      if (outputFolder == unityOutputFolder) {
+        UpdateScriptsDirectory(outputFolder, outputFiles, logVerbose);  
       } else {
         
         bool IsUnitySpecific(GeneratorOutputFileKind kind) {
@@ -119,10 +109,10 @@ namespace Quantum.Editor {
 
         var groups = outputFiles.ToLookup(x => IsUnitySpecific(x.Kind));
 
-        UpdateScriptsDirectory(simulationOutputFolder, groups[false], logVerbose, deleteOrphanedFiles);
+        UpdateScriptsDirectory(outputFolder, groups[false], logVerbose);
           
-        if (!string.IsNullOrEmpty(unityRuntimeOutputFolder)) {
-          UpdateScriptsDirectory(unityRuntimeOutputFolder, groups[true], logVerbose, deleteOrphanedFiles, p => {
+        if (!string.IsNullOrEmpty(unityOutputFolder)) {
+          UpdateScriptsDirectory(unityOutputFolder, groups[true], logVerbose, p => {
             if (!QuantumCodeGenSettings.IsMigrationEnabled) {
               return false;
             }
@@ -158,13 +148,10 @@ namespace Quantum.Editor {
     /// <param name="options">CodeGen options</param>
     public static void Run(bool verbose, GeneratorOptions options) {
       var assets = AssetDatabase.FindAssets($"t:{nameof(QuantumQtnAsset)}")
-        .Select(x => AssetDatabase.GUIDToAssetPath(x))
-        .Where(x => {
-          var importer = AssetImporter.GetAtPath(x) as QuantumQtnAssetImporter;
-          return importer == null || importer.UseCustomSettings == false;
-        })
-        .OrderBy(x => Path.GetFileNameWithoutExtension(x), StringComparer.OrdinalIgnoreCase)
-        .ToArray();
+       .Select(x => AssetDatabase.GUIDToAssetPath(x))
+       .OrderBy(x => Path.GetFileNameWithoutExtension(x), StringComparer.OrdinalIgnoreCase)
+       .ToArray();
+      
       Run(assets, verbose, options);
     }
     
@@ -185,7 +172,7 @@ namespace Quantum.Editor {
       return Path.GetFileNameWithoutExtension(file) + $".Part{index+1}" + Path.GetExtension(file);
     }
     
-    static void UpdateScriptsDirectory(string outputDir, IEnumerable<GeneratorOutputFile> files, Action<string> logProgress, bool deleteOrphaned = true, Predicate<string> ignoreFilter = null) {
+    static void UpdateScriptsDirectory(string outputDir, IEnumerable<GeneratorOutputFile> files, Action<string> logProgress, Predicate<string> ignoreFilter = null) {
       logProgress?.Invoke($"Generating scripts to {outputDir}");
       Directory.CreateDirectory(outputDir); // Create a directory first, because it might not exist.
       
@@ -205,10 +192,6 @@ namespace Quantum.Editor {
         }
       }
 
-      if (!deleteOrphaned) {
-        return;
-      }
-      
       var orphanedFiles = Directory.GetFiles(outputDir, "*.cs")
        .Select(x => Path.GetFileName(x))
        .Where(x => !generatedFiles.Contains(Path.GetFileName(x)))

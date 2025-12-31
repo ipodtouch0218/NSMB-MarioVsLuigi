@@ -89,10 +89,6 @@ namespace NSMB.UI.Loading {
             running = true;
         }
 
-        public void OnDestroy() {
-            NetworkHandler.OnError -= OnError;
-        }
-
         private void OnUnitySceneLoadBegin(CallbackUnitySceneLoadBegin e) {
             if (e.SceneName != null) {
                 // Loading a map.
@@ -182,9 +178,6 @@ namespace NSMB.UI.Loading {
         }
 
         private void OnError(string key, bool network) {
-            if (!this) {
-                return;
-            }
             EndAnimation();
         }
 

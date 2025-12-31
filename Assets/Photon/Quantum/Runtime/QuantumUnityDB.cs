@@ -2,13 +2,10 @@ namespace Quantum {
   using System;
   using System.Collections.Concurrent;
   using System.Collections.Generic;
-  using System.Runtime.CompilerServices;
   using System.Threading;
-  using JetBrains.Annotations;
   using Photon.Deterministic;
   using Profiling;
   using Task;
-  using UnityEditor;
   using UnityEngine;
   using UnityEngine.Serialization;
 #if ODIN_INSPECTOR && !QUANTUM_ODIN_DISABLED
@@ -31,12 +28,6 @@ namespace Quantum {
     /// </summary>
     public const char NestedPathSeparator = '|';
 
-    /// <summary>
-    /// Scope IDs known at build time.
-    /// </summary>
-    [UnityAssetGuid]
-    public string[] Scopes;
-    
     /// <summary>
     /// All the assets that are managed by this DB.
     /// </summary>
@@ -76,11 +67,6 @@ namespace Quantum {
     /// Increased every time the DB is updated.
     /// </summary>
     private uint _version;
-
-    /// <summary>
-    /// A set of all the loaded scopes.
-    /// </summary>
-    private Dictionary<string, List<AssetGuid>> _scopesLoaded = new Dictionary<string, List<AssetGuid>>(StringComparer.Ordinal);
     
     /// <summary>
     /// Exposes the list of entries in the DB. Can be used to iterate asset sources at both runtime and edit time.
@@ -98,6 +84,8 @@ namespace Quantum {
     /// Initializes the DB with asset sources collected from the project.
     /// </summary>
     protected void OnEnable() {
+      FPMathUtils.LoadLookupTables();
+
       _mainThreadId = Thread.CurrentThread.ManagedThreadId;
       _guidToIndex.Clear();
       _pathToIndex.Clear();
@@ -105,15 +93,10 @@ namespace Quantum {
         if (_entries[i] == null) {
           // removed, slot not used
           continue;
-        }
-
-        if (!TryAddSourceMapping(i, _entries[i].Guid, _entries[i].Path, out var conflictingIndex)) {
-          Log.Error($"Failed to add {_entries[i]}: conflict with {_entries[conflictingIndex]}");
-          continue;
-        }
+        } 
+        AddSourceMapping(i, _entries[i].Guid, _entries[i].Path);
       }
-      
-      OnEnableEditor();
+
       ++_version;
     }
 
@@ -122,9 +105,6 @@ namespace Quantum {
     /// </summary>
     protected override void OnDisable() {
       ((IDisposable)this).Dispose();
-#if UNITY_EDITOR
-      // remove scoped assets
-#endif
       base.OnDisable();
     }
     
@@ -205,19 +185,22 @@ namespace Quantum {
       Assert.Check(source);
       Assert.Check(guid.IsValid);
 
-      var index = GetNextIndex();
-
-      if (!TryAddSourceMapping(index, guid, path, out var conflictingIndex)) {
-        throw new ArgumentOutOfRangeException($"Failed to add {guid} (path: {path}): conflict with {_entries[conflictingIndex]}");
+      var entry = new Entry { Guid = guid, Source = source, Path = path };
+      
+      // are there any free slots?
+      if (_entries.Count == _guidToIndex.Count) {
+        // nope
+        AddSourceMapping(_entries.Count, guid, path);  
+        _entries.Add(entry);
+      } else {
+        // yes, find first free slot
+        var index = _entries.FindIndex(e => e == null);
+        Assert.Check(index >= 0);
+        AddSourceMapping(index, guid, path);
+        _entries[index] = entry;
       }
 
-      var entry = new Entry() {
-        Guid = guid,
-        Path = path,
-        Source = source,
-      };
-
-      AddEntry(index, entry);
+      ++_version;
     }
 
     /// <summary>
@@ -241,8 +224,18 @@ namespace Quantum {
         return false;
       }
       
-      var entry = RemoveSourceInternal(index);
+      var entry = _entries[index];
+      Assert.Check(entry != null);
+      _entries[index] = null;
+      
       result = (entry.Source, entry.State.Value >= EntryState.LoadingAsync);
+      
+      _guidToIndex.Remove(guid);
+      if (!string.IsNullOrEmpty(entry.Path)) {
+        _pathToIndex.Remove(entry.Path);
+      }
+
+      _version++;
       return true;
     }
 
@@ -252,182 +245,27 @@ namespace Quantum {
     /// <param name="guid"></param>
     /// <returns><c>true</c> if there was a matching source to remove</returns>
     public bool RemoveSource(AssetGuid guid) {
-      if (!_guidToIndex.TryGetValue(guid, out var index)) {
-        return false;
-      }
-      RemoveSourceInternal(index);
-      return true;
-    }
-
-    /// <summary>
-    /// Returns true if <paramref name="scope"/> is already loaded.
-    /// </summary>
-    public bool IsScopeLoaded(QuantumUnityDBScope scope) {
-      Assert.Check(scope);
-      return _scopesLoaded.ContainsKey(scope.Id);
+      return RemoveSource(guid, out _);
     }
     
-    /// <summary>
-    /// Returns true if <paramref name="scopeId"/> is already loaded.
-    /// </summary>
-    public bool IsScopeLoaded(string scopeId) {
-      return _scopesLoaded.ContainsKey(scopeId);
-    }
-    
-    /// <summary>
-    /// Adds assets from scope. If the scope is already loaded, throws an exception. Consider using <see cref="TryAddScope"/> instead.
-    /// </summary>
-    public void AddScope(QuantumUnityDBScope scope) {
-      Assert.Check(scope);
-
-      if (!TryAddScope(scope)) {
-        throw new ArgumentOutOfRangeException($"Scope already added: {scope.Id}");
-      }
-    }
-
-    /// <summary>
-    /// Adds assets from scope. If the scope is already loaded, returns false. For each asset that is already present in the db,
-    /// a warning is logged.
-    /// </summary>
-    public bool TryAddScope(QuantumUnityDBScope scope) {
-      Assert.Check(scope);
-
-      if (_scopesLoaded.ContainsKey(scope.Id)) {
-        // scope already added
-        return false;
+    private void AddSourceMapping(int index, AssetGuid guid, string path) {
+      if (_guidToIndex.TryGetValue(guid, out var existingIndex)) {
+        throw new ArgumentException($"Entry with {guid} already exists: {_entries[existingIndex]}", nameof(guid));
       }
 
-      var addedAssets = new List<AssetGuid>();
-      _scopesLoaded.Add(scope.Id, addedAssets);
-
-      foreach (var entry in scope.Entries) {
-
-        var index = GetNextIndex();
-
-        if (!TryAddSourceMapping(index, entry.Guid, entry.Path, out var conflictingIndex)) {
-          Log.Warn($"Ignoring scoped asset {entry}: conflict with {_entries[conflictingIndex]}");
-          continue;
-        }
-        
-        AddEntry(index, entry);
-        addedAssets.Add(entry.Guid);
-      }
-
-      return true;
-    }
-    
-    /// <summary>
-    /// Removes all scope asset sources previously loaded with <see cref="AddScope"/>
-    /// </summary>
-    /// <param name="unloadAssets">If true, assets will also be unloaded (if they have been acquired)</param>
-    public bool RemoveScope(string scopeId, bool unloadAssets) {
-      if (!_scopesLoaded.Remove(scopeId, out var assetGuids)) {
-        return false;
-      }
-
-      RemoveScopeInternal(scopeId, unloadAssets, assetGuids);
-      return true;
-    }
-    
-    /// <summary>
-    /// Removes all scope asset sources previously loaded with <see cref="AddScope"/>
-    /// </summary>
-    /// <param name="scope"></param>
-    /// <param name="unloadAssets">If true, assets will also be unloaded (if they have been acquired)</param>
-    public bool RemoveScope(QuantumUnityDBScope scope, bool unloadAssets) {
-      Assert.Check(scope);
-      return RemoveScope(scope.Id, unloadAssets);
-    }
-
-    /// <summary>
-    /// Calls <see cref="RemoveScope(string,bool)"/> for all the loaded scopes
-    /// </summary>
-    /// <param name="unloadAssets"></param>
-    public bool RemoveAllScopes(bool unloadAssets) {
-      if (_scopesLoaded.Count == 0) {
-        return false;
-      }
-
-      foreach (var (id, assets) in _scopesLoaded) {
-        RemoveScopeInternal(id, unloadAssets, assets);
-      }
-
-      _scopesLoaded.Clear();
-      return true;
-    }
-    
-    [NotNull]
-    Entry RemoveSourceInternal(int index) {
-      var entry = _entries[index];
-      Assert.Check(entry != null);
-      _entries[index] = null;
-      
-      _guidToIndex.Remove(entry.Guid);
-      if (!string.IsNullOrEmpty(entry.Path)) {
-        _pathToIndex.Remove(entry.Path);
-      }
-      
-      _version++;
-      return entry;
-    }
-    
-    private void AddEntry(int index, Entry entry) {
-      if (index == _entries.Count) {
-        _entries.Add(entry);
-      } else {
-        _entries[index] = entry;
-      }
-    }
-
-    private int GetNextIndex() {
-      // are there any free slots?
-      if (_entries.Count == _guidToIndex.Count) {
-        // nope
-        return _entries.Count;
-      } else {
-        // yes, find first free slot
-        var index = _entries.FindIndex(e => e == null);
-        Assert.Check(index >= 0);
-        return index;
-      }
-    }
-
-    private bool TryAddSourceMapping(int index, AssetGuid guid, string path, out int conflictingIndex) {
-      if (!_guidToIndex.TryAdd(guid, index)) {
-        conflictingIndex = _guidToIndex[guid];
-        return false;
-      }
-
-      if (!string.IsNullOrEmpty(path) && !_pathToIndex.TryAdd(path, index)) {
-        _guidToIndex.Remove(guid);
-        conflictingIndex = _pathToIndex[path];
-        return false;
-      }
-
-      conflictingIndex = 0;
-      return true;
-    }
-
-    void RemoveScopeInternal(string scopeId, bool unloadAssets, List<AssetGuid> assetGuids) {
-      foreach (var guid in assetGuids) {
-        if (!_guidToIndex.TryGetValue(guid, out var index)) {
-          Log.TraceAssetsWarn($"Tried to remove asset {guid} from scope {scopeId}, but it is not present in the DB");
-          continue;
-        }
-
-        var entry = _entries[index];
-        Assert.Always(entry != null, "_entries[index] != null");
-        
-        RemoveSourceInternal(index);
-        
-        Log.TraceAssets($"Removed {entry} from scope {scopeId}");
-
-        if (unloadAssets) {
-          DisposeEntryChecked(entry);
+      if (!string.IsNullOrEmpty(path)) {
+        if (_pathToIndex.TryGetValue(path, out existingIndex)) {
+          throw new ArgumentException($"Entry with {path} already exists: {_entries[existingIndex]}", nameof(path));
         }
       }
+
+      _guidToIndex.Add(guid, index);
+
+      if (!string.IsNullOrEmpty(path)) {
+        _pathToIndex.Add(path, index);
+      }
     }
-    
+
     /// <summary>
     /// Creates a deterministic GUID based and the provided path.
     /// </summary>
@@ -557,35 +395,19 @@ namespace Quantum {
     /// <returns><see langword="true"/> if the asset of type T exists.</returns>
     public static bool TryGetGlobalAsset<T>(AssetGuid assetGuid, out T result)
       where T : AssetObject {
-      
-      if (TryGetGlobal(out var global)) {
-        return global.TryGetAsset(assetGuid, out result);
-      }
-
-      result = null;
-      return false;
+      return Global.TryGetAsset(assetGuid, out result);
     }
 
     /// <inheritdoc cref="TryGetGlobalAsset{T}(AssetGuid, out T)"/>
     public static bool TryGetGlobalAsset<T>(AssetRef assetRef, out T result)
       where T : AssetObject {
-      if (TryGetGlobal(out var global)) {
-        return global.TryGetAsset(assetRef, out result);
-      }
-
-      result = null;
-      return false;
+      return Global.TryGetAsset(assetRef, out result);
     }
 
     /// <inheritdoc cref="TryGetGlobalAsset{T}(AssetGuid, out T)"/>
     public static bool TryGetGlobalAsset<T>(AssetRef<T> assetRef, out T result)
       where T : AssetObject {
-      if (TryGetGlobal(out var global)) {
-        return global.TryGetAsset(assetRef, out result);
-      }
-
-      result = null;
-      return false;
+      return Global.TryGetAsset(assetRef, out result);
     }
     
     /// <summary>
@@ -597,12 +419,7 @@ namespace Quantum {
     /// <returns><see langword="true"/> if the asset of type T exists.</returns>
     public static bool TryGetGlobalAsset<T>(string assetPath, out T result)
       where T : AssetObject {
-      if (TryGetGlobal(out var global)) {
-        return global.TryGetAsset(assetPath, out result);
-      }
-
-      result = null;
-      return false;
+      return Global.TryGetAsset(assetPath, out result);
     }
     
     #endregion
@@ -728,33 +545,28 @@ namespace Quantum {
           // removed, slot not used
           continue;
         }
+        var prevState = entry.State.Value;
+        if (prevState == EntryState.NotLoaded) {
+          // not loaded at all
+          continue;
+        }
 
-        DisposeEntryChecked(entry);
+        if (prevState >= EntryState.LoadingAsync) {
+          // already acquired
+          entry.State.Exchange(EntryState.UnloadingInvokingCallbacks);
+          DisposeEntry(entry);
+        } else {
+          // no need to dispose anything
+          entry.State.Exchange(EntryState.NotLoaded);
+        }
       }
 
       _disposeQueue.Clear();
       _workedThreadLoadQueue.Clear();
     }
+    
 
-    void DisposeEntryChecked(Entry entry) {
-
-      var prevState = entry.State.Value;
-      if (prevState == EntryState.NotLoaded) {
-        // not loaded at all
-        return;
-      }
-
-      if (prevState >= EntryState.LoadingAsync) {
-        // already acquired
-        entry.State.Exchange(EntryState.UnloadingInvokingCallbacks);
-        DisposeEntry(entry);
-      } else {
-        // no need to dispose anything
-        entry.State.Exchange(EntryState.NotLoaded);
-      }
-    }
-
-
+    
     /// <summary>
     /// Loads the asset with the given <paramref name="guid"/> synchronously.
     /// </summary>
@@ -805,14 +617,6 @@ namespace Quantum {
       
       guid = default;
       return false;
-    }
-
-    
-    /// <summary>
-    /// Returns true if there's an asset with matching GUID.
-    /// </summary>
-    public bool HasAsset(AssetGuid guid) {
-      return _guidToIndex.ContainsKey(guid);
     }
 
     /// <inheritdoc cref="IResourceManager.GetAssetState"/>
@@ -889,7 +693,7 @@ namespace Quantum {
               try {
                 var asset = entry.Source.WaitForResult();
                 Assert.Check(asset != null);
-                Assert.Check(asset.Guid == guid, "Expected to load {0}, but {1} was loaded instead", guid, asset.Guid);
+                Assert.Check(asset.Guid == guid, "Expected to load {0}, but {1} was loaded instead", asset.Guid, guid);
 
                 entry.LoadedAsset = asset;
                 entry.State.Exchange(EntryState.LoadedInvokingCallbacks);

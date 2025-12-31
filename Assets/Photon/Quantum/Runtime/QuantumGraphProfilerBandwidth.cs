@@ -1,50 +1,48 @@
 namespace Quantum.Profiling {
-  using Photon.Client;
 
   /// <summary>
   /// Gathers bandwidth statistics, uses an accumulator for feed averages into the graphs.
   /// </summary>
-  public sealed class QuantumGraphProfilerBandwidth : QuantumGraphProfilerValueSeries {
-
+  public sealed class QuantumGraphProfilerBandwidth : QuantumGraphProfilerAccumulator {
     /// <summary>
-    /// This profiler records two values: Incoming and Outgoing bandwidth in bytes per second.
+    /// Type of bandwidth collected.
     /// </summary>
-    protected override int ValueDimensions => 2;
-
-    TrafficStatsSnapshot _snapshotDelta;
-
-    /// <inheritdoc/>
-    protected override void OnActivated() {
-      base.OnActivated();
-
-      var peer = QuantumGraphProfilersUtility.GetNetworkPeer();
-
-      if (peer != null) {
-        _snapshotDelta = peer.Stats.ToSnapshot();
-      }
+    public enum BandwidthType {
+      /// <summary>
+      /// Incoming and outgoing bandwidth.
+      /// </summary>
+      Total,
+      /// <summary>
+      /// Only incoming bandwidth.
+      /// </summary>
+      Incoming,
+      /// <summary>
+      /// Only outgoing bandwidth.
+      /// </summary>
+      Outgoing
     }
 
     /// <summary>
-    /// Sample the values from the network peer.
+    /// Bandwidth type to be collected.
+    /// </summary>
+    public BandwidthType Type;
+
+    /// <summary>
+    /// Sample a value.
     /// </summary>
     protected override void OnUpdate() {
       var peer = QuantumGraphProfilersUtility.GetNetworkPeer();
 
-      var bytesIn = 0f;
-      var bytesOut = 0f;
-
       if (peer != null) {
-        if (_snapshotDelta != null) {
-          var snapShotDelta = peer.Stats.ToDelta(_snapshotDelta);
-          if (snapShotDelta.DeltaTime > 0) {
-            bytesIn = snapShotDelta.BytesIn / snapShotDelta.DeltaTime * 1000f;
-            bytesOut = snapShotDelta.BytesOut / snapShotDelta.DeltaTime * 1000f;
-          }
+        var bytes = 0L;
+        switch (Type) {
+          case BandwidthType.Incoming: bytes = peer.Stats.BytesIn; break;
+          case BandwidthType.Outgoing: bytes = peer.Stats.BytesOut; break;
+          case BandwidthType.Total: bytes = peer.Stats.BytesIn + peer.Stats.BytesOut; break;
         }
-        _snapshotDelta = peer.Stats.ToSnapshot();
-      }
 
-      AddValues(bytesIn, bytesOut);
+        AddValue(bytes);
+      }
     }
   }
 }

@@ -1,3 +1,5 @@
+using Unity.Collections.LowLevel.Unsafe;
+
 namespace Quantum {
     public unsafe class StageSystem : SystemSignalsOnly, ISignalOnGameStarting, ISignalOnMapChanged {
         public override void OnInit(Frame f) {
@@ -15,7 +17,7 @@ namespace Quantum {
                 f.ReallocStageTiles(count);
 
                 fixed (StageTileInstance* originalData = &stage.TileData[0]) {
-                    QuantumUnsafe.Copy(f.StageTiles, originalData, StageTileInstance.SIZE * count);
+                    UnsafeUtility.MemCpy(f.StageTiles, originalData, StageTileInstance.SIZE * count);
                 }
             } else {
                 // Not a valid VersusStage

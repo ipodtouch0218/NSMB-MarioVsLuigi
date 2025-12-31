@@ -2,7 +2,6 @@ namespace Quantum.Editor {
   using System;
   using System.Collections.Generic;
   using System.Diagnostics;
-  using System.Linq;
   using UnityEditor;
   using UnityEditor.AssetImporters;
   using UnityEngine;
@@ -12,17 +11,13 @@ namespace Quantum.Editor {
   using Object = UnityEngine.Object;
 
 #if UNITY_6000_3_OR_NEWER
-  using ObjectIdType = UnityEngine.EntityId;
-  using HierarchyIteratorType = UnityEditor.HierarchyIterator;
+  using InstanceIdType = UnityEngine.EntityId;
 #else 
-  using ObjectIdType = System.Int32;
-  using HierarchyIteratorType = UnityEditor.HierarchyProperty;
+  using InstanceIdType = System.Int32;
 #endif
   
-  [ScriptedImporter(6, Extension, importQueueOffset: ImportQueueOffset)]
+  [ScriptedImporter(6, Extension, importQueueOffset: 200000)]
   internal unsafe partial class QuantumUnityDBImporter : ScriptedImporter {
-    public const int ImportQueueOffset = 200000;
-    
     public const  string Extension              = "qunitydb";
     public const  string ExtensionWithDot       = ".qunitydb";
 
@@ -62,36 +57,12 @@ namespace Quantum.Editor {
 
       var factory = new QuantumAssetSourceFactory();
 
-      Profiler.BeginSample("QuantumAssetDB");
+      Profiler.BeginSample("QuantumAssetDB"); 
 
-      var scopeInfo = new ScopeContext(ctx);
-
-      {
-        Profiler.BeginSample("Discovering Scopes");
-
-        List<string> scopeGuids = new();
-
-        foreach (var it in AssetDatabaseUtils.IterateAssets(rootFolder, type: typeof(QuantumUnityDBScope))) {
-          var scopePath = AssetDatabaseUtils.GetAssetPathOrThrow(it.GetObjectId());
-          var importer = (QuantumUnityDBScopeImporter)AssetImporter.GetAtPath(scopePath);
-          scopeInfo.AddScope(importer);
-          scopeGuids.Add(it.guid);
-          ctx.DependsOnArtifact(scopePath);
-        }
-        
-        db.Scopes = scopeGuids.ToArray();
-        Profiler.EndSample();
-      }
-      
       {
         Profiler.BeginSample("Iterating Assets");
         foreach (var it in QuantumUnityDBUtilities.IterateAssets(rootFolder)) {
           try {
-            if (scopeInfo.Contains(it)) {
-              QuantumEditorLog.TraceImport(AssetDatabaseUtils.GetAssetGuidOrThrow(it.GetObjectId()), $"Asset not added to the DB, already a part of a scope");
-              continue;
-            }
-            
             var source = CreateAssetSource(factory, it.GetObjectId(), it.name, it.isMainRepresentation);
             if (source != default) {
               sources.Add(source);
@@ -129,7 +100,7 @@ namespace Quantum.Editor {
             try {
               db.AddSource(source, guid, path);  
             } catch (Exception ex) {
-              ctx.LogImportError($"{LogPrefix}Failed to add asset {guid} ({path}) to Quantum DB: {ex}", source.EditorInstance);
+              ctx.LogImportError($"{LogPrefix}Failed to add asset {guid} ({path}) to Quantum DB: {ex.Message}", source.EditorInstance);
             }
             
           }
@@ -151,7 +122,7 @@ namespace Quantum.Editor {
       ctx.SetMainObject(db);
     }
 
-    internal static (IQuantumAssetObjectSource, AssetGuid, string) CreateAssetSource(QuantumAssetSourceFactory factory, ObjectIdType instanceID, string unityAssetName, bool isMain) {
+    private (IQuantumAssetObjectSource, AssetGuid, string) CreateAssetSource(QuantumAssetSourceFactory factory, InstanceIdType instanceID, string unityAssetName, bool isMain) {
       
       var (unityAssetGuid, fileId) = AssetDatabaseUtils.GetGUIDAndLocalFileIdentifierOrThrow(instanceID);
       
@@ -172,7 +143,7 @@ namespace Quantum.Editor {
       return (source, quantumAssetGuid, quantumAssetPath);
     }
 
-    internal static readonly QuantumCustomDependency AssetObjectHashDependency = new QuantumCustomDependency("QuantumUnityDBImporterAssetObjectsDependency", () => {
+    static readonly QuantumCustomDependency AssetObjectHashDependency = new QuantumCustomDependency("QuantumUnityDBImporterAssetObjectsDependency", () => {
       var hash = new Hash128();
 
       foreach (var it in QuantumUnityDBUtilities.IterateAssets()) {
@@ -191,16 +162,10 @@ namespace Quantum.Editor {
         hash.Append(assetGuid);
       }
 
-      // adding/removing/moving the scope should update the DB as well
-      foreach (var it in AssetDatabaseUtils.IterateAssets(type: typeof(QuantumUnityDBScope))) {
-        hash.Append(it.guid);
-        hash.Append(AssetDatabase.GUIDToAssetPath(it.guid));
-      }
-
       return hash;
     });
 
-    internal static readonly QuantumCustomDependency AddressablesDependency = new QuantumCustomDependency("QuantumUnityDBImporterAddressablesDependency", () => {
+    static readonly QuantumCustomDependency AddressablesDependency = new QuantumCustomDependency("QuantumUnityDBImporterAddressablesDependency", () => {
 #if QUANTUM_ENABLE_ADDRESSABLES && !QUANTUM_DISABLE_ADDRESSABLES
       var assetsSettings = UnityEditor.AddressableAssets.AddressableAssetSettingsDefaultObject.Settings;
       if (assetsSettings) {
@@ -211,99 +176,5 @@ namespace Quantum.Editor {
     });
     
     public static void RefreshAssetObjectHash(bool immediate) => AssetObjectHashDependency.Refresh(immediate);
-
-    class ScopeContext {
-      public ScopeContext(AssetImportContext context) {
-        _ctx = context;
-      }
-      
-      readonly AssetImportContext                _ctx;
-      readonly List<ScopeEntry>                  _importers         = new();
-      readonly List<QuantumUnityDBScopeImporter> _matchingImporters = new();
-      
-      public void AddScope(QuantumUnityDBScopeImporter importer) {
-        HashSet<ObjectIdType> instances = null;
-        HashSet<string> bundles = null;
-        
-        if (importer.ExplicitAssets?.Length > 0) {
-          instances = new HashSet<ObjectIdType>();
-          foreach (var asset in importer.ExplicitAssets) {
-            instances.Add(asset.GetObjectId());
-          }
-        }
-
-        if (importer.AssetBundles?.Length > 0) {
-          foreach (var bundle in importer.AssetBundles) {
-            if (string.IsNullOrEmpty(bundle)) {
-              continue;
-            }
-
-            bundles ??= new HashSet<string>(StringComparer.Ordinal);
-            bundles.Add(bundle);
-          }
-        }
-        
-        _importers.Add(new ScopeEntry() {
-          Importer = importer,
-          Bundles = bundles,
-          Instances = instances,
-          FolderWithTrailingSlash = importer.IncludeSubfolders ? PathUtils.Normalize(System.IO.Path.GetDirectoryName(importer.assetPath)) + '/' : null,
-        });
-      }
-      
-      public bool Contains(HierarchyIteratorType it) {
-        string assetObjectPath = null;
-        string bundleName = null;
-        
-        _matchingImporters.Clear();
-        
-        foreach (var entry in _importers) {
-          if (entry.Instances?.Contains(it.GetObjectId()) == true) {
-            _matchingImporters.Add(entry.Importer);
-            continue;
-          }
-
-          if (entry.Bundles?.Contains(GetBundleName()) == true) {
-            _matchingImporters.Add(entry.Importer);
-            continue;
-          }
-
-          if (entry.FolderWithTrailingSlash != null && GetAssetPath().StartsWith(entry.FolderWithTrailingSlash, StringComparison.Ordinal)) {
-            _matchingImporters.Add(entry.Importer);
-            continue;
-          }
-        }
-        
-        if (_matchingImporters.Count == 0) {
-          return false;
-        }
-
-        if (_matchingImporters.Count > 1) {
-          foreach (var importer in _matchingImporters) {
-            if (importer.IsUnique) {
-              _ctx.LogImportWarning($"AssetObject {GetAssetPath()}{(it.isMainRepresentation ? "" : $" ({it.name})")} belongs to multiple scopes and at least one of them is marked as unique: {string.Join(", ", _matchingImporters.Select(x => x.assetPath))}");
-              break;
-            }
-          }
-        }
-
-        return true;
-        
-        string GetAssetPath() {
-          return assetObjectPath ??= AssetDatabaseUtils.GetAssetPathOrThrow(it.GetObjectId());
-        }
-
-        string GetBundleName() {
-          return bundleName ??= AssetDatabase.GetImplicitAssetBundleName(GetAssetPath());
-        }
-      }
-      
-      struct ScopeEntry {
-        public QuantumUnityDBScopeImporter Importer;
-        public HashSet<ObjectIdType>       Instances;
-        public HashSet<string>             Bundles;
-        public string                      FolderWithTrailingSlash;
-      }
-    }
   }
 }

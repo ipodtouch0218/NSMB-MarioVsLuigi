@@ -129,7 +129,7 @@ namespace Quantum {
             }
             }
 
-            f.Signals.OnProjectileHitEntity(projectileEntity, goombaEntity);
+            f.Signals.OnProjectileHitEntity(f, projectileEntity, goombaEntity);
         }
         #endregion
 

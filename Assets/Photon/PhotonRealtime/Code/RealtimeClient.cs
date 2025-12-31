@@ -904,7 +904,7 @@ namespace Photon.Realtime
         }
 
         /// <summary>Disconnects the client / peer from a server or stays disconnected. Internal method that sets the DisconnectedCause as well.</summary>
-        public void Disconnect(DisconnectCause cause)
+        public void Disconnect(DisconnectCause cause = DisconnectCause.DisconnectByClientLogic)
         {
             if (this.State == ClientState.Disconnecting || this.State == ClientState.Disconnected || this.State == ClientState.PeerCreated)
             {

@@ -14,7 +14,9 @@ namespace NSMB.Quantum {
         public bool IsPaused { get; set; }
 
         //---Serialized Variables
+#if UNITY_EDITOR || MVL_DEBUG
         [SerializeField] private List<DebugSpawnCommand> debugSpawnCommands = new();
+#endif
         [SerializeField] private PlayerElements playerElements;
 
         public void Start() {
@@ -34,27 +36,33 @@ namespace NSMB.Quantum {
 
             foreach (var debug in debugSpawnCommands) {
                 if (UnityEngine.Input.GetKeyDown(debug.KeyCode)) {
-                    game.AddCommand(new CommandMvLDebugCmd { 
+                    game.SendCommand(new CommandMvLDebugCmd { 
                         CommandId = CommandMvLDebugCmd.DebugCommand.SpawnEntity,
                         SpawnData = debug.Entity,
                     });
                 }
             }
             if (UnityEngine.Input.GetKeyDown(KeyCode.P)) {
-                game.AddCommand(new CommandMvLDebugCmd {
+                game.SendCommand(new CommandMvLDebugCmd {
                     CommandId = CommandMvLDebugCmd.DebugCommand.KillSelf,
                 });
             }
             if (UnityEngine.Input.GetKeyDown(KeyCode.O)) {
-                game.AddCommand(new CommandMvLDebugCmd {
+                game.SendCommand(new CommandMvLDebugCmd {
                     CommandId = CommandMvLDebugCmd.DebugCommand.FreezeSelf,
                 });
             }
         }
 
+        [Serializable]
+        public class DebugSpawnCommand {
+            public KeyCode KeyCode;
+            public AssetRef<EntityPrototype> Entity;
+        }
+
         public void OnPowerupAction(InputAction.CallbackContext context) {
             if (!playerElements.IsSpectating && !playerElements.PauseMenu.IsPaused) {
-                QuantumRunner.DefaultGame.AddCommand(new CommandSpawnReserveItem());
+                QuantumRunner.DefaultGame.SendCommand(new CommandSpawnReserveItem());
             }
         }
 
@@ -94,13 +102,5 @@ namespace NSMB.Quantum {
 
             callback.SetInput(i, DeterministicInputFlags.Repeatable);
         }
-
-
-        [Serializable]
-        public class DebugSpawnCommand {
-            public KeyCode KeyCode;
-            public AssetRef<EntityPrototype> Entity;
-        }
-
     }
 }

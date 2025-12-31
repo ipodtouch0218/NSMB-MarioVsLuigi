@@ -197,7 +197,7 @@ namespace NSMB.UI.Game.Results {
                     // Vote to continue
                     if (!votedToContinue) {
                         foreach (int slot in Game.GetLocalPlayerSlots()) {
-                            Game.AddCommand(slot, new CommandEndGameContinue());
+                            Game.SendCommand(slot, new CommandEndGameContinue());
                         }
                         sfx.PlayOneShot(SoundEffect.UI_Decide);
                         votedToContinue = true;

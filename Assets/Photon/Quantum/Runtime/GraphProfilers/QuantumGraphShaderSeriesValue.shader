@@ -7,6 +7,7 @@ Shader "Quantum/Value Series Graph"
 		_Threshold1Color      ("Threshold 1 Color",      Color)    = (1.0, 1.0, 0.0, 1.0)
 		_Threshold2Color      ("Threshold 2 Color",      Color)    = (1.0, 0.5, 0.0, 1.0)
 		_Threshold3Color      ("Threshold 3 Color",      Color)    = (1.0, 0.0, 0.0, 1.0)
+
 		_FadeColorIntensity   ("Fade Color Intensity",   Float)    = 1.0
 		_PointsThickness      ("Points Thickness",       Float)    = 1.0
 		_LinesThickness       ("Lines Thickness",        Float)    = 1.0
