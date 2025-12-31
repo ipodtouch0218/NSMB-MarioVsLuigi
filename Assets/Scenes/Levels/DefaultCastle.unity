@@ -20,7 +20,7 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.54901963, g: 0.5882353, b: 0.627451, a: 1}
+  m_AmbientSkyColor: {r: 0.5176471, g: 0.45882353, b: 0.45882353, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
@@ -693,7 +693,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 0
-      m_TileSpriteIndex: 0
+      m_TileSpriteIndex: 8
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -1283,7 +1283,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 0
-      m_TileSpriteIndex: 0
+      m_TileSpriteIndex: 9
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -1293,7 +1293,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 0
-      m_TileSpriteIndex: 5
+      m_TileSpriteIndex: 6
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -1883,7 +1883,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 0
-      m_TileSpriteIndex: 5
+      m_TileSpriteIndex: 7
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -1893,7 +1893,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 0
-      m_TileSpriteIndex: 5
+      m_TileSpriteIndex: 6
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -2483,7 +2483,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 0
-      m_TileSpriteIndex: 5
+      m_TileSpriteIndex: 7
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -2493,7 +2493,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 0
-      m_TileSpriteIndex: 3
+      m_TileSpriteIndex: 2
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -3083,7 +3083,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 0
-      m_TileSpriteIndex: 3
+      m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -4539,32 +4539,32 @@ Tilemap:
   - m_RefCount: 22
     m_Data: {fileID: 11400000, guid: 95716fa9d9afd16448ed70cb46c96703, type: 2}
   m_TileSpriteArray:
-  - m_RefCount: 56
+  - m_RefCount: 54
     m_Data: {fileID: -3604267399344534220, guid: a4f9db535870eae41abdc512667ac3d3,
       type: 3}
-  - m_RefCount: 9
-    m_Data: {fileID: 464114312144006252, guid: a4f9db535870eae41abdc512667ac3d3, type: 3}
   - m_RefCount: 10
+    m_Data: {fileID: 464114312144006252, guid: a4f9db535870eae41abdc512667ac3d3, type: 3}
+  - m_RefCount: 11
     m_Data: {fileID: 7542390983593812097, guid: a4f9db535870eae41abdc512667ac3d3,
       type: 3}
-  - m_RefCount: 51
+  - m_RefCount: 49
     m_Data: {fileID: -2204218097580962714, guid: a4f9db535870eae41abdc512667ac3d3,
       type: 3}
   - m_RefCount: 11
     m_Data: {fileID: 1910207137, guid: a4f9db535870eae41abdc512667ac3d3, type: 3}
-  - m_RefCount: 174
+  - m_RefCount: 170
     m_Data: {fileID: 6420436966992209846, guid: a4f9db535870eae41abdc512667ac3d3,
       type: 3}
-  - m_RefCount: 20
+  - m_RefCount: 22
     m_Data: {fileID: -1814156446696734081, guid: a4f9db535870eae41abdc512667ac3d3,
       type: 3}
-  - m_RefCount: 21
+  - m_RefCount: 23
     m_Data: {fileID: -3566987879499669825, guid: a4f9db535870eae41abdc512667ac3d3,
       type: 3}
-  - m_RefCount: 2
+  - m_RefCount: 3
     m_Data: {fileID: 6870441859917194535, guid: a4f9db535870eae41abdc512667ac3d3,
       type: 3}
-  - m_RefCount: 2
+  - m_RefCount: 3
     m_Data: {fileID: -7328405571476808372, guid: a4f9db535870eae41abdc512667ac3d3,
       type: 3}
   - m_RefCount: 10
@@ -14947,7 +14947,7 @@ Light:
   serializedVersion: 11
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1.1
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
