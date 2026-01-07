@@ -499,6 +499,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""Marker"",
+                    ""type"": ""Button"",
+                    ""id"": ""29e435c6-e6ce-4263-98a6-02cdfcfac928"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""Next"",
                     ""type"": ""Button"",
                     ""id"": ""0c263a71-9606-485f-8149-4ea77c761c1a"",
@@ -1187,6 +1196,50 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""action"": ""Next"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2f2408cd-5b0c-4619-991d-a1d1e717a8a7"",
+                    ""path"": ""<Keyboard>/backspace"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""Marker"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""77284594-48b4-429d-8309-99a5d21e6182"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""Marker"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7676706b-0a1b-4631-91fc-0f21da1d4d0b"",
+                    ""path"": ""<Gamepad>/leftStickPress"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""Marker"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7734d819-429d-47b1-b2ef-3311e6fdb971"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""Marker"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -1521,6 +1574,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_UI_Cancel = m_UI.FindAction("Cancel", throwIfNotFound: true);
         m_UI_Pause = m_UI.FindAction("Pause", throwIfNotFound: true);
         m_UI_Scoreboard = m_UI.FindAction("Scoreboard", throwIfNotFound: true);
+        m_UI_Marker = m_UI.FindAction("Marker", throwIfNotFound: true);
         m_UI_Next = m_UI.FindAction("Next", throwIfNotFound: true);
         m_UI_Previous = m_UI.FindAction("Previous", throwIfNotFound: true);
         m_UI_SpectatePlayerByIndex = m_UI.FindAction("!SpectatePlayerByIndex", throwIfNotFound: true);
@@ -1766,6 +1820,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_Cancel;
     private readonly InputAction m_UI_Pause;
     private readonly InputAction m_UI_Scoreboard;
+    private readonly InputAction m_UI_Marker;
     private readonly InputAction m_UI_Next;
     private readonly InputAction m_UI_Previous;
     private readonly InputAction m_UI_SpectatePlayerByIndex;
@@ -1805,6 +1860,10 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "UI/Scoreboard".
         /// </summary>
         public InputAction @Scoreboard => m_Wrapper.m_UI_Scoreboard;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/Marker".
+        /// </summary>
+        public InputAction @Marker => m_Wrapper.m_UI_Marker;
         /// <summary>
         /// Provides access to the underlying input action "UI/Next".
         /// </summary>
@@ -1878,6 +1937,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Scoreboard.started += instance.OnScoreboard;
             @Scoreboard.performed += instance.OnScoreboard;
             @Scoreboard.canceled += instance.OnScoreboard;
+            @Marker.started += instance.OnMarker;
+            @Marker.performed += instance.OnMarker;
+            @Marker.canceled += instance.OnMarker;
             @Next.started += instance.OnNext;
             @Next.performed += instance.OnNext;
             @Next.canceled += instance.OnNext;
@@ -1928,6 +1990,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Scoreboard.started -= instance.OnScoreboard;
             @Scoreboard.performed -= instance.OnScoreboard;
             @Scoreboard.canceled -= instance.OnScoreboard;
+            @Marker.started -= instance.OnMarker;
+            @Marker.performed -= instance.OnMarker;
+            @Marker.canceled -= instance.OnMarker;
             @Next.started -= instance.OnNext;
             @Next.performed -= instance.OnNext;
             @Next.canceled -= instance.OnNext;
@@ -2321,6 +2386,13 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnScoreboard(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Marker" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMarker(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Next" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

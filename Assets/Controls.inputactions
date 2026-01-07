@@ -413,6 +413,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Marker",
+                    "type": "Button",
+                    "id": "29e435c6-e6ce-4263-98a6-02cdfcfac928",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Next",
                     "type": "Button",
                     "id": "0c263a71-9606-485f-8149-4ea77c761c1a",
@@ -1099,6 +1108,50 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "Next",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2f2408cd-5b0c-4619-991d-a1d1e717a8a7",
+                    "path": "<Keyboard>/backspace",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard",
+                    "action": "Marker",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "77284594-48b4-429d-8309-99a5d21e6182",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard",
+                    "action": "Marker",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7676706b-0a1b-4631-91fc-0f21da1d4d0b",
+                    "path": "<Gamepad>/leftStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "Marker",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7734d819-429d-47b1-b2ef-3311e6fdb971",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "Marker",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
