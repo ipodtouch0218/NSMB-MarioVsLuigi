@@ -3,13 +3,13 @@
 --- !u!159 &1
 EditorSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 14
+  serializedVersion: 15
   m_SerializationMode: 2
   m_LineEndingsForNewScripts: 1
   m_DefaultBehaviorMode: 1
   m_PrefabRegularEnvironment: {fileID: 0}
   m_PrefabUIEnvironment: {fileID: 0}
-  m_SpritePackerMode: 4
+  m_SpritePackerMode: 5
   m_SpritePackerCacheSize: 10
   m_SpritePackerPaddingPower: 1
   m_Bc7TextureCompressor: 0
@@ -47,3 +47,4 @@ EditorSettings:
   m_CacheServerDownloadBatchSize: 128
   m_EnableEnlightenBakedGI: 0
   m_ReferencedClipsExactNaming: 0
+  m_ForceAssetUnloadAndGCOnSceneLoad: 1

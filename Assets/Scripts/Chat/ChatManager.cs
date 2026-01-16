@@ -48,6 +48,7 @@ namespace NSMB.Chat {
             QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged, FilterOutReplay);
             QuantumEvent.Subscribe<EventPlayerKickedFromRoom>(this, OnPlayerKickedFromRoom, FilterOutReplay);
             QuantumEvent.Subscribe<EventPlayerUnbanned>(this, OnPlayerUnbanned, FilterOutReplay);
+            QuantumEvent.Subscribe<EventPlayerTeamChangedByHost>(this, OnPlayerTeamChangedByHost, FilterOutReplay);
         }
 
         private void OnUpdateView(CallbackUpdateView e) {
@@ -192,6 +193,18 @@ namespace NSMB.Chat {
         private void OnHostChanged(EventHostChanged e) {
             if (e.Game.PlayerIsLocal(e.NewHost)) {
                 AddSystemMessage("ui.inroom.chat.hostreminder", Red);
+            }
+        }
+
+        private void OnPlayerTeamChangedByHost(EventPlayerTeamChangedByHost e) {
+            if (e.Game.PlayerIsLocal(e.Player)) {
+                Frame f = e.Game.Frames.Predicted;
+                var teams = f.SimulationConfig.Teams;
+                if (e.Team < teams.Length) {
+                    AddSystemMessage("ui.inroom.chat.player.changeteam", Blue, "team", f.FindAsset(teams[e.Team]).nameTranslationKey);
+                } else {
+                    AddSystemMessage("ui.inroom.chat.player.changeteam.unlocked", Blue);
+                }
             }
         }
     }

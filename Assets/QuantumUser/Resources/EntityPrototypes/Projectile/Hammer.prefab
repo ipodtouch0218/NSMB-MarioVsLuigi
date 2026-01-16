@@ -88,14 +88,14 @@ MonoBehaviour:
         RawValue: 0
       BoxExtents:
         X:
-          RawValue: 8291
+          RawValue: 8192
         Y:
-          RawValue: 8239
+          RawValue: 8192
       PositionOffset:
         X:
           RawValue: 0
         Y:
-          RawValue: 428
+          RawValue: 0
       RotationOffset:
         RawValue: 0
       UserTag: 0
@@ -354,6 +354,7 @@ MonoBehaviour:
         Value: 395779911797546411
     Speed:
       RawValue: 0
+    Lifetime: 60
 --- !u!114 &-8827579426703279798
 MonoBehaviour:
   m_ObjectHideFlags: 0

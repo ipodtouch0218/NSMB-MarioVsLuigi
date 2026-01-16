@@ -264,6 +264,7 @@ namespace Quantum {
                 // First player is host
                 newData->IsRoomHost = true;
                 newData->IsReady = false;
+                newData->IsTeamLocked = false;
                 f.Global->Host = player;
                 f.Events.HostChanged(player);
             }
@@ -281,6 +282,7 @@ namespace Quantum {
         }
 
         public void OnPlayerRemoved(Frame f, PlayerRef player) {
+            UnityEngine.Debug.Log(player + " left");
             var playerDatas = f.ResolveDictionary(f.Global->PlayerDatas);
             bool hostChanged = false;
 
@@ -311,6 +313,7 @@ namespace Quantum {
                     if (youngestPlayer != null) {
                         youngestPlayer->IsRoomHost = true;
                         youngestPlayer->IsReady = false;
+                        youngestPlayer->IsTeamLocked = false;
                         f.Global->Host = youngestPlayer->PlayerRef;
                         f.Events.HostChanged(youngestPlayer->PlayerRef);
                     }
@@ -399,9 +402,8 @@ namespace Quantum {
 
             // Assign random spawnpoints
             f.Global->TotalMarios = (byte) f.ComponentCount<MarioPlayer>();
-            List<int> spawnpoints = Enumerable.Range(0, f.ComponentCount<MarioPlayer>()).ToList();
-            var allMarios = f.Filter<MarioPlayer>();
-            while (allMarios.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {
+            List<int> spawnpoints = Enumerable.Range(0, f.Global->TotalMarios).ToList();
+            foreach ((var entity, var mario) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
                 int randomIndex = FPMath.FloorToInt(f.RNG->Next() * spawnpoints.Count);
                 mario->SpawnpointIndex = (byte) spawnpoints[randomIndex];
                 spawnpoints.RemoveAt(randomIndex);

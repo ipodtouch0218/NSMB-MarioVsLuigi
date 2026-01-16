@@ -45,7 +45,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0413bd8db4f29e3488d92156dc397190, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Asset: {fileID: 0}
+  AssetRef:
+    Id:
+      Value: 0
   BakeAllMode: 112
   NavMeshSerializeType: 0
   StaticCollider2DReferences: []
@@ -61,6 +63,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  Asset: {fileID: 0}
 --- !u!114 &2164258291205668163
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -744,6 +747,7 @@ MonoBehaviour:
   PoolablePrefabs:
   - {fileID: 6307920351473437675, guid: 00a2ef66a322a694c837b29404f2af49, type: 3}
   - {fileID: 6307920351473437675, guid: 8d3d3c8acd39a594c9077e49f837ec4a, type: 3}
+  - {fileID: 6307920351473437675, guid: 54ff1db4c7e9f02408395af6bf74b0c4, type: 3}
   - {fileID: 1973747262660636106, guid: d6c38f51091fae64fa27d92f9415b3ab, type: 3}
   - {fileID: 5780648777663731097, guid: 72667665d438ddc4daa05bc414f27a9c, type: 3}
 --- !u!114 &599652891852148525
@@ -759,7 +763,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MapData: {fileID: 7682502346014357760}
-  Stage: {fileID: 0}
 --- !u!1 &9097954689152686375
 GameObject:
   m_ObjectHideFlags: 0
@@ -822,7 +825,6 @@ MonoBehaviour:
       Id:
         Value: 3654882389298375385
     IsRealGame: 0
-  UseRandomSeed: 1
   SessionConfig: {fileID: 11400000, guid: a095ff8a2ef576047bdebfec7a20e387, type: 2}
   LocalPlayers:
   - PlayerAvatar:
@@ -832,20 +834,24 @@ MonoBehaviour:
     UserId: 
     UseColoredNickname: 0
     NicknameColor: 
-    Character: 0
-    Palette: 0
+    Character:
+      Id:
+        Value: 0
+    Palette:
+      Id:
+        Value: 0
   MaxPlayerCount: 10
   SimulationSpeedMultiplier: 1
-  DisplaySaveAndReloadButton: 0
+  UseRandomSeed: 1
   PreloadAddressables: 0
   DynamicAssetDB:
     OnInitialDynamicAssetsRequested:
       m_PersistentCalls:
         m_Calls: []
     IsLegacyModeEnabled: 0
-  OnBeforeStart:
-    m_PersistentCalls:
-      m_Calls: []
+  SnapshotFile: {fileID: 0}
+  DatabaseFile: {fileID: 0}
+  DBScopes: []
 --- !u!1001 &193195408209990055
 PrefabInstance:
   m_ObjectHideFlags: 0

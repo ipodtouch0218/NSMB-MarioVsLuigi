@@ -33,5 +33,6 @@ MonoBehaviour:
   InheritShooterVelocity: 0
   HasCollision: 0
   DoesntEffectBlueShell: 1
-  DestroyParticleEffect: 0
+  DestroyParticleEffect: 8
   ShootSound: 106
+  SfxOverrides: []

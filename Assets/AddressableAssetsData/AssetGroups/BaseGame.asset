@@ -60,6 +60,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e7ce079f9e02aaf498d81eb08e138d59
+    m_Address: Resources/EntityPrototypes/World/DonutBlockEntityPrototype.qprototype
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 1bed88ed79bf8f74fb164b168fd35146, type: 2}
   m_SchemaSet:

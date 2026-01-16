@@ -10,7 +10,8 @@ namespace Quantum {
         }
 
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
-            if (f.Global->GameState != GameState.PreGameRoom || !playerData->IsRoomHost) {
+            if (f.Global->GameState != GameState.PreGameRoom
+                || !playerData->IsRoomHost) {
                 return;
             }
 

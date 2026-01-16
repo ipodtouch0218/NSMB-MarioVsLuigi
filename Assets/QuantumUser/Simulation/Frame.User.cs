@@ -47,5 +47,9 @@
 
             StageTilesLength = newSize;
         }
+
+        public bool PlayerIsConnected(PlayerRef player) {
+            return ResolveDictionary(Global->PlayerDatas).ContainsKey(player);
+        }
     }
 }

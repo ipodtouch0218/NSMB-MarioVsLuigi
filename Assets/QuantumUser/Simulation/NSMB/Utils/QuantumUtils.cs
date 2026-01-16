@@ -3,7 +3,6 @@ using Quantum;
 using Quantum.Collections;
 using Quantum.Core;
 using System;
-using System.Collections.Generic;
 
 public static unsafe class QuantumUtils {
 
@@ -220,8 +219,7 @@ public static unsafe class QuantumUtils {
     public static int GetValidTeams(Frame f) {
         int result = 0;
 
-        var allPlayers = f.Filter<PlayerData>();
-        while (allPlayers.NextUnsafe(out _, out PlayerData* data)) {
+        foreach ((_, var data) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
             if (data->IsSpectator) {
                 continue;
             }
@@ -416,10 +414,7 @@ public static unsafe class QuantumUtils {
         PlayerData** allPlayerDatas = stackalloc PlayerData*[playerDataCount];
         
         int index = 0;
-        var playerDataFilter = f.Filter<PlayerData>();
-        playerDataFilter.UseCulling = false;
-
-        while (playerDataFilter.NextUnsafe(out _, out PlayerData* pd)) {
+        foreach ((_, var pd) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
             allPlayerDatas[index++] = pd;
         }
 
@@ -448,7 +443,7 @@ public static unsafe class QuantumUtils {
                 byte team = pd->RequestedTeam;
                 if (firstTeam.HasValue) {
                     if (firstTeam != team) {
-                        goto skip;
+                        return true;
                     }
                 } else {
                     firstTeam = team;
@@ -457,35 +452,18 @@ public static unsafe class QuantumUtils {
             return false;
         }
 
-        skip:
         return true;
     }
 
     public static bool Decrement(ref byte timer) {
-        if (timer > 0) {
-            return --timer == 0;
-        }
-
-        return true;
+        return timer <= 0 || --timer == 0;
     }
 
     public static bool Decrement(ref ushort timer) {
-        if (timer > 0) {
-            return --timer == 0;
-        }
-
-        return true;
+        return timer <= 0 || --timer == 0;
     }
 
     public static bool Decrement(ref int timer) {
-        if (timer > 0) {
-            return --timer == 0;
-        }
-
-        return true;
+        return timer <= 0 || --timer == 0;
     }
-}
-
-public static class Extensions {
-    public static IEnumerator<T> GetEnumerator<T>(this IEnumerator<T> enumerator) => enumerator;
 }

@@ -269,7 +269,7 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.CoinItem))]
   public unsafe partial class CoinItemPrototype : ComponentPrototype<Quantum.CoinItem> {
     public AssetRef<CoinItemAsset> Scriptable;
-    public Int32 Lifetime;
+    public UInt16 Lifetime;
     partial void MaterializeUser(Frame frame, ref Quantum.CoinItem result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.CoinItem component = default;
@@ -799,6 +799,7 @@ namespace Quantum.Prototypes {
     public QBoolean IsSpectator;
     public QBoolean ManualSpectator;
     public QBoolean VotedToContinue;
+    public QBoolean IsTeamLocked;
     public Int32 Wins;
     public Byte RealTeam;
     public Int32 LastChatMessage;
@@ -822,6 +823,7 @@ namespace Quantum.Prototypes {
         result.IsSpectator = this.IsSpectator;
         result.ManualSpectator = this.ManualSpectator;
         result.VotedToContinue = this.VotedToContinue;
+        result.IsTeamLocked = this.IsTeamLocked;
         result.Wins = this.Wins;
         result.RealTeam = this.RealTeam;
         result.LastChatMessage = this.LastChatMessage;
@@ -880,6 +882,7 @@ namespace Quantum.Prototypes {
   public unsafe partial class ProjectilePrototype : ComponentPrototype<Quantum.Projectile> {
     public AssetRef<ProjectileAsset> Asset;
     public FP Speed;
+    public Byte Lifetime;
     partial void MaterializeUser(Frame frame, ref Quantum.Projectile result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.Projectile component = default;
@@ -889,6 +892,7 @@ namespace Quantum.Prototypes {
     public void Materialize(Frame frame, ref Quantum.Projectile result, in PrototypeMaterializationContext context = default) {
         result.Asset = this.Asset;
         result.Speed = this.Speed;
+        result.Lifetime = this.Lifetime;
         MaterializeUser(frame, ref result, in context);
     }
   }
