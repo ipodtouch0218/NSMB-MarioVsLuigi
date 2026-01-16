@@ -3,6 +3,7 @@ using NSMB.Replay;
 using NSMB.UI.Game;
 using Photon.Deterministic;
 using Quantum;
+using Quantum.Core;
 using System.Linq;
 
 namespace NSMB.Utilities {

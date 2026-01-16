@@ -7,10 +7,13 @@ namespace Quantum {
 
         public override void Serialize(BitStream stream) {
             stream.Serialize(ref Target);
-
         }
+
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
-            if (f.Global->GameState != GameState.PreGameRoom || sender == Target || !playerData->IsRoomHost) {
+            if (f.Global->GameState != GameState.PreGameRoom
+                || !playerData->IsRoomHost 
+                || sender == Target 
+                || !f.PlayerIsConnected(Target)) {
                 // Can't ban
                 return;
             }

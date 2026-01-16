@@ -1,5 +1,6 @@
 using JimmysUnityUtilities;
 using NSMB.Chat;
+using NSMB.UI.Elements;
 using NSMB.Utilities;
 using Quantum;
 using System;
@@ -37,7 +38,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         [SerializeField] private RectTransform background, dropdownBackgroundImage;
         [SerializeField] private GameObject blockerTemplate, dropdownOptions, firstButton, chattingIcon, settingsIcon, readyIcon;
         [SerializeField] private LayoutElement layout;
-        [SerializeField] private Button[] allOptions, adminOnlyOptions, othersOnlyOptions;
+        [SerializeField] private Button[] allOptions, adminOnlyOptions, othersOnlyOptions, teamsOnlyOptions;
         [SerializeField] private GameObject playerExistsGameObject;
 
         //---Private Variables
@@ -195,13 +196,8 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
 
             QuantumGame game = QuantumRunner.DefaultGame;
-            bool adminOptions = false;
-            foreach (PlayerRef localPlayer in game.GetLocalPlayers()) {
-                if (QuantumUtils.GetPlayerData(game.Frames.Predicted, localPlayer)->IsRoomHost) {
-                    adminOptions = true;
-                    break;
-                }
-            }
+            Frame f = game.Frames.Predicted;
+            bool adminOptions = game.PlayerIsLocal(f.Global->Host);
 
             if (!adminOptions) {
                 foreach (var optionButton in adminOnlyOptions) {
@@ -212,6 +208,12 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             bool othersOptions = !game.PlayerIsLocal(player);
             if (!othersOptions) {
                 foreach (var optionButton  in othersOnlyOptions) {
+                    optionButton.gameObject.SetActive(false);
+                }
+            }
+
+            if (!f.Global->Rules.TeamsEnabled) {
+                foreach (var optionButton in teamsOnlyOptions) {
                     optionButton.gameObject.SetActive(false);
                 }
             }
@@ -319,12 +321,27 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
             if (game.PlayerIsLocal(host)) {
                 game.AddCommand(game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)], new CommandChangeHost {
-                    NewHost = player,
+                    Target = player,
                 });
                 RuntimePlayer runtimePlayer = f.GetPlayerData(player);
                 if (runtimePlayer != null) {
                     ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promoted", ChatManager.Blue, "playername", runtimePlayer.PlayerNickname.ToValidNickname(f, player));
                 }
+            }
+
+            HideDropdown(true);
+        }
+
+        public unsafe void AssignPlayerTeam(ContextMenuTeamSelector selector) {
+            QuantumGame game = QuantumRunner.DefaultGame;
+            Frame f = game.Frames.Predicted;
+            PlayerRef host = f.Global->Host;
+
+            if (game.PlayerIsLocal(host)) {
+                game.AddCommand(game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)], new CommandAssignTeam {
+                    Target = player,
+                    Team = (byte) selector.TeamIndex,
+                });
             }
 
             HideDropdown(true);

@@ -3,6 +3,7 @@ import enum ParticleEffect(byte);
 table component Projectile {
 	AssetRef<ProjectileAsset> Asset;
 	FP Speed;
+	byte Lifetime;
 
 	[ExcludeFromPrototype] EntityRef Owner;
 	[ExcludeFromPrototype] bool FacingRight;

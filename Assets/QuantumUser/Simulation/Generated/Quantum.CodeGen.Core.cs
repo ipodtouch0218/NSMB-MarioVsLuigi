@@ -1915,7 +1915,7 @@ namespace Quantum {
     [FieldOffset(16)]
     public AssetRef<CoinItemAsset> Scriptable;
     [FieldOffset(4)]
-    public Int32 Lifetime;
+    public UInt16 Lifetime;
     [FieldOffset(2)]
     [ExcludeFromPrototype()]
     public PowerupSpawnReason SpawnReason;
@@ -3106,10 +3106,12 @@ namespace Quantum {
     public Byte RequestedTeam;
     [FieldOffset(40)]
     public QBoolean IsSpectator;
-    [FieldOffset(44)]
-    public QBoolean ManualSpectator;
     [FieldOffset(48)]
+    public QBoolean ManualSpectator;
+    [FieldOffset(52)]
     public QBoolean VotedToContinue;
+    [FieldOffset(44)]
+    public QBoolean IsTeamLocked;
     [FieldOffset(16)]
     public Int32 Wins;
     [FieldOffset(0)]
@@ -3136,6 +3138,7 @@ namespace Quantum {
         hash = hash * 31 + IsSpectator.GetHashCode();
         hash = hash * 31 + ManualSpectator.GetHashCode();
         hash = hash * 31 + VotedToContinue.GetHashCode();
+        hash = hash * 31 + IsTeamLocked.GetHashCode();
         hash = hash * 31 + Wins.GetHashCode();
         hash = hash * 31 + RealTeam.GetHashCode();
         hash = hash * 31 + LastChatMessage.GetHashCode();
@@ -3160,6 +3163,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsReady, serializer);
         QBoolean.Serialize(&p->IsRoomHost, serializer);
         QBoolean.Serialize(&p->IsSpectator, serializer);
+        QBoolean.Serialize(&p->IsTeamLocked, serializer);
         QBoolean.Serialize(&p->ManualSpectator, serializer);
         QBoolean.Serialize(&p->VotedToContinue, serializer);
         AssetRef.Serialize(&p->Character, serializer);
@@ -3205,6 +3209,8 @@ namespace Quantum {
     public AssetRef<ProjectileAsset> Asset;
     [FieldOffset(32)]
     public FP Speed;
+    [FieldOffset(1)]
+    public Byte Lifetime;
     [FieldOffset(24)]
     [ExcludeFromPrototype()]
     public EntityRef Owner;
@@ -3225,6 +3231,7 @@ namespace Quantum {
         var hash = 16141;
         hash = hash * 31 + Asset.GetHashCode();
         hash = hash * 31 + Speed.GetHashCode();
+        hash = hash * 31 + Lifetime.GetHashCode();
         hash = hash * 31 + Owner.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
         hash = hash * 31 + HasBounced.GetHashCode();
@@ -3236,6 +3243,7 @@ namespace Quantum {
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Projectile*)ptr;
         serializer.Stream.Serialize(&p->Combo);
+        serializer.Stream.Serialize(&p->Lifetime);
         QBoolean.Serialize(&p->CheckedCollision, serializer);
         QBoolean.Serialize(&p->FacingRight, serializer);
         QBoolean.Serialize(&p->HasBounced, serializer);

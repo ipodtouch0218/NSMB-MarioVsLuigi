@@ -1,5 +1,4 @@
 using Photon.Deterministic;
-using Quantum.Collections;
 
 namespace Quantum {
     public unsafe class ProjectileSystem : SystemMainThreadEntityFilter<Projectile, ProjectileSystem.Filter>, ISignalOnProjectileHitEntity {
@@ -25,8 +24,14 @@ namespace Quantum {
             }
 
             var projectile = filter.Projectile;
-            var physicsObject = filter.PhysicsObject;
             var asset = f.FindAsset(projectile->Asset);
+
+            if (projectile->Lifetime > 0 && QuantumUtils.Decrement(ref projectile->Lifetime)) {
+                // Despawn via timer
+                Destroy(f, filter.Entity, asset.DestroyParticleEffect);
+            }
+
+            var physicsObject = filter.PhysicsObject;
 
             // Check to instant-despawn if spawned inside a wall
             if (!physicsObject->DisableCollision && !projectile->CheckedCollision) {
@@ -51,14 +56,16 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
 
             // Despawn
-            if ((physicsObject->IsTouchingLeftWall
-                || physicsObject->IsTouchingRightWall
-                || physicsObject->IsTouchingCeiling
-                || (physicsObject->IsTouchingGround && (!asset.Bounce || (projectile->HasBounced && asset.DestroyOnSecondBounce)))
-                || PhysicsObjectSystem.BoxInGround(f, filter.Transform->Position, filter.PhysicsCollider->Shape)) && !physicsObject->DisableCollision) {
+            if (!physicsObject->DisableCollision) {
+                if (physicsObject->IsTouchingLeftWall
+                    || physicsObject->IsTouchingRightWall
+                    || physicsObject->IsTouchingCeiling
+                    || (physicsObject->IsTouchingGround && (!asset.Bounce || (projectile->HasBounced && asset.DestroyOnSecondBounce)))
+                    || PhysicsObjectSystem.BoxInGround(f, filter.Transform->Position, filter.PhysicsCollider->Shape)) {
 
-                Destroy(f, filter.Entity, asset.DestroyParticleEffect);
-                return;
+                    Destroy(f, filter.Entity, asset.DestroyParticleEffect);
+                    return;
+                }
             }
 
             // Bounce

@@ -57,6 +57,11 @@ namespace Quantum {
             systems.Add(new StageSystem());
 
             if (!gameConfig.IsRealGame) {
+                var debugSystem = DebugCommand.CreateSystem();
+                if (debugSystem != null) {
+                    systems.Add(debugSystem);
+                }
+
                 systems.Add(new MvLDebugSystem());
             }
         }

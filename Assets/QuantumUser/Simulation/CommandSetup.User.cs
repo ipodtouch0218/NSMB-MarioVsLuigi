@@ -30,6 +30,7 @@ namespace Quantum {
             factories.Add(new CommandBanPlayer());
             factories.Add(new CommandKickPlayer());
             factories.Add(new CommandUnbanPlayer());
+            factories.Add(new CommandAssignTeam());
             factories.Add(new CommandMvLDebugCmd());
         }
     }

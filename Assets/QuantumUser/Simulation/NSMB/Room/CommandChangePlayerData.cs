@@ -29,8 +29,8 @@ namespace Quantum {
 
             Changes playerChanges = EnabledChanges;
 
-            if (f.Global->GameStartFrames > 0) {
-                // Cannot change team when game is in countdown
+            if (f.Global->GameStartFrames > 0 || playerData->IsTeamLocked) {
+                // Cannot change team when game is in countdown, or when the host says so.
                 playerChanges &= ~Changes.Team;
             }
 
