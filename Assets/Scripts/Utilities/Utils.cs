@@ -156,6 +156,19 @@ namespace NSMB.Utilities {
         }
 
         private static readonly Color spectatorColor = new(0.8f, 0.8f, 0.8f, 0.7f);
+        private static readonly Color[] playerColorPalette = new Color[] {
+            new Color32(0xFF, 0x00, 0x00, 0xFF), // #FF0000 Red
+            new Color32(0x00, 0x80, 0x00, 0xFF), // #008000 Green
+            new Color32(0xFF, 0xFF, 0x00, 0xFF), // #FFFF00 Yellow
+            new Color32(0x00, 0x00, 0xFF, 0xFF), // #0000FF Blue
+            new Color32(0xFF, 0x80, 0x00, 0xFF), // #FF8000 Orange
+            new Color32(0x00, 0xFF, 0xFF, 0xFF), // #00FFFF Cyan
+            new Color32(0x00, 0xFF, 0x00, 0xFF), // #00FF00 Lime
+            new Color32(0x80, 0x40, 0x00, 0xFF), // #804000 Brown
+            new Color32(0xFF, 0x00, 0xFF, 0xFF), // #FF00FF Magenta
+            new Color32(0x80, 0x06, 0xFF, 0xFF), // #8006FF Purple
+        };
+
         public unsafe static Color GetPlayerColor(Frame f, PlayerRef player, float s = 1, float v = 1, bool considerDisqualifications = true) {
             if (f == null || player == PlayerRef.None) {
                 return spectatorColor;
@@ -230,7 +243,12 @@ namespace NSMB.Utilities {
                 }
             }
 
-            return Color.HSVToRGB(ourIndex / (totalPlayers + 1f), s, v);
+            Color baseColor = playerColorPalette[ourIndex % playerColorPalette.Length];
+            Color.RBGToHSV(baseColor, out float h, out float sat, out float val);
+            sat = Mathf.Clamp01(sat * s);
+            val = Mathf.Clamp01(val * v);
+
+            return Color.HSVToRGB(h, sat, val);
         }
 
         public static Color GetTeamColor(Frame f, int team, float s = 1, float v = 1) {
