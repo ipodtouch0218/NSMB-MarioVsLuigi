@@ -230,6 +230,25 @@ namespace NSMB.Utilities {
                 }
             }
 
+            Color[] palette = {
+                new Color(1f, 0f, 0f),                     // P1  #FF0000 Red
+                new Color(0f, 128f/255f, 0f),              // P2  #008000 Green
+                new Color(1f, 1f, 0f),                     // P3  #FFFF00 Yellow
+                new Color(0f, 0f, 1f),                     // P4  #0000FF Blue
+                new Color(1f, 128f/255f, 0f),              // P5  #FF8000 Orange
+                new Color(0f, 1f, 1f),                     // P6  #00FFFF Cyan
+                new Color(0f, 1f, 0f),                     // P7  #00FF00 Lime
+                new Color(128f/255f, 64f/255f, 0f),        // P8  #804000 Brown
+                new Color(1f, 0f, 1f),                     // P9  #FF00FF Magenta
+                new Color(128f/255f, 6f/255f, 1f)          // P10 #8006FF Purple
+            };
+
+            if (ourIndex >= 0 && ourIndex < palette.Length) {
+                Color.RGBToHSV(palette[ourIndex], out float h, out float sat, out float val);
+                return Color.HSVToRGB(h, sat * s, val * v);
+            }
+
+            // Fallback (should rarely happen)
             return Color.HSVToRGB(ourIndex / (totalPlayers + 1f), s, v);
         }
 
