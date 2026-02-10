@@ -232,7 +232,7 @@ namespace NSMB.UI.Game {
         }
 
         private unsafe void OnNavigate(InputAction.CallbackContext context) {
-            if (!spectating || cameraAnimator.Mode != CameraAnimator.CameraMode.FollowPlayer || pauseMenu.IsPaused || Game.Frames.Predicted.Global->GameState >= GameState.Ended) {
+            if (!spectating || cameraAnimator.Mode != CameraAnimator.CameraMode.FollowPlayer || pauseMenu.IsPaused || Game.Frames.Predicted.Global->GameState >= GameState.Ended || Game.Session.IsReplay) {
                 previousNavigate = Vector2.zero;
                 return;
             }
