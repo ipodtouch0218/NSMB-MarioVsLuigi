@@ -1,4 +1,0 @@
-component GenericMover {
-	AssetRef<GenericMoverAsset> MoverAsset;
-	FP StartOffset;
-}

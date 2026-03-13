@@ -1,6 +1,0 @@
-component MovingPlatform {
-	FPVector2 Velocity;
-	bool IgnoreMovement;
-	bool CanCrushEntities;
-	[ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] list<PhysicsQueryRef> Queries;
-}

@@ -1,6 +1,0 @@
-component EnterablePipe {
-	EntityRef OtherPipe;
-	bool IsEnterable;
-	bool IsCeilingPipe;
-	bool IsMiniOnly;
-}

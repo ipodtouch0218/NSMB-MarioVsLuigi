@@ -1,4 +1,0 @@
-component Cullable {
-	FPVector2 Offset;
-	FP BroadRadius;
-}

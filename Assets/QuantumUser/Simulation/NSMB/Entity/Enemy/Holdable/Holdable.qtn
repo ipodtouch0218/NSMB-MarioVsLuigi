@@ -1,9 +1,0 @@
-component Holdable {
-	bool HoldAboveHead;
-
-	[ExcludeFromPrototype] EntityRef Holder;
-	[ExcludeFromPrototype] EntityRef PreviousHolder;
-	[ExcludeFromPrototype] byte IgnoreOwnerFrames;
-}
-
-signal OnThrowHoldable(EntityRef entity, EntityRef mario, bool crouching, bool dropped);

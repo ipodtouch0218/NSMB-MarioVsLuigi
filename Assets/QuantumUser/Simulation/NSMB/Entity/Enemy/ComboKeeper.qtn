@@ -1,3 +1,0 @@
-component ComboKeeper {
-	byte Combo;
-}

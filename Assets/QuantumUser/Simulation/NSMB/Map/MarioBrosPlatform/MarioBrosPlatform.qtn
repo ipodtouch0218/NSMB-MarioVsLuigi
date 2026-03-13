@@ -1,8 +1,0 @@
-component MarioBrosPlatform {
-
-}
-
-event MarioBrosPlatformBumped {
-	EntityRef Entity;
-	nothashed FPVector2 Position;
-}
