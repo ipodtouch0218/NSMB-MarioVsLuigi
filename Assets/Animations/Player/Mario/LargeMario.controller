@@ -8179,7 +8179,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: walljump
-  m_Speed: 1
+  m_Speed: 0.375
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 3966724826765006966}

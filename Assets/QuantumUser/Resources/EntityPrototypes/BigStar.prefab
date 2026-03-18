@@ -322,7 +322,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pulseAmount: 0.05
   pulseSpeed: 16
-  rotationSpeed: 6
+  rotationSpeed: 3
   blinkingSpeed: 0.25
   graphicTransform: {fileID: 7308630834410186342}
   particles: {fileID: 5237286551399780066}
@@ -369,7 +369,7 @@ MonoBehaviour:
     Speed:
       RawValue: 98304
     BounceForce:
-      RawValue: 491520
+      RawValue: 360448
 --- !u!114 &5641718087526033968
 MonoBehaviour:
   m_ObjectHideFlags: 0
