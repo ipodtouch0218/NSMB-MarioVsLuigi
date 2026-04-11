@@ -1,6 +1,6 @@
 component Freezable {
 	FPVector2 IceBlockSize;
-	byte AutoBreakFrames;
+	int AutoBreakFrames;
 	byte AutoBreakGrabAdditionalFrames;
 	bool AutoBreakWhileHeld;
 	FPVector2 Offset;

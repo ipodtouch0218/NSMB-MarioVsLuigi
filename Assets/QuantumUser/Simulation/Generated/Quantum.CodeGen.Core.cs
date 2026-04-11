@@ -2174,23 +2174,23 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Freezable : Quantum.IComponent {
-    public const Int32 SIZE = 56;
+    public const Int32 SIZE = 64;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(24)]
+    [FieldOffset(32)]
     public FPVector2 IceBlockSize;
-    [FieldOffset(0)]
-    public Byte AutoBreakFrames;
-    [FieldOffset(1)]
-    public Byte AutoBreakGrabAdditionalFrames;
     [FieldOffset(4)]
-    public QBoolean AutoBreakWhileHeld;
-    [FieldOffset(40)]
-    public FPVector2 Offset;
+    public Int32 AutoBreakFrames;
+    [FieldOffset(0)]
+    public Byte AutoBreakGrabAdditionalFrames;
     [FieldOffset(8)]
-    public QBoolean IsCarryable;
+    public QBoolean AutoBreakWhileHeld;
+    [FieldOffset(48)]
+    public FPVector2 Offset;
     [FieldOffset(12)]
-    public QBoolean IsFlying;
+    public QBoolean IsCarryable;
     [FieldOffset(16)]
+    public QBoolean IsFlying;
+    [FieldOffset(24)]
     [ExcludeFromPrototype()]
     public EntityRef FrozenCubeEntity;
     public override readonly Int32 GetHashCode() {
@@ -2209,8 +2209,8 @@ namespace Quantum {
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Freezable*)ptr;
-        serializer.Stream.Serialize(&p->AutoBreakFrames);
         serializer.Stream.Serialize(&p->AutoBreakGrabAdditionalFrames);
+        serializer.Stream.Serialize(&p->AutoBreakFrames);
         QBoolean.Serialize(&p->AutoBreakWhileHeld, serializer);
         QBoolean.Serialize(&p->IsCarryable, serializer);
         QBoolean.Serialize(&p->IsFlying, serializer);
@@ -2350,10 +2350,10 @@ namespace Quantum {
     [FieldOffset(8)]
     [ExcludeFromPrototype()]
     public QBoolean FacingRight;
-    [FieldOffset(0)]
-    [ExcludeFromPrototype()]
-    public Byte AutoBreakFrames;
     [FieldOffset(4)]
+    [ExcludeFromPrototype()]
+    public Int32 AutoBreakFrames;
+    [FieldOffset(0)]
     [ExcludeFromPrototype()]
     public LiquidType InLiquidType;
     public override readonly Int32 GetHashCode() {
@@ -2373,8 +2373,8 @@ namespace Quantum {
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (IceBlock*)ptr;
-        serializer.Stream.Serialize(&p->AutoBreakFrames);
         serializer.Stream.Serialize((byte*)&p->InLiquidType);
+        serializer.Stream.Serialize(&p->AutoBreakFrames);
         QBoolean.Serialize(&p->FacingRight, serializer);
         QBoolean.Serialize(&p->IsFlying, serializer);
         QBoolean.Serialize(&p->IsSliding, serializer);

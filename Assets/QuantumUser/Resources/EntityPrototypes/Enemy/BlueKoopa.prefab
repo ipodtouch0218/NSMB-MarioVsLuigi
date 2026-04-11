@@ -94,6 +94,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 22100000, guid: 8df73f9409b06d04190e8538ddfd3727,
         type: 2}
+    - target: {fileID: 4870734189259043644, guid: 8cf8f49ac0882ed44953ea53ff901f11,
+        type: 3}
+      propertyPath: Prototype.AutoBreakFrames
+      value: 480
+      objectReference: {fileID: 0}
     - target: {fileID: 5882114383898416491, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
       propertyPath: respawnColor.a

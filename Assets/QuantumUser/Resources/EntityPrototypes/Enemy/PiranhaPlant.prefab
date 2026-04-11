@@ -637,7 +637,7 @@ MonoBehaviour:
         RawValue: 49152
       Y:
         RawValue: 88474
-    AutoBreakFrames: 180
+    AutoBreakFrames: 480
     AutoBreakGrabAdditionalFrames: 0
     AutoBreakWhileHeld:
       Value: 0

@@ -394,7 +394,7 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.Freezable))]
   public unsafe partial class FreezablePrototype : ComponentPrototype<Quantum.Freezable> {
     public FPVector2 IceBlockSize;
-    public Byte AutoBreakFrames;
+    public Int32 AutoBreakFrames;
     public Byte AutoBreakGrabAdditionalFrames;
     public QBoolean AutoBreakWhileHeld;
     public FPVector2 Offset;

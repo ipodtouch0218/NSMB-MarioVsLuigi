@@ -164,7 +164,7 @@ namespace Quantum {
                     holdable2->Pickup(f, iceBlockEntity, marioEntity);
 
                     // Don't allow overflow
-                    iceBlock->AutoBreakFrames = (byte) FPMath.Clamp(iceBlock->AutoBreakFrames + child->AutoBreakGrabAdditionalFrames, 0, byte.MaxValue);
+                    iceBlock->AutoBreakFrames = FPMath.Clamp(iceBlock->AutoBreakFrames + child->AutoBreakGrabAdditionalFrames, 0, int.MaxValue);
                 }
             }
             return false;
