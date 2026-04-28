@@ -2449,6 +2449,19 @@ namespace Quantum {
                 return false;
             }
 
+            var marioAPhysics = f.Unsafe.GetPointer<PhysicsObject>(marioAEntity);
+            var marioBPhysics = f.Unsafe.GetPointer<PhysicsObject>(marioBEntity);
+
+            var marioAPhysicsInfo = f.FindAsset(marioA->PhysicsAsset);
+            var marioBPhysicsInfo = f.FindAsset(marioB->PhysicsAsset);
+
+            FP averageWalkSpeed = (marioAPhysicsInfo.WalkMaxVelocity[marioAPhysicsInfo.WalkSpeedStage] + marioBPhysicsInfo.WalkMaxVelocity[marioBPhysicsInfo.WalkSpeedStage]) / 2;
+            FP velocityDifference = FPMath.Abs(marioAPhysics->Velocity.X - marioBPhysics->Velocity.X);
+
+            if (FPMath.Abs(velocityDifference) <= averageWalkSpeed) {
+                return false;
+            }
+
             // this is special thus we swap
             void DoBump(EntityRef victimRef, EntityRef attackerRef, bool fromRight) {
                 var victim = f.Unsafe.GetPointer<MarioPlayer>(victimRef);
@@ -2468,21 +2481,10 @@ namespace Quantum {
                 }
             }
 
-            var marioAPhysics = f.Unsafe.GetPointer<PhysicsObject>(marioAEntity);
-            var marioBPhysics = f.Unsafe.GetPointer<PhysicsObject>(marioBEntity);
-
-            var marioAPhysicsInfo = f.FindAsset(marioA->PhysicsAsset);
-            var marioBPhysicsInfo = f.FindAsset(marioB->PhysicsAsset);
-
-            FP averageWalkSpeed = (marioAPhysicsInfo.WalkMaxVelocity[marioAPhysicsInfo.WalkSpeedStage] + marioBPhysicsInfo.WalkMaxVelocity[marioBPhysicsInfo.WalkSpeedStage]) / 2;
-            FP velocityDifference = FPMath.Abs(marioAPhysics->Velocity.X - marioBPhysics->Velocity.X);
-
-            if (FPMath.Abs(velocityDifference) > averageWalkSpeed) {
-                // marioA
-                DoBump(marioAEntity, marioBEntity, fromRight);
-                // marioB
-                DoBump(marioBEntity, marioAEntity, !fromRight);
-            }
+            // marioA
+            DoBump(marioAEntity, marioBEntity, fromRight);
+            // marioB
+            DoBump(marioBEntity, marioAEntity, !fromRight);
             return true;
         }
 
