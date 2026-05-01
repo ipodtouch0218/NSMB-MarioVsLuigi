@@ -213,7 +213,7 @@ MonoBehaviour:
   childAnimator: {fileID: 0}
   childAnimation: {fileID: 5475970293224446293}
   blinkingRate: 4
-  scaleRate: 0.1333
+  scaleRate: 0.1667
   scaleSize: 0.3
   sfx: {fileID: -6891361109405082350}
   koopaSpawnParticles: {fileID: 0}
@@ -652,8 +652,6 @@ MonoBehaviour:
     SlowInLiquids:
       Value: 0
     IsWaterSolid:
-      Value: 0
-    BreakMegaObjects:
       Value: 0
 --- !u!114 &7282818765540506302
 MonoBehaviour:

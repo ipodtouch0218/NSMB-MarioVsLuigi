@@ -536,11 +536,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   graphicsRoot: {fileID: 6142040129701411480}
+  moveBehindBlocksRoot: {fileID: 0}
   renderer: {fileID: 3522644845206703513}
   childAnimator: {fileID: 579011151076643705}
   childAnimation: {fileID: 8480178127695157793}
   blinkingRate: 4
-  scaleRate: 0.1333
+  scaleRate: 0.1667
   scaleSize: 0.3
   sfx: {fileID: 0}
   koopaSpawnParticles: {fileID: 0}
@@ -584,9 +585,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    AttachedTo: {fileID: 0}
-    ObjectiveCoinsRemaining: 50
-    Timer: 0
+    _empty_prototype_dummy_field_: 0
 --- !u!1 &1501951331144334225
 GameObject:
   m_ObjectHideFlags: 0
