@@ -11,7 +11,7 @@ namespace NSMB.Entities.CoinItems {
         [SerializeField] private new Renderer renderer;
         [SerializeField] private Animator childAnimator;
         [SerializeField] private Animation childAnimation;
-        [SerializeField] private float blinkingRate = 4, scaleRate = 0.1333f, scaleSize = 0.3f;
+        [SerializeField] private float blinkingRate = 4, scaleRate = 0.1666f, scaleSize = 0.3f;
         [SerializeField] private AudioSource sfx;
         [SerializeField] private ParticleSystem koopaSpawnParticles;
 
