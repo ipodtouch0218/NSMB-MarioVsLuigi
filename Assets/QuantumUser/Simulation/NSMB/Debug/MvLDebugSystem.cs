@@ -40,7 +40,7 @@ namespace Quantum {
                     newEntityTransform->Position.X += mario->FacingRight ? 1 : -1;
                 }
                 if (f.Unsafe.TryGetPointer(newEntity, out CoinItem* coinItem)) {
-                    coinItem->InitializePlayerSpawn(f, newEntity, marioEntity);
+                    coinItem->InitializePlayerSpawn(f, newEntity, marioEntity, false);
                 }
                 if (f.Unsafe.TryGetPointer(newEntity, out Enemy* enemy)) {
                     enemy->DisableRespawning = true;

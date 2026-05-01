@@ -111,6 +111,7 @@ component MarioPlayer {
 	// Powerups
 	[ExcludeFromPrototype,AllocateOnComponentAdded,FreeOnComponentRemoved] list<PowerupTransitionAnimation> PowerupTransitionQueue;
     [ExcludeFromPrototype] ushort InvincibilityFrames;
+	[ExcludeFromPrototype] byte ReserveLockoutFrames;
 	
 	[ExcludeFromPrototype] byte MegaMushroomStartFrames;
 	[ExcludeFromPrototype] ushort MegaMushroomFrames;

@@ -232,6 +232,7 @@ namespace Quantum {
             if (currentItem == null) {
                 // We don't have a reserve item, so we can just set it
                 ReserveItem = newItem;
+                ReserveLockoutFrames = 28;
                 return;
             }
 
@@ -251,6 +252,7 @@ namespace Quantum {
 
             // Replace our current reserve item with the new one
             ReserveItem = newItem;
+            ReserveLockoutFrames = 28;
         }
 
         public void QueuePowerupAnim(Frame f, EntityRef marioEntity, PowerupState startingState, PowerupState endingState, bool isPowerdown, PowerupAsset powerupAsset = null) {
