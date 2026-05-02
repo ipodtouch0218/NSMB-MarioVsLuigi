@@ -43,10 +43,9 @@ namespace Quantum {
         }
 
         public void InitializePlayerSpawn(Frame f, EntityRef thisEntity, EntityRef playerToFollow, bool fromReserve) {
-            byte frames = (byte)(fromReserve ? 80 : 60);
-            Initialize(f, thisEntity, frames, PowerupSpawnReason.Coins);
+            Initialize(f, thisEntity, (byte)(fromReserve ? 80 : 60), PowerupSpawnReason.Coins);
             ParentMarioPlayer = playerToFollow;
-            IgnorePlayerFrames = frames;
+            IgnorePlayerFrames = (byte) (fromReserve ? 80 : 60);
 
             var marioTransform = f.Unsafe.GetPointer<Transform2D>(playerToFollow);
             var marioCamera = f.Unsafe.GetPointer<CameraController>(playerToFollow);
