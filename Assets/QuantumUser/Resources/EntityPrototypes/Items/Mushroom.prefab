@@ -56,12 +56,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   graphicsRoot: {fileID: 2479772350441087688}
-  moveBehindBlocksRoot: {fileID: 0}
   renderer: {fileID: 1145319354374527610}
   childAnimator: {fileID: 0}
   childAnimation: {fileID: 0}
   blinkingRate: 4
-  scaleRate: 0.1667
+  scaleRate: 0.1333
   scaleSize: 0.3
   sfx: {fileID: 4207910641862185911}
   koopaSpawnParticles: {fileID: 0}
@@ -454,6 +453,8 @@ MonoBehaviour:
     SlowInLiquids:
       Value: 1
     IsWaterSolid:
+      Value: 0
+    BreakMegaObjects:
       Value: 0
 --- !u!114 &1256801405142820976
 MonoBehaviour:
