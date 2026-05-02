@@ -147,7 +147,7 @@ namespace Quantum {
             bool item = newCoins == f.Global->Rules.CoinsForPowerup;
             if (item) {
                 mario->Coins = 0;
-                spawnedItem = MarioPlayerSystem.SpawnItem(f, marioEntity, mario, default, fromBlock, false);
+                spawnedItem = MarioPlayerSystem.SpawnItem(f, marioEntity, mario, default, fromBlock);
             } else {
                 mario->Coins = newCoins;
             }

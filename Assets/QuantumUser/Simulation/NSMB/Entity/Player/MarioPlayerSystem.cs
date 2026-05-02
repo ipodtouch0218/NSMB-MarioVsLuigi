@@ -2093,7 +2093,7 @@ namespace Quantum {
             return true;
         }
 
-        public static EntityRef SpawnItem(Frame f, EntityRef marioEntity, MarioPlayer* mario, AssetRef<EntityPrototype> prefab, bool fromBlock, bool fromReserve) {
+        public static EntityRef SpawnItem(Frame f, EntityRef marioEntity, MarioPlayer* mario, AssetRef<EntityPrototype> prefab, bool fromBlock) {
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             if (!prefab.IsValid) {
                 prefab = gamemode.GetRandomItem(f, mario, fromBlock).Prefab;
@@ -2101,7 +2101,7 @@ namespace Quantum {
 
             EntityRef newEntity = f.Create(prefab);
             if (f.Unsafe.TryGetPointer(newEntity, out CoinItem* coinItem)) {
-                coinItem->InitializePlayerSpawn(f, newEntity, marioEntity, fromReserve);
+                coinItem->InitializePlayerSpawn(f, newEntity, marioEntity);
             }
             return newEntity;
         }
@@ -2115,7 +2115,7 @@ namespace Quantum {
                 return;
             }
 
-            SpawnItem(f, filter.Entity, mario, reserveItem.Prefab, false, true);
+            SpawnItem(f, filter.Entity, mario, reserveItem.Prefab, false);
             mario->ReserveItem = default;
             f.Events.MarioPlayerUsedReserveItem(filter.Entity, true);
         }
