@@ -61,9 +61,7 @@ namespace Quantum {
             }
 #else
             var command = f.GetPlayerCommand(player);
-            if (command is CommandSpawnReserveItem & QuantumUtils.Decrement(ref mario->ReserveLockoutFrames)) {
-                SpawnReserveItem(f, ref filter);
-            } 
+            HandleReserveItem(f, ref filter, command);
 #endif
 
             if (HandleMegaMushroom(f, ref filter, physics, stage)) {
@@ -2106,16 +2104,26 @@ namespace Quantum {
             return newEntity;
         }
 
-        public void SpawnReserveItem(Frame f, ref Filter filter) {
+        public void HandleReserveItem(Frame f, ref Filter filter, DeterministicCommand command) {
             var mario = filter.MarioPlayer;
             var reserveItem = f.FindAsset(mario->ReserveItem);
+            var spawningReserveItem = f.FindAsset(mario->SpawningReserveItem);
 
+            if (--mario->ReserveItemSpawnFrames == 0 && mario->SpawningReserveItem != default) {
+                SpawnItem(f, filter.Entity, mario, spawningReserveItem.Prefab, false);
+                mario->SpawningReserveItem = default;
+            }
+
+            if (command is not CommandSpawnReserveItem | !QuantumUtils.Decrement(ref mario->ReserveLockoutFrames)) {
+                return;
+            }
             if (reserveItem == null || mario->IsDead || mario->MegaMushroomStartFrames > 0 || (mario->MegaMushroomStationaryEnd && mario->MegaMushroomEndFrames > 0)) {
                 f.Events.MarioPlayerUsedReserveItem(filter.Entity, false);
                 return;
             }
 
-            SpawnItem(f, filter.Entity, mario, reserveItem.Prefab, false);
+            mario->ReserveItemSpawnFrames = 24;
+            mario->SpawningReserveItem = mario->ReserveItem;
             mario->ReserveItem = default;
             f.Events.MarioPlayerUsedReserveItem(filter.Entity, true);
         }

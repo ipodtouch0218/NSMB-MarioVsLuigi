@@ -59,6 +59,9 @@ component MarioPlayer {
 	[ExcludeFromPrototype] PowerupState CurrentPowerupState;
 	[ExcludeFromPrototype] PowerupState PreviousPowerupState;
 	[ExcludeFromPrototype] AssetRef<PowerupAsset> ReserveItem;
+	[ExcludeFromPrototype] byte ReserveLockoutFrames;
+	[ExcludeFromPrototype] byte ReserveItemSpawnFrames;
+	[ExcludeFromPrototype] AssetRef<PowerupAsset> SpawningReserveItem;
 	[ExcludeFromPrototype] RNGSession RNG;
 
 	[ExcludeFromPrototype] GamemodeSpecificData GamemodeData;
@@ -111,7 +114,6 @@ component MarioPlayer {
 	// Powerups
 	[ExcludeFromPrototype,AllocateOnComponentAdded,FreeOnComponentRemoved] list<PowerupTransitionAnimation> PowerupTransitionQueue;
     [ExcludeFromPrototype] ushort InvincibilityFrames;
-	[ExcludeFromPrototype] byte ReserveLockoutFrames;
 	
 	[ExcludeFromPrototype] byte MegaMushroomStartFrames;
 	[ExcludeFromPrototype] ushort MegaMushroomFrames;

@@ -2751,31 +2751,40 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct MarioPlayer : Quantum.IComponent {
-    public const Int32 SIZE = 192;
+    public const Int32 SIZE = 208;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(96)]
+    [FieldOffset(104)]
     public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
-    [FieldOffset(88)]
+    [FieldOffset(96)]
     public AssetRef<CharacterAsset> CharacterAsset;
-    [FieldOffset(64)]
+    [FieldOffset(68)]
     [ExcludeFromPrototype()]
     public PlayerRef PlayerRef;
-    [FieldOffset(34)]
+    [FieldOffset(35)]
     [ExcludeFromPrototype()]
     public Byte SpawnpointIndex;
-    [FieldOffset(42)]
-    [ExcludeFromPrototype()]
-    public PowerupState CurrentPowerupState;
     [FieldOffset(43)]
     [ExcludeFromPrototype()]
+    public PowerupState CurrentPowerupState;
+    [FieldOffset(44)]
+    [ExcludeFromPrototype()]
     public PowerupState PreviousPowerupState;
-    [FieldOffset(104)]
+    [FieldOffset(112)]
     [ExcludeFromPrototype()]
     public AssetRef<PowerupAsset> ReserveItem;
-    [FieldOffset(176)]
+    [FieldOffset(30)]
+    [ExcludeFromPrototype()]
+    public Byte ReserveLockoutFrames;
+    [FieldOffset(29)]
+    [ExcludeFromPrototype()]
+    public Byte ReserveItemSpawnFrames;
+    [FieldOffset(120)]
+    [ExcludeFromPrototype()]
+    public AssetRef<PowerupAsset> SpawningReserveItem;
+    [FieldOffset(192)]
     [ExcludeFromPrototype()]
     public RNGSession RNG;
-    [FieldOffset(152)]
+    [FieldOffset(168)]
     [ExcludeFromPrototype()]
     public GamemodeSpecificData GamemodeData;
     [FieldOffset(1)]
@@ -2784,16 +2793,16 @@ namespace Quantum {
     [FieldOffset(15)]
     [ExcludeFromPrototype()]
     public Byte Lives;
-    [FieldOffset(68)]
-    [ExcludeFromPrototype()]
-    public QBoolean Disconnected;
-    [FieldOffset(76)]
-    [ExcludeFromPrototype()]
-    public QBoolean IsDead;
     [FieldOffset(72)]
     [ExcludeFromPrototype()]
-    public QBoolean FireDeath;
+    public QBoolean Disconnected;
     [FieldOffset(80)]
+    [ExcludeFromPrototype()]
+    public QBoolean IsDead;
+    [FieldOffset(76)]
+    [ExcludeFromPrototype()]
+    public QBoolean FireDeath;
+    [FieldOffset(84)]
     [ExcludeFromPrototype()]
     public QBoolean IsRespawning;
     [FieldOffset(6)]
@@ -2802,31 +2811,31 @@ namespace Quantum {
     [FieldOffset(22)]
     [ExcludeFromPrototype()]
     public Byte PreRespawnFrames;
-    [FieldOffset(30)]
+    [FieldOffset(31)]
     [ExcludeFromPrototype()]
     public Byte RespawnFrames;
     [FieldOffset(19)]
     [ExcludeFromPrototype()]
     public Byte NoLivesStarDirection;
-    [FieldOffset(112)]
+    [FieldOffset(128)]
     [ExcludeFromPrototype()]
     public BitSet21 Flags;
     [FieldOffset(7)]
     [ExcludeFromPrototype()]
     public Byte FastTurnaroundFrames;
-    [FieldOffset(33)]
+    [FieldOffset(34)]
     [ExcludeFromPrototype()]
     public Byte SlowTurnaroundFrames;
-    [FieldOffset(60)]
+    [FieldOffset(64)]
     [ExcludeFromPrototype()]
     public Int32 LastPushingFrame;
-    [FieldOffset(35)]
+    [FieldOffset(36)]
     [ExcludeFromPrototype()]
     public Byte StationaryFrames;
-    [FieldOffset(39)]
+    [FieldOffset(40)]
     [ExcludeFromPrototype()]
     public JumpState JumpState;
-    [FieldOffset(40)]
+    [FieldOffset(41)]
     [ExcludeFromPrototype()]
     public JumpState PreviousJumpState;
     [FieldOffset(13)]
@@ -2838,7 +2847,7 @@ namespace Quantum {
     [FieldOffset(2)]
     [ExcludeFromPrototype()]
     public Byte CoyoteTimeFrames;
-    [FieldOffset(56)]
+    [FieldOffset(60)]
     [ExcludeFromPrototype()]
     public Int32 LandedFrame;
     [FieldOffset(8)]
@@ -2847,10 +2856,10 @@ namespace Quantum {
     [FieldOffset(0)]
     [ExcludeFromPrototype()]
     public Byte CantJumpTimer;
-    [FieldOffset(38)]
+    [FieldOffset(39)]
     [ExcludeFromPrototype()]
     public Byte WallslideEndFrames;
-    [FieldOffset(37)]
+    [FieldOffset(38)]
     [ExcludeFromPrototype()]
     public Byte WalljumpFrames;
     [FieldOffset(11)]
@@ -2862,10 +2871,10 @@ namespace Quantum {
     [FieldOffset(10)]
     [ExcludeFromPrototype()]
     public Byte GroundpoundStandFrames;
-    [FieldOffset(41)]
+    [FieldOffset(42)]
     [ExcludeFromPrototype()]
     public KnockbackStrength CurrentKnockback;
-    [FieldOffset(52)]
+    [FieldOffset(56)]
     [ExcludeFromPrototype()]
     public Int32 KnockbackTick;
     [FieldOffset(5)]
@@ -2874,24 +2883,21 @@ namespace Quantum {
     [FieldOffset(14)]
     [ExcludeFromPrototype()]
     public Byte KnockbackGetupFrames;
-    [FieldOffset(144)]
+    [FieldOffset(160)]
     [ExcludeFromPrototype()]
     public EntityRef LastAttacker;
-    [FieldOffset(84)]
+    [FieldOffset(88)]
     [ExcludeFromPrototype()]
     [AllocateOnComponentAdded()]
     [FreeOnComponentRemoved()]
     public QListPtr<PowerupTransitionAnimation> PowerupTransitionQueue;
-    [FieldOffset(44)]
+    [FieldOffset(46)]
     [ExcludeFromPrototype()]
     public UInt16 InvincibilityFrames;
-    [FieldOffset(29)]
-    [ExcludeFromPrototype()]
-    public Byte ReserveLockoutFrames;
     [FieldOffset(18)]
     [ExcludeFromPrototype()]
     public Byte MegaMushroomStartFrames;
-    [FieldOffset(46)]
+    [FieldOffset(48)]
     [ExcludeFromPrototype()]
     public UInt16 MegaMushroomFrames;
     [FieldOffset(16)]
@@ -2912,10 +2918,10 @@ namespace Quantum {
     [FieldOffset(4)]
     [ExcludeFromPrototype()]
     public Byte CurrentVolley;
-    [FieldOffset(32)]
+    [FieldOffset(33)]
     [ExcludeFromPrototype()]
     public Byte ShellSpeedStage;
-    [FieldOffset(31)]
+    [FieldOffset(32)]
     [ExcludeFromPrototype()]
     public Byte ShellSlowdownFrames;
     [FieldOffset(27)]
@@ -2930,16 +2936,16 @@ namespace Quantum {
     [FieldOffset(26)]
     [ExcludeFromPrototype()]
     public Byte PropellerDrillHoldFrames;
-    [FieldOffset(136)]
+    [FieldOffset(152)]
     [ExcludeFromPrototype()]
     public EntityRef HeldEntity;
-    [FieldOffset(48)]
+    [FieldOffset(52)]
     [ExcludeFromPrototype()]
     public Int32 HoldStartFrame;
-    [FieldOffset(120)]
+    [FieldOffset(136)]
     [ExcludeFromPrototype()]
     public EntityRef CurrentPipe;
-    [FieldOffset(160)]
+    [FieldOffset(176)]
     [ExcludeFromPrototype()]
     public FPVector2 PipeDirection;
     [FieldOffset(21)]
@@ -2948,10 +2954,10 @@ namespace Quantum {
     [FieldOffset(20)]
     [ExcludeFromPrototype()]
     public Byte PipeCooldownFrames;
-    [FieldOffset(36)]
+    [FieldOffset(37)]
     [ExcludeFromPrototype()]
     public Byte TauntFrames;
-    [FieldOffset(128)]
+    [FieldOffset(144)]
     [ExcludeFromPrototype()]
     public EntityRef CurrentSpinner;
     public override readonly Int32 GetHashCode() {
@@ -2964,6 +2970,9 @@ namespace Quantum {
         hash = hash * 31 + (Byte)CurrentPowerupState;
         hash = hash * 31 + (Byte)PreviousPowerupState;
         hash = hash * 31 + ReserveItem.GetHashCode();
+        hash = hash * 31 + ReserveLockoutFrames.GetHashCode();
+        hash = hash * 31 + ReserveItemSpawnFrames.GetHashCode();
+        hash = hash * 31 + SpawningReserveItem.GetHashCode();
         hash = hash * 31 + RNG.GetHashCode();
         hash = hash * 31 + GamemodeData.GetHashCode();
         hash = hash * 31 + Coins.GetHashCode();
@@ -3001,7 +3010,6 @@ namespace Quantum {
         hash = hash * 31 + LastAttacker.GetHashCode();
         hash = hash * 31 + PowerupTransitionQueue.GetHashCode();
         hash = hash * 31 + InvincibilityFrames.GetHashCode();
-        hash = hash * 31 + ReserveLockoutFrames.GetHashCode();
         hash = hash * 31 + MegaMushroomStartFrames.GetHashCode();
         hash = hash * 31 + MegaMushroomFrames.GetHashCode();
         hash = hash * 31 + MegaMushroomEndFrames.GetHashCode();
@@ -3072,6 +3080,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->PropellerDrillHoldFrames);
         serializer.Stream.Serialize(&p->PropellerLaunchFrames);
         serializer.Stream.Serialize(&p->PropellerSpinFrames);
+        serializer.Stream.Serialize(&p->ReserveItemSpawnFrames);
         serializer.Stream.Serialize(&p->ReserveLockoutFrames);
         serializer.Stream.Serialize(&p->RespawnFrames);
         serializer.Stream.Serialize(&p->ShellSlowdownFrames);
@@ -3102,6 +3111,7 @@ namespace Quantum {
         AssetRef.Serialize(&p->CharacterAsset, serializer);
         AssetRef.Serialize(&p->PhysicsAsset, serializer);
         AssetRef.Serialize(&p->ReserveItem, serializer);
+        AssetRef.Serialize(&p->SpawningReserveItem, serializer);
         Quantum.BitSet21.Serialize(&p->Flags, serializer);
         EntityRef.Serialize(&p->CurrentPipe, serializer);
         EntityRef.Serialize(&p->CurrentSpinner, serializer);
