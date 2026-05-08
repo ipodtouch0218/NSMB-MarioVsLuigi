@@ -1,11 +1,12 @@
 using Photon.Deterministic;
 using Quantum;
 using UnityEngine;
+using NSMB.Utilities;
 using System.Collections.Generic;
 
 namespace NSMB.Replay.Stats {
-    public class ReplayStatRecorder {
-        public readonly BinaryReplayFile ReplayFile;
+    public class ReplayStatRecorder : Singleton<ReplayStatRecorder> {
+        public BinaryReplayFile ReplayFile { get; private set; }
         public int ReplayStart => ReplayFile.Header.InitialFrameNumber;
         public int ReplayLength => ReplayFile.Header.ReplayLengthInFrames;
         public int ReplayEnd => ReplayStart + ReplayLength;
@@ -13,11 +14,9 @@ namespace NSMB.Replay.Stats {
         public GlobalInfo GlobalInfo { get; private set; }
         private SessionRunner Runner;
 
-        public ReplayStatRecorder(BinaryReplayFile replayFile) {
+        public void StartAnalyzing(BinaryReplayFile replayFile) {
             ReplayFile = replayFile;
-        }
 
-        public void Start() {
             if (ReplayFile.LoadAllIfNeeded() != ReplayParseResult.Success) {
                 return;
             }

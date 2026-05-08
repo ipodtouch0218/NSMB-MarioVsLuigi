@@ -39,7 +39,7 @@ namespace NSMB.Replay.Stats
             timePoint.OccurenceFrame = f.Number;
             timePoint.DeltaTime = f.DeltaTime;
             timePoint.Id = _index++;
-            timePoint.AffectedPlayerName = playerInfo.Name;
+            timePoint.AffectedPlayerName = playerInfo.PlayerName;
         }
 
         private protected static void BasicInit(TimePoint timePoint, Frame f, string playerName)

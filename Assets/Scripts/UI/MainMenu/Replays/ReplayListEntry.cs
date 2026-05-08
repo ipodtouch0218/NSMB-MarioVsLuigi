@@ -1,4 +1,5 @@
 using NSMB.Replay;
+using NSMB.Replay.Stats;
 using NSMB.UI.Translation;
 using NSMB.Utilities.Extensions;
 using SFB;
@@ -158,6 +159,10 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
         public void OnWatchClick() {
             ActiveReplayManager.Instance.StartReplayPlayback(ReplayFile);
+        }
+
+        public void OnStatsClick() {
+            ReplayStatRecorder.Instance.StartAnalyzing(ReplayFile);
         }
 
         public void OnRenameClick() {

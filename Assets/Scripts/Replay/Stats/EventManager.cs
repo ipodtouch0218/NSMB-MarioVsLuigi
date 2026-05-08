@@ -21,7 +21,7 @@ namespace NSMB.Replay.Stats
             eventDispatcher.Subscribe<EventMarioPlayerCollectedCoin>(this, OnMarioPlayerCollectedCoin);
             eventDispatcher.Subscribe<EventBigCollectableAttemptedSpawn>(this, OnBigCollectableAttemptedSpawn);
 
-            callbackDispatcher.Subscribe<CallbackGameStarted>(this, e => OnGameStarted(e.Game.Frames.Predicted));
+            // callbackDispatcher.Subscribe<CallbackGameStarted>(this, e => OnGameStarted(e.Game.Frames.Predicted));
             callbackDispatcher.Subscribe<CallbackSimulateFinished>(this, e => OnSimulationFinished(e.Frame));
         }
 
@@ -244,20 +244,22 @@ namespace NSMB.Replay.Stats
 
 
         #region Simulation Callbacks
-        public void OnGameStarted(Frame f) {
+        /*public void OnGameStarted(Frame f) {
             // register all the players
-            for (int i = 0; i < f.MaxPlayerCount; i++) {
-                if (f.PlayerIsConnected(i)) {
-                    var runtimeData = f.GetPlayerData(i);
-                    StatRecorder.PlayerInfos.Add(i, new PlayerInfo(runtimeData.PlayerNickname));
-                }
-            }
-        }
+            
+            UnityEngine.Debug.Log("Hello");
+        }*/
 
+        public bool didLoop = false;
         public void OnSimulationFinished(Frame f) {
             // scan all Marios
             var marios = f.Filter<MarioPlayer>();
             while (marios.NextUnsafe(out _, out var marioPlayer)) {
+                if (!didLoop) {
+                    var runtimeData = f.GetPlayerData(marioPlayer->PlayerRef);
+                    StatRecorder.PlayerInfos.Add(marioPlayer->PlayerRef, new PlayerInfo(runtimeData.PlayerNickname));
+                }
+
                 // what we're GOing to do is very simple, check if Mario is not in knockback.
                 // If he isn't then the combo is over, and we delete the current combo from
                 // the list if it has only one element.
@@ -265,6 +267,7 @@ namespace NSMB.Replay.Stats
                 HandleCombo(f, marioPlayer, playerInfo);
                 HandleStateData(f, marioPlayer, playerInfo);
             }
+            didLoop = true;
         }
 
         private void HandleCombo(Frame f, MarioPlayer* marioPlayer, PlayerInfo playerInfo) {
