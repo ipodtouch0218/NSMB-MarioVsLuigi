@@ -19729,7 +19729,7 @@ GameObject:
   - component: {fileID: 6114239374411719935}
   - component: {fileID: 405963795238578845}
   - component: {fileID: 5858149666679547523}
-  - component: {fileID: 2196197215827924034}
+  - component: {fileID: 7999691352056472906}
   m_Layer: 0
   m_Name: GlobalController
   m_TagString: Untagged
@@ -20098,7 +20098,7 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4938254683282774592}
   m_Enabled: 1
---- !u!114 &2196197215827924034
+--- !u!114 &7999691352056472906
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -20109,7 +20109,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1c8d3d29e0c92674f8eccc22e1ea4735, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NSMB.Replay.Stats.ReplayStatRecorder
+  m_EditorClassIdentifier: Assembly-CSharp::NSMB.Replay.Stats.ReplayStatsRecorder
 --- !u!1 &4947824015881995125
 GameObject:
   m_ObjectHideFlags: 0
