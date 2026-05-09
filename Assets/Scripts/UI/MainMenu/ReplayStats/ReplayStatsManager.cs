@@ -1,6 +1,7 @@
 using NSMB.Replay;
 using NSMB.Replay.Stats;
 using NSMB.UI.MainMenu.Submenus.Replays;
+using NSMB.UI.MainMenu.Submenus.RoomList;
 using NSMB.UI.Translation;
 using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
@@ -25,8 +26,8 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
         //---Serialized Variables
         [SerializeField] public MainMenuCanvas canvas;
-        [SerializeField] private TMP_Text header;
         [SerializeField] private ScrollRect scrollRect;
+        [SerializeField] private TimePointEntry entryTemplate;
         [SerializeField] internal VerticalLayoutGroup layout;
 
         // side panel
@@ -39,6 +40,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         //---Private Variables
         private ReplayListEntry replayListEntry;
         private readonly StringBuilder stringBuilder = new();
+        private readonly List<TimePointEntry> timePointEnteries = new();
 
         public enum StatOptions {
             Stars,
@@ -46,9 +48,8 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             KnockbackReceived,
             KnockbackDealt,
             Damage,
-            PowerupGrabs,
-            PowerupSpawns,
             PowerupInfo,
+            PowerupSpawns,
             BigCollectableSpawns,
         }
 
@@ -76,10 +77,10 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             viewingStatisticDropdown.value = 0;
             targetPlayerDropdown.value = 0;
             scrollRect.verticalNormalizedPosition = 1;
+            entryTemplate.gameObject.SetActive(false);
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
             TranslationManager.OnLanguageChanged += UpdateStatsDropdown;
             TranslationManager.OnLanguageChanged += UpdateEntryCount;
-            TranslationManager.OnLanguageChanged += UpdateStatsHeader;
             Canvas.ForceUpdateCanvases();
 
             UpdatePlayerDropdown();
@@ -218,14 +219,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         }
 
         private void UpdateEntryCount(TranslationManager tm) {
-            entryCount.text = tm.GetTranslationWithReplacements("ui.replay.stats.occurences", "occurences", 4.ToString());
-        }
-
-        private void UpdateStatsHeader(TranslationManager tm) {
-            string prefix = tm.RightToLeft ? "<align=right>" : "";
-            string tmPrefix = "ui.replay.stats.statsselect.";
-
-            header.text = GetHeaderPrefix() + prefix + tm.GetTranslation(tmPrefix + ViewingStats.ToString().ToLower());
+            entryCount.text = tm.GetTranslationWithReplacements("ui.replay.stats.occurences", "occurences", timePointEnteries.Count.ToString());
         }
 
         public void ChangedViewingStats() {
@@ -236,7 +230,25 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             } else {
                 targetPlayerDropdown.RefreshShownValue();
             }
-            UpdateStatsHeader(GlobalController.Instance.translationManager);
+
+            foreach (var entry in timePointEnteries) {
+                Destroy(entry.gameObject);
+            }
+            timePointEnteries.Clear();
+
+            var timePoints = GetTimePoints();
+            if (timePoints is List<PointStarCollected> starPoints) {
+                for (int i = 0; i < starPoints.Count; i++) {
+                    var point = starPoints[i];
+                    var entry = Instantiate(entryTemplate, entryTemplate.transform.parent);
+                    entry.name = $"TimePointEntry{i}";
+                    entry.gameObject.SetActive(true);
+                    entry.UpdateUI(point, i+1);
+                    timePointEnteries.Add(entry);
+                }
+            }
+
+            UpdateEntryCount(GlobalController.Instance.translationManager);
         }
 
         #region Switches
@@ -249,9 +261,8 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 StatOptions.KnockbackReceived => "",
                 StatOptions.KnockbackDealt => "",
                 StatOptions.Damage => "<sprite name=room_lives> ",
-                StatOptions.PowerupGrabs => "<sprite name=room_powerups> ",
-                StatOptions.PowerupSpawns => "<sprite name=room_coins> ",
                 StatOptions.PowerupInfo => "<sprite name=room_powerups> ",
+                StatOptions.PowerupSpawns => "<sprite name=room_coins> ",
                 StatOptions.BigCollectableSpawns => "<sprite name=room_stars> ",
                 _ => ""
             };
@@ -264,12 +275,54 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             };
         }
 
+        private List<PointKnockback> GetKnockbackDealt() {
+            List<PointKnockback> newList = new();
+
+            // loop through all players
+            var stats = ReplayStatsRecorder.Instance;
+            foreach (var currPlayer in stats.PlayerInfos.Keys) {
+                // exclude ourself of course <3
+                if (currPlayer == TargetPlayer) {
+                    continue;
+                }
+
+                var kbPoints = stats.PlayerInfos[currPlayer].KnockbackPoints;
+                newList.AddRange(kbPoints);
+            }
+            newList.Sort();
+
+            return newList;
+        }
+
+        private List<PointCoinCollected> GetItemDrops() {
+            List<PointCoinCollected> newList = new();
+
+            // loop through all players
+            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+            var points = stats[TargetPlayer].CoinsCollectedPoints;
+            foreach (var point in points) {
+                // skip no item drops
+                if (point.ItemName == null) {
+                    continue;
+                }
+
+                newList.Add(point);
+            }
+
+            return newList;
+        }
+
         private object GetTimePoints() {
             var stats = ReplayStatsRecorder.Instance.PlayerInfos;
             return ViewingStats switch {
                 // all star collection points
                 StatOptions.Stars => stats[TargetPlayer].StarsCollectedPoints,
                 StatOptions.Death => stats[TargetPlayer].DeathPoints,
+                StatOptions.KnockbackReceived => stats[TargetPlayer].KnockbackPoints,
+                StatOptions.KnockbackDealt => GetKnockbackDealt(),
+                StatOptions.Damage => stats[TargetPlayer].DamagePoints,
+                StatOptions.PowerupInfo => stats[TargetPlayer].PowerChangePoints,
+                StatOptions.PowerupSpawns => GetItemDrops(),
                 StatOptions.BigCollectableSpawns => ReplayStatsRecorder.Instance.GlobalInfo,
                 _ => null,
             };

@@ -18,6 +18,7 @@ namespace NSMB.Replay.Stats
 
         // useful info that must be tracked from the simulation
         public int ItemDropCount;
+        public readonly List<PointDamage> DamagePoints = new();
         public readonly List<PointDeath> DeathPoints = new();
         public readonly List<PointStarCollected> StarsCollectedPoints = new();
         public readonly List<PointStarLoss> StarsLostPoints = new();

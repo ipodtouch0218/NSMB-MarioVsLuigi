@@ -155,6 +155,7 @@ namespace NSMB.Replay.Stats
             var damagePoint = new PointDamage(f, mario);
             var starsToDrop = Math.Min(1, e.OldObjectiveCount);
             marioPlayerInfo.StarsLostPoints.Add(new PointStarLoss(f, mario, marioPlayerInfo, starsToDrop, PointStarLoss.StarLossCause.Damage, EntityRef.None));
+            marioPlayerInfo.DamagePoints.Add(new PointDamage(f, mario));
             if (marioPlayerInfo.CurrComboPoint != null) {
                 StatUtilSetCombo(f, mario, marioPlayerInfo, damagePoint, starsToDrop);
             }
