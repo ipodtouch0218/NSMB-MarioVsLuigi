@@ -1,6 +1,7 @@
 using NSMB.Replay;
 using NSMB.UI.Elements;
 using NSMB.UI.MainMenu.Submenus.Prompts;
+using NSMB.UI.MainMenu.Submenus.ReplayStats;
 using NSMB.UI.Translation;
 using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
@@ -68,6 +69,9 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         [SerializeField] private GameObject progressBar;
         [SerializeField] private TMP_Text progressBarText;
         [SerializeField] private Image progressBarFill;
+
+        [SerializeField] public ReplayStatsSubmenu statsSubmenu;
+        [SerializeField] private ReplayStatsManager statsManager;
 
         //---Private Variables
         private readonly List<ReplayListEntry> replayListEntries = new();
@@ -441,7 +445,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 replayListEntries.Add(result);
             }
 
-            result.Initialize(this, replay);
+            result.Initialize(this, replay, statsManager);
             result.name = replay.Header.GetDisplayName();
             result.UpdateText();
             result.UpdateNavigation(previousEntry);

@@ -5,7 +5,7 @@ using NSMB.Utilities;
 using System.Collections.Generic;
 
 namespace NSMB.Replay.Stats {
-    public class ReplayStatRecorder : Singleton<ReplayStatRecorder> {
+    public class ReplayStatsRecorder : Singleton<ReplayStatsRecorder> {
         public BinaryReplayFile ReplayFile { get; private set; }
         public int ReplayStart => ReplayFile.Header.InitialFrameNumber;
         public int ReplayLength => ReplayFile.Header.ReplayLengthInFrames;

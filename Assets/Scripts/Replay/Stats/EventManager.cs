@@ -8,9 +8,9 @@ namespace NSMB.Replay.Stats
 {
     public unsafe class EventManager
     {
-        public ReplayStatRecorder StatRecorder;
+        public ReplayStatsRecorder StatRecorder;
 
-        public EventManager(ReplayStatRecorder statRecorder, EventDispatcher eventDispatcher, CallbackDispatcher callbackDispatcher)
+        public EventManager(ReplayStatsRecorder statRecorder, EventDispatcher eventDispatcher, CallbackDispatcher callbackDispatcher)
         {
             StatRecorder = statRecorder;
             eventDispatcher.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar);
@@ -334,7 +334,7 @@ namespace NSMB.Replay.Stats
 
         #region Static Methods
 
-        public static void StatUtilStopCombo(Frame f, PlayerInfo playerInfo, ReplayStatRecorder statRecorder, TimePoint? timePoint = null, int starsLost = 0, bool noEndFrame = false) {
+        public static void StatUtilStopCombo(Frame f, PlayerInfo playerInfo, ReplayStatsRecorder statRecorder, TimePoint? timePoint = null, int starsLost = 0, bool noEndFrame = false) {
             var comb = playerInfo.CurrComboPoint;
             if (comb != null) {
                 if (timePoint != null) {

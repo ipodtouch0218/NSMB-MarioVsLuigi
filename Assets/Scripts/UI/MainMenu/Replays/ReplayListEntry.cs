@@ -1,5 +1,6 @@
 using NSMB.Replay;
 using NSMB.Replay.Stats;
+using NSMB.UI.MainMenu.Submenus.ReplayStats;
 using NSMB.UI.Translation;
 using NSMB.Utilities.Extensions;
 using SFB;
@@ -41,11 +42,13 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
         //---Private Variables
         private ReplayListManager manager;
+        private ReplayStatsManager statsManager;
         //private Coroutine showHideButtonsCoroutine;
 
-        public void Initialize(ReplayListManager ourManager, BinaryReplayFile ourReplay) {
+        public void Initialize(ReplayListManager ourManager, BinaryReplayFile ourReplay, ReplayStatsManager ourStatsManager) {
             manager = ourManager;
             ReplayFile = ourReplay;
+            statsManager = ourStatsManager;
             // gameObject.SetActive(true);
         }
 
@@ -162,7 +165,9 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         }
 
         public void OnStatsClick() {
-            ReplayStatRecorder.Instance.StartAnalyzing(ReplayFile);
+            ReplayStatsRecorder.Instance.StartAnalyzing(ReplayFile);
+            statsManager.Initialize(this);
+            canvas.OpenMenu(manager.statsSubmenu);
         }
 
         public void OnRenameClick() {
