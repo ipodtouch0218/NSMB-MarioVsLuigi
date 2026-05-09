@@ -10,8 +10,7 @@ namespace NSMB.Replay.Stats
     {
         public ReplayStatsRecorder StatRecorder;
 
-        public EventManager(ReplayStatsRecorder statRecorder, EventDispatcher eventDispatcher, CallbackDispatcher callbackDispatcher)
-        {
+        public EventManager(ReplayStatsRecorder statRecorder, EventDispatcher eventDispatcher, CallbackDispatcher callbackDispatcher) {
             StatRecorder = statRecorder;
             eventDispatcher.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar);
             eventDispatcher.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
@@ -27,8 +26,7 @@ namespace NSMB.Replay.Stats
 
         #region Events
 
-        public void OnMarioPlayerCollectedCoin(EventMarioPlayerCollectedCoin e)
-        {
+        public void OnMarioPlayerCollectedCoin(EventMarioPlayerCollectedCoin e) {
             Frame f = e.Game.Frames.Verified;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
@@ -36,43 +34,35 @@ namespace NSMB.Replay.Stats
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             var firstPlaceObj = gamemode.GetFirstPlaceObjectiveCount(f);
             PointCoinCollected timePoint;
-            if (e.ItemSpawned != EntityRef.None)
-            {
+            if (e.ItemSpawned != EntityRef.None) {
                 int starDifference = firstPlaceObj - gamemode.GetTeamObjectiveCount(f, mario->GetTeam(f)) ?? -1;
                 var coinItemPtr = f.Unsafe.GetPointer<CoinItem>(e.ItemSpawned);
                 var asset = f.FindAsset(coinItemPtr->Scriptable);
                 timePoint = new PointCoinCollected(StatRecorder, f, mario, playerInfo, e.Coins, asset);
-                UnityEngine.Debug.Log($"{playerInfo.PlayerName} collected {e.Coins} coin(s) ({playerInfo.Coins} total) at {FrameToTime(f, StatRecorder.ReplayStart)} frame {f.Number - StatRecorder.ReplayStart} spawning a {timePoint.ItemName} ({timePoint.SpawnChancePercentage:F2}% chance, dist {starDifference})");
-            } else
-            {
+            } else {
                 timePoint = new PointCoinCollected(StatRecorder, f, mario, playerInfo, e.Coins, null);
-                UnityEngine.Debug.Log($"{playerInfo.PlayerName} collected coin at {FrameToTime(f, StatRecorder.ReplayStart)} frame {f.Number - StatRecorder.ReplayStart} now has {e.Coins} coins ({playerInfo.Coins} total)");
             }
             playerInfo.CoinsCollectedPoints.Add(timePoint);
         }
 
-        public void OnMarioPlayerCollectedStar(EventMarioPlayerCollectedStar e)
-        {
+        public void OnMarioPlayerCollectedStar(EventMarioPlayerCollectedStar e) {
             Frame f = e.Game.Frames.Verified;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
 
             playerInfo.StarsCollectedPoints.Add(new PointStarCollected(StatRecorder, f, mario, playerInfo, mario->GamemodeData.StarChasers->Stars));
-            UnityEngine.Debug.Log($"{playerInfo.PlayerName} collected star at {FrameToTime(f, StatRecorder.ReplayStart)} frame {f.Number - StatRecorder.ReplayStart} now has {mario->GamemodeData.StarChasers->Stars} stars!");
 
             // check if the big star is the main one
-            if (e.StarEntity == f.Global->MainBigStar && StatRecorder.GlobalInfo.CurrBigCollectable is PointBigCollectableSpawned currBigCollectable)
-            {
+            if (e.StarEntity == f.Global->MainBigStar &&
+                StatRecorder.GlobalInfo.CurrBigCollectable is PointBigCollectableSpawned currBigCollectable) {
                 currBigCollectable.CollectingPlayer = playerInfo.PlayerName;
                 currBigCollectable.EndFrame = f.Number;
                 StatRecorder.GlobalInfo.CurrBigCollectable = null;
             }
         }
 
-        public void OnMarioPlayerDied(EventMarioPlayerDied e)
-        {
+        public void OnMarioPlayerDied(EventMarioPlayerDied e) {
             Frame f = e.Game.Frames.Verified;
-            bool livesEnabled = StatRecorder.ReplayFile.Header.Rules.Lives > 0;
 
             // for some reason when dying via pit the entity and attacker are the same
             bool wasPitDeath = e.Entity == e.Attacker;
@@ -87,23 +77,14 @@ namespace NSMB.Replay.Stats
             playerInfo.DeathPoints.Add(deathPoint);
             playerInfo.StarsLostPoints.Add(new PointStarLoss(StatRecorder, f, mario, playerInfo, starsToDrop, PointStarLoss.StarLossCause.Death, EntityRef.None));
 
-            StringBuilder sb = new();
-            sb.Append($"{playerInfo.PlayerName} died at {FrameToTime(f, StatRecorder.ReplayStart)} frame {f.Number - StatRecorder.ReplayStart} with {playerData->Ping}ms ping");
-            if (livesEnabled) {
-                sb.Append($" now has {mario->Lives} lives...");
-            }
-            UnityEngine.Debug.Log(sb.ToString());
-
             // end a combo, finisher
-            if (playerInfo.CurrComboPoint != null)
-            {
+            if (playerInfo.CurrComboPoint != null) {
                 bool includeInCombo = playerInfo.CurrComboPoint.ComboElements.Count > 1 || !wasPitDeath && !wasDisconnect;
                 StatUtilStopCombo(f, playerInfo, StatRecorder, includeInCombo ? deathPoint : null, starsToDrop);
             }
         }
 
-        public void OnMarioPlayerKnockback(EventMarioPlayerTookKnockback e)
-        {
+        public void OnMarioPlayerKnockback(EventMarioPlayerTookKnockback e) {
             Frame f = e.Game.Frames.Verified;
             KnockbackStrength strength = e.Strength;
             var victimMario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
@@ -137,17 +118,9 @@ namespace NSMB.Replay.Stats
             victimMarioInfo.KnockbackPoints.Add(knockbackPoint);
             victimMarioInfo.CurrKnockbackPoint = knockbackPoint;
             StatUtilSetCombo(StatRecorder, f, victimMario, victimMarioInfo, knockbackPoint, starsToDrop);
-
-            if (!isProjectile) {
-                UnityEngine.Debug.Log($"{victimMarioInfo.PlayerName} recieved {strength} knockback from {attackerMarioInfo.PlayerName} at {FrameToTime(f, StatRecorder.ReplayStart)} frame {f.Number - StatRecorder.ReplayStart}.");
-            }
-            else {
-                UnityEngine.Debug.Log($"{victimMarioInfo.PlayerName} recieved {strength} knockback from {attackerMarioInfo.PlayerName}'s projectile at {FrameToTime(f, StatRecorder.ReplayStart)} frame {f.Number - StatRecorder.ReplayStart}.");
-            }
         }
 
-        public void OnMarioPlayerTookDamage(EventMarioPlayerTookDamage e)
-        {
+        public void OnMarioPlayerTookDamage(EventMarioPlayerTookDamage e) {
             Frame f = e.Game.Frames.Verified;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             var marioRuntimeData = f.GetPlayerData(mario->PlayerRef);
@@ -161,8 +134,7 @@ namespace NSMB.Replay.Stats
             }
         }
 
-        public void OnMarioPlayerCollectedPowerup(EventMarioPlayerCollectedPowerup e)
-        {
+        public void OnMarioPlayerCollectedPowerup(EventMarioPlayerCollectedPowerup e) {
             Frame f = e.Game.Frames.Verified;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             var marioRuntimeData = f.GetPlayerData(mario->PlayerRef);
@@ -173,22 +145,9 @@ namespace NSMB.Replay.Stats
 
             var point = new PointPowerupCollect(StatRecorder, f, mario, result, scriptable);
             marioPlayerInfo.PowerupCollectPoints.Add(point);
-
-            StringBuilder sb = new();
-            sb.Append($"{marioRuntimeData.PlayerNickname} ");
-            switch (e.Result)
-            {
-                case PowerupReserveResult.CollectNewIgnoreOld: sb.Append("collected"); break;
-                case PowerupReserveResult.CollectNewReserveOld: sb.Append("reserved"); break;
-                case PowerupReserveResult.KeepOldReserveNew: sb.Append("discarded"); break;
-                default: sb.Append("did something with"); break;
-            }
-            sb.Append($" a {point.Powerup} at {FrameToTime(f, StatRecorder.ReplayStart)} frame {f.Number - StatRecorder.ReplayStart}.");
-            Console.WriteLine(sb.ToString());
         }
 
-        public void OnBigCollectableAttemptedSpawn(EventBigCollectableAttemptedSpawn e)
-        {
+        public void OnBigCollectableAttemptedSpawn(EventBigCollectableAttemptedSpawn e) {
             Frame f = e.Game.Frames.Predicted;
             int spawnIndex = e.PositionIndex;
             FPVector2 position = e.Position;
@@ -199,15 +158,12 @@ namespace NSMB.Replay.Stats
             var point = new PointBigCollectableSpawned(StatRecorder, f, usedSpawns, spawnIndex, wasBlocked, position, ref info, stage);
             
             // set the curr big collectable
-            if (!wasBlocked)
-            {
+            if (!wasBlocked) {
                 info.CurrBigCollectable = point;
                 //Console.WriteLine("Set curr big star");
-            } else
-            {
+            } else {
                 var hits = f.Physics2D.OverlapShape(position, 0, f.Context.CircleRadiusTwo, f.Context.PlayerOnlyMask);
-                for (int i = 0; i < hits.Count; i++)
-                {
+                for (int i = 0; i < hits.Count; i++) {
                     var hit = hits[i];
                     var marioPtr = f.Unsafe.GetPointer<MarioPlayer>(hit.Entity);
                     var runtimeData = f.GetPlayerData(marioPtr->PlayerRef);
@@ -215,42 +171,20 @@ namespace NSMB.Replay.Stats
                 }
             }
             info.BigCollectablesSpawned.Add(point);
-            var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
-            string collectableName;
-            if (gamemode is StarChasersGamemode) collectableName = "Big Star";
-            else if (gamemode is CoinRunnersGamemode) collectableName = "Star Coin";
-            else collectableName = "mrrrrrrow :3";
-
-            StringBuilder sb = new();
-            char starSpawnSymbol = wasBlocked ? '☆' : '★';
-            sb.Append($"{starSpawnSymbol}A {collectableName} {(wasBlocked ? "blocked" : "spawned")} at {FrameToTime(f, StatRecorder.ReplayFile.Header.InitialFrameNumber)} frame {f.Number - StatRecorder.ReplayFile.Header.InitialFrameNumber} ");
-            /*if (wasBlocked) sb.Append($"making {replayInfo.GlobalReplayInfo.FailedStarSpawns} fails");
-            else sb.Append($"making {replayInfo.GlobalReplayInfo.SuccessfulStarSpawns} spawns");
-            sb.Append($" {replayInfo.GlobalReplayInfo.AttemptedStarSpawns} attempts total");*/
-            sb.Append($"- Blocks: {info.FailedStarSpawns}, Spawns: {info.SuccessfulStarSpawns}, Attempts {info.AttemptedStarSpawns} ");
-            sb.Append($"- Spots: {point.Spawnpoints - point.UsedSpawns} ");
-            sb.Append($"- at position {spawnIndex + 1} {position.ToString()}");
-            if (wasBlocked)
-            {
-                sb.Append(" - blocked by ");
-                foreach(var playerName in point.BlockingPlayers)
-                {
-                    sb.Append(playerName);
-                }
-            }
-            UnityEngine.Debug.Log(sb.ToString());
         }
 
         #endregion
 
 
         #region Simulation Callbacks
+        // buggy
         /*public void OnGameStarted(Frame f) {
             // register all the players
             
             UnityEngine.Debug.Log("Hello");
         }*/
 
+        //! we have to use this janky setUP with a did loop bool since OnGameStarted doesn't work
         public bool didLoop = false;
         public void OnSimulationFinished(Frame f) {
             // scan all Marios
