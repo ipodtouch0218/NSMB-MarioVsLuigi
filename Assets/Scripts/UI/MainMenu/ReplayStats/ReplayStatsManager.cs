@@ -9,6 +9,7 @@ using NUnit.Framework;
 using Quantum;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using TMPro;
@@ -195,7 +196,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
             targetPlayerDropdown.ClearOptions();
             BinaryReplayHeader header = replayListEntry.ReplayFile.Header;
-            foreach (int i in Enumerable.Range(0, header.PlayerInformation.Length).OrderByDescending(idx => header.PlayerInformation[idx].FinalObjectiveCount)) {
+            for (int i = 0; i < header.PlayerInformation.Length; i++) {
                 ref ReplayPlayerInformation info = ref header.PlayerInformation[i];
                 targetPlayerDropdown.options.Add(new TMP_Dropdown.OptionData { text = info.Nickname });
             }
@@ -237,15 +238,14 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             timePointEnteries.Clear();
 
             var timePoints = GetTimePoints();
-            if (timePoints is List<PointStarCollected> starPoints) {
-                for (int i = 0; i < starPoints.Count; i++) {
-                    var point = starPoints[i];
-                    var entry = Instantiate(entryTemplate, entryTemplate.transform.parent);
-                    entry.name = $"TimePointEntry{i}";
-                    entry.gameObject.SetActive(true);
-                    entry.UpdateUI(point, i+1);
-                    timePointEnteries.Add(entry);
-                }
+            int index = 0;
+            foreach (var point in timePoints) {
+                var entry = Instantiate(entryTemplate, entryTemplate.transform.parent);
+                entry.name = $"TimePointEntry{index}";
+                entry.gameObject.SetActive(true);
+                entry.UpdateUI(point, index + 1);
+                timePointEnteries.Add(entry);
+                index++;
             }
 
             UpdateEntryCount(GlobalController.Instance.translationManager);
@@ -275,6 +275,25 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             };
         }
 
+        private IEnumerable<TimePoint> GetTimePoints() {
+            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+            return ViewingStats switch {
+                StatOptions.Stars => stats[TargetPlayer].StarsCollectedPoints,
+                StatOptions.Death => stats[TargetPlayer].DeathPoints,
+                StatOptions.KnockbackReceived => stats[TargetPlayer].KnockbackPoints,
+                StatOptions.KnockbackDealt => GetKnockbackDealt(),
+                StatOptions.Damage => stats[TargetPlayer].DamagePoints,
+                StatOptions.PowerupInfo => stats[TargetPlayer].PowerChangePoints,
+                StatOptions.PowerupSpawns => GetItemDrops(),
+                StatOptions.BigCollectableSpawns => ReplayStatsRecorder.Instance.GlobalInfo.BigCollectablesSpawned,
+                _ => Enumerable.Empty<TimePoint>(),
+            };
+        }
+
+        #endregion
+
+        #region Other Methods
+
         private List<PointKnockback> GetKnockbackDealt() {
             List<PointKnockback> newList = new();
 
@@ -289,6 +308,8 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 var kbPoints = stats.PlayerInfos[currPlayer].KnockbackPoints;
                 newList.AddRange(kbPoints);
             }
+
+            // sort by index which is time occured
             newList.Sort();
 
             return newList;
@@ -310,22 +331,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             }
 
             return newList;
-        }
-
-        private object GetTimePoints() {
-            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
-            return ViewingStats switch {
-                // all star collection points
-                StatOptions.Stars => stats[TargetPlayer].StarsCollectedPoints,
-                StatOptions.Death => stats[TargetPlayer].DeathPoints,
-                StatOptions.KnockbackReceived => stats[TargetPlayer].KnockbackPoints,
-                StatOptions.KnockbackDealt => GetKnockbackDealt(),
-                StatOptions.Damage => stats[TargetPlayer].DamagePoints,
-                StatOptions.PowerupInfo => stats[TargetPlayer].PowerChangePoints,
-                StatOptions.PowerupSpawns => GetItemDrops(),
-                StatOptions.BigCollectableSpawns => ReplayStatsRecorder.Instance.GlobalInfo,
-                _ => null,
-            };
         }
 
         #endregion
