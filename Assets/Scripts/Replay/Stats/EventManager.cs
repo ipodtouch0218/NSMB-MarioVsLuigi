@@ -2,7 +2,6 @@
 using Photon.Deterministic;
 using Quantum;
 using System;
-using System.Text;
 
 namespace NSMB.Replay.Stats
 {
@@ -63,15 +62,44 @@ namespace NSMB.Replay.Stats
 
         public void OnMarioPlayerDied(EventMarioPlayerDied e) {
             Frame f = e.Game.Frames.Verified;
+            PointDeath.DeathCause deathCause = PointDeath.DeathCause.Unknown;
 
             // for some reason when dying via pit the entity and attacker are the same
             bool wasPitDeath = e.Entity == e.Attacker;
             bool wasDisconnect = e.Entity == EntityRef.None;
 
+            string? attackerName = null;
+
+            if (wasDisconnect) {
+                deathCause = PointDeath.DeathCause.Disconnect;
+            } else if (e.IsLava) {
+                deathCause = PointDeath.DeathCause.Lava;
+            } else if (wasPitDeath) {
+                var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+                var transform = f.Unsafe.GetPointer<Transform2D>(e.Entity);
+
+                // check if above the stage, if so then it was poison
+                if (transform->Position.Y > stage.StageWorldMin.Y) {
+                    deathCause = PointDeath.DeathCause.Poison;
+                } else {
+                    deathCause = PointDeath.DeathCause.Pit;
+                }
+            } else {
+                // check if enemy
+                if (f.Unsafe.TryGetPointer<Enemy>(e.Attacker, out _)) {
+                    deathCause = PointDeath.DeathCause.Enemy;
+                }
+                // else it was Mario
+                if (f.Unsafe.TryGetPointer<MarioPlayer>(e.Attacker, out var attackerMario)) {
+                    var runtimeData = f.GetPlayerData(attackerMario->PlayerRef);
+                    attackerName = runtimeData.PlayerNickname;
+                }
+            }
+
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             var playerData = QuantumUtils.GetPlayerData(f, mario->PlayerRef);
             var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
-            var deathPoint = new PointDeath(StatRecorder, f, mario, playerInfo, playerData->Ping);
+            var deathPoint = new PointDeath(StatRecorder, f, mario, playerInfo, deathCause, playerData->Ping, attackerName);
             var starsToDrop = Math.Min(1, e.OldObjectiveCount);
 
             playerInfo.DeathPoints.Add(deathPoint);
@@ -104,7 +132,7 @@ namespace NSMB.Replay.Stats
                 _ => PointStarLoss.StarLossCause.Unknown
             };
 
-            int starsToDrop = e.StarsToDrop;
+            int starsToDrop = Math.Min(e.StarsToDrop, e.OldObjectiveCount);
             if (dropStars) {
                 victimMarioInfo.StarsLostPoints.Add(new PointStarLoss(StatRecorder, f, victimMario, victimMarioInfo, starsToDrop, lossCause, e.Attacker));
             }
@@ -190,7 +218,7 @@ namespace NSMB.Replay.Stats
             while (marios.NextUnsafe(out _, out var marioPlayer)) {
                 if (!didLoop) {
                     var runtimeData = f.GetPlayerData(marioPlayer->PlayerRef);
-                    StatRecorder.PlayerInfos.Add(marioPlayer->PlayerRef, new PlayerInfo(runtimeData.PlayerNickname));
+                    StatRecorder.PlayerInfos.Add(marioPlayer->PlayerRef, new PlayerInfo(runtimeData.PlayerNickname, marioPlayer->PlayerRef));
                 }
 
                 // what we're GOing to do is very simple, check if Mario is not in knockback.
@@ -201,6 +229,11 @@ namespace NSMB.Replay.Stats
                 HandleStateData(f, marioPlayer, playerInfo);
             }
             didLoop = true;
+
+#if CACHE_REPLAY_STATS
+            // significantly slows down the stats
+            ActiveReplayManager.Instance.ReplayFrameCache.Add(f.Serialize(DeterministicFrameSerializeMode.Serialize));
+#endif
         }
 
         private void HandleCombo(Frame f, MarioPlayer* marioPlayer, PlayerInfo playerInfo) {
@@ -263,7 +296,7 @@ namespace NSMB.Replay.Stats
                 playerInfo.CurrStarmanChangePoint = point;
             }
         }
-        #endregion
+#endregion
 
         #region Static Methods
 

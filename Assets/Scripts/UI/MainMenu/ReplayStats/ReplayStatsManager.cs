@@ -43,16 +43,46 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         private readonly StringBuilder stringBuilder = new();
         private readonly List<TimePointEntry> timePointEnteries = new();
 
+        #region Switches
         public enum StatOptions {
             Stars,
             Death,
             KnockbackReceived,
             KnockbackDealt,
             Damage,
+            ComboLanded,
+            ComboRecieved,
             PowerupInfo,
             PowerupSpawns,
             BigCollectableSpawns,
         }
+
+        private bool StatSupportsPlayers() {
+            return ViewingStats switch {
+                StatOptions.BigCollectableSpawns => false,
+                _ => true,
+            };
+        }
+
+        private IEnumerable<TimePoint> GetTimePoints(StatOptions? options = null) {
+            StatOptions viewingOptions = options ?? ViewingStats;
+            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+            return viewingOptions switch {
+                StatOptions.Stars => stats[TargetPlayer].StarsCollectedPoints,
+                StatOptions.Death => stats[TargetPlayer].DeathPoints,
+                StatOptions.KnockbackReceived => stats[TargetPlayer].KnockbackPoints,
+                StatOptions.KnockbackDealt => GetKnockbackDealt(),
+                StatOptions.Damage => stats[TargetPlayer].DamagePoints,
+                StatOptions.ComboLanded => GetComboWithPlayer(),
+                StatOptions.ComboRecieved => stats[TargetPlayer].ComboReceivedPoints,
+                StatOptions.PowerupInfo => stats[TargetPlayer].PowerChangePoints,
+                StatOptions.PowerupSpawns => GetItemDrops(),
+                StatOptions.BigCollectableSpawns => ReplayStatsRecorder.Instance.GlobalInfo.BigCollectablesSpawned,
+                _ => Enumerable.Empty<TimePoint>(),
+            };
+        }
+
+        #endregion
 
 
 #if UNITY_EDITOR
@@ -251,48 +281,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             UpdateEntryCount(GlobalController.Instance.translationManager);
         }
 
-        #region Switches
-
-        private string GetHeaderPrefix() {
-            // placeholder icons
-            return ViewingStats switch {
-                StatOptions.Stars => "<sprite name=room_stars> ",
-                StatOptions.Death => "<sprite name=room_lives> ",
-                StatOptions.KnockbackReceived => "",
-                StatOptions.KnockbackDealt => "",
-                StatOptions.Damage => "<sprite name=room_lives> ",
-                StatOptions.PowerupInfo => "<sprite name=room_powerups> ",
-                StatOptions.PowerupSpawns => "<sprite name=room_coins> ",
-                StatOptions.BigCollectableSpawns => "<sprite name=room_stars> ",
-                _ => ""
-            };
-        }
-
-        private bool StatSupportsPlayers() {
-            return ViewingStats switch {
-                StatOptions.BigCollectableSpawns => false,
-                _ => true,
-            };
-        }
-
-        private IEnumerable<TimePoint> GetTimePoints(StatOptions? options = null) {
-            StatOptions viewingOptions = options ?? ViewingStats;
-            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
-            return viewingOptions switch {
-                StatOptions.Stars => stats[TargetPlayer].StarsCollectedPoints,
-                StatOptions.Death => stats[TargetPlayer].DeathPoints,
-                StatOptions.KnockbackReceived => stats[TargetPlayer].KnockbackPoints,
-                StatOptions.KnockbackDealt => GetKnockbackDealt(),
-                StatOptions.Damage => stats[TargetPlayer].DamagePoints,
-                StatOptions.PowerupInfo => stats[TargetPlayer].PowerChangePoints,
-                StatOptions.PowerupSpawns => GetItemDrops(),
-                StatOptions.BigCollectableSpawns => ReplayStatsRecorder.Instance.GlobalInfo.BigCollectablesSpawned,
-                _ => Enumerable.Empty<TimePoint>(),
-            };
-        }
-
-        #endregion
-
         #region Other Methods
 
         private List<PointKnockback> GetKnockbackDealt() {
@@ -329,6 +317,28 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 }
 
                 newList.Add(point);
+            }
+
+            return newList;
+        }
+
+        private List<PointCombo> GetComboWithPlayer() {
+            List<PointCombo> newList = new();
+
+            // loop through all enteries checking playerref
+            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+            foreach (var playerInfo in stats.Values) {
+                // don't include ourselves UwU
+                if (playerInfo.PlayerRef == TargetPlayer) {
+                    continue;
+                }
+
+                // now check the combo points
+                foreach (var comboPoint in playerInfo.ComboReceivedPoints) {
+                    if (comboPoint.GetParticipants().ContainsKey(TargetPlayer)) {
+                        newList.Add(comboPoint);
+                    }
+                }
             }
 
             return newList;

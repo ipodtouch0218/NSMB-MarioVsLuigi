@@ -273,8 +273,14 @@ namespace NSMB.Replay {
                 DeltaTimeType = SimulationUpdateTime.EngineDeltaTime,
             };
 
-            ReplayFrameCache.Clear();
-            ReplayFrameCache.Add(arguments.FrameData);
+#if CACHE_REPLAY_STATS
+            if (ReplayStartFrame == null) {
+#endif
+                ReplayFrameCache.Clear();
+                ReplayFrameCache.Add(arguments.FrameData);
+#if CACHE_REPLAY_STATS
+            }
+#endif
 
             try {
                 NetworkHandler.Runner = await QuantumRunner.StartGameAsync(arguments);

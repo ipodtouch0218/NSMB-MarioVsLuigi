@@ -1,11 +1,13 @@
 ﻿#nullable enable
 
+using Quantum;
 using System.Collections.Generic;
 
 namespace NSMB.Replay.Stats
 {
 
     public class PlayerInfo {
+        public readonly PlayerRef PlayerRef;
         public readonly string PlayerName;
 
         public int Stars; // StarChasers
@@ -54,8 +56,9 @@ namespace NSMB.Replay.Stats
         public const int ComboTimerStart = 15;
         public int ComboEndTimer;
 
-        public PlayerInfo(string playerName) {
+        public PlayerInfo(string playerName, PlayerRef playerRef) {
             PlayerName = playerName;
+            PlayerRef = playerRef;
         }
     }
 
