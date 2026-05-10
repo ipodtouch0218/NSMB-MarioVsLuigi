@@ -275,9 +275,10 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             };
         }
 
-        private IEnumerable<TimePoint> GetTimePoints() {
+        private IEnumerable<TimePoint> GetTimePoints(StatOptions? options = null) {
+            StatOptions viewingOptions = options ?? ViewingStats;
             var stats = ReplayStatsRecorder.Instance.PlayerInfos;
-            return ViewingStats switch {
+            return viewingOptions switch {
                 StatOptions.Stars => stats[TargetPlayer].StarsCollectedPoints,
                 StatOptions.Death => stats[TargetPlayer].DeathPoints,
                 StatOptions.KnockbackReceived => stats[TargetPlayer].KnockbackPoints,
@@ -323,7 +324,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             var points = stats[TargetPlayer].CoinsCollectedPoints;
             foreach (var point in points) {
                 // skip no item drops
-                if (point.ItemName == null) {
+                if (point.CoinItem == null) {
                     continue;
                 }
 

@@ -7,49 +7,46 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NSMB.Replay.Stats
-{
+namespace NSMB.Replay.Stats {
 
     /**
      * Use this class to save information such as when a powerUP is GOtten,
      * when a star is GOtten, when a star is dropped etc.
      */
-    public unsafe abstract class TimePoint : IComparable<TimePoint>
-    {
+    public unsafe abstract class TimePoint : IComparable<TimePoint> {
+        public PlayerRef? PlayerRef { get; protected set; }
         public string? AffectedPlayerName { get; protected set; }
         public int OccurenceFrame { get; private protected set; }
         public FP DeltaTime { get; private protected set; }
         public int? EndFrame { get; set; }
         public int Id;
         public static int _index { get; private protected set; }
-        public ReplayStatsRecorder StatsRecorder { get; protected set; }
+        public ReplayStatsRecorder? StatsRecorder { get; protected set; }
 
-        public int CompareTo(TimePoint? other)
-        {
+        public int CompareTo(TimePoint? other) {
             if (other == null) return 1;
             return this.Id.CompareTo(other.Id);
         }
 
-        private protected static void BasicInit(TimePoint timePoint, ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario)
-        {
+        private protected static void BasicInit(TimePoint timePoint, ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) {
             timePoint.StatsRecorder = statsRecorder;
             timePoint.OccurenceFrame = f.Number;
             timePoint.DeltaTime = f.DeltaTime;
             timePoint.Id = _index++;
+            timePoint.PlayerRef = mario->PlayerRef;
             if (mario != null) timePoint.AffectedPlayerName = f.GetPlayerData(mario->PlayerRef).PlayerNickname;
         }
 
-        private protected static void BasicInit(TimePoint timePoint, ReplayStatsRecorder statsRecorder, Frame f, PlayerInfo playerInfo)
-        {
+        private protected static void BasicInit(TimePoint timePoint, ReplayStatsRecorder statsRecorder, Frame f, PlayerInfo playerInfo, PlayerRef playerRef) {
             timePoint.StatsRecorder = statsRecorder;
             timePoint.OccurenceFrame = f.Number;
             timePoint.DeltaTime = f.DeltaTime;
             timePoint.Id = _index++;
+            timePoint.PlayerRef = playerRef;
             timePoint.AffectedPlayerName = playerInfo.PlayerName;
         }
 
-        private protected static void BasicInit(TimePoint timePoint, ReplayStatsRecorder statsRecorder, Frame f, string playerName)
-        {
+        private protected static void BasicInit(TimePoint timePoint, ReplayStatsRecorder statsRecorder, Frame f, string playerName) {
             timePoint.StatsRecorder = statsRecorder;
             timePoint.OccurenceFrame = f.Number;
             timePoint.DeltaTime = f.DeltaTime;
@@ -57,8 +54,7 @@ namespace NSMB.Replay.Stats
             timePoint.AffectedPlayerName = playerName;
         }
 
-        private protected static void GlobalInit(TimePoint timePoint, ReplayStatsRecorder statsRecorder, Frame f)
-        {
+        private protected static void GlobalInit(TimePoint timePoint, ReplayStatsRecorder statsRecorder, Frame f) {
             timePoint.StatsRecorder = statsRecorder;
             timePoint.OccurenceFrame = f.Number;
             timePoint.DeltaTime = f.DeltaTime;
@@ -72,16 +68,20 @@ namespace NSMB.Replay.Stats
 
         // new methods for Time Point entry
         public virtual void SetTimeText(TranslationManager tm, StringBuilder stringBuilder) {
+            if (StatsRecorder == null) {
+                stringBuilder.Append("");
+                return;
+            }
             stringBuilder.Append($"@ {EventManager.FrameToTime(OccurenceFrame, StatsRecorder.ReplayStart, DeltaTime)}");
 
             if (EndFrame != null) {
-                stringBuilder.Append($"~{EventManager.FrameToTime(EndFrame.Value, StatsRecorder.ReplayStart, DeltaTime)}");
+                stringBuilder.Append($"-{EventManager.FrameToTime(EndFrame.Value, StatsRecorder.ReplayStart, DeltaTime)}");
             }
 
             stringBuilder.Append($" - F{OccurenceFrame - StatsRecorder.ReplayStart}");
 
             if (EndFrame != null) {
-                stringBuilder.Append($"~F{EndFrame - StatsRecorder.ReplayStart}");
+                stringBuilder.Append($"-F{EndFrame - StatsRecorder.ReplayStart}");
             }
         }
 
@@ -94,17 +94,15 @@ namespace NSMB.Replay.Stats
         // any extra parameters can be GOtten
     }
 
-    public unsafe class PointCoinCollected : TimePoint
-    {
-        public readonly string? ItemName;
+    public unsafe class PointCoinCollected : TimePoint {
+        public readonly CoinItemAsset? CoinItem;
         public readonly FP? SpawnChancePercentage;
         public readonly FP? SpawnChanceRaw;
         public readonly int CoinCount;
         public readonly int CoinCountTotal;
         public readonly int CurrStarCount;
         public readonly int LeaderStars;
-        public PointCoinCollected(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, int coinCount, CoinItemAsset? coinItemAsset)
-        {
+        public PointCoinCollected(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, int coinCount, CoinItemAsset? coinItemAsset) {
             BasicInit(this, statsRecorder, f, mario);
             int starsToWin = f.Global->Rules.StarsToWin; // we can get stars to win from the Replay Header
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
@@ -112,13 +110,11 @@ namespace NSMB.Replay.Stats
             LeaderStars = gamemode.GetFirstPlaceObjectiveCount(f);
             CoinCount = coinCount;
             CoinCountTotal = ++playerInfo.Coins;
-            if (coinItemAsset is CoinItemAsset coinItem)
-            {
-                ItemName = coinItem.name;
+            if (coinItemAsset is CoinItemAsset coinItem) {
+                CoinItem = coinItem;
                 SpawnChanceRaw = gamemode.GetItemSpawnWeight(f, coinItem, CurrStarCount);
                 FP sum = 0;
-                foreach (var currCoinItemRef in gamemode.AllCoinItems)
-                {
+                foreach (var currCoinItemRef in gamemode.AllCoinItems) {
                     CoinItemAsset currCoinItemAsset = f.FindAsset(currCoinItemRef);
 
                     var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
@@ -131,16 +127,32 @@ namespace NSMB.Replay.Stats
         }
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder) {
-            stringBuilder.Append($"Starman invincible");
+            if (CoinItem != null) {
+                stringBuilder.Append($"Collected a coin spawning a "+CoinItem.name);
+            } else {
+                stringBuilder.Append($"Collected a coin");
+            }
+        }
+
+        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder) {
+            if (CoinItem != null) {
+                stringBuilder.Append("<sprite name=room_powerups>");
+            }
+
+            stringBuilder.Append("<sprite name=room_coins>").Append(Utils.GetSymbolString(CoinCount.ToString(), Utils.smallSymbols));
+        }
+
+        public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder) {
+            if (CoinItem != null) {
+                stringBuilder.Append($"Spawn Chance: {(float)SpawnChancePercentage.GetValueOrDefault():0.00}%");
+            }
         }
     }
 
-    public unsafe class PointStarCollected : TimePoint
-    {
+    public unsafe class PointStarCollected : TimePoint {
         public readonly int StarCount;
         public readonly int TotalStarCount;
-        public PointStarCollected(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo info, int starCount)
-        {
+        public PointStarCollected(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo info, int starCount) {
             BasicInit(this, statsRecorder, f, mario);
             StarCount = starCount;
             TotalStarCount = ++info.Stars;
@@ -156,11 +168,9 @@ namespace NSMB.Replay.Stats
         }
     }
 
-    public unsafe class PointDamage : TimePoint
-    {
+    public unsafe class PointDamage : TimePoint {
         public readonly PowerupState NewState;
-        public PointDamage(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario)
-        {
+        public PointDamage(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) {
             OccurenceFrame = f.Number;
             DeltaTime = f.DeltaTime;
             NewState = mario->CurrentPowerupState;
@@ -172,12 +182,10 @@ namespace NSMB.Replay.Stats
         }
     }
 
-    public unsafe class PointDeath : TimePoint
-    {
+    public unsafe class PointDeath : TimePoint {
         public readonly int LivesRemaining;
         public readonly int Ping;
-        public PointDeath(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, int ping)
-        {
+        public PointDeath(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, int ping) {
             BasicInit(this, statsRecorder, f, mario);
             LivesRemaining = mario->Lives;
             Ping = ping;
@@ -188,19 +196,19 @@ namespace NSMB.Replay.Stats
         }
     }
 
-    public unsafe class PointKnockback : TimePoint
-    {
+    public unsafe class PointKnockback : TimePoint {
         public readonly int StarsDropped;
         public readonly string? AttackerName;
+        public readonly PlayerRef AttackerRef;
         public readonly KnockbackStrength KnockbackStrength;
-        public PointKnockback(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, EntityRef attacker, int starDropCount, KnockbackStrength knockbackStrength)
-        {
+        public PointKnockback(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, EntityRef attacker, int starDropCount, KnockbackStrength knockbackStrength) {
             BasicInit(this, statsRecorder, f, mario);
             var attackerMario = f.Unsafe.GetPointer<MarioPlayer>(attacker);
             var attackerPlayer = f.GetPlayerData(attackerMario->PlayerRef);
             AttackerName = attackerPlayer.PlayerNickname;
             KnockbackStrength = knockbackStrength;
             StarsDropped = starDropCount;
+            AttackerRef = attackerMario->PlayerRef;
         }
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder) {
@@ -208,10 +216,8 @@ namespace NSMB.Replay.Stats
         }
     }
 
-    public unsafe class PointStarLoss : TimePoint
-    {
-        public enum StarLossCause
-        {
+    public unsafe class PointStarLoss : TimePoint {
+        public enum StarLossCause {
             Unknown,
             Death,
             Stomp,
@@ -227,8 +233,7 @@ namespace NSMB.Replay.Stats
         public readonly int StarAmount;
         public readonly int StarDropCount;
         public readonly int TotalStarsLost;
-        public PointStarLoss(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo victimInfo, int starDropCount, StarLossCause reason, EntityRef attacker)
-        {
+        public PointStarLoss(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo victimInfo, int starDropCount, StarLossCause reason, EntityRef attacker) {
             BasicInit(this, statsRecorder, f, mario);
             StarAmount = mario->GamemodeData.StarChasers->Stars;
             StarDropCount = starDropCount;
@@ -236,8 +241,7 @@ namespace NSMB.Replay.Stats
             TotalStarsLost = victimInfo.StarsDropped += starDropCount;
             if (attacker == EntityRef.None) return;
 
-            if (f.Unsafe.TryGetPointer<MarioPlayer>(attacker, out var AttackerMario))
-            {
+            if (f.Unsafe.TryGetPointer<MarioPlayer>(attacker, out var AttackerMario)) {
                 var attackerPlayer = f.GetPlayerData(AttackerMario->PlayerRef);
                 AttackerName = attackerPlayer.PlayerNickname;
             }
@@ -248,15 +252,13 @@ namespace NSMB.Replay.Stats
         }
     }
 
-    public unsafe class PointCombo : TimePoint
-    {
+    public unsafe class PointCombo : TimePoint {
         // these are the things that are in the combo
         // we reuse TimePoints for this.
         public readonly List<TimePoint> ComboElements = new();
         public readonly List<int> StarsLost = new();
         public readonly List<int> TotalStarsLost = new();
-        public PointCombo(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, TimePoint comboElement, int starsLost)
-        {
+        public PointCombo(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, TimePoint comboElement, int starsLost) {
             BasicInit(this, statsRecorder, f, mario);
             ComboElements.Add(comboElement);
             StarsLost.Add(starsLost);
@@ -273,11 +275,9 @@ namespace NSMB.Replay.Stats
         }
     }
 
-    public unsafe class PointPowerChange : TimePoint
-    {
+    public unsafe class PointPowerChange : TimePoint {
         public readonly PowerupState PowerupState;
-        public PointPowerChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario)
-        {
+        public PointPowerChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) {
             BasicInit(this, statsRecorder, f, mario);
             PowerupState = mario->CurrentPowerupState;
         }
@@ -287,10 +287,8 @@ namespace NSMB.Replay.Stats
         }
     }
 
-    public unsafe class PointStarmanChange : TimePoint
-    {
-        public PointStarmanChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario)
-        {
+    public unsafe class PointStarmanChange : TimePoint {
+        public PointStarmanChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) {
             BasicInit(this, statsRecorder, f, mario);
         }
 
@@ -299,12 +297,10 @@ namespace NSMB.Replay.Stats
         }
     }
 
-    public unsafe class PointReserveChange : TimePoint
-    {
+    public unsafe class PointReserveChange : TimePoint {
         // allow for null
         public readonly PowerupAsset Powerup;
-        public PointReserveChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario)
-        {
+        public PointReserveChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) {
             BasicInit(this, statsRecorder, f, mario);
             Powerup = f.FindAsset(mario->ReserveItem);
         }
@@ -314,12 +310,10 @@ namespace NSMB.Replay.Stats
         }
     }
 
-    public unsafe class PointPowerupCollect : TimePoint
-    {
+    public unsafe class PointPowerupCollect : TimePoint {
         public readonly PowerupReserveResult ReserveResult;
         public readonly PowerupAsset Powerup;
-        public PointPowerupCollect(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PowerupReserveResult reserveResult, PowerupAsset powerupAsset)
-        {
+        public PointPowerupCollect(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PowerupReserveResult reserveResult, PowerupAsset powerupAsset) {
             BasicInit(this, statsRecorder, f, mario);
             ReserveResult = reserveResult;
             Powerup = powerupAsset;
@@ -330,8 +324,7 @@ namespace NSMB.Replay.Stats
         }
     }
 
-    public unsafe class PointBigCollectableSpawned : TimePoint
-    {
+    public unsafe class PointBigCollectableSpawned : TimePoint {
         public readonly int AttemptedSpawnCount;
         public readonly int SuccessfulSpawnCount;
         public readonly int FailedSpawnCount; // when stars are blocked
@@ -343,8 +336,7 @@ namespace NSMB.Replay.Stats
         public readonly FPVector2 Coordinates;
         public readonly List<string> BlockingPlayers = new();
         public string? CollectingPlayer; // if a player collected the big star this is their name
-        public PointBigCollectableSpawned(ReplayStatsRecorder statsRecorder, Frame f, int usedSpawns, int index, bool blocked, FPVector2 coordinates, ref GlobalInfo globalReplayInfo, VersusStageData stage)
-        {
+        public PointBigCollectableSpawned(ReplayStatsRecorder statsRecorder, Frame f, int usedSpawns, int index, bool blocked, FPVector2 coordinates, ref GlobalInfo globalReplayInfo, VersusStageData stage) {
             GlobalInit(this, statsRecorder, f);
             PositionIndex = index;
             UsedSpawns = usedSpawns;
@@ -354,8 +346,11 @@ namespace NSMB.Replay.Stats
             Coordinates = coordinates;
 
             AttemptedSpawnCount = ++globalReplayInfo.AttemptedStarSpawns;
-            if (!blocked) ++globalReplayInfo.SuccessfulStarSpawns;
-            else ++globalReplayInfo.FailedStarSpawns;
+            if (!blocked) {
+                ++globalReplayInfo.SuccessfulStarSpawns;
+            } else {
+                ++globalReplayInfo.FailedStarSpawns;
+            }
 
             SuccessfulSpawnCount = globalReplayInfo.SuccessfulStarSpawns;
             FailedSpawnCount = globalReplayInfo.FailedStarSpawns;
@@ -364,6 +359,16 @@ namespace NSMB.Replay.Stats
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder) {
             stringBuilder.Append("Big Star spawned at Pos "+PositionIndex);
         }
+
+        public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder) {
+            stringBuilder.Append(CollectingPlayer);
+        }
+
+        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder) {
+            stringBuilder.Append("X").Append(Utils.GetSymbolString(FailedSpawnCount.ToString(), Utils.smallSymbols));
+            stringBuilder.Append("<sprite name=room_stars>").Append(Utils.GetSymbolString(SuccessfulSpawnCount.ToString(), Utils.smallSymbols));
+        }
+
     }
 
 }

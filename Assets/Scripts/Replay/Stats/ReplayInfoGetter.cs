@@ -1,6 +1,5 @@
 ﻿#nullable enable
 
-using Quantum;
 using System.Collections.Generic;
 
 namespace NSMB.Replay.Stats
@@ -36,10 +35,7 @@ namespace NSMB.Replay.Stats
         public int StarsDropped;
         public int PurpleCoinsDropped;
 
-        // we store the powerUP state for counting
-        // when a player switches powerUP states
-        // we will automatically make a new timepoint
-        // if their powerUP state doesn't match
+        // for powerUP changes
         public PointPowerChange? CurrPowerChangePoint = null;
         public readonly List<PointPowerChange> PowerChangePoints = new();
 

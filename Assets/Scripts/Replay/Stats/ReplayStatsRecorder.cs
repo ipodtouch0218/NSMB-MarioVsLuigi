@@ -10,7 +10,7 @@ namespace NSMB.Replay.Stats {
         public int ReplayStart => ReplayFile.Header.InitialFrameNumber;
         public int ReplayLength => ReplayFile.Header.ReplayLengthInFrames;
         public int ReplayEnd => ReplayStart + ReplayLength;
-        public readonly Dictionary<PlayerRef, PlayerInfo> PlayerInfos = new();
+        public Dictionary<PlayerRef, PlayerInfo> PlayerInfos { get; private set; }
         public GlobalInfo GlobalInfo { get; private set; }
         private SessionRunner Runner;
 
@@ -64,6 +64,7 @@ namespace NSMB.Replay.Stats {
 
             Runner = QuantumRunner.StartGame(arguments);
             GlobalInfo = new GlobalInfo();
+            PlayerInfos = new();
         }
     }
 }

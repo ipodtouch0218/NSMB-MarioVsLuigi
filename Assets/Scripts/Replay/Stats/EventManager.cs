@@ -93,7 +93,7 @@ namespace NSMB.Replay.Stats
             var attackerMario = f.Unsafe.GetPointer<MarioPlayer>(e.Attacker);
             var attackerMarioInfo = StatRecorder.PlayerInfos[attackerMario->PlayerRef];
            
-            bool isProjectile = e.ProjectileEffect != ProjectileEffectType.None;
+            //bool isProjectile = e.ProjectileEffect != ProjectileEffectType.None;
             bool dropStars = e.StarsToDrop != 0;
 
             var lossCause = strength switch {
@@ -123,7 +123,6 @@ namespace NSMB.Replay.Stats
         public void OnMarioPlayerTookDamage(EventMarioPlayerTookDamage e) {
             Frame f = e.Game.Frames.Verified;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
-            var marioRuntimeData = f.GetPlayerData(mario->PlayerRef);
             var marioPlayerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
             var damagePoint = new PointDamage(StatRecorder, f, mario);
             var starsToDrop = Math.Min(1, e.OldObjectiveCount);
@@ -137,7 +136,6 @@ namespace NSMB.Replay.Stats
         public void OnMarioPlayerCollectedPowerup(EventMarioPlayerCollectedPowerup e) {
             Frame f = e.Game.Frames.Verified;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
-            var marioRuntimeData = f.GetPlayerData(mario->PlayerRef);
             var marioPlayerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
 
             var result = e.Result;

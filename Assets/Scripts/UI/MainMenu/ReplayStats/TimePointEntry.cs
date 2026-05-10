@@ -1,4 +1,5 @@
-﻿using NSMB.Replay.Stats;
+﻿using NSMB.Replay;
+using NSMB.Replay.Stats;
 using NSMB.UI.Translation;
 using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
@@ -13,7 +14,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         public TimePoint timePoint;
 
         //---Serialized Variables
-        [SerializeField] private TMP_Text entryNumText, timeText, symbolsText, descriptionText, additionalInfo;
+        [SerializeField] private TMP_Text entryNumText, timeText, symbolsText, descriptionText, additionalText;
         [SerializeField] private Image icon;
 
         //---Private Variables
@@ -48,7 +49,15 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
             //--setting the additional info
             stringBuilder.Clear();
             timePointInfo.SetAdditionalText(tm, stringBuilder);
-            descriptionText.SetText(stringBuilder);
+            additionalText.SetText(stringBuilder);
         }
+
+        #region Button Methods
+
+        public void StartReplayAtPart() {
+            ActiveReplayManager.Instance.StartReplayPlayback(timePoint.StatsRecorder.ReplayFile, timePoint.OccurenceFrame, timePoint.PlayerRef);
+        }
+
+        #endregion
     }
 }
