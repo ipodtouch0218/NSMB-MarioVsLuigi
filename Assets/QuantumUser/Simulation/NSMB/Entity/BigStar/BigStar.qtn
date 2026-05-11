@@ -38,5 +38,6 @@ event CollectableDespawned {
 synced event BigCollectableAttemptedSpawn {
 	int PositionIndex;
 	FPVector2 Position;
+	int UsedSpawnpoints;
 	bool Success;
 }

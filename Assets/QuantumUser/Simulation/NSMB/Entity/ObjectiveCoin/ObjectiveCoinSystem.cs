@@ -74,10 +74,10 @@ namespace Quantum {
                     var newStarCoinTransform = f.Unsafe.GetPointer<Transform2D>(newEntity);
                     newStarCoinTransform->Position = position;
                     spawnedStarCoin = true;
-                    f.Events.BigCollectableAttemptedSpawn(index, position, Success: true);
+                    f.Events.BigCollectableAttemptedSpawn(index, position, usedSpawnpoints.GetSetCount(), true);
                     break;
                 } else {
-                    f.Events.BigCollectableAttemptedSpawn(index, position, Success: false);
+                    f.Events.BigCollectableAttemptedSpawn(index, position, usedSpawnpoints.GetSetCount(), false);
                 }
             }
 

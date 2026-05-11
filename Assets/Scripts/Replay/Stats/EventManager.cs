@@ -30,26 +30,21 @@ namespace NSMB.Replay.Stats
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
 
-            var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
-            var firstPlaceObj = gamemode.GetFirstPlaceObjectiveCount(f);
-            PointCoinCollected timePoint;
+            CoinItemAsset? coinItemAsset = null;
             if (e.ItemSpawned != EntityRef.None) {
-                int starDifference = firstPlaceObj - gamemode.GetTeamObjectiveCount(f, mario->GetTeam(f)) ?? -1;
                 var coinItemPtr = f.Unsafe.GetPointer<CoinItem>(e.ItemSpawned);
-                var asset = f.FindAsset(coinItemPtr->Scriptable);
-                timePoint = new PointCoinCollected(StatRecorder, f, mario, playerInfo, e.Coins, asset);
-            } else {
-                timePoint = new PointCoinCollected(StatRecorder, f, mario, playerInfo, e.Coins, null);
+                coinItemAsset = f.FindAsset(coinItemPtr->Scriptable);
             }
-            playerInfo.CoinsCollectedPoints.Add(timePoint);
+            playerInfo.CoinsCollectedPoints.Add(new PointCoinCollected(StatRecorder, f, mario, playerInfo, e.Coins, coinItemAsset));
         }
 
         public void OnMarioPlayerCollectedStar(EventMarioPlayerCollectedStar e) {
             Frame f = e.Game.Frames.Verified;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
+            var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
 
-            playerInfo.StarsCollectedPoints.Add(new PointStarCollected(StatRecorder, f, mario, playerInfo, mario->GamemodeData.StarChasers->Stars));
+            playerInfo.StarsCollectedPoints.Add(new PointStarCollected(StatRecorder, f, mario, playerInfo, gamemode.GetObjectiveCount(f, mario)));
 
             // check if the big star is the main one
             if (e.StarEntity == f.Global->MainBigStar &&
@@ -72,14 +67,14 @@ namespace NSMB.Replay.Stats
 
             if (wasDisconnect) {
                 deathCause = PointDeath.DeathCause.Disconnect;
-            } else if (e.IsLava) {
-                deathCause = PointDeath.DeathCause.Lava;
             } else if (wasPitDeath) {
                 var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
                 var transform = f.Unsafe.GetPointer<Transform2D>(e.Entity);
 
                 // check if above the stage, if so then it was poison
-                if (transform->Position.Y > stage.StageWorldMin.Y) {
+                if (e.IsLava) {
+                    deathCause = PointDeath.DeathCause.Lava;
+                } else if (transform->Position.Y > stage.StageWorldMin.Y) {
                     deathCause = PointDeath.DeathCause.Poison;
                 } else {
                     deathCause = PointDeath.DeathCause.Pit;
@@ -88,24 +83,23 @@ namespace NSMB.Replay.Stats
                 // check if enemy
                 if (f.Unsafe.TryGetPointer<Enemy>(e.Attacker, out _)) {
                     deathCause = PointDeath.DeathCause.Enemy;
-                }
-                // else it was Mario
-                if (f.Unsafe.TryGetPointer<MarioPlayer>(e.Attacker, out var attackerMario)) {
+                } else if (f.Unsafe.TryGetPointer<MarioPlayer>(e.Attacker, out var attackerMario)) {
+                    // else it was Mario
                     var runtimeData = f.GetPlayerData(attackerMario->PlayerRef);
                     attackerName = runtimeData.PlayerNickname;
                 }
             }
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
-            var playerData = QuantumUtils.GetPlayerData(f, mario->PlayerRef);
             var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
+            var playerData = QuantumUtils.GetPlayerData(f, mario->PlayerRef);
             var deathPoint = new PointDeath(StatRecorder, f, mario, playerInfo, deathCause, playerData->Ping, attackerName);
             var starsToDrop = Math.Min(1, e.OldObjectiveCount);
 
             playerInfo.DeathPoints.Add(deathPoint);
             playerInfo.StarsLostPoints.Add(new PointStarLoss(StatRecorder, f, mario, playerInfo, starsToDrop, PointStarLoss.StarLossCause.Death, EntityRef.None));
 
-            // end a combo, finisher
+            // end a combo as a finisher finisher
             if (playerInfo.CurrComboPoint != null) {
                 bool includeInCombo = playerInfo.CurrComboPoint.ComboElements.Count > 1 || !wasPitDeath && !wasDisconnect;
                 StatUtilStopCombo(f, playerInfo, includeInCombo ? deathPoint : null, starsToDrop);
@@ -140,7 +134,6 @@ namespace NSMB.Replay.Stats
             // end the current knockback setting the end frame
             if (victimMarioInfo.CurrKnockbackPoint is PointKnockback currKnockbackPoint) {
                 currKnockbackPoint.EndFrame = f.Number;
-                victimMarioInfo.CurrKnockbackPoint = null;
             }
             var knockbackPoint = new PointKnockback(StatRecorder, f, victimMario, e.Attacker, starsToDrop, strength);
             victimMarioInfo.KnockbackPoints.Add(knockbackPoint);
@@ -153,6 +146,7 @@ namespace NSMB.Replay.Stats
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             var marioPlayerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
             var damagePoint = new PointDamage(StatRecorder, f, mario);
+
             var starsToDrop = Math.Min(1, e.OldObjectiveCount);
             marioPlayerInfo.StarsLostPoints.Add(new PointStarLoss(StatRecorder, f, mario, marioPlayerInfo, starsToDrop, PointStarLoss.StarLossCause.Damage, EntityRef.None));
             marioPlayerInfo.DamagePoints.Add(new PointDamage(StatRecorder, f, mario));
@@ -165,28 +159,20 @@ namespace NSMB.Replay.Stats
             Frame f = e.Game.Frames.Verified;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             var marioPlayerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
-
-            var result = e.Result;
-            var scriptable = e.Scriptable;
-
-            var point = new PointPowerupCollect(StatRecorder, f, mario, result, scriptable);
-            marioPlayerInfo.PowerupCollectPoints.Add(point);
+            marioPlayerInfo.PowerupCollectPoints.Add(new PointPowerupCollect(StatRecorder, f, mario, e.Result, e.Scriptable));
         }
 
         public void OnBigCollectableAttemptedSpawn(EventBigCollectableAttemptedSpawn e) {
             Frame f = e.Game.Frames.Predicted;
-            int spawnIndex = e.PositionIndex;
             FPVector2 position = e.Position;
             bool wasBlocked = !e.Success;
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            var usedSpawns = f.Global->UsedStarSpawns.GetSetCount();
             var info = StatRecorder.GlobalInfo;
-            var point = new PointBigCollectableSpawned(StatRecorder, f, usedSpawns, spawnIndex, wasBlocked, position, ref info, stage);
+            var point = new PointBigCollectableSpawned(StatRecorder, f, e.UsedSpawnpoints, e.PositionIndex, wasBlocked, position, ref info, stage);
             
             // set the curr big collectable
             if (!wasBlocked) {
                 info.CurrBigCollectable = point;
-                //Console.WriteLine("Set curr big star");
             } else {
                 var hits = f.Physics2D.OverlapShape(position, 0, f.Context.CircleRadiusTwo, f.Context.PlayerOnlyMask);
                 for (int i = 0; i < hits.Count; i++) {
@@ -221,19 +207,11 @@ namespace NSMB.Replay.Stats
                     StatRecorder.PlayerInfos.Add(marioPlayer->PlayerRef, new PlayerInfo(runtimeData.PlayerNickname, marioPlayer->PlayerRef));
                 }
 
-                // what we're GOing to do is very simple, check if Mario is not in knockback.
-                // If he isn't then the combo is over, and we delete the current combo from
-                // the list if it has only one element.
                 var playerInfo = StatRecorder.PlayerInfos[marioPlayer->PlayerRef];
                 HandleCombo(f, marioPlayer, playerInfo);
                 HandleStateData(f, marioPlayer, playerInfo);
             }
             didLoop = true;
-
-#if CACHE_REPLAY_STATS
-            // significantly slows down the stats
-            ActiveReplayManager.Instance.ReplayFrameCache.Add(f.Serialize(DeterministicFrameSerializeMode.Serialize));
-#endif
         }
 
         private void HandleCombo(Frame f, MarioPlayer* marioPlayer, PlayerInfo playerInfo) {
@@ -275,6 +253,7 @@ namespace NSMB.Replay.Stats
             }
 
             /** Current Reserve State **/
+            // check if the reserve item matches
             var reservePowerup = f.FindAsset(marioPlayer->ReserveItem);
             if (playerInfo.CurrReserveChangePoint == null || playerInfo.CurrReserveChangePoint.Powerup != reservePowerup) {
                 var point = new PointReserveChange(StatRecorder, f, marioPlayer);
@@ -282,7 +261,6 @@ namespace NSMB.Replay.Stats
                 playerInfo.CurrReserveChangePoint = point;
             }
 
-            // check if the reserve item matches
             if (playerInfo.CurrReserveChangePoint is PointReserveChange currReserveChangePoint) {
                 currReserveChangePoint.EndFrame = gameEnded ? -1 : f.Number;
             }

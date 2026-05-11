@@ -87,18 +87,17 @@ namespace NSMB.Replay.Stats {
 
     public unsafe class PointCoinCollected : TimePoint {
         public readonly CoinItemAsset? CoinItem;
-        public readonly FP? SpawnChancePercentage;
-        public readonly FP? SpawnChanceRaw;
-        public readonly int CoinCount;
-        public readonly int CoinCountTotal;
-        public readonly int CurrStarCount;
-        public readonly int LeaderStars;
+        public readonly FP? SpawnChancePercentage, SpawnChanceRaw;
+        public readonly int CoinCount, CoinCountTotal, CurrStarCount, LeaderStars;
+        public readonly FP AverageStarCount;
+
         public PointCoinCollected(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, int coinCount, CoinItemAsset? coinItemAsset) {
             BasicInit(this, statsRecorder, f, mario);
             int starsToWin = f.Global->Rules.StarsToWin; // we can get stars to win from the Replay Header
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             CurrStarCount = gamemode.GetTeamObjectiveCount(f, mario->GetTeam(f)) ?? -1;
             LeaderStars = gamemode.GetFirstPlaceObjectiveCount(f);
+            AverageStarCount = gamemode.GetAverageObjectiveCount(f);
             CoinCount = coinCount;
             CoinCountTotal = ++playerInfo.Coins;
             if (coinItemAsset is CoinItemAsset coinItem) {
@@ -141,8 +140,7 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointStarCollected : TimePoint {
-        public readonly int StarCount;
-        public readonly int TotalStarCount;
+        public readonly int StarCount, TotalStarCount;
         public PointStarCollected(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo info, int starCount) {
             BasicInit(this, statsRecorder, f, mario);
             StarCount = starCount;
@@ -174,8 +172,7 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointDeath : TimePoint {
-        public readonly int LivesRemaining;
-        public readonly int Ping;
+        public readonly int LivesRemaining, Ping;
         public readonly DeathCause Reason;
         public readonly string? AttackerName;
         public enum DeathCause {
@@ -253,9 +250,7 @@ namespace NSMB.Replay.Stats {
         }
         public StarLossCause Reason;
         public string? AttackerName;
-        public readonly int StarAmount;
-        public readonly int StarDropCount;
-        public readonly int TotalStarsLost;
+        public readonly int StarAmount, StarDropCount, TotalStarsLost;
         public PointStarLoss(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo victimInfo, int starDropCount, StarLossCause reason, EntityRef attacker) {
             BasicInit(this, statsRecorder, f, mario);
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
@@ -283,14 +278,14 @@ namespace NSMB.Replay.Stats {
     public unsafe class PointCombo : TimePoint {
         // these are the things that are in the combo
         // we reuse TimePoints for this.
-        public readonly List<TimePoint> ComboElements = new();
-        public readonly List<int> StarsLost = new();
-        public readonly List<int> TotalStarsLost = new();
+        
+        // tUPle, first is the elemnt, second is stars lost third is total stars lost
+        public readonly List<(TimePoint Element, int StarsLost, int TotalStarsLost)> ComboElements = new();
         public Dictionary<PlayerRef, string> GetParticipants() {
             Dictionary<PlayerRef, string> attackerNames = new();
 
             foreach (var element in ComboElements) {
-                if (element is PointKnockback kbPoint) {
+                if (element.Element is PointKnockback kbPoint) {
                     if (!attackerNames.ContainsKey(kbPoint.AttackerRef)) {
                         attackerNames.Add(kbPoint.AttackerRef, kbPoint.AttackerName);
                     }
@@ -302,20 +297,18 @@ namespace NSMB.Replay.Stats {
 
         public int TotalStarsAfterCombo() {
             int totalStars = 0;
-            foreach (var starPoint in StarsLost) {
-                totalStars += starPoint;
+            foreach (var element in ComboElements) {
+                totalStars += element.StarsLost;
             }
             return totalStars;
         }
         public PointCombo(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, TimePoint comboElement, int starsLost) {
             BasicInit(this, statsRecorder, f, mario);
-            ComboElements.Add(comboElement);
-            StarsLost.Add(starsLost);
             int totalStarsLost = 0;
-            for (int i = 0; i < StarsLost.Count; i++) {
-                totalStarsLost += StarsLost[i];
+            foreach (var element in ComboElements) {
+                totalStarsLost += element.StarsLost;
             }
-            TotalStarsLost.Add(totalStarsLost);
+            ComboElements.Add((comboElement, starsLost, totalStarsLost));
         }
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder) {
@@ -383,13 +376,9 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointBigCollectableSpawned : TimePoint {
-        public readonly int AttemptedSpawnCount;
-        public readonly int SuccessfulSpawnCount;
-        public readonly int FailedSpawnCount; // when stars are blocked
+        public readonly int AttemptedSpawnCount, SuccessfulSpawnCount, FailedSpawnCount;
+        public readonly int Spawnpoints, PositionIndex, UsedSpawns;
 
-        public readonly int Spawnpoints;
-        public readonly int PositionIndex;
-        public readonly int UsedSpawns;
         public readonly bool WasBlocked;
         public readonly FPVector2 Coordinates;
         public readonly List<string> BlockingPlayers = new();

@@ -66,10 +66,10 @@ namespace Quantum {
                     newStar->IsStationary = true;
                     newStarPhysicsObject->DisableCollision = true;
                     spawnedStar = true;
-                    f.Events.BigCollectableAttemptedSpawn(index, position, Success: true);
+                    f.Events.BigCollectableAttemptedSpawn(index, position, usedSpawnpoints.GetSetCount(), true);
                     break;
                 } else {
-                    f.Events.BigCollectableAttemptedSpawn(index, position, Success: false);
+                    f.Events.BigCollectableAttemptedSpawn(index, position, usedSpawnpoints.GetSetCount(), false);
                 }
 
                 if (!spawnedStar) {
