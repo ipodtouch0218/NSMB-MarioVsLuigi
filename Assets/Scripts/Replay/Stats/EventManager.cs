@@ -108,7 +108,7 @@ namespace NSMB.Replay.Stats
             // end a combo, finisher
             if (playerInfo.CurrComboPoint != null) {
                 bool includeInCombo = playerInfo.CurrComboPoint.ComboElements.Count > 1 || !wasPitDeath && !wasDisconnect;
-                StatUtilStopCombo(f, playerInfo, StatRecorder, includeInCombo ? deathPoint : null, starsToDrop);
+                StatUtilStopCombo(f, playerInfo, includeInCombo ? deathPoint : null, starsToDrop);
             }
         }
 
@@ -241,7 +241,7 @@ namespace NSMB.Replay.Stats
             if (!marioPlayer->IsInKnockback) {
                 if (playerInfo.ComboEndTimer > 0) {
                     if (--playerInfo.ComboEndTimer == 0) {
-                        EventManager.StatUtilStopCombo(f, playerInfo, StatRecorder);
+                        EventManager.StatUtilStopCombo(f, playerInfo);
                     }
                 }
 
@@ -254,11 +254,13 @@ namespace NSMB.Replay.Stats
 
             // end any remaining combos when game is over
             if (f.Global->GameState == GameState.Ended) {
-                EventManager.StatUtilStopCombo(f, playerInfo, StatRecorder, noEndFrame: true);
+                EventManager.StatUtilStopCombo(f, playerInfo, noEndFrame: true);
             }
         }
 
         private void HandleStateData(Frame f, MarioPlayer* marioPlayer, PlayerInfo playerInfo) {
+            bool gameEnded = f.Global->GameState == GameState.Ended;
+
             /** Current PowerUP State **/
             // power states don't match, create a new time point
             if (playerInfo.CurrPowerChangePoint == null || playerInfo.CurrPowerChangePoint.PowerupState != marioPlayer->CurrentPowerupState) {
@@ -269,7 +271,7 @@ namespace NSMB.Replay.Stats
 
             // set the end frame of the previous point if it exists
             if (playerInfo.CurrPowerChangePoint is PointPowerChange currPoint) {
-                currPoint.EndFrame = f.Number;
+                currPoint.EndFrame = gameEnded ? -1 : f.Number;
             }
 
             /** Current Reserve State **/
@@ -282,13 +284,13 @@ namespace NSMB.Replay.Stats
 
             // check if the reserve item matches
             if (playerInfo.CurrReserveChangePoint is PointReserveChange currReserveChangePoint) {
-                currReserveChangePoint.EndFrame = f.Number;
+                currReserveChangePoint.EndFrame = gameEnded ? -1 : f.Number;
             }
 
             /** Current Starman State **/
-            if ((!marioPlayer->IsStarmanInvincible || f.Global->GameState == GameState.Ended) && playerInfo.CurrStarmanChangePoint is PointStarmanChange currStarmanChangePoint) {
+            if ((!marioPlayer->IsStarmanInvincible || gameEnded) && playerInfo.CurrStarmanChangePoint is PointStarmanChange currStarmanChangePoint) {
                 // set the end frame
-                currStarmanChangePoint.EndFrame = f.Number;
+                currStarmanChangePoint.EndFrame = gameEnded ? -1 : f.Number;
                 playerInfo.CurrStarmanChangePoint = null;
             } else if (marioPlayer->IsStarmanInvincible && playerInfo.CurrStarmanChangePoint == null) {
                 var point = new PointStarmanChange(StatRecorder, f, marioPlayer);
@@ -300,33 +302,34 @@ namespace NSMB.Replay.Stats
 
         #region Static Methods
 
-        public static void StatUtilStopCombo(Frame f, PlayerInfo playerInfo, ReplayStatsRecorder statRecorder, TimePoint? timePoint = null, int starsLost = 0, bool noEndFrame = false) {
+        public static void StatUtilStopCombo(Frame f, PlayerInfo playerInfo, TimePoint? timePoint = null, int starsLost = 0, bool noEndFrame = false) {
             var comb = playerInfo.CurrComboPoint;
-            if (comb != null) {
-                if (timePoint != null) {
-                    // add that element as a finisher
-                    comb.ComboElements.Add(timePoint);
-                    comb.StarsLost.Add(starsLost);
-                    int totalStarsLost = 0;
-                    for (int i = 0; i < comb.StarsLost.Count; i++) {
-                        totalStarsLost += comb.StarsLost[i];
-                    }
-                    comb.TotalStarsLost.Add(totalStarsLost);
-                }
-
-                // combo not valid, delete
-                if (comb.ComboElements.Count < 2) {
-                    playerInfo.ComboReceivedPoints.Remove(comb);
-                    playerInfo.CurrComboPoint = null;
-                    return;
-                }
-
-                // length is in frames
-                if (!noEndFrame) {
-                    comb.EndFrame = f.Number;
-                }
-                playerInfo.CurrComboPoint = null;
+            if (comb == null) {
+                return;
             }
+
+            if (timePoint != null) {
+                // add that element as a finisher
+                comb.ComboElements.Add(timePoint);
+                comb.StarsLost.Add(starsLost);
+                int totalStarsLost = 0;
+                for (int i = 0; i < comb.StarsLost.Count; i++) {
+                    totalStarsLost += comb.StarsLost[i];
+                }
+                comb.TotalStarsLost.Add(totalStarsLost);
+            }
+
+            // combo not valid, delete
+            if (comb.ComboElements.Count < 2) {
+                playerInfo.ComboReceivedPoints.Remove(comb);
+                playerInfo.CurrComboPoint = null;
+                return;
+            }
+
+            // length is in frames
+            comb.EndFrame = noEndFrame ? -1 : f.Number;
+            playerInfo.ComboEndTimer = 0;
+            playerInfo.CurrComboPoint = null;
         }
 
         public static void StatUtilSetCombo(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* victimMario, PlayerInfo playerInfo, TimePoint timePoint, int starsLost) {

@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Playables;
 
 namespace NSMB.Replay {
     public class ActiveReplayManager : Singleton<ActiveReplayManager> {
@@ -35,7 +36,7 @@ namespace NSMB.Replay {
             }
         }
         public string SavedRecordingPath { get; set; }
-        public int? ReplayStartFrame { get; private set; }
+        public byte[] ReplayStartFrame { get; private set; }
 
         //---Public Variables
         public readonly List<byte[]> ReplayFrameCache = new();
@@ -208,12 +209,12 @@ namespace NSMB.Replay {
             }
         }
 
-        public async void StartReplayPlayback(BinaryReplayFile replay, int? frame = null, PlayerRef? playerRef = null) {
+        public async void StartReplayPlayback(BinaryReplayFile replay, byte[] frameData = null, PlayerRef? playerRef = null) {
             if (replay.LoadAllIfNeeded() != ReplayParseResult.Success) {
                 return;
             }
 
-            ReplayStartFrame = frame;
+            ReplayStartFrame = frameData;
 
             GlobalController.Instance.loadingCanvas.dontHideOnGameDestroy = true;
             GlobalController.Instance.loadingCanvas.Initialize(null);
@@ -273,14 +274,8 @@ namespace NSMB.Replay {
                 DeltaTimeType = SimulationUpdateTime.EngineDeltaTime,
             };
 
-#if CACHE_REPLAY_STATS
-            if (ReplayStartFrame == null) {
-#endif
-                ReplayFrameCache.Clear();
-                ReplayFrameCache.Add(arguments.FrameData);
-#if CACHE_REPLAY_STATS
-            }
-#endif
+            ReplayFrameCache.Clear();
+            ReplayFrameCache.Add(arguments.FrameData);
 
             try {
                 NetworkHandler.Runner = await QuantumRunner.StartGameAsync(arguments);

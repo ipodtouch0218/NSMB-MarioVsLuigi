@@ -18,7 +18,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         [SerializeField] private Image icon;
 
         //---Private Variables
-        private StringBuilder stringBuilder = new();
+        private readonly StringBuilder stringBuilder = new();
 
         public void OnValidate() {
             this.SetIfNull(ref icon);
@@ -55,7 +55,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         #region Button Methods
 
         public void StartReplayAtPart() {
-            ActiveReplayManager.Instance.StartReplayPlayback(timePoint.StatsRecorder.ReplayFile, timePoint.OccurenceFrame, timePoint.PlayerRef);
+            ActiveReplayManager.Instance.StartReplayPlayback(timePoint.StatsRecorder.ReplayFile, timePoint.SerializedFrame, timePoint.PlayerRef);
         }
 
         #endregion

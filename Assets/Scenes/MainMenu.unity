@@ -33692,6 +33692,7 @@ MonoBehaviour:
   targetPlayerDropdown: {fileID: 1519858399}
   entryCount: {fileID: 826628527}
   replayInformation: {fileID: 1261341350}
+  statNoSupportPlayers: 09000000
 --- !u!1 &744346871
 GameObject:
   m_ObjectHideFlags: 0

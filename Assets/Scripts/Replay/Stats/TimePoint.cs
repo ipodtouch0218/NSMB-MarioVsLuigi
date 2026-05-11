@@ -14,59 +14,26 @@ namespace NSMB.Replay.Stats {
      * when a star is GOtten, when a star is dropped etc.
      */
     public unsafe abstract class TimePoint : IComparable<TimePoint> {
+        //---object-specific variables
         public PlayerRef? PlayerRef { get; protected set; }
         public string? AffectedPlayerName { get; protected set; }
         public int OccurenceFrame { get; private protected set; }
         public FP DeltaTime { get; private protected set; }
         public int? EndFrame { get; set; }
         public int Id;
-        public static int _index { get; private protected set; }
+        public byte[]? SerializedFrame { get; protected set; }
         public ReplayStatsRecorder? StatsRecorder { get; protected set; }
+
+        //---for assigning the index of time point
+        public static int _index { get; private protected set; }
 
         public int CompareTo(TimePoint? other) {
             if (other == null) return 1;
             return this.Id.CompareTo(other.Id);
         }
 
-        private protected static void BasicInit(TimePoint timePoint, ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) {
-            timePoint.StatsRecorder = statsRecorder;
-            timePoint.OccurenceFrame = f.Number;
-            timePoint.DeltaTime = f.DeltaTime;
-            timePoint.Id = _index++;
-            timePoint.PlayerRef = mario->PlayerRef;
-            if (mario != null) timePoint.AffectedPlayerName = f.GetPlayerData(mario->PlayerRef).PlayerNickname;
-        }
 
-        private protected static void BasicInit(TimePoint timePoint, ReplayStatsRecorder statsRecorder, Frame f, PlayerInfo playerInfo, PlayerRef playerRef) {
-            timePoint.StatsRecorder = statsRecorder;
-            timePoint.OccurenceFrame = f.Number;
-            timePoint.DeltaTime = f.DeltaTime;
-            timePoint.Id = _index++;
-            timePoint.PlayerRef = playerRef;
-            timePoint.AffectedPlayerName = playerInfo.PlayerName;
-        }
-
-        private protected static void BasicInit(TimePoint timePoint, ReplayStatsRecorder statsRecorder, Frame f, string playerName) {
-            timePoint.StatsRecorder = statsRecorder;
-            timePoint.OccurenceFrame = f.Number;
-            timePoint.DeltaTime = f.DeltaTime;
-            timePoint.Id = _index++;
-            timePoint.AffectedPlayerName = playerName;
-        }
-
-        private protected static void GlobalInit(TimePoint timePoint, ReplayStatsRecorder statsRecorder, Frame f) {
-            timePoint.StatsRecorder = statsRecorder;
-            timePoint.OccurenceFrame = f.Number;
-            timePoint.DeltaTime = f.DeltaTime;
-            timePoint.Id = _index++;
-        }
-
-        public static void ResetIndex() {
-            _index = 0;
-        }
-
-
-        // new methods for Time Point entry
+        //---abstractions, overrideables for time point enteries
         public virtual void SetTimeText(TranslationManager tm, StringBuilder stringBuilder) {
             if (StatsRecorder == null) {
                 stringBuilder.Append("");
@@ -75,15 +42,14 @@ namespace NSMB.Replay.Stats {
             stringBuilder.Append($"@ {EventManager.FrameToTime(OccurenceFrame, StatsRecorder.ReplayStart, DeltaTime)}");
 
             if (EndFrame != null) {
-                stringBuilder.Append($"-{EventManager.FrameToTime(EndFrame.Value, StatsRecorder.ReplayStart, DeltaTime)}");
-            }
+                stringBuilder.Append('-');
 
-            stringBuilder.Append($" - F{OccurenceFrame - StatsRecorder.ReplayStart}");
-
-            if (EndFrame != null) {
-                stringBuilder.Append($"-F{EndFrame - StatsRecorder.ReplayStart}");
+                if (EndFrame > -1) {
+                    stringBuilder.Append(EventManager.FrameToTime(EndFrame.Value, StatsRecorder.ReplayStart, DeltaTime));
+                }
             }
         }
+
 
         public virtual void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder) { }
 
@@ -91,6 +57,31 @@ namespace NSMB.Replay.Stats {
 
         public abstract void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder);
 
+        //---bases for generating a new time point
+        private protected static void BasicInit(TimePoint timePoint, ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) {
+            timePoint.StatsRecorder = statsRecorder;
+            timePoint.OccurenceFrame = f.Number;
+            timePoint.DeltaTime = f.DeltaTime;
+            timePoint.Id = _index++;
+            timePoint.PlayerRef = mario->PlayerRef;
+            timePoint.SerializedFrame = f.Serialize(DeterministicFrameSerializeMode.Serialize);
+            if (mario != null) {
+                timePoint.AffectedPlayerName = f.GetPlayerData(mario->PlayerRef).PlayerNickname;
+            }
+        }
+
+        private protected static void GlobalInit(TimePoint timePoint, ReplayStatsRecorder statsRecorder, Frame f) {
+            timePoint.StatsRecorder = statsRecorder;
+            timePoint.OccurenceFrame = f.Number;
+            timePoint.DeltaTime = f.DeltaTime;
+            timePoint.Id = _index++;
+            timePoint.SerializedFrame = f.Serialize(DeterministicFrameSerializeMode.Serialize);
+        }
+
+        //---static methods
+        public static void ResetIndex() {
+            _index = 0;
+        }
         // any extra parameters can be GOtten
     }
 
@@ -285,7 +276,7 @@ namespace NSMB.Replay.Stats {
         }
 
         public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder) {
-            stringBuilder.Append("<sprite name=room_stars>").Append(Utils.GetSymbolString(StarAmount.ToString(), Utils.smallSymbols));
+            stringBuilder.Append("X").Append(Utils.GetSymbolString(StarAmount.ToString(), Utils.smallSymbols));
         }
     }
 

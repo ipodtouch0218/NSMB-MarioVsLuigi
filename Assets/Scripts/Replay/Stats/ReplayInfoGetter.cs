@@ -3,46 +3,35 @@
 using Quantum;
 using System.Collections.Generic;
 
-namespace NSMB.Replay.Stats
-{
-
+namespace NSMB.Replay.Stats{
     public class PlayerInfo {
+        //--player info
         public readonly PlayerRef PlayerRef;
         public readonly string PlayerName;
 
-        public int Stars; // StarChasers
-        public int PurpleCoins; // CoinRunners
-
-        public int Coins, Lives, Deaths;
-
-        public bool Disconnected;
+        //--tracking information
+        public int Stars, Coins;
+        public int StarsDropped, PurpleCoinsDropped;
 
         // useful info that must be tracked from the simulation
-        public int ItemDropCount;
         public readonly List<PointDamage> DamagePoints = new();
         public readonly List<PointDeath> DeathPoints = new();
         public readonly List<PointStarCollected> StarsCollectedPoints = new();
         public readonly List<PointStarLoss> StarsLostPoints = new();
-        //public int PurpleCoinsCollected;
         public readonly List<PointCoinCollected> CoinsCollectedPoints = new();
-        public readonly List<PointCombo> ComboReceivedPoints = new();
+        public readonly List<PointPowerupCollect> PowerupCollectPoints = new();
 
+        //--more complex points
         public PointKnockback? CurrKnockbackPoint = null;
         public readonly List<PointKnockback> KnockbackPoints = new();
 
-        public readonly List<PointPowerupCollect> PowerupCollectPoints = new();
-
         public PointCombo? CurrComboPoint;
-
-        public int StarsDropped;
-        public int PurpleCoinsDropped;
+        public readonly List<PointCombo> ComboReceivedPoints = new();
 
         // for powerUP changes
         public PointPowerChange? CurrPowerChangePoint = null;
         public readonly List<PointPowerChange> PowerChangePoints = new();
 
-        // if Mario is invincible we will create a new starman point
-        // if he's not then we will set the current starman point end frame
         public PointStarmanChange? CurrStarmanChangePoint = null;
         public readonly List<PointStarmanChange> StarmanChangePoints = new();
 
@@ -56,9 +45,18 @@ namespace NSMB.Replay.Stats
         public const int ComboTimerStart = 15;
         public int ComboEndTimer;
 
+        //--methods
         public PlayerInfo(string playerName, PlayerRef playerRef) {
             PlayerName = playerName;
             PlayerRef = playerRef;
+        }
+
+        public IEnumerable<TimePoint> GetAllStarPoints() {
+            List<TimePoint> starInfoPoints = new();
+            starInfoPoints.AddRange(StarsCollectedPoints);
+            starInfoPoints.AddRange(StarsLostPoints);
+            starInfoPoints.Sort();
+            return starInfoPoints;
         }
     }
 

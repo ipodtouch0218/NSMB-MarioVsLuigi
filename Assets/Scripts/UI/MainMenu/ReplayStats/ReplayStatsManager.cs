@@ -37,6 +37,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
         // bottom panel
         [SerializeField] private TMP_Text replayInformation;
+        [SerializeField] private StatOptions[] statNoSupportPlayers;
 
         //---Private Variables
         private ReplayListEntry replayListEntry;
@@ -45,23 +46,19 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
         #region Switches
         public enum StatOptions {
+            // positives for the player
             Stars,
+            KnockbackDealt,
+            PowerupInfo,
+            ComboLanded,
+            // negatives for the player
             Death,
             KnockbackReceived,
-            KnockbackDealt,
             Damage,
-            ComboLanded,
             ComboRecieved,
-            PowerupInfo,
             PowerupSpawns,
+            // global
             BigCollectableSpawns,
-        }
-
-        private bool StatSupportsPlayers() {
-            return ViewingStats switch {
-                StatOptions.BigCollectableSpawns => false,
-                _ => true,
-            };
         }
 
         private IEnumerable<TimePoint> GetTimePoints(StatOptions? options = null) {
@@ -78,7 +75,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 StatOptions.PowerupInfo => stats[TargetPlayer].PowerChangePoints,
                 StatOptions.PowerupSpawns => GetItemDrops(),
                 StatOptions.BigCollectableSpawns => ReplayStatsRecorder.Instance.GlobalInfo.BigCollectablesSpawned,
-                _ => Enumerable.Empty<TimePoint>(),
+                _ => throw new NotImplementedException(),
             };
         }
 
@@ -254,7 +251,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         }
 
         public void ChangedViewingStats() {
-            bool targetPlayerSupported = StatSupportsPlayers();
+            bool targetPlayerSupported = Array.IndexOf(statNoSupportPlayers, ViewingStats) == -1;
             targetPlayerDropdown.interactable = targetPlayerSupported;
             if (!targetPlayerSupported) {
                 targetPlayerDropdown.captionText.text = "N/A";

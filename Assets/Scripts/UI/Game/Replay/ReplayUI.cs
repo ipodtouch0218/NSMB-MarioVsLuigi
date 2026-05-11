@@ -49,8 +49,6 @@ namespace NSMB.UI.Game.Replay {
         private bool gameEnded;
         private Frame resetFrame;
 
-        private int? fastForwardDestinationFrame = null;
-
         public void OnValidate() {
             this.SetIfNull(ref playerElements, UnityExtensions.GetComponentType.Parent);
         }
@@ -73,17 +71,9 @@ namespace NSMB.UI.Game.Replay {
             trackArrowText.gameObject.SetActive(false);
             Settings.Controls.UI.Pause.performed += OnPause;
 
-            if (ActiveReplayManager.Instance.ReplayStartFrame != null && ActiveReplayManager.Instance.ReplayStartFrame.Value > 0) {
-                int newFrame = ActiveReplayManager.Instance.ReplayStartFrame.Value - ActiveReplayManager.Instance.ReplayStart;
-                ActiveReplayManager.Instance.IsReplayFastForwarding = true;
-                simulatingCanvas.SetActive(true);
-                fastForwardDestinationFrame = newFrame;
-                QuantumRunner.Default.IsSessionUpdateDisabled = true;
-                Time.captureDeltaTime = 1/30f;
-                Time.timeScale = 8;
-                simulationTargetTrackArrow.position = trackArrow.position;
-                simulationTargetTrackArrow.gameObject.SetActive(true);
-                UnityEngine.Debug.Log("Destination Frame "+newFrame);
+            if (ActiveReplayManager.Instance.ReplayStartFrame != null) {
+                resetFrame.Deserialize(ActiveReplayManager.Instance.ReplayStartFrame);
+                QuantumRunner.Default.Session.ResetReplay(resetFrame);
             }
         }
 
@@ -100,10 +90,9 @@ namespace NSMB.UI.Game.Replay {
                 float update = Time.deltaTime;
                 var runner = QuantumRunner.Default;
                 Frame f = runner.Game.Frames.Predicted;
-                float currFrame = f.Number;
                 float maxDelta = (fastForwardDestinationTick - f.Number) * f.DeltaTime.AsFloat;
 
-                bool done = update >= maxDelta && (fastForwardDestinationFrame == null || currFrame >= fastForwardDestinationFrame.Value);
+                bool done = update >= maxDelta;
                 if (done) {
                     update = maxDelta;
                 }
@@ -112,7 +101,6 @@ namespace NSMB.UI.Game.Replay {
 
                 if (done) {
                     FinishFastForward();
-                    UnityEngine.Debug.Log("Stopped ff, curr frame is "+currFrame);
                 }
             }
 
@@ -126,7 +114,6 @@ namespace NSMB.UI.Game.Replay {
             ActiveReplayManager.Instance.IsReplayFastForwarding = false;
             simulatingCanvas.SetActive(false);
             fastForwardDestinationTick = 0;
-            fastForwardDestinationFrame = null;
             Time.captureDeltaTime = 0;
 
             if (gameEnded) {
