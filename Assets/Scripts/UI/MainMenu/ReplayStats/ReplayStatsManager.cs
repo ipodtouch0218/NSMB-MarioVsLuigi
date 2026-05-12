@@ -4,12 +4,9 @@ using NSMB.UI.MainMenu.Submenus.Replays;
 using NSMB.UI.MainMenu.Submenus.RoomList;
 using NSMB.UI.Translation;
 using NSMB.Utilities;
-using NSMB.Utilities.Extensions;
-using NUnit.Framework;
 using Quantum;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using TMPro;
@@ -18,11 +15,21 @@ using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
     public class ReplayStatsManager : Selectable {
+        [System.Serializable]
+        public class StatOptionsWrapper {
+            public string name;
+            public string TranslationKey;
+            public StatOptions[] StatOptions;
+            public StatOptions[] StatOptionNoPlayer;
+        }
+
         //---Static Variables
         public static ReplayStatsManager Instance { get; private set; }
 
         //---Properties
-        private StatOptions ViewingStats => (StatOptions)viewingStatisticDropdown.value;
+        private StatOptionsWrapper CurrStatsGroup => statOptionGroup[selectedButton];
+        private bool IsViewingGlobalOnlyStats => viewingStatisticDropdown.value >= CurrStatsGroup.StatOptions.Length;
+        private StatOptions ViewingStats => ViewingStatsMeth();
         private int TargetPlayer => targetPlayerDropdown.value;
 
         //---Serialized Variables
@@ -30,6 +37,8 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         [SerializeField] private ScrollRect scrollRect;
         [SerializeField] private TimePointEntry entryTemplate;
         [SerializeField] internal VerticalLayoutGroup layout;
+        [SerializeField] private StatsButton buttonTemplate; 
+        [SerializeField] public int selectedButton;
 
         // side panel
         [SerializeField] private TMP_Dropdown viewingStatisticDropdown, targetPlayerDropdown;
@@ -37,27 +46,35 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
         // bottom panel
         [SerializeField] private TMP_Text replayInformation;
-        [SerializeField] private StatOptions[] statNoSupportPlayers;
+        [SerializeField] private StatOptionsWrapper[] statOptionGroup;
+        //[SerializeField] private StatOptions[] positiveStats, negativeStats, stageStats, miscStats;
 
         //---Private Variables
         private ReplayListEntry replayListEntry;
         private readonly StringBuilder stringBuilder = new();
         private readonly List<TimePointEntry> timePointEnteries = new();
+        public readonly List<StatsButton> statsButtons = new();
 
+        private StatOptions ViewingStatsMeth() {
+            int value = viewingStatisticDropdown.value;
+            if (IsViewingGlobalOnlyStats) {
+                return CurrStatsGroup.StatOptionNoPlayer[value - CurrStatsGroup.StatOptions.Length];
+            } else {
+                return CurrStatsGroup.StatOptions[value];
+            }
+        }
         #region Switches
         public enum StatOptions {
-            // positives for the player
-            Stars,
+            StarsCollected,
             KnockbackDealt,
             PowerupInfo,
             ComboLanded,
-            // negatives for the player
             Death,
             KnockbackReceived,
             Damage,
             ComboRecieved,
             PowerupSpawns,
-            // global
+            CoinsCollected,
             BigCollectableSpawns,
         }
 
@@ -65,7 +82,8 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             StatOptions viewingOptions = options ?? ViewingStats;
             var stats = ReplayStatsRecorder.Instance.PlayerInfos;
             return viewingOptions switch {
-                StatOptions.Stars => stats[TargetPlayer].StarsCollectedPoints,
+                StatOptions.StarsCollected => stats[TargetPlayer].StarsCollectedPoints,
+                StatOptions.CoinsCollected => stats[TargetPlayer].CoinsCollectedPoints,
                 StatOptions.Death => stats[TargetPlayer].DeathPoints,
                 StatOptions.KnockbackReceived => stats[TargetPlayer].KnockbackPoints,
                 StatOptions.KnockbackDealt => GetKnockbackDealt(),
@@ -85,7 +103,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 #if UNITY_EDITOR
         protected override void OnValidate() {
             base.OnValidate();
-            this.SetIfNull(ref canvas, UnityExtensions.GetComponentType.Parent);
         }
 #endif
         public void Initialize(ReplayListEntry ourReplayEntry) {
@@ -102,14 +119,29 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             }
 #endif
 
+            if (replayListEntry == null) {
+                return;
+            }
+
             viewingStatisticDropdown.value = 0;
             targetPlayerDropdown.value = 0;
             scrollRect.verticalNormalizedPosition = 1;
             entryTemplate.gameObject.SetActive(false);
+            buttonTemplate.gameObject.SetActive(false);
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
             TranslationManager.OnLanguageChanged += UpdateStatsDropdown;
             TranslationManager.OnLanguageChanged += UpdateEntryCount;
             Canvas.ForceUpdateCanvases();
+
+            for (int i = 0; i < statOptionGroup.Length; i++) {
+                var statGroup = statOptionGroup[i];
+                var button = Instantiate(buttonTemplate, buttonTemplate.transform.parent);
+                button.name = statGroup.name;
+                button.gameObject.SetActive(true);
+                button.Initialize(i, statGroup.TranslationKey);
+                button.UpdateUI(GlobalController.Instance.translationManager);
+                statsButtons.Add(button);
+            }
 
             UpdatePlayerDropdown();
             UpdateStatsDropdown(GlobalController.Instance.translationManager);
@@ -130,6 +162,16 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
             TranslationManager.OnLanguageChanged -= UpdateStatsDropdown;
             TranslationManager.OnLanguageChanged -= UpdateEntryCount;
+
+            foreach(var button in statsButtons) {
+                Destroy(button.gameObject);
+            }
+            statsButtons.Clear();
+
+            foreach (var entry in timePointEnteries) {
+                Destroy(entry.gameObject);
+            }
+            timePointEnteries.Clear();
         }
 
         public void UpdateInformation(ReplayListEntry replay) {
@@ -231,7 +273,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             targetPlayerDropdown.RefreshShownValue();
         }
 
-        private void UpdateStatsDropdown(TranslationManager tm) {
+        public void UpdateStatsDropdown(TranslationManager tm) {
             int index = viewingStatisticDropdown.value;
 
             viewingStatisticDropdown.ClearOptions();
@@ -239,7 +281,11 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             string tmPrefix = "ui.replay.stats.statsselect.";
 
             // loop through all replay stat options
-            foreach (StatOptions value in Enum.GetValues(typeof(StatOptions))) {
+            foreach (StatOptions value in CurrStatsGroup.StatOptions) {
+                viewingStatisticDropdown.options.Add(new TMP_Dropdown.OptionData { text = prefix + tm.GetTranslation(tmPrefix + value.ToString().ToLower()) });
+            }
+
+            foreach (StatOptions value in CurrStatsGroup.StatOptionNoPlayer) {
                 viewingStatisticDropdown.options.Add(new TMP_Dropdown.OptionData { text = prefix + tm.GetTranslation(tmPrefix + value.ToString().ToLower()) });
             }
             viewingStatisticDropdown.SetValueWithoutNotify(index);
@@ -251,7 +297,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         }
 
         public void ChangedViewingStats() {
-            bool targetPlayerSupported = Array.IndexOf(statNoSupportPlayers, ViewingStats) == -1;
+            bool targetPlayerSupported = !IsViewingGlobalOnlyStats;
             targetPlayerDropdown.interactable = targetPlayerSupported;
             if (!targetPlayerSupported) {
                 targetPlayerDropdown.captionText.text = "N/A";

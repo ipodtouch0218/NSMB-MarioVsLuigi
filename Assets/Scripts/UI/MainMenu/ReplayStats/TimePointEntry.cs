@@ -16,6 +16,9 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         //---Serialized Variables
         [SerializeField] private TMP_Text entryNumText, timeText, symbolsText, descriptionText, additionalText;
         [SerializeField] private Image icon;
+        [Header("Tooltips")]
+        [SerializeField] private GameObject infoButton;
+        [SerializeField] private TMP_Text tooltipText;
 
         //---Private Variables
         private readonly StringBuilder stringBuilder = new();
@@ -50,6 +53,14 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
             stringBuilder.Clear();
             timePointInfo.SetAdditionalText(tm, stringBuilder);
             additionalText.SetText(stringBuilder);
+
+            var tooltip = timePointInfo.GetTooltip();
+            if (tooltip != null) {
+                infoButton.SetActive(true);
+                tooltipText.text = tooltip;
+            } else {
+                infoButton.SetActive(false);
+            }
         }
 
         #region Button Methods

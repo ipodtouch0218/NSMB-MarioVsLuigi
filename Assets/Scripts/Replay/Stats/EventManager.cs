@@ -276,7 +276,7 @@ namespace NSMB.Replay.Stats
                 playerInfo.CurrStarmanChangePoint = point;
             }
         }
-#endregion
+        #endregion
 
         #region Static Methods
 
@@ -288,13 +288,7 @@ namespace NSMB.Replay.Stats
 
             if (timePoint != null) {
                 // add that element as a finisher
-                comb.ComboElements.Add(timePoint);
-                comb.StarsLost.Add(starsLost);
-                int totalStarsLost = 0;
-                for (int i = 0; i < comb.StarsLost.Count; i++) {
-                    totalStarsLost += comb.StarsLost[i];
-                }
-                comb.TotalStarsLost.Add(totalStarsLost);
+                comb.AddComboElement(timePoint, starsLost);
             }
 
             // combo not valid, delete
@@ -317,14 +311,7 @@ namespace NSMB.Replay.Stats
                 playerInfo.CurrComboPoint = currCombo;
                 playerInfo.ComboReceivedPoints.Add(currCombo);
             } else {
-                // add an element to the combo
-                playerInfo.CurrComboPoint.ComboElements.Add(timePoint);
-                playerInfo.CurrComboPoint.StarsLost.Add(starsLost);
-                int totalStarsLost = 0;
-                for (int i = 0; i < playerInfo.CurrComboPoint.StarsLost.Count; i++) {
-                    totalStarsLost += playerInfo.CurrComboPoint.StarsLost[i];
-                }
-                playerInfo.CurrComboPoint.TotalStarsLost.Add(totalStarsLost);
+                playerInfo.CurrComboPoint.AddComboElement(timePoint, starsLost);
             }
             playerInfo.ComboEndTimer = PlayerInfo.ComboTimerStart;
         }

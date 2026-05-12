@@ -142,13 +142,17 @@ namespace NSMB.Utilities {
         };
 
         private static StringBuilder symbolStringBuilder = new();
-        public static string GetSymbolString(ReadOnlySpan<char> str, Dictionary<char, string> dict = null) {
+        public static string GetSymbolString(ReadOnlySpan<char> str, Dictionary<char, string> dict = null, Color32? color = null) {
             dict ??= uiSymbols;
 
             symbolStringBuilder.Clear();
             foreach (char c in str) {
                 if (dict.TryGetValue(c, out string name)) {
-                    symbolStringBuilder.Append("<sprite name=").Append(name).Append('>');
+                    symbolStringBuilder.Append("<sprite name=\"").Append(name).Append("\"");
+                    if (color != null) {
+                        symbolStringBuilder.Append(' ').Append("color=#").Append(ColorToHex(color.Value, false));
+                    }
+                    symbolStringBuilder.Append('>');
                 } else {
                     symbolStringBuilder.Append(c);
                 }
