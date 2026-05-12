@@ -490,9 +490,9 @@ namespace NSMB.Replay.Stats {
             var blockCol = Color.red;
             var successCol = Color.green;
 
-            stringBuilder.Append("color=#").Append(Utils.ColorToHex(blockCol, false)).Append("X");
+            stringBuilder.Append("<color=#").Append(Utils.ColorToHex(blockCol, false)).Append('>').Append("X");
             stringBuilder.Append(Utils.GetSymbolString(FailedSpawnCount.ToString(), Utils.smallSymbols, blockCol));
-            stringBuilder.Append("<sprite name=\"room_stars\"  color=#").Append(Utils.ColorToHex(successCol, false)).Append('>');
+            stringBuilder.Append("<sprite name=\"room_stars\" color=#").Append(Utils.ColorToHex(successCol, false)).Append('>');
             stringBuilder.Append(Utils.GetSymbolString(SuccessfulSpawnCount.ToString(), Utils.smallSymbols, successCol));
         }
     }

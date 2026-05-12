@@ -389,7 +389,7 @@
   "ui.replay.stats.entry.coin.itemspawn": "Collected a coin spawning a {item}!",
   "ui.replay.stats.entry.blockhit": "Hit a block spawning {item}",
   "ui.replay.stats.entry.spawnchance": "Spawn chance: {chance}%",
-  "ui.replay.stats.entry.bigcollectablespawn": "Spawned succesfully at position {position}/{spawnpoints}",
+  "ui.replay.stats.entry.bigcollectablespawn": "Spawned at position {position}/{spawnpoints}",
   "ui.replay.stats.entry.bigcollectableblock": "Blocked at position {position}/{spawnpoints}",
   "ui.replay.stats.entry.powerup.state": "Powerup state: {powerup}",
   "ui.replay.stats.entry.powerup.reserve": "Reserve item: {powerup}",
