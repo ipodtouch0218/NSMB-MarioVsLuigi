@@ -1,10 +1,9 @@
-using NSMB.UI.MainMenu.Submenus.ReplayStats;
 using NSMB.UI.Translation;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace NSMB.Replay.Stats {
+namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
     public class StatsButton : MonoBehaviour {
         [SerializeField] private ReplayStatsManager statsManager;
         [SerializeField] private TMP_Text label;
@@ -47,6 +46,7 @@ namespace NSMB.Replay.Stats {
             statsManager.selectedButton = index;
             statsManager.UpdateStatsDropdown(GlobalController.Instance.translationManager);
             statsManager.ChangedViewingStats();
+            statsManager.ResetStatsDropdownPos();
         }
     }
 }

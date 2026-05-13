@@ -1,7 +1,6 @@
 ﻿using NSMB.Replay;
 using NSMB.Replay.Stats;
 using NSMB.UI.Translation;
-using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
 using System.Text;
 using TMPro;
@@ -27,7 +26,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
             this.SetIfNull(ref icon);
         }
 
-        public void UpdateUI(TimePoint timePointInfo, int entryNum) {
+        public void UpdateUI(TimePoint timePointInfo, int entryNum, int displayArg) {
             timePoint = timePointInfo;
 
             TranslationManager tm = GlobalController.Instance.translationManager;
@@ -36,25 +35,25 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
             
             //--printing the time
             stringBuilder.Clear();
-            timePointInfo.SetTimeText(tm, stringBuilder);
+            timePointInfo.SetTimeText(tm, stringBuilder, displayArg);
             timeText.SetText(stringBuilder);
 
             //--setting the symbols
             stringBuilder.Clear();
-            timePointInfo.SetSymbolsText(tm, stringBuilder);
+            timePointInfo.SetSymbolsText(tm, stringBuilder, displayArg);
             symbolsText.SetText(stringBuilder);
 
             //--setting the description
             stringBuilder.Clear();
-            timePointInfo.SetDescriptionText(tm, stringBuilder);
+            timePointInfo.SetDescriptionText(tm, stringBuilder, displayArg);
             descriptionText.SetText(stringBuilder);
 
             //--setting the additional info
             stringBuilder.Clear();
-            timePointInfo.SetAdditionalText(tm, stringBuilder);
+            timePointInfo.SetAdditionalText(tm, stringBuilder, displayArg);
             additionalText.SetText(stringBuilder);
 
-            var tooltip = timePointInfo.GetTooltip();
+            var tooltip = timePointInfo.GetTooltip(tm, displayArg);
             if (tooltip != null) {
                 infoButton.SetActive(true);
                 tooltipText.text = tooltip;

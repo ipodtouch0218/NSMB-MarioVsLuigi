@@ -76,6 +76,8 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             PowerupSpawns,
             CoinsCollected,
             BigCollectableSpawns,
+            PowerupGrabs,
+            ReserveInfo,
         }
 
         private IEnumerable<TimePoint> GetTimePoints(StatOptions? options = null) {
@@ -91,9 +93,21 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 StatOptions.ComboLanded => GetComboWithPlayer(),
                 StatOptions.ComboRecieved => stats[TargetPlayer].ComboReceivedPoints,
                 StatOptions.PowerupInfo => stats[TargetPlayer].PowerChangePoints,
-                StatOptions.PowerupSpawns => GetItemDrops(),
+                StatOptions.PowerupSpawns => stats[TargetPlayer].GetAllItemSpawnPoints(),
                 StatOptions.BigCollectableSpawns => ReplayStatsRecorder.Instance.GlobalInfo.BigCollectablesSpawned,
+                StatOptions.PowerupGrabs => stats[TargetPlayer].PowerupCollectPoints,
+                StatOptions.ReserveInfo => stats[TargetPlayer].ReserveChangePoints,
                 _ => throw new NotImplementedException(),
+            };
+        }
+
+        private int GetDisplayArgs(StatOptions? options = null) {
+            StatOptions viewingOptions = options ?? ViewingStats;
+            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+            return viewingOptions switch {
+                StatOptions.KnockbackDealt => 1,
+                StatOptions.ComboLanded => 1,
+                _ => 0
             };
         }
 
@@ -278,7 +292,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
             viewingStatisticDropdown.ClearOptions();
             string prefix = tm.RightToLeft ? "<align=right>" : "";
-            string tmPrefix = "ui.replay.stats.statsselect.";
+            string tmPrefix = "ui.replay.stats.select.";
 
             // loop through all replay stat options
             foreach (StatOptions value in CurrStatsGroup.StatOptions) {
@@ -311,12 +325,13 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             timePointEnteries.Clear();
 
             var timePoints = GetTimePoints();
+            var displayArg = GetDisplayArgs();
             int index = 0;
             foreach (var point in timePoints) {
                 var entry = Instantiate(entryTemplate, entryTemplate.transform.parent);
                 entry.name = $"TimePointEntry{index}";
                 entry.gameObject.SetActive(true);
-                entry.UpdateUI(point, index + 1);
+                entry.UpdateUI(point, index + 1, displayArg);
                 timePointEnteries.Add(entry);
                 index++;
             }
@@ -347,24 +362,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             return newList;
         }
 
-        private List<PointCoinCollected> GetItemDrops() {
-            List<PointCoinCollected> newList = new();
-
-            // loop through all players
-            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
-            var points = stats[TargetPlayer].CoinsCollectedPoints;
-            foreach (var point in points) {
-                // skip no item drops
-                if (point.CoinItem == null) {
-                    continue;
-                }
-
-                newList.Add(point);
-            }
-
-            return newList;
-        }
-
         private List<PointCombo> GetComboWithPlayer() {
             List<PointCombo> newList = new();
 
@@ -385,6 +382,10 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             }
 
             return newList;
+        }
+
+        public void ResetStatsDropdownPos() {
+            viewingStatisticDropdown.value = 0;
         }
 
         #endregion

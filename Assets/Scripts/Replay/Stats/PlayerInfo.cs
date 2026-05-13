@@ -1,9 +1,10 @@
-﻿#nullable enable
+#nullable enable
 
 using Quantum;
 using System.Collections.Generic;
 
-namespace NSMB.Replay.Stats{
+
+namespace NSMB.Replay.Stats {
     public class PlayerInfo {
         //--player info
         public readonly PlayerRef PlayerRef;
@@ -39,6 +40,9 @@ namespace NSMB.Replay.Stats{
         public PointReserveChange? CurrReserveChangePoint = null;
         public readonly List<PointReserveChange> ReserveChangePoints = new();
 
+        public readonly List<EntityRef> BlocksBumped = new();
+        public readonly List<PointBlockHit> BlockHitPoints = new();
+
         // when a combo starts, this gets set
         // when this reaches 0 then the combo is over
         // this is needed to count combos where player dies in a pit
@@ -58,14 +62,29 @@ namespace NSMB.Replay.Stats{
             starInfoPoints.Sort();
             return starInfoPoints;
         }
-    }
 
-    public class GlobalInfo {
-        public int AttemptedStarSpawns = 0;
-        public int SuccessfulStarSpawns = 0;
-        public int FailedStarSpawns = 0;
+        public IEnumerable<TimePoint> GetAllItemSpawnPoints() {
+            List<TimePoint> itemSpawnPoints = new();
+            foreach (var point in CoinsCollectedPoints) {
+                // skip no item drops
+                if (point.CoinItem == null) {
+                    continue;
+                }
 
-        public PointBigCollectableSpawned? CurrBigCollectable = null;
-        public readonly List<PointBigCollectableSpawned> BigCollectablesSpawned = new();
+                itemSpawnPoints.Add(point);
+            }
+
+            foreach (var point in BlockHitPoints) {
+                // skip no item drops
+                if (point.SpawnedItem == null) {
+                    continue;
+                }
+
+                itemSpawnPoints.Add(point);
+            }
+
+            itemSpawnPoints.Sort();
+            return itemSpawnPoints;
+        }
     }
 }

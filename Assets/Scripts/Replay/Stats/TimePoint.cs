@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using UnityEngine;
 
 namespace NSMB.Replay.Stats {
@@ -17,14 +18,16 @@ namespace NSMB.Replay.Stats {
      */
     public unsafe abstract class TimePoint : IComparable<TimePoint> {
         //---object-specific variables
-        public PlayerRef? PlayerRef { get; protected set; }
-        public string? AffectedPlayerName { get; protected set; }
-        public int OccurenceFrame { get; private protected set; }
-        public FP DeltaTime { get; private protected set; }
         public int? EndFrame { get; set; }
-        public int Id;
-        public byte[]? SerializedFrame { get; protected set; }
-        public ReplayStatsRecorder? StatsRecorder { get; protected set; }
+
+        //---properties (read-only)
+        public readonly PlayerRef? PlayerRef;
+        public readonly string? AffectedPlayerName;
+        public readonly int OccurenceFrame;
+        public readonly FP DeltaTime;
+        public readonly int Id;
+        public readonly byte[] SerializedFrame;
+        public readonly ReplayStatsRecorder StatsRecorder;
 
         //---for assigning the index of time point
         public static int _index { get; private protected set; }
@@ -34,11 +37,29 @@ namespace NSMB.Replay.Stats {
             return this.Id.CompareTo(other.Id);
         }
 
+        //---bases for generating a new time point
+        // global init
+        public TimePoint(ReplayStatsRecorder stats, Frame f) {
+            StatsRecorder = stats;
+            OccurenceFrame = f.Number;
+            DeltaTime = f.DeltaTime;
+            Id = _index++;
+            SerializedFrame = f.Serialize(DeterministicFrameSerializeMode.Serialize);
+        }
+
+        // basic init - per player
+        public TimePoint(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : this(stats, f) {
+            PlayerRef = mario->PlayerRef;
+            if (mario != null) {
+                AffectedPlayerName = f.GetPlayerData(mario->PlayerRef).PlayerNickname;
+            }
+        }
+
 
         //---abstractions, overrideables for time point enteries
-        public abstract void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder);
+        public abstract void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, int displayArg);
 
-        public virtual void SetTimeText(TranslationManager tm, StringBuilder stringBuilder) {
+        public virtual void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
             if (StatsRecorder == null) {
                 stringBuilder.Append("");
                 return;
@@ -54,32 +75,11 @@ namespace NSMB.Replay.Stats {
             }
         }
 
-        public virtual void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder) { }
+        public virtual void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) { }
 
-        public virtual void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder) { }
+        public virtual void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) { }
 
-        public virtual string? GetTooltip() => null;
-
-        //---bases for generating a new time point
-        private protected static void BasicInit(TimePoint timePoint, ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) {
-            timePoint.StatsRecorder = statsRecorder;
-            timePoint.OccurenceFrame = f.Number;
-            timePoint.DeltaTime = f.DeltaTime;
-            timePoint.Id = _index++;
-            timePoint.PlayerRef = mario->PlayerRef;
-            timePoint.SerializedFrame = f.Serialize(DeterministicFrameSerializeMode.Serialize);
-            if (mario != null) {
-                timePoint.AffectedPlayerName = f.GetPlayerData(mario->PlayerRef).PlayerNickname;
-            }
-        }
-
-        private protected static void GlobalInit(TimePoint timePoint, ReplayStatsRecorder statsRecorder, Frame f) {
-            timePoint.StatsRecorder = statsRecorder;
-            timePoint.OccurenceFrame = f.Number;
-            timePoint.DeltaTime = f.DeltaTime;
-            timePoint.Id = _index++;
-            timePoint.SerializedFrame = f.Serialize(DeterministicFrameSerializeMode.Serialize);
-        }
+        public virtual string? GetTooltip(TranslationManager tm, int displayArg) => null;
 
         //---static methods
         public static void ResetIndex() {
@@ -94,9 +94,7 @@ namespace NSMB.Replay.Stats {
         public readonly int CoinCount, CoinCountTotal, CurrStarCount, LeaderStars;
         public readonly FP AverageStarCount;
 
-        public PointCoinCollected(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, int coinCount, CoinItemAsset? coinItemAsset) {
-            BasicInit(this, statsRecorder, f, mario);
-            int starsToWin = f.Global->Rules.StarsToWin;
+        public PointCoinCollected(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, int coinCount, CoinItemAsset? coinItemAsset) : base(statsRecorder, f, mario) {
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             CurrStarCount = gamemode.GetTeamObjectiveCount(f, mario->GetTeam(f)) ?? -1;
             LeaderStars = gamemode.GetFirstPlaceObjectiveCount(f);
@@ -112,7 +110,7 @@ namespace NSMB.Replay.Stats {
 
                     var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
-                    if (!coinItem.CanSpawn(f, false)) {
+                    if (!currCoinItemAsset.CanSpawn(f, false)) {
                         continue;
                     }
                     sum += gamemode.GetItemSpawnWeight(f, currCoinItemAsset, CurrStarCount);
@@ -121,15 +119,9 @@ namespace NSMB.Replay.Stats {
             }
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder) {
-            if (CoinItem != null) {
-                stringBuilder.Append(tm.GetTranslationWithReplacements("ui.replay.stats.entry.coin.itemspawn", "item", CoinItem.name));
-            } else {
-                stringBuilder.Append(tm.GetTranslation("ui.replay.stats.entry.coin.collected"));
-            }
-        }
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) => stringBuilder.Append(tm.GetTranslation("ui.replay.stats.entry.coincollected"));
 
-        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder) {
+        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
             if (CoinItem != null) {
                 stringBuilder.Append("<sprite name=room_powerups>");
             }
@@ -137,42 +129,68 @@ namespace NSMB.Replay.Stats {
             stringBuilder.Append("<sprite name=room_coins>").Append(Utils.GetSymbolString(CoinCount.ToString(), Utils.smallSymbols));
         }
 
-        public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder) {
-            if (CoinItem != null) {
-                stringBuilder.Append(tm.GetTranslationWithReplacements("ui.replay.stats.entry.spawnchance", "chance", $"{(float)SpawnChancePercentage.GetValueOrDefault():0.00}"));
+        public override string? GetTooltip(TranslationManager tm, int displayArg) {
+            if (CoinItem == null) {
+                return null;
             }
+            var itemTranslation = tm.GetTranslation(CoinItem.TranslationKey);
+            return tm.GetTranslationWithReplacements("ui.replay.stats.entry.tooltip.randomspawn", "item", itemTranslation, "chance", $"{ (float) SpawnChancePercentage.GetValueOrDefault():0.00}");
         }
     }
 
     public unsafe class PointStarCollected : TimePoint {
         public readonly int StarCount, TotalStarCount;
-        public PointStarCollected(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo info, int starCount) {
-            BasicInit(this, statsRecorder, f, mario);
+        public PointStarCollected(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo info, int starCount) : base(statsRecorder, f, mario) {
             StarCount = starCount;
             TotalStarCount = ++info.Stars;
         }
 
 
-        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder) {
+        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
             stringBuilder.Append("<sprite name=room_stars>").Append(Utils.GetSymbolString(StarCount.ToString(), Utils.smallSymbols));
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder) {
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
             stringBuilder.Append(tm.GetTranslationWithReplacements("ui.replay.stats.entry.starscollected", "total", TotalStarCount.ToString()));
         }
     }
 
     public unsafe class PointDamage : TimePoint {
         public readonly PowerupState NewState;
-        public PointDamage(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) {
-            OccurenceFrame = f.Number;
-            DeltaTime = f.DeltaTime;
-            NewState = mario->CurrentPowerupState;
-            Id = _index++;
+        public readonly DamageCause Reason;
+        public readonly string? AttackerName;
+        public readonly PlayerRef? AttackerRef;
+        public enum DamageCause {
+            Enemy,
+            Shell,
+            Starman,
+            MegaMushroom,
+            BlueShell,
+            Explode
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder) {
-            stringBuilder.Append($"Damage");
+        public PointDamage(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, DamageCause reason, string? attackerName, PlayerRef? attackerRef) : base(statsRecorder, f, mario) {
+            NewState = mario->CurrentPowerupState;
+            Reason = reason;
+            AttackerName = attackerName;
+            AttackerRef = attackerRef;
+        }
+
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) => stringBuilder.Append(tm.GetTranslation("ui.replay.stats.entry.damage."+Reason.ToString().ToLower()));
+
+        public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
+            switch (displayArg) {
+            case 0:
+                if (AttackerName != null) {
+                    stringBuilder.Append(AttackerName);
+                }
+                break;
+            case 1:
+                if (AffectedPlayerName != null) {
+                    stringBuilder.Append(AffectedPlayerName);
+                }
+                break;
+            }
         }
     }
 
@@ -180,40 +198,52 @@ namespace NSMB.Replay.Stats {
         public readonly int LivesRemaining, Ping;
         public readonly DeathCause Reason;
         public readonly string? AttackerName;
+        public readonly PlayerRef? AttackerRef;
         public enum DeathCause {
+            Enemy,
+            Shell,
+            Starman,
+            MegaMushroom,
+            BlueShell,
+            Explode,
             Pit,
             Lava,
             Poison,
-            Enemy,
-            Disconnect,
-            OtherPlayer,
-            Unknown
+            Disconnect
         }
-        public PointDeath(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, DeathCause reason, int ping, string? attackerName = null) {
-            BasicInit(this, statsRecorder, f, mario);
+
+        public PointDeath(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, DeathCause reason, int ping, string? attackerName, PlayerRef? attackRef) : base(statsRecorder, f, mario) {
             LivesRemaining = mario->Lives;
             Reason = reason;
             Ping = ping;
             AttackerName = attackerName;
+            AttackerRef = attackRef;
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder) {
-            var translationKey = "ui.replay.stats.entry.deaths."+Reason.ToString().ToLower();
-            var translation = AttackerName == null ?
-                tm.GetTranslation(translationKey) :
-                tm.GetTranslationWithReplacements(translationKey, "attacker", AttackerName);
-            stringBuilder.Append(translation);
-        }
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) => stringBuilder.Append(tm.GetTranslation("ui.replay.stats.entry.deaths."+Reason.ToString().ToLower()));
 
-        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder) {
+        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
             if (StatsRecorder != null && StatsRecorder.ReplayFile.Header.Rules.Lives > 0) {
                 stringBuilder.Append("<sprite name=room_lives>").Append(Utils.GetSymbolString(LivesRemaining.ToString(), Utils.smallSymbols));
             }
         }
 
-        public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder) {
-            stringBuilder.Append($"Ping: {Ping}ms");
+        public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
+            switch (displayArg) {
+            case 0:
+                if (AttackerName != null) {
+                    stringBuilder.Append(AttackerName);
+                }
+                break;
+            case 1:
+                if (AffectedPlayerName != null) {
+                    stringBuilder.Append(AffectedPlayerName);
+                }
+                break;
+            }
         }
+
+        public override string? GetTooltip(TranslationManager tm, int displayArg) => $"Ping: {Ping}ms";
     }
 
     public unsafe class PointKnockback : TimePoint {
@@ -221,8 +251,7 @@ namespace NSMB.Replay.Stats {
         public readonly string AttackerName;
         public readonly PlayerRef AttackerRef;
         public readonly KnockbackStrength KnockbackStrength;
-        public PointKnockback(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, EntityRef attacker, int starDropCount, KnockbackStrength knockbackStrength) {
-            BasicInit(this, statsRecorder, f, mario);
+        public PointKnockback(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, EntityRef attacker, int starDropCount, KnockbackStrength knockbackStrength) : base(statsRecorder, f, mario) {
             var attackerMario = f.Unsafe.GetPointer<MarioPlayer>(attacker);
             var attackerPlayer = f.GetPlayerData(attackerMario->PlayerRef);
             AttackerName = attackerPlayer.PlayerNickname;
@@ -231,23 +260,34 @@ namespace NSMB.Replay.Stats {
             AttackerRef = attackerMario->PlayerRef;
         }
 
-        public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder) {
-            base.SetTimeText(tm, stringBuilder);
+        public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
+            base.SetTimeText(tm, stringBuilder, displayArg);
             if (EndFrame != null && EndFrame > 0) {
                 stringBuilder.Append($" ({EndFrame - OccurenceFrame}F)");
             }
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder) {
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
             string translationString = "ui.replay.stats.entry.knockback." + KnockbackStrength.ToString().ToLower();
             stringBuilder.Append(tm.GetTranslationWithReplacements(translationString, "victim", AffectedPlayerName));
         }
 
-        public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder) {
-            stringBuilder.Append(AttackerName);
+        public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
+            switch (displayArg) {
+            case 0:
+                if (AttackerName != null) {
+                    stringBuilder.Append(AttackerName);
+                }
+                break;
+            case 1:
+                if (AffectedPlayerName != null) {
+                    stringBuilder.Append(AffectedPlayerName);
+                }
+                break;
+            }
         }
 
-        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder) {
+        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
             var color = Color.red;
             stringBuilder.Append("<sprite name=\"room_stars\" color=#").Append(Utils.ColorToHex(color, false)).Append('>');
             stringBuilder.Append(Utils.GetSymbolString(StarsDropped.ToString(), Utils.smallSymbols, Color.red));
@@ -269,8 +309,7 @@ namespace NSMB.Replay.Stats {
         public StarLossCause Reason;
         public string? AttackerName;
         public readonly int StarAmount, StarDropCount, TotalStarsLost;
-        public PointStarLoss(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo victimInfo, int starDropCount, StarLossCause reason, EntityRef attacker) {
-            BasicInit(this, statsRecorder, f, mario);
+        public PointStarLoss(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo victimInfo, int starDropCount, StarLossCause reason, EntityRef attacker) : base(statsRecorder, f, mario) {
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             StarAmount = gamemode.GetObjectiveCount(f, mario);
             StarDropCount = starDropCount;
@@ -284,13 +323,11 @@ namespace NSMB.Replay.Stats {
             }
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder) {
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
             stringBuilder.Append($"Lost a star due to {Reason}");
         }
 
-        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder) {
-            stringBuilder.Append("X").Append(Utils.GetSymbolString(StarAmount.ToString(), Utils.smallSymbols));
-        }
+        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) => stringBuilder.Append("X").Append(Utils.GetSymbolString(StarAmount.ToString(), Utils.smallSymbols));
     }
 
     public unsafe class PointCombo : TimePoint {
@@ -320,8 +357,7 @@ namespace NSMB.Replay.Stats {
             }
             return totalStars;
         }
-        public PointCombo(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, TimePoint comboElement, int starsLost) {
-            BasicInit(this, statsRecorder, f, mario);
+        public PointCombo(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, TimePoint comboElement, int starsLost) : base(statsRecorder, f, mario) {
             AddComboElement(comboElement, starsLost);
         }
 
@@ -333,7 +369,7 @@ namespace NSMB.Replay.Stats {
             ComboElements.Add((timePoint, starsLost, totalStarsLost));
         }
 
-        public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder) {
+        public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
             if (StatsRecorder == null) {
                 return;
             }
@@ -343,23 +379,21 @@ namespace NSMB.Replay.Stats {
             ));
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder) {
-            stringBuilder.Append(tm.GetTranslationWithReplacements("ui.replay.stats.entry.combo", "victim", AffectedPlayerName, "count", ComboElements.Count.ToString()));
-        }
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) => stringBuilder.Append(tm.GetTranslationWithReplacements("ui.replay.stats.entry.combo", "victim", AffectedPlayerName, "count", ComboElements.Count.ToString()));
 
-        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder) {
+        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
             var color = Color.red;
             stringBuilder.Append("<sprite name=\"room_stars\" color=#").Append(Utils.ColorToHex(color, false)).Append('>');
             stringBuilder.Append(Utils.GetSymbolString(TotalStarsAfterCombo().ToString(), Utils.smallSymbols, Color.red));
         }
 
-        public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder) {
+        public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
             var attackers = GetParticipants();
             var attackersStr = string.Join(", ", attackers.Values);
             stringBuilder.Append(attackersStr);
         }
 
-        public override string? GetTooltip() {
+        public override string? GetTooltip(TranslationManager tm, int displayArg) {
             StringBuilder sb = new();
             sb.AppendLine("Combo Participants:");
             foreach (var (Element, _, _) in ComboElements) {
@@ -378,74 +412,92 @@ namespace NSMB.Replay.Stats {
 
     public unsafe class PointPowerChange : TimePoint {
         public readonly PowerupState PowerupState;
-        public PointPowerChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) {
-            BasicInit(this, statsRecorder, f, mario);
+        public PointPowerChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) : base(statsRecorder, f, mario) {
             PowerupState = mario->CurrentPowerupState;
         }
 
-        public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder) {
-            base.SetTimeText(tm, stringBuilder);
+        public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
+            base.SetTimeText(tm, stringBuilder, displayArg);
             if (EndFrame != null && EndFrame > 0) {
                 var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime;
                 stringBuilder.Append($" ({(float)lengthInSec:F2}s)");
             }
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder) {
-            stringBuilder.Append($"Has powerup state {PowerupState}");
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
+            // annoyingly powerUP state doesn't reference powerUP asset
+            string powerupTranslation;
+            if (PowerupState == PowerupState.NoPowerup) {
+                powerupTranslation = tm.GetTranslation("ui.generic.none");
+            } else {
+                powerupTranslation = tm.GetTranslation("powerup."+PowerupState.ToString().ToLower());
+            }
+            stringBuilder.Append(tm.GetTranslationWithReplacements("ui.replay.stats.entry.powerup.state", "powerup", powerupTranslation));
         }
     }
 
     public unsafe class PointStarmanChange : TimePoint {
-        public PointStarmanChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) {
-            BasicInit(this, statsRecorder, f, mario);
-        }
+        public PointStarmanChange(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) {}
 
-        public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder) {
-            base.SetTimeText(tm, stringBuilder);
+        public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
+            base.SetTimeText(tm, stringBuilder, displayArg);
             if (EndFrame != null && EndFrame > 0) {
                 var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime;
                 stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
             }
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder) {
-            stringBuilder.Append($"Starman invincible");
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
+            stringBuilder.Append(tm.GetTranslation("ui.replay.stats.entry.powerup.starman"));
         }
     }
 
     public unsafe class PointReserveChange : TimePoint {
         // allow for null
         public readonly PowerupAsset Powerup;
-        public PointReserveChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) {
-            BasicInit(this, statsRecorder, f, mario);
+        public PointReserveChange(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) {
             Powerup = f.FindAsset(mario->ReserveItem);
         }
 
-        public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder) {
-            base.SetTimeText(tm, stringBuilder);
+        public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
+            base.SetTimeText(tm, stringBuilder, displayArg);
             if (EndFrame != null && EndFrame > 0) {
                 var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime;
                 stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
             }
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder) {
-            stringBuilder.Append($"Reserve powerup is {Powerup.name}");
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
+            string powerupTranslation;
+            if (Powerup == null) {
+                powerupTranslation = tm.GetTranslation("ui.generic.none");
+            } else {
+                powerupTranslation = tm.GetTranslation(Powerup.TranslationKey);
+            }
+            stringBuilder.Append(tm.GetTranslationWithReplacements("ui.replay.stats.entry.powerup.reserve", "powerup", powerupTranslation));
         }
     }
 
     public unsafe class PointPowerupCollect : TimePoint {
         public readonly PowerupReserveResult ReserveResult;
         public readonly PowerupAsset Powerup;
-        public PointPowerupCollect(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PowerupReserveResult reserveResult, PowerupAsset powerupAsset) {
-            BasicInit(this, statsRecorder, f, mario);
+        public PointPowerupCollect(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario, PowerupReserveResult reserveResult, PowerupAsset powerupAsset) : base(stats, f, mario) {
             ReserveResult = reserveResult;
             Powerup = powerupAsset;
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder) {
-            stringBuilder.Append($"Collected a {Powerup.name}");
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
+            string translationPrefix = "ui.replay.stats.entry.powerupgrab";
+            string powerupTranslation = tm.GetTranslation(Powerup.TranslationKey);
+            switch (ReserveResult) {
+            case PowerupReserveResult.CollectNewReserveOld:
+            case PowerupReserveResult.CollectNewIgnoreOld:
+                stringBuilder.Append(tm.GetTranslationWithReplacements($"{translationPrefix}.collected", "powerup", powerupTranslation));
+                break;
+            case PowerupReserveResult.KeepOldReserveNew:
+                stringBuilder.Append(tm.GetTranslationWithReplacements($"{translationPrefix}.reserved", "powerup", powerupTranslation));
+                break;
+            }
         }
     }
 
@@ -457,8 +509,7 @@ namespace NSMB.Replay.Stats {
         public readonly FPVector2 Coordinates;
         public readonly List<string> BlockingPlayers = new();
         public string? CollectingPlayer; // if a player collected the big star this is their name
-        public PointBigCollectableSpawned(ReplayStatsRecorder statsRecorder, Frame f, int usedSpawns, int index, bool blocked, FPVector2 coordinates, ref GlobalInfo globalReplayInfo, VersusStageData stage) {
-            GlobalInit(this, statsRecorder, f);
+        public PointBigCollectableSpawned(ReplayStatsRecorder stats, Frame f, int usedSpawns, int index, bool blocked, FPVector2 coordinates, ref GlobalInfo globalReplayInfo, VersusStageData stage) : base(stats, f) {
             PositionIndex = index;
             UsedSpawns = usedSpawns;
             WasBlocked = blocked;
@@ -476,17 +527,17 @@ namespace NSMB.Replay.Stats {
             FailedSpawnCount = globalReplayInfo.FailedStarSpawns;
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder) {
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
             var translationPrefix = "ui.replay.stats.entry.";
             var translationSuffix = WasBlocked ? "bigcollectableblock" : "bigcollectablespawn";
             stringBuilder.Append(tm.GetTranslationWithReplacements(translationPrefix + translationSuffix, "position", PositionIndex.ToString(), "spawnpoints", Spawnpoints.ToString()));
         }
 
-        public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder) {
+        public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
             stringBuilder.Append(CollectingPlayer);
         }
 
-        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder) {
+        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
             var blockCol = Color.red;
             var successCol = Color.green;
 
@@ -494,6 +545,52 @@ namespace NSMB.Replay.Stats {
             stringBuilder.Append(Utils.GetSymbolString(FailedSpawnCount.ToString(), Utils.smallSymbols, blockCol));
             stringBuilder.Append("<sprite name=\"room_stars\" color=#").Append(Utils.ColorToHex(successCol, false)).Append('>');
             stringBuilder.Append(Utils.GetSymbolString(SuccessfulSpawnCount.ToString(), Utils.smallSymbols, successCol));
+        }
+    }
+
+    public unsafe class PointBlockHit : TimePoint {
+        public readonly bool WasRandom;
+        public readonly CoinItemAsset? SpawnedItem;
+        public readonly FP? SpawnChancePercentage, SpawnChanceRaw;
+        public readonly int CurrStarCount, LeaderStars;
+        public readonly FP AverageStarCount;
+
+        public PointBlockHit(Frame f, ReplayStatsRecorder stats, MarioPlayer* mario, bool wasRandom, CoinItemAsset? spawnedItem) : base(stats, f, mario) {
+            var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
+            WasRandom = wasRandom;
+            SpawnedItem = spawnedItem;
+            CurrStarCount = gamemode.GetTeamObjectiveCount(f, mario->GetTeam(f)) ?? -1;
+            LeaderStars = gamemode.GetFirstPlaceObjectiveCount(f);
+            AverageStarCount = gamemode.GetAverageObjectiveCount(f);
+            if (WasRandom) {
+                SpawnChanceRaw = gamemode.GetItemSpawnWeight(f, spawnedItem, CurrStarCount);
+                FP sum = 0;
+                foreach (var currCoinItemRef in gamemode.AllCoinItems) {
+                    CoinItemAsset currCoinItemAsset = f.FindAsset(currCoinItemRef);
+
+                    var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+
+                    if (!currCoinItemAsset.CanSpawn(f, false)) {
+                        continue;
+                    }
+                    sum += gamemode.GetItemSpawnWeight(f, currCoinItemAsset, CurrStarCount);
+                }
+                SpawnChancePercentage = SpawnChanceRaw / sum * 100;
+            }
+        }
+
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, int displayArg) {
+            string translationKey = "ui.replay.stats.entry.blockhit." + (WasRandom ? "random" : "normal");
+            stringBuilder.Append(tm.GetTranslation(translationKey));
+        }
+
+        public override string? GetTooltip(TranslationManager tm, int displayArg) {
+            if (SpawnedItem == null) {
+                return null;
+            }
+            string translationKey = "ui.replay.stats.entry.tooltip." + (WasRandom ? "randomspawn" : "itemspawn");
+            string itemTranslation = tm.GetTranslation(SpawnedItem.TranslationKey);
+            return tm.GetTranslationWithReplacements(translationKey, "item", itemTranslation, "chance", $"{(float) SpawnChancePercentage.GetValueOrDefault():0.00}");
         }
     }
 }

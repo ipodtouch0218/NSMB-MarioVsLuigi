@@ -57,13 +57,14 @@ namespace NSMB.Replay.Stats
 
         public void OnMarioPlayerDied(EventMarioPlayerDied e) {
             Frame f = e.Game.Frames.Verified;
-            PointDeath.DeathCause deathCause = PointDeath.DeathCause.Unknown;
+            PointDeath.DeathCause deathCause = PointDeath.DeathCause.Enemy;
 
             // for some reason when dying via pit the entity and attacker are the same
             bool wasPitDeath = e.Entity == e.Attacker;
             bool wasDisconnect = e.Entity == EntityRef.None;
 
             string? attackerName = null;
+            PlayerRef? attackerRef = null;
 
             if (wasDisconnect) {
                 deathCause = PointDeath.DeathCause.Disconnect;
@@ -80,20 +81,47 @@ namespace NSMB.Replay.Stats
                     deathCause = PointDeath.DeathCause.Pit;
                 }
             } else {
-                // check if enemy
-                if (f.Unsafe.TryGetPointer<Enemy>(e.Attacker, out _)) {
-                    deathCause = PointDeath.DeathCause.Enemy;
+                // check if it's a shelled enemy
+                if (f.Unsafe.TryGetPointer<Koopa>(e.Attacker, out _)) {
+                    f.Unsafe.ComponentGetter<KoopaSystem.Filter>().TryGet(f, e.Attacker, out var koopaFilter);
+                    var koopa = koopaFilter.Koopa;
+                    var holdable = koopaFilter.Holdable;
+                    deathCause = PointDeath.DeathCause.Shell;
+                    if (f.Exists(holdable->PreviousHolder) && koopa->IsKicked) {
+                        var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
+                        attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
+                        attackerRef = holdableMario->PlayerRef;
+                    }
+                } else if (f.Unsafe.TryGetPointer<Bobomb>(e.Attacker, out _)) {
+                    // maybe it's a bobomb...
+                    f.Unsafe.ComponentGetter<BobombSystem.Filter>().TryGet(f, e.Attacker, out var bobombFilter);
+                    var bobomb = bobombFilter.Bobomb;
+                    var holdable = bobombFilter.Holdable;
+                    if (f.Exists(holdable->PreviousHolder) && bobomb->CurrentDetonationFrames > 0) {
+                        var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
+                        attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
+                        attackerRef = holdableMario->PlayerRef;
+                        deathCause = PointDeath.DeathCause.Explode;
+                    }
                 } else if (f.Unsafe.TryGetPointer<MarioPlayer>(e.Attacker, out var attackerMario)) {
                     // else it was Mario
-                    var runtimeData = f.GetPlayerData(attackerMario->PlayerRef);
-                    attackerName = runtimeData.PlayerNickname;
+                    attackerName = f.GetPlayerData(attackerMario->PlayerRef).PlayerNickname;
+                    attackerRef = attackerMario->PlayerRef;
+                    
+                    if (attackerMario->IsStarmanInvincible) {
+                        deathCause = PointDeath.DeathCause.Starman;
+                    } else if (attackerMario->CurrentPowerupState == PowerupState.MegaMushroom) {
+                        deathCause = PointDeath.DeathCause.MegaMushroom;
+                    } else if (attackerMario->IsInShell) {
+                        deathCause = PointDeath.DeathCause.BlueShell;
+                    }
                 }
             }
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
             var playerData = QuantumUtils.GetPlayerData(f, mario->PlayerRef);
-            var deathPoint = new PointDeath(StatRecorder, f, mario, playerInfo, deathCause, playerData->Ping, attackerName);
+            var deathPoint = new PointDeath(StatRecorder, f, mario, playerInfo, deathCause, playerData->Ping, attackerName, attackerRef);
             var starsToDrop = Math.Min(1, e.OldObjectiveCount);
 
             playerInfo.DeathPoints.Add(deathPoint);
@@ -143,13 +171,54 @@ namespace NSMB.Replay.Stats
 
         public void OnMarioPlayerTookDamage(EventMarioPlayerTookDamage e) {
             Frame f = e.Game.Frames.Verified;
+            PointDamage.DamageCause damageCause = PointDamage.DamageCause.Enemy;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             var marioPlayerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
-            var damagePoint = new PointDamage(StatRecorder, f, mario);
+
+            string? attackerName = null;
+            PlayerRef? attackerRef = null;
+
+            // check if it's a shelled enemy
+            if (f.Unsafe.TryGetPointer<Koopa>(e.Attacker, out _)) {
+                f.Unsafe.ComponentGetter<KoopaSystem.Filter>().TryGet(f, e.Attacker, out var koopaFilter);
+                var koopa = koopaFilter.Koopa;
+                var holdable = koopaFilter.Holdable;
+                if (f.Exists(holdable->PreviousHolder) && koopa->IsKicked) {
+                    var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
+                    attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
+                    attackerRef = holdableMario->PlayerRef;
+                    damageCause = PointDamage.DamageCause.Shell;
+                }
+            } else if (f.Unsafe.TryGetPointer<Bobomb>(e.Attacker, out _)) {
+                // maybe it's a bobomb...
+                f.Unsafe.ComponentGetter<BobombSystem.Filter>().TryGet(f, e.Attacker, out var bobombFilter);
+                var bobomb = bobombFilter.Bobomb;
+                var holdable = bobombFilter.Holdable;
+                if (f.Exists(holdable->PreviousHolder) && bobomb->CurrentDetonationFrames > 0) {
+                    damageCause = PointDamage.DamageCause.Explode;
+                    var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
+                    attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
+                    attackerRef = holdableMario->PlayerRef;
+                }
+            } else if (f.Unsafe.TryGetPointer<MarioPlayer>(e.Attacker, out var attackerMario)) {
+                // else it was Mario
+                attackerName = f.GetPlayerData(attackerMario->PlayerRef).PlayerNickname;
+                attackerRef = attackerMario->PlayerRef;
+
+                if (attackerMario->IsStarmanInvincible) {
+                    damageCause = PointDamage.DamageCause.Starman;
+                } else if (attackerMario->CurrentPowerupState == PowerupState.MegaMushroom) {
+                    damageCause = PointDamage.DamageCause.MegaMushroom;
+                } else if (attackerMario->IsInShell) {
+                    damageCause = PointDamage.DamageCause.BlueShell;
+                }
+            }
+
+            var damagePoint = new PointDamage(StatRecorder, f, mario, damageCause, attackerName, attackerRef);
 
             var starsToDrop = Math.Min(1, e.OldObjectiveCount);
             marioPlayerInfo.StarsLostPoints.Add(new PointStarLoss(StatRecorder, f, mario, marioPlayerInfo, starsToDrop, PointStarLoss.StarLossCause.Damage, EntityRef.None));
-            marioPlayerInfo.DamagePoints.Add(new PointDamage(StatRecorder, f, mario));
+            marioPlayerInfo.DamagePoints.Add(damagePoint);
             if (marioPlayerInfo.CurrComboPoint != null) {
                 StatUtilSetCombo(StatRecorder, f, mario, marioPlayerInfo, damagePoint, starsToDrop);
             }
@@ -212,6 +281,34 @@ namespace NSMB.Replay.Stats
                 HandleStateData(f, marioPlayer, playerInfo);
             }
             didLoop = true;
+
+            if (f.Global->GameState == GameState.Ended && StatRecorder.GlobalInfo.CurrBigCollectable != null) {
+                StatRecorder.GlobalInfo.CurrBigCollectable.EndFrame = -1;
+            }
+
+            var blockBumps = f.Filter<BlockBump>();
+            while (blockBumps.NextUnsafe(out var entityRef, out var blockBump)) {
+                var ownerPtr = f.Unsafe.GetPointer<MarioPlayer>(blockBump->Owner);
+                var startTileAsset = f.FindAsset(blockBump->StartTile);
+                var playerInfo = StatRecorder.PlayerInfos[ownerPtr->PlayerRef];
+
+                if (startTileAsset is PowerupTileBase powerupTile) {
+                    if (!playerInfo.BlocksBumped.Contains(entityRef)) {
+                        var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
+                        CoinItemAsset? coinItemAsset = null;
+                        foreach (var coinItem in gamemode.AllCoinItems) {
+                            var coinItemAsAsset = f.FindAsset(coinItem);
+                            var entityPrototype = f.FindAsset(coinItemAsAsset.Prefab);
+                            if (entityPrototype == blockBump->Powerup) {
+                                coinItemAsset = coinItemAsAsset;
+                                break;
+                            }
+                        }
+                        playerInfo.BlockHitPoints.Add(new PointBlockHit(f, StatRecorder, ownerPtr, powerupTile is RouletteTile, coinItemAsset));
+                        playerInfo.BlocksBumped.Add(entityRef);
+                    }
+                }
+            }
         }
 
         private void HandleCombo(Frame f, MarioPlayer* marioPlayer, PlayerInfo playerInfo) {
