@@ -22,6 +22,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             public StatOptions[] StatOptions;
             public StatOptions[] StatOptionNoPlayer;
         }
+        public int selectedButton;
 
         //---Static Variables
         public static ReplayStatsManager Instance { get; private set; }
@@ -33,19 +34,27 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         private int TargetPlayer => targetPlayerDropdown.value;
 
         //---Serialized Variables
+        [Header("Main Panel")]
         [SerializeField] public MainMenuCanvas canvas;
         [SerializeField] private ScrollRect scrollRect;
-        [SerializeField] private TimePointEntry entryTemplate;
-        [SerializeField] internal VerticalLayoutGroup layout;
-        [SerializeField] private StatsButton buttonTemplate; 
-        [SerializeField] public int selectedButton;
+        [SerializeField] internal VerticalLayoutGroup layout, leftTopLayout;
 
         // side panel
+        [Header("Top-left Panel")]
         [SerializeField] private TMP_Dropdown viewingStatisticDropdown, targetPlayerDropdown;
         [SerializeField] private TMP_Text entryCount;
 
         // bottom panel
+        [Header("Bottom-left Panel")]
         [SerializeField] private TMP_Text replayInformation;
+
+        [Header("Templates")]
+        [SerializeField] private TimePointEntry entryTemplate;
+        [SerializeField] private StatsButton buttonTemplate;
+        [SerializeField] private StatsToggle toggleTemplate;
+        [SerializeField] private StatsList listTemplate;
+
+        [Header("Lists")]
         [SerializeField] private StatOptionsWrapper[] statOptionGroup;
         //[SerializeField] private StatOptions[] positiveStats, negativeStats, stageStats, miscStats;
 
@@ -54,6 +63,8 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         private readonly StringBuilder stringBuilder = new();
         private readonly List<TimePointEntry> timePointEnteries = new();
         public readonly List<StatsButton> statsButtons = new();
+        private readonly List<StatsToggle> statToggles = new();
+        private readonly List<StatsList> statLists = new();
 
         private StatOptions ViewingStatsMeth() {
             int value = viewingStatisticDropdown.value;
@@ -63,6 +74,143 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 return CurrStatsGroup.StatOptions[value];
             }
         }
+
+        #region Point List Methods
+        
+        //---lists
+        private Dictionary<TimePoint, bool> GetKnockbackDealt() {
+            Dictionary<PointKnockback, bool> temp = new();
+
+            var target = statLists[0].value;
+
+            // loop through all players
+            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+            foreach (var currPlayer in stats) {
+                // exclude ourself of course <3
+                if (currPlayer.Key == TargetPlayer) {
+                    continue;
+                }
+
+                bool show = true;
+                if (target != -1 && currPlayer.Key != target) {
+                    show = false;
+                }
+
+                foreach (var kbPoint in currPlayer.Value.KnockbackPoints) {
+                    if (kbPoint.AttackerRef != null && kbPoint.AttackerRef == TargetPlayer) {
+                        temp.Add(kbPoint, show);
+                    }
+                }
+            }
+
+            return temp.ToDictionary(kvp => (TimePoint) kvp.Key, kvp => kvp.Value);
+        }
+
+        private Dictionary<TimePoint, bool> GetDamageDealt() {
+            Dictionary<PointDamage, bool> temp = new();
+
+            var target = statLists[0].value;
+
+            // loop through all players
+            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+            foreach (var currPlayer in stats) {
+                // exclude ourself of course <3
+                if (currPlayer.Key == TargetPlayer) {
+                    continue;
+                }
+
+                bool show = true;
+                if (target != -1 && currPlayer.Key != target) {
+                    show = false;
+                }
+
+                foreach (var dmgPoint in currPlayer.Value.DamagePoints) {
+                    if (dmgPoint.AttackerRef != null && dmgPoint.AttackerRef == TargetPlayer) {
+                        temp.Add(dmgPoint, show);
+                    }
+                }
+            }
+
+            return temp.ToDictionary(kvp => (TimePoint) kvp.Key, kvp => kvp.Value);
+        }
+
+        //---dictionaries
+        private Dictionary<TimePoint, bool> GetComboWithPlayer() {
+            Dictionary<PointCombo, bool> temp = new();
+
+            bool selfOnly = statToggles[0].value;
+            bool deathOnly = statToggles[1].value;
+
+            // loop through all enteries checking playerref
+            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+            foreach (var playerInfo in stats) {
+                // don't include ourselves UwU
+                if (playerInfo.Key == TargetPlayer) {
+                    continue;
+                }
+
+                // now check the combo points
+                foreach (var comboPoint in playerInfo.Value.ComboReceivedPoints) {
+                    bool show = true;
+                    if (selfOnly && comboPoint.GetParticipants().Count > 1) {
+                        show = false;
+                    }
+                    if (deathOnly && !comboPoint.EndsInDeath()) {
+                        show = false;
+                    }
+                    if (comboPoint.GetParticipants().ContainsKey(TargetPlayer)) {
+                        temp.Add(comboPoint, show);
+                    }
+                }
+            }
+
+            return temp.ToDictionary(kvp => (TimePoint) kvp.Key, kvp => kvp.Value);
+        }
+
+        private Dictionary<TimePoint, bool> GetBigCollectableSpawns() {
+            Dictionary<PointBigCollectableSpawned, bool> temp = new();
+
+            bool hideSuccess = statToggles[0].value;
+            bool hideBlocks = statToggles[1].value;
+
+            var attempts = ReplayStatsRecorder.Instance.GlobalInfo;
+            foreach (var spawn in attempts.BigCollectablesSpawned) {
+                bool show = true;
+                if (hideSuccess && spawn.WasBlocked) {
+                    show = false;
+                }
+
+                if (hideBlocks && !spawn.WasBlocked) {
+                    show = false;
+                }
+
+                temp.Add(spawn, show);
+            }
+
+            return temp.ToDictionary(kvp => (TimePoint) kvp.Key, kvp => kvp.Value);
+        }
+
+        private List<PointDeath> GetKills() {
+            List<PointDeath> temp = new();
+
+            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+            foreach (var playerInfoEntry in stats) {
+                if (playerInfoEntry.Key == TargetPlayer) {
+                    continue;
+                }
+
+                foreach (var deathPoint in playerInfoEntry.Value.DeathPoints) {
+                    if (deathPoint.AttackerRef == TargetPlayer) {
+                        temp.Add(deathPoint);
+                    }
+                }
+            }
+
+            return temp;
+        }
+
+        #endregion
+
         #region Switches
         public enum StatOptions {
             StarsCollected,
@@ -78,9 +226,11 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             BigCollectableSpawns,
             PowerupGrabs,
             ReserveInfo,
+            Kills,
+            DamageDealt
         }
 
-        private IEnumerable<TimePoint> GetTimePoints(StatOptions? options = null) {
+        private object GetTimePoints(StatOptions? options = null) {
             StatOptions viewingOptions = options ?? ViewingStats;
             var stats = ReplayStatsRecorder.Instance.PlayerInfos;
             return viewingOptions switch {
@@ -94,21 +244,58 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 StatOptions.ComboRecieved => stats[TargetPlayer].ComboReceivedPoints,
                 StatOptions.PowerupInfo => stats[TargetPlayer].PowerChangePoints,
                 StatOptions.PowerupSpawns => stats[TargetPlayer].GetAllItemSpawnPoints(),
-                StatOptions.BigCollectableSpawns => ReplayStatsRecorder.Instance.GlobalInfo.BigCollectablesSpawned,
+                StatOptions.BigCollectableSpawns => GetBigCollectableSpawns(),
                 StatOptions.PowerupGrabs => stats[TargetPlayer].PowerupCollectPoints,
                 StatOptions.ReserveInfo => stats[TargetPlayer].ReserveChangePoints,
+                StatOptions.Kills => GetKills(),
+                StatOptions.DamageDealt => GetDamageDealt(),
                 _ => throw new NotImplementedException(),
             };
         }
 
-        private int GetDisplayArgs(StatOptions? options = null) {
+        private TimePoint.DisplayArgs GetDisplayArgs(StatOptions? options = null) {
             StatOptions viewingOptions = options ?? ViewingStats;
-            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
             return viewingOptions switch {
-                StatOptions.KnockbackDealt => 1,
-                StatOptions.ComboLanded => 1,
+                StatOptions.KnockbackDealt => TimePoint.DisplayArgs.FromAttacker,
+                StatOptions.ComboLanded => TimePoint.DisplayArgs.FromAttacker,
                 _ => 0
             };
+        }
+
+        private Dictionary<string, bool> GetToggleOptions(StatOptions? options = null) {
+            Dictionary<string, bool> dictionary = new();
+            StatOptions viewingOptions = options ?? ViewingStats;
+            var togglePrefix = "ui.replay.stats.toggles.";
+            var translationPrefix = togglePrefix+viewingOptions.ToString().ToLower()+".";
+
+            switch (viewingOptions) {
+            case StatOptions.ComboLanded:
+                dictionary.Add(translationPrefix+"showselfonly", true);
+                dictionary.Add(translationPrefix+"killsonly", false);
+                break;
+            case StatOptions.BigCollectableSpawns:
+                dictionary.Add(translationPrefix+"hidesuccess", false);
+                dictionary.Add(translationPrefix+"hideblocks", false);
+                break;
+            };
+
+            return dictionary;
+        }
+
+        private Dictionary<string, int> GetListOptions(StatOptions? options = null) {
+            Dictionary<string, int> dictionary = new();
+            StatOptions viewingOptions = options ?? ViewingStats;
+            var listPrefix = "ui.replay.stats.list.";
+            var translationPrefix = listPrefix+viewingOptions.ToString().ToLower()+".";
+            switch(viewingOptions) {
+            case StatOptions.Kills:
+            case StatOptions.DamageDealt:
+            case StatOptions.KnockbackDealt:
+                dictionary.Add(listPrefix+"target", 0);
+                break;
+            }
+
+            return dictionary;
         }
 
         #endregion
@@ -142,9 +329,13 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             scrollRect.verticalNormalizedPosition = 1;
             entryTemplate.gameObject.SetActive(false);
             buttonTemplate.gameObject.SetActive(false);
+            toggleTemplate.gameObject.SetActive(false);
+            listTemplate.gameObject.SetActive(false);
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) leftTopLayout.transform);
             TranslationManager.OnLanguageChanged += UpdateStatsDropdown;
             TranslationManager.OnLanguageChanged += UpdateEntryCount;
+            TranslationManager.OnLanguageChanged += UpdateLists;
             Canvas.ForceUpdateCanvases();
 
             for (int i = 0; i < statOptionGroup.Length; i++) {
@@ -162,7 +353,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             UpdateEntryCount(GlobalController.Instance.translationManager);
             UpdateInformation(replayListEntry);
 
-            ChangedViewingStats();
+            ChangedViewingStats(true);
         }
 
         protected override void OnDisable() {
@@ -176,8 +367,9 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
             TranslationManager.OnLanguageChanged -= UpdateStatsDropdown;
             TranslationManager.OnLanguageChanged -= UpdateEntryCount;
+            TranslationManager.OnLanguageChanged -= UpdateLists;
 
-            foreach(var button in statsButtons) {
+            foreach (var button in statsButtons) {
                 Destroy(button.gameObject);
             }
             statsButtons.Clear();
@@ -273,6 +465,61 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             replayInformation.horizontalAlignment = HorizontalAlignmentOptions.Left;
         }
 
+        private void UpdateToggles() {
+            foreach (var entry in statToggles) {
+                Destroy(entry.gameObject);
+            }
+            statToggles.Clear();
+
+            var toggleOptions = GetToggleOptions();
+
+            for (int i = 0; i < toggleOptions.Count; i++) {
+                var toggle = toggleOptions.ElementAt(i);
+                var translationKey = toggle.Key;
+                var defaultValue = toggle.Value;
+                var toggleObj = Instantiate(toggleTemplate, toggleTemplate.transform.parent);
+                toggleObj.name = $"Toggle{i}";
+                toggleObj.gameObject.SetActive(true);
+                toggleObj.Initialize(translationKey, defaultValue);
+                statToggles.Add(toggleObj);
+            }
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) leftTopLayout.transform);
+            Canvas.ForceUpdateCanvases();
+        }
+
+        private void UpdateLists(TranslationManager tm) {
+            foreach (var entry in statLists) {
+                Destroy(entry.gameObject);
+            }
+            statLists.Clear();
+
+            var listsOptions = GetListOptions();
+
+            for (int i = 0; i < listsOptions.Count; i++) {
+                var list = listsOptions.ElementAt(i);
+                var translationKey = list.Key;
+                var defaultValue = list.Value;
+                var listObj = Instantiate(listTemplate, listTemplate.transform.parent);
+                listObj.name = $"List{i}";
+                listObj.gameObject.SetActive(true);
+                listObj.Initialize(translationKey, defaultValue);
+                // just have it be a player list for now
+                listObj.AddToDropdown(tm.GetTranslation("ui.generic.all"), -1);
+
+                var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+                for (int j = 0; j < stats.Count; j++) {
+                    // exclude ourselves
+                    if (j == TargetPlayer) {
+                        continue;
+                    }
+                    var info = stats.Values.ElementAt(j);
+                    listObj.AddToDropdown(info.PlayerName, j);
+                }
+                statLists.Add(listObj);
+            }
+        }
+
         private void UpdatePlayerDropdown() {
             // initializes as 0 though
             int index = targetPlayerDropdown.value;
@@ -310,79 +557,58 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             entryCount.text = tm.GetTranslationWithReplacements("ui.replay.stats.occurences", "occurences", timePointEnteries.Count.ToString());
         }
 
-        public void ChangedViewingStats() {
+        public void ChangedViewingStats(bool updateToggles) {
+            if (updateToggles) {
+                UpdateToggles();
+                UpdateLists(GlobalController.Instance.translationManager);
+            }
+
             bool targetPlayerSupported = !IsViewingGlobalOnlyStats;
             targetPlayerDropdown.interactable = targetPlayerSupported;
             if (!targetPlayerSupported) {
-                targetPlayerDropdown.captionText.text = "N/A";
+                targetPlayerDropdown.captionText.text = "-----";
             } else {
                 targetPlayerDropdown.RefreshShownValue();
             }
 
+            // clear all time point enteries
             foreach (var entry in timePointEnteries) {
                 Destroy(entry.gameObject);
             }
             timePointEnteries.Clear();
 
-            var timePoints = GetTimePoints();
+            // new time points
+            var timePointsList = GetTimePoints();
             var displayArg = GetDisplayArgs();
             int index = 0;
-            foreach (var point in timePoints) {
-                var entry = Instantiate(entryTemplate, entryTemplate.transform.parent);
-                entry.name = $"TimePointEntry{index}";
-                entry.gameObject.SetActive(true);
-                entry.UpdateUI(point, index + 1, displayArg);
-                timePointEnteries.Add(entry);
-                index++;
+            if (timePointsList is IEnumerable<TimePoint> timePoints) {
+                foreach (var point in timePoints) {
+                    var entry = Instantiate(entryTemplate, entryTemplate.transform.parent);
+                    entry.name = $"TimePointEntry{index}";
+                    entry.gameObject.SetActive(true);
+                    entry.UpdateUI(point, index + 1, displayArg);
+                    timePointEnteries.Add(entry);
+                    index++;
+                }
+            } else if (timePointsList is Dictionary<TimePoint, bool> timePointDictionary) {
+                foreach (var pointPair in timePointDictionary) {
+                    var point = pointPair.Key;
+                    var show = pointPair.Value;
+                    if (show) {
+                        var entry = Instantiate(entryTemplate, entryTemplate.transform.parent);
+                        entry.name = $"TimePointEntry{index}";
+                        entry.gameObject.SetActive(true);
+                        entry.UpdateUI(point, index + 1, displayArg);
+                        timePointEnteries.Add(entry);
+                    }
+                    index++;
+                }
             }
 
             UpdateEntryCount(GlobalController.Instance.translationManager);
         }
 
         #region Other Methods
-
-        private List<PointKnockback> GetKnockbackDealt() {
-            List<PointKnockback> newList = new();
-
-            // loop through all players
-            var stats = ReplayStatsRecorder.Instance;
-            foreach (var currPlayer in stats.PlayerInfos.Keys) {
-                // exclude ourself of course <3
-                if (currPlayer == TargetPlayer) {
-                    continue;
-                }
-
-                var kbPoints = stats.PlayerInfos[currPlayer].KnockbackPoints;
-                newList.AddRange(kbPoints);
-            }
-
-            // sort by index which is time occured
-            newList.Sort();
-
-            return newList;
-        }
-
-        private List<PointCombo> GetComboWithPlayer() {
-            List<PointCombo> newList = new();
-
-            // loop through all enteries checking playerref
-            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
-            foreach (var playerInfo in stats.Values) {
-                // don't include ourselves UwU
-                if (playerInfo.PlayerRef == TargetPlayer) {
-                    continue;
-                }
-
-                // now check the combo points
-                foreach (var comboPoint in playerInfo.ComboReceivedPoints) {
-                    if (comboPoint.GetParticipants().ContainsKey(TargetPlayer)) {
-                        newList.Add(comboPoint);
-                    }
-                }
-            }
-
-            return newList;
-        }
 
         public void ResetStatsDropdownPos() {
             viewingStatisticDropdown.value = 0;

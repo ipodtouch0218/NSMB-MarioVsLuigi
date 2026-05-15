@@ -15,9 +15,8 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         //---Serialized Variables
         [SerializeField] private TMP_Text entryNumText, timeText, symbolsText, descriptionText, additionalText;
         [SerializeField] private Image icon;
-        [Header("Tooltips")]
-        [SerializeField] private GameObject infoButton;
-        [SerializeField] private TMP_Text tooltipText;
+        [Header("Info")]
+        [SerializeField] private EntryInfoButton infoButton;
 
         //---Private Variables
         private readonly StringBuilder stringBuilder = new();
@@ -26,7 +25,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
             this.SetIfNull(ref icon);
         }
 
-        public void UpdateUI(TimePoint timePointInfo, int entryNum, int displayArg) {
+        public void UpdateUI(TimePoint timePointInfo, int entryNum, TimePoint.DisplayArgs displayArg) {
             timePoint = timePointInfo;
 
             TranslationManager tm = GlobalController.Instance.translationManager;
@@ -55,10 +54,9 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
 
             var tooltip = timePointInfo.GetTooltip(tm, displayArg);
             if (tooltip != null) {
-                infoButton.SetActive(true);
-                tooltipText.text = tooltip;
+                infoButton.Initialize(this, displayArg);
             } else {
-                infoButton.SetActive(false);
+                infoButton.gameObject.SetActive(false);
             }
         }
 

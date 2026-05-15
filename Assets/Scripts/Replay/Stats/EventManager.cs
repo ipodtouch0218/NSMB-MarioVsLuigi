@@ -66,6 +66,8 @@ namespace NSMB.Replay.Stats
             string? attackerName = null;
             PlayerRef? attackerRef = null;
 
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+
             if (wasDisconnect) {
                 deathCause = PointDeath.DeathCause.Disconnect;
             } else if (wasPitDeath) {
@@ -79,6 +81,12 @@ namespace NSMB.Replay.Stats
                     deathCause = PointDeath.DeathCause.Poison;
                 } else {
                     deathCause = PointDeath.DeathCause.Pit;
+                }
+
+                // for finding out the killer
+                if (f.Unsafe.TryGetPointer<MarioPlayer>(mario->LastAttacker, out var attackerMario)) {
+                    attackerName = f.GetPlayerData(attackerMario->PlayerRef).PlayerNickname;
+                    attackerRef = attackerMario->PlayerRef;
                 }
             } else {
                 // check if it's a shelled enemy
@@ -118,7 +126,6 @@ namespace NSMB.Replay.Stats
                 }
             }
 
-            var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
             var playerData = QuantumUtils.GetPlayerData(f, mario->PlayerRef);
             var deathPoint = new PointDeath(StatRecorder, f, mario, playerInfo, deathCause, playerData->Ping, attackerName, attackerRef);
