@@ -256,9 +256,11 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         private TimePoint.DisplayArgs GetDisplayArgs(StatOptions? options = null) {
             StatOptions viewingOptions = options ?? ViewingStats;
             return viewingOptions switch {
-                StatOptions.KnockbackDealt => TimePoint.DisplayArgs.FromAttacker,
-                StatOptions.ComboLanded => TimePoint.DisplayArgs.FromAttacker,
-                _ => 0
+                StatOptions.KnockbackDealt or
+                StatOptions.ComboLanded or
+                StatOptions.Kills or
+                StatOptions.DamageDealt => TimePoint.DisplayArgs.FromAttacker,
+                _ => TimePoint.DisplayArgs.Normal
             };
         }
 
@@ -557,12 +559,11 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             entryCount.text = tm.GetTranslationWithReplacements("ui.replay.stats.occurences", "occurences", timePointEnteries.Count.ToString());
         }
 
-        public void ChangedViewingStats(bool updateToggles) {
-            if (updateToggles) {
+        public void ChangedViewingStats(bool changeButtons) {
+            if (changeButtons) {
                 UpdateToggles();
                 UpdateLists(GlobalController.Instance.translationManager);
             }
-
             bool targetPlayerSupported = !IsViewingGlobalOnlyStats;
             targetPlayerDropdown.interactable = targetPlayerSupported;
             if (!targetPlayerSupported) {

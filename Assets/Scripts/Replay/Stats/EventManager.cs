@@ -2,6 +2,7 @@
 using Photon.Deterministic;
 using Quantum;
 using System;
+using System.Linq;
 
 namespace NSMB.Replay.Stats
 {
@@ -67,6 +68,7 @@ namespace NSMB.Replay.Stats
             PlayerRef? attackerRef = null;
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+            var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
 
             if (wasDisconnect) {
                 deathCause = PointDeath.DeathCause.Disconnect;
@@ -84,9 +86,16 @@ namespace NSMB.Replay.Stats
                 }
 
                 // for finding out the killer
-                if (f.Unsafe.TryGetPointer<MarioPlayer>(mario->LastAttacker, out var attackerMario)) {
+                //! LastAttacker gets cleared...
+                /*if (f.Unsafe.TryGetPointer<MarioPlayer>(mario->LastAttacker, out var attackerMario)) {
                     attackerName = f.GetPlayerData(attackerMario->PlayerRef).PlayerNickname;
                     attackerRef = attackerMario->PlayerRef;
+                }*/
+
+                var lastComboElement = playerInfo.CurrComboPoint.ComboElements.Last();
+                if (lastComboElement.Element is PointKnockback lastKbPoint) {
+                    attackerName = lastKbPoint.AttackerName;
+                    attackerRef = lastKbPoint.AttackerRef;
                 }
             } else {
                 // check if it's a shelled enemy
@@ -126,7 +135,6 @@ namespace NSMB.Replay.Stats
                 }
             }
 
-            var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
             var playerData = QuantumUtils.GetPlayerData(f, mario->PlayerRef);
             var deathPoint = new PointDeath(StatRecorder, f, mario, playerInfo, deathCause, playerData->Ping, attackerName, attackerRef);
             var starsToDrop = Math.Min(1, e.OldObjectiveCount);

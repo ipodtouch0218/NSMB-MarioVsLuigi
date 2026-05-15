@@ -45,7 +45,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             }
             statsManager.selectedButton = index;
             statsManager.UpdateStatsDropdown(GlobalController.Instance.translationManager);
-            statsManager.ChangedViewingStats(true);
+            statsManager.ChangedViewingStats(false);
             statsManager.ResetStatsDropdownPos();
         }
     }
