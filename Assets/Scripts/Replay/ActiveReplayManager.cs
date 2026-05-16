@@ -40,6 +40,7 @@ namespace NSMB.Replay {
 
         //---Public Variables
         public readonly List<byte[]> ReplayFrameCache = new();
+        public bool DisableCaching;
 
         //---Private Variables
         private bool _isReplayFastForwarding;
@@ -216,6 +217,10 @@ namespace NSMB.Replay {
 
             ReplayStartFrame = frameData;
 
+            if (frameData != null) {
+                DisableCaching = true;
+            }
+
             GlobalController.Instance.loadingCanvas.dontHideOnGameDestroy = true;
             GlobalController.Instance.loadingCanvas.Initialize(null);
 
@@ -285,7 +290,7 @@ namespace NSMB.Replay {
         }
 
         private void OnSimulateFinished(CallbackSimulateFinished e) {
-            if (!IsReplay) {
+            if (!IsReplay || DisableCaching) {
                 return;
             }
 

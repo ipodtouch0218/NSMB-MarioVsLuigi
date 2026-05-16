@@ -322,6 +322,8 @@ namespace NSMB.UI.Game.Replay {
             QuantumRunner runner = QuantumRunner.Default;
             Frame f = runner.Game.Frames.Predicted;
 
+            ActiveReplayManager.Instance.DisableCaching = false;
+
             float newX = Mathf.Clamp(trackArrow.localPosition.x, minTrackX, maxTrackX);
             float percentage = (newX - minTrackX) / (maxTrackX - minTrackX);
             int newFrame = Mathf.RoundToInt(percentage * ActiveReplayManager.Instance.ReplayLength) + ActiveReplayManager.Instance.ReplayStart;

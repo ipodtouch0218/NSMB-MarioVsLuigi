@@ -20,7 +20,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             public string name;
             public string TranslationKey;
             public StatOptions[] StatOptions;
-            public StatOptions[] StatOptionNoPlayer;
         }
         public int selectedButton;
 
@@ -29,9 +28,8 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
         //---Properties
         private StatOptionsWrapper CurrStatsGroup => statOptionGroup[selectedButton];
-        private bool IsViewingGlobalOnlyStats => viewingStatisticDropdown.value >= CurrStatsGroup.StatOptions.Length;
-        private StatOptions ViewingStats => ViewingStatsMeth();
-        private int TargetPlayer => targetPlayerDropdown.value;
+        private StatOptions ViewingStats => CurrStatsGroup.StatOptions[viewingStatisticDropdown.value];
+        private int TargetPlayer => OptionSupportsAllPlayer() ? targetPlayerDropdown.value - 1 : targetPlayerDropdown.value;
 
         //---Serialized Variables
         [Header("Main Panel")]
@@ -66,18 +64,9 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         private readonly List<StatsToggle> statToggles = new();
         private readonly List<StatsList> statLists = new();
 
-        private StatOptions ViewingStatsMeth() {
-            int value = viewingStatisticDropdown.value;
-            if (IsViewingGlobalOnlyStats) {
-                return CurrStatsGroup.StatOptionNoPlayer[value - CurrStatsGroup.StatOptions.Length];
-            } else {
-                return CurrStatsGroup.StatOptions[value];
-            }
-        }
-
         #region Point List Methods
-        
-        //---lists
+
+        //---dictionaries - the value is if false will hide the entry
         private Dictionary<TimePoint, bool> GetKnockbackDealt() {
             Dictionary<PointKnockback, bool> temp = new();
 
@@ -134,7 +123,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             return temp.ToDictionary(kvp => (TimePoint) kvp.Key, kvp => kvp.Value);
         }
 
-        //---dictionaries
         private Dictionary<TimePoint, bool> GetComboWithPlayer() {
             Dictionary<PointCombo, bool> temp = new();
 
@@ -165,6 +153,59 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             }
 
             return temp.ToDictionary(kvp => (TimePoint) kvp.Key, kvp => kvp.Value);
+        }
+
+        private IEnumerable<TimePoint> GetPowerupInfo() {
+            bool targetAll = TargetPlayer < 0;
+            bool invincibleOnly = statToggles[0].value;
+
+            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+            if (!targetAll) {
+                if (!invincibleOnly) {
+                    return stats[TargetPlayer].PowerChangePoints;
+                } else {
+                    List<TimePoint> temp = new();
+
+                    temp.AddRange(stats[TargetPlayer].StarmanChangePoints);
+
+                    foreach (var powerPoint in stats[TargetPlayer].PowerChangePoints) {
+                        if (powerPoint.PowerupState == PowerupState.MegaMushroom) {
+                            temp.Add(powerPoint);
+                        }
+                    }
+
+                    temp.Sort();
+
+                    return temp;
+                }
+            } else {
+                if (!invincibleOnly) {
+                    List<PointPowerChange> temp = new();
+                    foreach (var playerInfo in stats.Values) {
+                        temp.AddRange(playerInfo.PowerChangePoints);
+                    }
+
+                    temp.Sort();
+                    return temp;
+                } else {
+                    List<TimePoint> temp = new();
+
+                    foreach (var playerInfo in stats.Values) {
+                        temp.AddRange(playerInfo.StarmanChangePoints);
+                    }
+
+                    foreach (var playerInfo in stats.Values) {
+                        foreach (var powerPoint in playerInfo.PowerChangePoints) {
+                            if (powerPoint.PowerupState == PowerupState.MegaMushroom) {
+                                temp.Add(powerPoint);
+                            }
+                        }
+                    }
+
+                    temp.Sort();
+                    return temp;
+                }
+            }
         }
 
         private Dictionary<TimePoint, bool> GetBigCollectableSpawns() {
@@ -242,7 +283,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 StatOptions.Damage => stats[TargetPlayer].DamagePoints,
                 StatOptions.ComboLanded => GetComboWithPlayer(),
                 StatOptions.ComboRecieved => stats[TargetPlayer].ComboReceivedPoints,
-                StatOptions.PowerupInfo => stats[TargetPlayer].PowerChangePoints,
+                StatOptions.PowerupInfo => GetPowerupInfo(),
                 StatOptions.PowerupSpawns => stats[TargetPlayer].GetAllItemSpawnPoints(),
                 StatOptions.BigCollectableSpawns => GetBigCollectableSpawns(),
                 StatOptions.PowerupGrabs => stats[TargetPlayer].PowerupCollectPoints,
@@ -264,6 +305,22 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             };
         }
 
+        private bool OptionSupportTargetPlayer(StatOptions? options = null) {
+            StatOptions viewingOptions = options ?? ViewingStats;
+            return viewingOptions switch {
+                StatOptions.BigCollectableSpawns => false,
+                _ => true
+            };
+        }
+
+        private bool OptionSupportsAllPlayer(StatOptions? options = null) {
+            StatOptions viewingOptions = options ?? ViewingStats;
+            return viewingOptions switch {
+                StatOptions.PowerupInfo => statToggles[0].value,
+                _ => false
+            };
+        }
+
         private Dictionary<string, bool> GetToggleOptions(StatOptions? options = null) {
             Dictionary<string, bool> dictionary = new();
             StatOptions viewingOptions = options ?? ViewingStats;
@@ -279,7 +336,11 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 dictionary.Add(translationPrefix+"hidesuccess", false);
                 dictionary.Add(translationPrefix+"hideblocks", false);
                 break;
-            };
+            case StatOptions.PowerupInfo:
+                dictionary.Add(translationPrefix+"showinvincible", false);
+                break;
+            }
+            ;
 
             return dictionary;
         }
@@ -338,8 +399,10 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             TranslationManager.OnLanguageChanged += UpdateStatsDropdown;
             TranslationManager.OnLanguageChanged += UpdateEntryCount;
             TranslationManager.OnLanguageChanged += UpdateLists;
+            TranslationManager.OnLanguageChanged += UpdatePlayerDropdown;
             Canvas.ForceUpdateCanvases();
 
+            // create the buttons for cateGOries
             for (int i = 0; i < statOptionGroup.Length; i++) {
                 var statGroup = statOptionGroup[i];
                 var button = Instantiate(buttonTemplate, buttonTemplate.transform.parent);
@@ -350,8 +413,8 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 statsButtons.Add(button);
             }
 
-            UpdatePlayerDropdown();
             UpdateStatsDropdown(GlobalController.Instance.translationManager);
+            UpdatePlayerDropdown(GlobalController.Instance.translationManager);
             UpdateEntryCount(GlobalController.Instance.translationManager);
             UpdateInformation(replayListEntry);
 
@@ -370,11 +433,22 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             TranslationManager.OnLanguageChanged -= UpdateStatsDropdown;
             TranslationManager.OnLanguageChanged -= UpdateEntryCount;
             TranslationManager.OnLanguageChanged -= UpdateLists;
+            TranslationManager.OnLanguageChanged -= UpdatePlayerDropdown;
 
             foreach (var button in statsButtons) {
                 Destroy(button.gameObject);
             }
             statsButtons.Clear();
+
+            foreach (var toggle in statToggles) {
+                Destroy(toggle.gameObject);
+            }
+            statToggles.Clear();
+
+            foreach (var list in statLists) {
+                Destroy(list.gameObject);
+            }
+            statLists.Clear();
 
             foreach (var entry in timePointEnteries) {
                 Destroy(entry.gameObject);
@@ -522,11 +596,15 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             }
         }
 
-        private void UpdatePlayerDropdown() {
+        private void UpdatePlayerDropdown(TranslationManager tm) {
             // initializes as 0 though
             int index = targetPlayerDropdown.value;
+            bool showAll = OptionSupportsAllPlayer();
 
             targetPlayerDropdown.ClearOptions();
+            if (showAll) {
+                targetPlayerDropdown.options.Add(new TMP_Dropdown.OptionData { text = tm.GetTranslation("ui.generic.all") });
+            }
             BinaryReplayHeader header = replayListEntry.ReplayFile.Header;
             for (int i = 0; i < header.PlayerInformation.Length; i++) {
                 ref ReplayPlayerInformation info = ref header.PlayerInformation[i];
@@ -547,10 +625,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             foreach (StatOptions value in CurrStatsGroup.StatOptions) {
                 viewingStatisticDropdown.options.Add(new TMP_Dropdown.OptionData { text = prefix + tm.GetTranslation(tmPrefix + value.ToString().ToLower()) });
             }
-
-            foreach (StatOptions value in CurrStatsGroup.StatOptionNoPlayer) {
-                viewingStatisticDropdown.options.Add(new TMP_Dropdown.OptionData { text = prefix + tm.GetTranslation(tmPrefix + value.ToString().ToLower()) });
-            }
             viewingStatisticDropdown.SetValueWithoutNotify(index);
             viewingStatisticDropdown.RefreshShownValue();
         }
@@ -564,10 +638,11 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 UpdateToggles();
                 UpdateLists(GlobalController.Instance.translationManager);
             }
-            bool targetPlayerSupported = !IsViewingGlobalOnlyStats;
+            UpdatePlayerDropdown(GlobalController.Instance.translationManager);
+            bool targetPlayerSupported = OptionSupportTargetPlayer();
             targetPlayerDropdown.interactable = targetPlayerSupported;
             if (!targetPlayerSupported) {
-                targetPlayerDropdown.captionText.text = "-----";
+                targetPlayerDropdown.captionText.text = "-";
             } else {
                 targetPlayerDropdown.RefreshShownValue();
             }
@@ -610,6 +685,11 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         }
 
         #region Other Methods
+
+        public void OnChangedViewingPlayer() {
+            UpdateLists(GlobalController.Instance.translationManager);
+            ChangedViewingStats(false);
+        }
 
         public void ResetStatsDropdownPos() {
             viewingStatisticDropdown.value = 0;

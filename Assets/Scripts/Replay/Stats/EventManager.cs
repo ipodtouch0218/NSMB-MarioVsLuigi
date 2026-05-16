@@ -92,10 +92,12 @@ namespace NSMB.Replay.Stats
                     attackerRef = attackerMario->PlayerRef;
                 }*/
 
-                var lastComboElement = playerInfo.CurrComboPoint.ComboElements.Last();
-                if (lastComboElement.Element is PointKnockback lastKbPoint) {
-                    attackerName = lastKbPoint.AttackerName;
-                    attackerRef = lastKbPoint.AttackerRef;
+                if (playerInfo.CurrComboPoint != null) {
+                    var lastComboElement = playerInfo.CurrComboPoint.ComboElements.Last();
+                    if (lastComboElement.Element is PointKnockback lastKbPoint) {
+                        attackerName = lastKbPoint.AttackerName;
+                        attackerRef = lastKbPoint.AttackerRef;
+                    }
                 }
             } else {
                 // check if it's a shelled enemy
@@ -103,21 +105,25 @@ namespace NSMB.Replay.Stats
                     f.Unsafe.ComponentGetter<KoopaSystem.Filter>().TryGet(f, e.Attacker, out var koopaFilter);
                     var koopa = koopaFilter.Koopa;
                     var holdable = koopaFilter.Holdable;
-                    deathCause = PointDeath.DeathCause.Shell;
-                    if (f.Exists(holdable->PreviousHolder) && koopa->IsKicked) {
-                        var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
-                        attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
-                        attackerRef = holdableMario->PlayerRef;
+                    if (koopa->IsKicked) {
+                        deathCause = PointDeath.DeathCause.Shell;
+                        if (f.Exists(holdable->PreviousHolder) && koopa->IsKicked) {
+                            var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
+                            attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
+                            attackerRef = holdableMario->PlayerRef;
+                        }
                     }
                 } else if (f.Unsafe.TryGetPointer<Bobomb>(e.Attacker, out _)) {
                     // maybe it's a bobomb...
                     f.Unsafe.ComponentGetter<BobombSystem.Filter>().TryGet(f, e.Attacker, out var bobombFilter);
                     var bobomb = bobombFilter.Bobomb;
                     var holdable = bobombFilter.Holdable;
-                    if (f.Exists(holdable->PreviousHolder) && bobomb->CurrentDetonationFrames > 0) {
-                        var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
-                        attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
-                        attackerRef = holdableMario->PlayerRef;
+                    if (bobomb->CurrentDetonationFrames > 0) {
+                        if (f.Exists(holdable->PreviousHolder)) {
+                            var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
+                            attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
+                            attackerRef = holdableMario->PlayerRef;
+                        }
                         deathCause = PointDeath.DeathCause.Explode;
                     }
                 } else if (f.Unsafe.TryGetPointer<MarioPlayer>(e.Attacker, out var attackerMario)) {
@@ -198,22 +204,26 @@ namespace NSMB.Replay.Stats
                 f.Unsafe.ComponentGetter<KoopaSystem.Filter>().TryGet(f, e.Attacker, out var koopaFilter);
                 var koopa = koopaFilter.Koopa;
                 var holdable = koopaFilter.Holdable;
-                if (f.Exists(holdable->PreviousHolder) && koopa->IsKicked) {
-                    var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
-                    attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
-                    attackerRef = holdableMario->PlayerRef;
+                if (koopa->IsKicked) {
                     damageCause = PointDamage.DamageCause.Shell;
+                    if (f.Exists(holdable->PreviousHolder) && koopa->IsKicked) {
+                        var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
+                        attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
+                        attackerRef = holdableMario->PlayerRef;
+                    }
                 }
             } else if (f.Unsafe.TryGetPointer<Bobomb>(e.Attacker, out _)) {
                 // maybe it's a bobomb...
                 f.Unsafe.ComponentGetter<BobombSystem.Filter>().TryGet(f, e.Attacker, out var bobombFilter);
                 var bobomb = bobombFilter.Bobomb;
                 var holdable = bobombFilter.Holdable;
-                if (f.Exists(holdable->PreviousHolder) && bobomb->CurrentDetonationFrames > 0) {
+                if (bobomb->CurrentDetonationFrames > 0) {
+                    if (f.Exists(holdable->PreviousHolder)) {
+                        var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
+                        attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
+                        attackerRef = holdableMario->PlayerRef;
+                    }
                     damageCause = PointDamage.DamageCause.Explode;
-                    var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
-                    attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
-                    attackerRef = holdableMario->PlayerRef;
                 }
             } else if (f.Unsafe.TryGetPointer<MarioPlayer>(e.Attacker, out var attackerMario)) {
                 // else it was Mario
