@@ -411,10 +411,11 @@ namespace NSMB.Replay.Stats {
 
         public override string? GetTooltip(TranslationManager tm, DisplayArgs displayArg) {
             StringBuilder sb = new();
-            sb.AppendLine("Combo Participants:");
+            sb.AppendLine(tm.GetTranslation(translationPrefix + "combo.tooltip.parts"));
             foreach (var (Element, _, _) in ComboElements) {
                 if (Element is PointKnockback kb) {
-                    sb.Append(kb.AttackerName).Append(" with a ").Append(kb.KnockbackStrength.ToString()).AppendLine($" at F{kb.OccurenceFrame - OccurenceFrame}");
+                    int frame = kb.OccurenceFrame - OccurenceFrame;
+                    sb.Append(tm.GetTranslationWithReplacements(translationPrefix + "combo.tooltip.knockback", "attacker", kb.AttackerName, "framenumber", frame.ToString())).Append(" "+kb.StarsDropped+"★");
                 } else if (Element is PointDamage dmg) {
                     dmg.SetDescriptionText(tm, sb, displayArg);
                 } else if (Element is PointDeath death) {

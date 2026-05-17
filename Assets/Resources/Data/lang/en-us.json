@@ -412,6 +412,8 @@
   "ui.replay.stats.entry.knockback.dealt.collisionbump": "Ran into someone",
   "ui.replay.stats.entry.combo": "Received a {count}-part combo",
   "ui.replay.stats.entry.combo.participents": "{number} participents",
+  "ui.replay.stats.entry.combo.tooltip.parts": "Combo Parts:",
+  "ui.replay.stats.entry.combo.tooltip.knockback": "Took knockback by {attacker} at F{framenumber}",
   "ui.replay.stats.entry.coincollected": "Collected a coin",
   "ui.replay.stats.entry.tooltip.itemspawn": "Spawned an item {item}",
   "ui.replay.stats.entry.tooltip.randomspawn": "Spawned an item {item}\nSpawn chance: {chance}%",
