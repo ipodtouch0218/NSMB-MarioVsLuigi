@@ -130,13 +130,21 @@ namespace NSMB.Replay.Stats
                     // else it was Mario
                     attackerName = f.GetPlayerData(attackerMario->PlayerRef).PlayerNickname;
                     attackerRef = attackerMario->PlayerRef;
-                    
+
                     if (attackerMario->IsStarmanInvincible) {
                         deathCause = PointDeath.DeathCause.Starman;
                     } else if (attackerMario->CurrentPowerupState == PowerupState.MegaMushroom) {
                         deathCause = PointDeath.DeathCause.MegaMushroom;
                     } else if (attackerMario->IsInShell) {
                         deathCause = PointDeath.DeathCause.BlueShell;
+                    }
+                } else if (f.Unsafe.TryGetPointer<Enemy>(e.Attacker, out _)) {
+                    if (playerInfo.CurrComboPoint != null) {
+                        var lastComboElement = playerInfo.CurrComboPoint.ComboElements.Last();
+                        if (lastComboElement.Element is PointKnockback lastKbPoint) {
+                            attackerName = lastKbPoint.AttackerName;
+                            attackerRef = lastKbPoint.AttackerRef;
+                        }
                     }
                 }
             }
@@ -236,6 +244,14 @@ namespace NSMB.Replay.Stats
                     damageCause = PointDamage.DamageCause.MegaMushroom;
                 } else if (attackerMario->IsInShell) {
                     damageCause = PointDamage.DamageCause.BlueShell;
+                }
+            } else if (f.Unsafe.TryGetPointer<Enemy>(e.Attacker, out _)) {
+                if (marioPlayerInfo.CurrComboPoint != null) {
+                    var lastComboElement = marioPlayerInfo.CurrComboPoint.ComboElements.Last();
+                    if (lastComboElement.Element is PointKnockback lastKbPoint) {
+                        attackerName = lastKbPoint.AttackerName;
+                        attackerRef = lastKbPoint.AttackerRef;
+                    }
                 }
             }
 

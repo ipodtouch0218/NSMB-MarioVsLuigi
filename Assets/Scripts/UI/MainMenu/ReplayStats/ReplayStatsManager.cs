@@ -15,13 +15,17 @@ using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
     public class ReplayStatsManager : Selectable {
+        //---Nested types
         [System.Serializable]
-        public class StatOptionsWrapper {
+        class StatOptionsWrapper {
             public string name;
             public string TranslationKey;
             public StatOptions[] StatOptions;
         }
+
+        //---Public Variables
         public int selectedButton;
+        public MainMenuCanvas canvas;
 
         //---Static Variables
         public static ReplayStatsManager Instance { get; private set; }
@@ -33,7 +37,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
         //---Serialized Variables
         [Header("Main Panel")]
-        [SerializeField] public MainMenuCanvas canvas;
         [SerializeField] private ScrollRect scrollRect;
         [SerializeField] internal VerticalLayoutGroup layout, leftTopLayout;
 
@@ -70,7 +73,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         private Dictionary<TimePoint, bool> GetKnockbackDealt() {
             Dictionary<PointKnockback, bool> temp = new();
 
-            var target = statLists[0].value;
+            var target = statLists[0].Value;
 
             // loop through all players
             var stats = ReplayStatsRecorder.Instance.PlayerInfos;
@@ -98,7 +101,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         private Dictionary<TimePoint, bool> GetDamageDealt() {
             Dictionary<PointDamage, bool> temp = new();
 
-            var target = statLists[0].value;
+            var target = statLists[0].Value;
 
             // loop through all players
             var stats = ReplayStatsRecorder.Instance.PlayerInfos;
@@ -126,8 +129,8 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         private Dictionary<TimePoint, bool> GetComboWithPlayer() {
             Dictionary<PointCombo, bool> temp = new();
 
-            bool selfOnly = statToggles[0].value;
-            bool deathOnly = statToggles[1].value;
+            bool selfOnly = statToggles[0].Value;
+            bool deathOnly = statToggles[1].Value;
 
             // loop through all enteries checking playerref
             var stats = ReplayStatsRecorder.Instance.PlayerInfos;
@@ -157,7 +160,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
         private IEnumerable<TimePoint> GetPowerupInfo() {
             bool targetAll = TargetPlayer < 0;
-            bool invincibleOnly = statToggles[0].value;
+            bool invincibleOnly = statToggles[0].Value;
 
             var stats = ReplayStatsRecorder.Instance.PlayerInfos;
             if (!targetAll) {
@@ -211,8 +214,8 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         private Dictionary<TimePoint, bool> GetBigCollectableSpawns() {
             Dictionary<PointBigCollectableSpawned, bool> temp = new();
 
-            bool hideSuccess = statToggles[0].value;
-            bool hideBlocks = statToggles[1].value;
+            bool hideSuccess = statToggles[0].Value;
+            bool hideBlocks = statToggles[1].Value;
 
             var attempts = ReplayStatsRecorder.Instance.GlobalInfo;
             foreach (var spawn in attempts.BigCollectablesSpawned) {
@@ -231,8 +234,10 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             return temp.ToDictionary(kvp => (TimePoint) kvp.Key, kvp => kvp.Value);
         }
 
-        private List<PointDeath> GetKills() {
-            List<PointDeath> temp = new();
+        private Dictionary<TimePoint, bool> GetKills() {
+            Dictionary<PointDeath, bool> temp = new();
+
+            var target = statLists[0].Value;
 
             var stats = ReplayStatsRecorder.Instance.PlayerInfos;
             foreach (var playerInfoEntry in stats) {
@@ -240,14 +245,19 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                     continue;
                 }
 
+                bool show = true;
+                if (target != -1 && playerInfoEntry.Key != target) {
+                    show = false;
+                }
+
                 foreach (var deathPoint in playerInfoEntry.Value.DeathPoints) {
                     if (deathPoint.AttackerRef == TargetPlayer) {
-                        temp.Add(deathPoint);
+                        temp.Add(deathPoint, show);
                     }
                 }
             }
 
-            return temp;
+            return temp.ToDictionary(kvp => (TimePoint) kvp.Key, kvp => kvp.Value);
         }
 
         #endregion
@@ -316,7 +326,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         private bool OptionSupportsAllPlayer(StatOptions? options = null) {
             StatOptions viewingOptions = options ?? ViewingStats;
             return viewingOptions switch {
-                StatOptions.PowerupInfo => statToggles[0].value,
+                StatOptions.PowerupInfo => statToggles[0].Value,
                 _ => false
             };
         }

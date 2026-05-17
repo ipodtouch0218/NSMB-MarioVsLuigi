@@ -8,10 +8,10 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         [SerializeField] private ReplayStatsManager statsManager;
         [SerializeField] private TMP_Text label;
         private string translationString;
-        public int index { get; private set; }
+        public int Index { get; private set; }
 
         public void Initialize(int index, string translationString) {
-            this.index = index;
+            this.Index = index;
             this.translationString = translationString;
 
             TranslationManager.OnLanguageChanged += UpdateUI;
@@ -24,7 +24,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
         public bool CheckButtonState() {
             var button = GetComponent<Button>();
-            if (statsManager.selectedButton == index) {
+            if (statsManager.selectedButton == Index) {
                 button.interactable = false;
                 return false;
             } else {
@@ -43,7 +43,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 var button = statButton.GetComponent<Button>();
                 button.interactable = true;
             }
-            statsManager.selectedButton = index;
+            statsManager.selectedButton = Index;
             statsManager.UpdateStatsDropdown(GlobalController.Instance.translationManager);
             statsManager.ChangedViewingStats(true);
             statsManager.ResetStatsDropdownPos();

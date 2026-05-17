@@ -7,7 +7,7 @@ using UnityEngine.UI;
 namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
     public class StatsToggle : MonoBehaviour {
         //---property
-        public bool value => toggle.isOn;
+        public bool Value => toggle.isOn;
 
         //---serialized
         [SerializeField] private TMP_Text label;

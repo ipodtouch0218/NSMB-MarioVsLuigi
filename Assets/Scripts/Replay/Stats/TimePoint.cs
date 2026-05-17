@@ -28,8 +28,9 @@ namespace NSMB.Replay.Stats {
         public readonly byte[] SerializedFrame;
         public readonly ReplayStatsRecorder StatsRecorder;
 
-        //---for assigning the index of time point
-        public static int _index { get; private protected set; }
+        //---static
+        private static int _index;
+        public const string translationPrefix = "ui.replay.stats.entry.";
 
         //---enums
         public enum DisplayArgs {
@@ -88,9 +89,8 @@ namespace NSMB.Replay.Stats {
         public virtual string? GetTooltip(TranslationManager tm, DisplayArgs displayArg) => null;
 
         //---static methods
-        public static void ResetIndex() {
-            _index = 0;
-        }
+        public static void ResetIndex() => _index = 0;
+
         // any extra parameters can be GOtten
     }
 
@@ -140,7 +140,7 @@ namespace NSMB.Replay.Stats {
                 return null;
             }
             var itemTranslation = tm.GetTranslation(CoinItem.TranslationKey);
-            return tm.GetTranslationWithReplacements("ui.replay.stats.entry.tooltip.randomspawn", "item", itemTranslation, "chance", $"{ (float) SpawnChancePercentage.GetValueOrDefault():0.00}");
+            return tm.GetTranslationWithReplacements(translationPrefix+"tooltip.randomspawn", "item", itemTranslation, "chance", $"{ (float) SpawnChancePercentage.GetValueOrDefault():0.00}");
         }
     }
 
@@ -152,13 +152,9 @@ namespace NSMB.Replay.Stats {
         }
 
 
-        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
-            stringBuilder.Append("<sprite name=room_stars>").Append(Utils.GetSymbolString(StarCount.ToString(), Utils.smallSymbols));
-        }
+        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append("<sprite name=room_stars>").Append(Utils.GetSymbolString(StarCount.ToString(), Utils.smallSymbols));
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
-            stringBuilder.Append(tm.GetTranslationWithReplacements("ui.replay.stats.entry.starscollected", "total", TotalStarCount.ToString()));
-        }
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append(tm.GetTranslationWithReplacements("ui.replay.stats.entry.starscollected", "total", TotalStarCount.ToString()));
     }
 
     public unsafe class PointDamage : TimePoint {
@@ -274,7 +270,8 @@ namespace NSMB.Replay.Stats {
         }
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
-            string translationString = "ui.replay.stats.entry.knockback." + KnockbackStrength.ToString().ToLower();
+            string recieveOrDealt = displayArg == DisplayArgs.FromAttacker ? "dealt" : "recieved";
+            string translationString = translationPrefix+"knockback." + recieveOrDealt + KnockbackStrength.ToString().ToLower();
             stringBuilder.Append(tm.GetTranslationWithReplacements(translationString, "victim", AffectedPlayerName));
         }
 
@@ -329,9 +326,7 @@ namespace NSMB.Replay.Stats {
             }
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
-            stringBuilder.Append($"Lost a star due to {Reason}");
-        }
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append($"Lost a star due to {Reason}");
 
         public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append("X").Append(Utils.GetSymbolString(StarAmount.ToString(), Utils.smallSymbols));
     }
@@ -408,7 +403,7 @@ namespace NSMB.Replay.Stats {
         public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             var attackers = GetParticipants();
             if (attackers.Count > 1) {
-                stringBuilder.Append(tm.GetTranslationWithReplacements("ui.replay.stats.entry.combo.participents", "number", attackers.Count.ToString()));
+                stringBuilder.Append(tm.GetTranslationWithReplacements(translationPrefix+"combo.participents", "number", attackers.Count.ToString()));
             } else {
                 stringBuilder.Append(attackers.Values.First());
             }
@@ -451,7 +446,7 @@ namespace NSMB.Replay.Stats {
             } else {
                 powerupTranslation = tm.GetTranslation("powerup."+PowerupState.ToString().ToLower());
             }
-            stringBuilder.Append(tm.GetTranslationWithReplacements("ui.replay.stats.entry.powerup.state", "powerup", powerupTranslation));
+            stringBuilder.Append(tm.GetTranslationWithReplacements(translationPrefix+"powerup.state", "powerup", powerupTranslation));
         }
     }
 
@@ -470,8 +465,7 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointReserveChange : TimePoint {
-        // allow for null
-        public readonly PowerupAsset Powerup;
+        public readonly PowerupAsset? Powerup;
         public PointReserveChange(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) => Powerup = f.FindAsset(mario->ReserveItem);
 
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
@@ -489,7 +483,7 @@ namespace NSMB.Replay.Stats {
             } else {
                 powerupTranslation = tm.GetTranslation(Powerup.TranslationKey);
             }
-            stringBuilder.Append(tm.GetTranslationWithReplacements("ui.replay.stats.entry.powerup.reserve", "powerup", powerupTranslation));
+            stringBuilder.Append(tm.GetTranslationWithReplacements(translationPrefix+"powerup.reserve", "powerup", powerupTranslation));
         }
     }
 
@@ -502,15 +496,15 @@ namespace NSMB.Replay.Stats {
         }
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
-            string translationPrefix = "ui.replay.stats.entry.powerupgrab";
+            string translationPrefix2 = translationPrefix+"powerup.grab";
             string powerupTranslation = tm.GetTranslation(Powerup.TranslationKey);
             switch (ReserveResult) {
             case PowerupReserveResult.CollectNewReserveOld:
             case PowerupReserveResult.CollectNewIgnoreOld:
-                stringBuilder.Append(tm.GetTranslationWithReplacements($"{translationPrefix}.collected", "powerup", powerupTranslation));
+                stringBuilder.Append(tm.GetTranslationWithReplacements($"{translationPrefix2}.collected", "powerup", powerupTranslation));
                 break;
             case PowerupReserveResult.KeepOldReserveNew:
-                stringBuilder.Append(tm.GetTranslationWithReplacements($"{translationPrefix}.reserved", "powerup", powerupTranslation));
+                stringBuilder.Append(tm.GetTranslationWithReplacements($"{translationPrefix2}.reserved", "powerup", powerupTranslation));
                 break;
             }
         }
@@ -543,7 +537,6 @@ namespace NSMB.Replay.Stats {
         }
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
-            var translationPrefix = "ui.replay.stats.entry.";
             var translationSuffix = WasBlocked ? "bigcollectableblock" : "bigcollectablespawn";
             stringBuilder.Append(tm.GetTranslationWithReplacements(translationPrefix + translationSuffix, "position", PositionIndex.ToString(), "spawnpoints", Spawnpoints.ToString()));
         }
@@ -593,7 +586,7 @@ namespace NSMB.Replay.Stats {
         }
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
-            string translationKey = "ui.replay.stats.entry.blockhit." + (WasRandom ? "random" : "normal");
+            string translationKey = translationPrefix+"blockhit." + (WasRandom ? "random" : "normal");
             stringBuilder.Append(tm.GetTranslation(translationKey));
         }
 
@@ -601,7 +594,7 @@ namespace NSMB.Replay.Stats {
             if (SpawnedItem == null) {
                 return null;
             }
-            string translationKey = "ui.replay.stats.entry.tooltip." + (WasRandom ? "randomspawn" : "itemspawn");
+            string translationKey = translationPrefix+"tooltip." + (WasRandom ? "randomspawn" : "itemspawn");
             string itemTranslation = tm.GetTranslation(SpawnedItem.TranslationKey);
             return tm.GetTranslationWithReplacements(translationKey, "item", itemTranslation, "chance", $"{(float) SpawnChancePercentage.GetValueOrDefault():0.00}");
         }

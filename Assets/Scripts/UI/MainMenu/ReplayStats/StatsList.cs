@@ -7,7 +7,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
     public class StatsList : MonoBehaviour {
         //---property
-        public int value => dropdownValues[dropdown.value];
+        public int Value => dropdownValues[dropdown.value];
 
         //---serialized
         [SerializeField] private TMP_Text label;
@@ -15,7 +15,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
         //---private variables
         private string translationKey;
-        private List<int> dropdownValues = new();
+        private readonly List<int> dropdownValues = new();
 
         public void Initialize(string translationKey, int value) {
             this.translationKey = translationKey;
