@@ -50,6 +50,12 @@ namespace Quantum.Prototypes {
   #endif //;
   
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(System.Collections.Generic.KeyValuePair<AssetRef<CoinItemAsset>, FP>))]
+  public unsafe class DictionaryEntry_AssetRefCoinItemAsset_FP : Quantum.Prototypes.DictionaryEntry {
+    public AssetRef<CoinItemAsset> Key;
+    public FP Value;
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.BannedPlayerInfo))]
   public unsafe partial class BannedPlayerInfoPrototype : StructPrototype {
     [MaxStringByteCount(46, "Unicode")]
@@ -471,6 +477,9 @@ namespace Quantum.Prototypes {
     public Quantum.QEnum8<TeamAttackOptions> TeamAttack;
     public Int32 StarFountain;
     public Int32 CoinDeathPenalty;
+    [DictionaryAttribute()]
+    [DynamicCollectionAttribute()]
+    public DictionaryEntry_AssetRefCoinItemAsset_FP[] CoinItemCustomSpawnWeights = {};
     partial void MaterializeUser(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context = default) {
         result.Stage = this.Stage;
@@ -496,6 +505,18 @@ namespace Quantum.Prototypes {
         result.TeamAttack = this.TeamAttack;
         result.StarFountain = this.StarFountain;
         result.CoinDeathPenalty = this.CoinDeathPenalty;
+        if (this.CoinItemCustomSpawnWeights.Length == 0) {
+          result.CoinItemCustomSpawnWeights = default;
+        } else {
+          var dict = frame.AllocateDictionary(out result.CoinItemCustomSpawnWeights, this.CoinItemCustomSpawnWeights.Length);
+          for (int i = 0; i < this.CoinItemCustomSpawnWeights.Length; ++i) {
+            AssetRef<CoinItemAsset> tmpKey = default;
+            FP tmpValue = default;
+            tmpKey = this.CoinItemCustomSpawnWeights[i].Key;
+            tmpValue = this.CoinItemCustomSpawnWeights[i].Value;
+            PrototypeValidator.AddToDictionary(dict, tmpKey, tmpValue, in context);
+          }
+        }
         MaterializeUser(frame, ref result, in context);
     }
   }

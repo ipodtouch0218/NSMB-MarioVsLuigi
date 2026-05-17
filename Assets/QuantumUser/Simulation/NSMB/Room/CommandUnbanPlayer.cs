@@ -17,7 +17,7 @@ namespace Quantum {
 
             var bans = f.ResolveList(f.Global->BannedPlayerIds);
             for (int i = bans.Count - 1; i >= 0; i--) {
-                if (bans[i].UserId == TargetUserId) {
+                if (bans[i].UserId.Equals(TargetUserId)) {
                     f.Events.PlayerUnbanned(bans[i]);
                     bans.RemoveAt(i);
                 }

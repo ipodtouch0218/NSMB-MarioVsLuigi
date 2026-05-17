@@ -2,6 +2,7 @@ using NSMB.UI.MainMenu.Submenus.Replays;
 using System.IO;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 namespace NSMB.UI.MainMenu.Submenus.Prompts {
     public class ReplayDeletePromptSubmenu : PromptSubmenu {
@@ -36,15 +37,23 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             return base.TryGoBack(out playSound);
         }
 
-        public void ClickConfirm() {
+        [Preserve]
+        public async void ClickConfirm() {
+            int index = manager.ReplayListEntries.IndexOf(target);
+
             manager.RemoveReplay(target);
-            _ = manager.CreateReplayListEntries(default);
             try {
                 File.Delete(target.ReplayFile.FilePath);
             } catch { }
             target = null;
             success = true;
             Canvas.GoBack();
+
+            await manager.CreateReplayListEntries(default);
+            if (manager.ReplayListEntries.Count > 0) {
+                index = Mathf.Clamp(0, index, manager.ReplayListEntries.Count - 1);
+                manager.Select(manager.ReplayListEntries[index], true);
+            }
         }
     }
 }

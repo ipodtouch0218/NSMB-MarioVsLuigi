@@ -31,12 +31,14 @@ namespace Quantum {
                     transform->Position = 
                         new FPVector2(marioTransform->Position.X, marioCamera->CurrentPosition.Y)
                             + asset.CameraSpawnOffset;
-
+                    collider->Enabled = false;
+                    
                     if (QuantumUtils.Decrement(ref coinItem->SpawnAnimationFrames)) {
                         coinItem->ParentMarioPlayer = EntityRef.None;
                         if (physicsObject != null) {
                             physicsObject->IsFrozen = false;
                         }
+                        collider->Enabled = true;
                         f.Events.CoinItemBecameActive(entity);
                     } else {
                         return;

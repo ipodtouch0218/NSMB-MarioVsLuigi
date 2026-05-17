@@ -1,5 +1,5 @@
-﻿using System.Text;
-using Unity.Collections.LowLevel.Unsafe;
+﻿using Photon.Deterministic;
+using System.Text;
 
 namespace Quantum {
     public unsafe partial class Frame {
@@ -9,11 +9,7 @@ namespace Quantum {
 
         partial void FreeUser() {
             if (StageTiles != null) {
-#if QUANTUM_3_1
-                QuantumUnsafe.Free(StageTiles);
-#else
-                UnsafeUtility.Free(StageTiles, Unity.Collections.Allocator.Persistent);
-#endif
+                Context.Allocator.Free(StageTiles);
                 StageTiles = null;
             }
         }
@@ -73,11 +69,7 @@ namespace Quantum {
 
         partial void CopyFromUser(Frame frame) {
             ReallocStageTiles(frame.StageTilesLength);
-#if QUANTUM_3_1
-            QuantumUnsafe.Copy(StageTiles, frame.StageTiles, StageTileInstance.SIZE * frame.StageTilesLength);
-#else
-            UnsafeUtility.MemCpy(StageTiles, frame.StageTiles, StageTileInstance.SIZE * frame.StageTilesLength);
-#endif
+            Native.Utils.Copy(StageTiles, frame.StageTiles, StageTileInstance.SIZE * frame.StageTilesLength);
         }
 
         public void ReallocStageTiles(int newSize) {
@@ -86,20 +78,12 @@ namespace Quantum {
             }
 
             if (StageTiles != null) {
-#if QUANTUM_3_1
-                QuantumUnsafe.Free(StageTiles);
-#else
-                UnsafeUtility.Free(StageTiles, Unity.Collections.Allocator.Persistent);
-#endif
+                Context.Allocator.Free(StageTiles);
                 StageTiles = null;
             }
             
             if (newSize > 0) {
-#if QUANTUM_3_1
-                StageTiles = (StageTileInstance*) QuantumUnsafe.Alloc(StageTileInstance.SIZE * newSize, StageTileInstance.ALIGNMENT);
-#else
-                StageTiles = (StageTileInstance*) UnsafeUtility.Malloc(StageTileInstance.SIZE * newSize, StageTileInstance.ALIGNMENT, Unity.Collections.Allocator.Persistent);
-#endif
+                StageTiles = (StageTileInstance*) Context.Allocator.AllocAndClear(StageTileInstance.SIZE * newSize, StageTileInstance.ALIGNMENT);
             }
 
             StageTilesLength = newSize;

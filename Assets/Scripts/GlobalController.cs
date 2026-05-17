@@ -26,9 +26,6 @@ using UnityEngine.Profiling;
 namespace NSMB {
     public class GlobalController : Singleton<GlobalController> {
 
-        //---Events
-        public static event Action ResolutionChanged;
-
         //---Public Variables
         public TranslationManager translationManager;
         public DiscordController discordController;
@@ -145,7 +142,6 @@ namespace NSMB {
             if (windowWidth != newWindowWidth || windowHeight != newWindowHeight) {
                 windowWidth = newWindowWidth;
                 windowHeight = newWindowHeight;
-                ResolutionChanged?.Invoke();
             }
 
         }

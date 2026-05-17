@@ -55,6 +55,7 @@ namespace NSMB.UI.Game.Replay {
 
         public void Start() {
             QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
+            QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
         }
 
@@ -149,8 +150,8 @@ namespace NSMB.UI.Game.Replay {
             float bufferPercentage = (float) ActiveReplayManager.Instance.ReplayFrameCache.Count * f.UpdateRate * 5 / ActiveReplayManager.Instance.ReplayLength;
             trackBufferMask.rectTransform.SetAnchorMaxX(Mathf.Clamp01(bufferPercentage));
             
-            if (draggingArrow && !replayCanvasGroup.interactable) {
-                StopArrowDrag();
+            if (draggingArrow && (playerElements.PauseMenu.IsPaused || !replayCanvasGroup.interactable)) {
+                CancelArrowDrag();
             }
 
             float percentage;
@@ -311,13 +312,14 @@ namespace NSMB.UI.Game.Replay {
             }
         }
 
+        public void CancelArrowDrag() {
+            draggingArrow = false;
+            trackArrowText.gameObject.SetActive(false);
+        }
+
         public void StopArrowDrag() {
             draggingArrow = false;
             trackArrowText.gameObject.SetActive(false);
-
-            if (!replayCanvasGroup.interactable) {
-                return;
-            }
 
             QuantumRunner runner = QuantumRunner.Default;
             Frame f = runner.Game.Frames.Predicted;
@@ -391,6 +393,11 @@ namespace NSMB.UI.Game.Replay {
             ActiveReplayManager.Instance.IsReplayFastForwarding = false;
             replayPaused = false;
             Time.timeScale = replaySpeed;
+        }
+
+        private void OnGameDestroyed(CallbackGameDestroyed e) {
+            Time.timeScale = 1;
+            Time.captureDeltaTime = 0;
         }
 
         private unsafe void OnGameResynced(CallbackGameResynced e) {

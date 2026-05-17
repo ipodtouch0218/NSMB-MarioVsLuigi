@@ -2920,7 +2920,7 @@ namespace Quantum {
             VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             var marios = f.Filter<MarioPlayer, Transform2D, PhysicsCollider2D>();
             while (marios.NextUnsafe(out EntityRef entity, out MarioPlayer* mario, out Transform2D* transform, out PhysicsCollider2D* physicsCollider)) {
-                if (mario->CurrentPowerupState < PowerupState.Mushroom) {
+                if (mario->IsDead || mario->CurrentPowerupState < PowerupState.Mushroom) {
                     continue;
                 }
 
@@ -2935,7 +2935,7 @@ namespace Quantum {
                             it.Interact(f, entity, InteractionDirection.Up, tiles[i].Position, tiles[i].Tile, out _);
                         }
                     }
-                } else if (mario->CurrentPowerupState >= PowerupState.Mushroom) {
+                } else {
                     // Break any breakable tiles
                     for (int i = 0; i < overlappingTiles; i++) {
                         StageTile stageTile = f.FindAsset(tiles[i].Tile.Tile);

@@ -25,7 +25,7 @@ namespace NSMB.Chat {
         //---Private Variables
         private AssetRef<Map> currentMap;
         private AssetRef<GamemodeAsset> currentGamemode;
-        private ChatMessageData changeMapMessage, changeGamemodeMessage;
+        private ChatMessageData changeMapMessage, changeGamemodeMessage, randomizeTeamMessage;
 
         public void Awake() {
             Instance = this;
@@ -212,9 +212,10 @@ namespace NSMB.Chat {
 
         private void OnPlayerTeamRandomized(EventPlayerTeamRandomized e) {
             if (e.Game.PlayerIsLocal(e.Player)) {
+                RemoveChatMessage(randomizeTeamMessage);
                 Frame f = e.Game.Frames.Predicted;
                 var teams = f.Context.GetAllAssets<TeamAsset>();
-                AddSystemMessage("ui.inroom.chat.player.randomizeteam", Blue, "team", teams[e.Team].nameTranslationKey);
+                randomizeTeamMessage = AddSystemMessage("ui.inroom.chat.player.randomizeteam", Blue, "team", teams[e.Team].nameTranslationKey);
             }
         }
     }

@@ -77,18 +77,6 @@ namespace Quantum {
             return base.IsFastMusicEnabled(f);
         }
 
-        public override int GetObjectiveCount(Frame f, PlayerRef player) {
-            foreach ((_, var mario) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
-                if (player != mario->PlayerRef) {
-                    continue;
-                }
-
-                return GetObjectiveCount(f, mario);
-            }
-
-            return -1;
-        }
-
         public override int GetObjectiveCount(Frame f, MarioPlayer* mario) {
             if (mario == null || !mario->IsValid(f)) {
                 return -1;
@@ -127,7 +115,16 @@ namespace Quantum {
                 FP magni = (starsAvg + starsFirstPlace * FP._0_50) / starsToWin;
                 bonus = item.BelowAverageBonus * FPMath.Log(FPMath.Abs(itemRank) + 1, FP.E) * magni;
             }
-            return FPMath.Max(0, item.SpawnChance + bonus);
+
+            FP unclampedWeight = item.SpawnChance + bonus;
+
+            if (f.TryResolveDictionary(f.Global->Rules.CoinItemCustomSpawnWeights, out var customWeights)) {
+                if (customWeights.TryGetValue(item, out FP additionalWeight)) {
+                    unclampedWeight += additionalWeight;
+                }
+            }
+            
+            return FPMath.Max(0, unclampedWeight);
         }
     }
 }

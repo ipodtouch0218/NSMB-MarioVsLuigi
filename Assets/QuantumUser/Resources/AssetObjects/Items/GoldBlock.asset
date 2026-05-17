@@ -28,6 +28,7 @@ MonoBehaviour:
   BlockSpawnSoundEffect: 69
   Flags: 5
   MaxNumberOfItems: 1
+  TranslationKey: coinitem.goldblock
   CameraSpawnOffset:
     X:
       RawValue: 0

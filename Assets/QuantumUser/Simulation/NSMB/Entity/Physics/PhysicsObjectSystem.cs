@@ -1078,13 +1078,12 @@ namespace Quantum {
             FPVector2 boxMin = origin - extents;
             FPVector2 boxMax = origin + extents;
 
-            FPVector2[] boxCorners = {
-                new(origin.X - extents.X, origin.Y + extents.Y),
-                boxMax,
-                new(origin.X + extents.X, origin.Y - extents.Y),
-                boxMin,
-            };
-
+            Span<FPVector2> boxCorners = stackalloc FPVector2[4];
+            boxCorners[0] = new(origin.X - extents.X, origin.Y + extents.Y);
+            boxCorners[1] = boxMax;
+            boxCorners[2] = new(origin.X + extents.X, origin.Y - extents.Y);
+            boxCorners[3] = boxMin;
+            
             return PointIsInsidePolygon(testPosition, boxCorners);
         }
 

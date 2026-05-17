@@ -55,6 +55,7 @@ struct GameRules {
 	TeamAttackOptions TeamAttack;
 	int StarFountain; // divide this number by 100, options 0, 1/4, 2/4, 3/4, ALL
 	int CoinDeathPenalty; // divide this number by 100. 0 for NONE, 100 for ALL
+	dictionary<AssetRef<CoinItemAsset>, FP> CoinItemCustomSpawnWeights;
 }
 
 enum TeamAttackOptions : Byte {
@@ -112,6 +113,11 @@ synced event RulesChanged {
 synced event RandomStageToggled {
 	AssetRef<Map> Stage;
 	bool IsDisabled;
+}
+
+synced event CoinItemCustomSpawnWeightChanged {
+	AssetRef<CoinItemAsset> CoinItem;
+	FP NewWeight;
 }
 
 synced event HostCloseRulesPanel {

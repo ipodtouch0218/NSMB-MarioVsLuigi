@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace Quantum {
     public unsafe class InteractionSystem : SystemMainThreadEntity<InteractionInitiator>, ISignalOnMarioPlayerGroundpoundedSolid {
 
-        private HashSet<EntityRefPair> alreadyInteracted = new(16);
+        private HashSet<UnorderedEntityRefPair> alreadyInteracted = new(16);
 
         public override void Update(Frame f) {
             // Safety.
@@ -59,10 +59,7 @@ namespace Quantum {
                 return;
             }
 
-            EntityRefPair pair = new() {
-                EntityA = entityA,
-                EntityB = entityB
-            };
+            UnorderedEntityRefPair pair = new(entityA, entityB);
 
             if (!alreadyInteracted.Add(pair)) {
                 return;
@@ -91,10 +88,7 @@ namespace Quantum {
                 return;
             }
 
-            EntityRefPair pair = new() {
-                EntityA = entityA,
-                EntityB = entityB
-            };
+            UnorderedEntityRefPair pair = new(entityA, entityB);
 
             if (!alreadyInteracted.Add(pair)) {
                 return;
@@ -150,21 +144,37 @@ namespace Quantum {
             }
         }
 
-        public struct EntityRefPair : IEquatable<EntityRefPair> {
+        public readonly struct UnorderedEntityRefPair : IEquatable<UnorderedEntityRefPair> {
 
-            public EntityRef EntityA, EntityB;
+            public readonly EntityRef EntityA, EntityB;
 
-            public bool Equals(EntityRefPair other) {
-                return (EntityA.Equals(other.EntityA) && EntityB.Equals(other.EntityB))
-                    || (EntityA.Equals(other.EntityB) && EntityB.Equals(other.EntityA));
+            public UnorderedEntityRefPair(EntityRef a, EntityRef b) {
+                // Order via Index (asc) then Version (asc)
+                int indexDiff = a.Index.CompareTo(b.Index);
+                if (indexDiff > 0) {
+                    (a, b) = (b, a);
+                } else if (indexDiff == 0) {
+                    // Both have the same index. Sort by version instead
+                    int versionDiff = a.Version.CompareTo(b.Version);
+                    if (versionDiff > 0) {
+                        (a, b) = (b, a);
+                    }
+                }
+
+                EntityA = a;
+                EntityB = b;
             }
 
-            public override bool Equals(object obj) {
-                return obj is EntityRefPair other && Equals(other);
+            public readonly bool Equals(UnorderedEntityRefPair other) {
+                return EntityA.Equals(other.EntityA) && EntityB.Equals(other.EntityB);
             }
 
-            public override int GetHashCode() {
-                return EntityA.GetHashCode() ^ EntityB.GetHashCode();
+            public override readonly bool Equals(object obj) {
+                return obj is UnorderedEntityRefPair other && Equals(other);
+            }
+
+            public override readonly int GetHashCode() {
+                return HashCodeUtils.CombineHashCodes(EntityA.GetHashCode(), EntityB.GetHashCode());
             }
         }
     }

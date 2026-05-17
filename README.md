@@ -56,7 +56,6 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [ArianLust](https://github.com/ArianLust)
 * [Atwer](https://github.com/AtwerJ)
 * [Ave](https://github.com/AutumnLeafDev)
-* [BluCorDev](https://github.com/BluCorDev)
 * Cleeaf
 * [Cubby Crazes](https://github.com/CubbyCrazes)
 * [davart154](https://github.com/davart154)
@@ -70,6 +69,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [KingKittyTurnip](https://github.com/KingKittyTurnip)
 * [kittenchilly](https://github.com/kittenchilly)
 * [Kraken](https://github.com/McKrak)
+* [LadyBlue (RosyRose)](https://github.com/BluCorDev)
 * [MiiBumm](https://github.com/MiiBumm)
 * [mindnomad](https://github.com/mindnomad)
 * Mixin

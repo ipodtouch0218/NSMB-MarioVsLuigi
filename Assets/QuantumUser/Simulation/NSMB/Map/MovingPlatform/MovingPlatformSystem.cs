@@ -20,6 +20,10 @@ namespace Quantum {
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
+            if (!filter.Collider->Enabled) {
+                return;
+            }
+
             TryMove(f, ref filter, stage);
         }
 

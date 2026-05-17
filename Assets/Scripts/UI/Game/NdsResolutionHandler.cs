@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,6 +17,7 @@ namespace NSMB.UI.Game {
         private RenderTexture texture;
         private bool pixelPerfect;
         private (int, int) previousResolution;
+        private FullScreenMode previousFullscreenMode;
 
         public void Start() {
             Settings.OnNdsResolutionSettingChanged += OnNdsResolutionSettingChanged;
@@ -46,31 +49,36 @@ namespace NSMB.UI.Game {
             bool resolutionChanged;
             if (Settings.Instance.GraphicsNdsForceAspect) {
                 resolutionChanged = CreateRenderTexture(298, 224);
-                RectTransform fitterTransform = (RectTransform) fitter.transform;
-
-                if (Settings.Instance.GraphicsNdsPixelPerfect && (!pixelPerfect || resolutionChanged || previousResolution != (width, height))) {
+                
+                if (Settings.Instance.GraphicsNdsPixelPerfect && (!pixelPerfect || resolutionChanged || previousResolution != (width, height) || (previousFullscreenMode != Screen.fullScreenMode))) {
                     // Enable pixel-perfect
-                    fitter.enabled = false;
-                    fitterTransform.anchorMax = fitterTransform.anchorMin = new Vector2(0.5f, 0.5f);
-                    float scaling = Mathf.Min((float) width / texture.width, (float) height / texture.height);
-                    if (scaling >= 1) {
-                        scaling = Mathf.Floor(scaling);
-                    } else {
-                        scaling = 1 / Mathf.Ceil(1 / scaling);
-                    }
-                    scaling /= rootCanvas.scaleFactor;
-                    fitterTransform.sizeDelta = new Vector2(texture.width * scaling, texture.height * scaling);
-                    fitterTransform.hasChanged = true;
+                    StartCoroutine(WaitOneFrame(() => {
+                        RectTransform fitterTransform = (RectTransform) fitter.transform;
+                        fitter.enabled = false;
+                        fitterTransform.anchorMax = fitterTransform.anchorMin = new Vector2(0.5f, 0.5f);
+                        float scaling = Mathf.Min((float) width / texture.width, (float) height / texture.height);
+                        if (scaling >= 1) {
+                            scaling = Mathf.Floor(scaling);
+                        } else {
+                            scaling = 1 / Mathf.Ceil(1 / scaling);
+                        }
+                        scaling /= rootCanvas.scaleFactor;
+                        fitterTransform.sizeDelta = new Vector2(texture.width * scaling, texture.height * scaling);
+                        fitterTransform.hasChanged = true;
+                    }));
                     pixelPerfect = true;
                     previousResolution = (width, height);
-
+                    previousFullscreenMode = Screen.fullScreenMode;
                 } else if (!Settings.Instance.GraphicsNdsPixelPerfect && (pixelPerfect || resolutionChanged)) {
                     // Disable pixel-perfect.
-                    fitter.enabled = true;
-                    fitterTransform.anchorMin = Vector2.zero;
-                    fitterTransform.anchorMax = Vector2.one;
-                    fitterTransform.sizeDelta = Vector2.zero;
-                    fitterTransform.hasChanged = true;
+                    StartCoroutine(WaitOneFrame(() => {
+                        RectTransform fitterTransform = (RectTransform) fitter.transform;
+                        fitter.enabled = true;
+                        fitterTransform.anchorMin = Vector2.zero;
+                        fitterTransform.anchorMax = Vector2.one;
+                        fitterTransform.sizeDelta = Vector2.zero;
+                        fitterTransform.hasChanged = true;
+                    }));
                     pixelPerfect = false;
                 }
             } else {
@@ -96,6 +104,11 @@ namespace NSMB.UI.Game {
             if (resolutionChanged) {
                 ndsImage.texture = texture;
             }
+        }
+
+        private IEnumerator WaitOneFrame(Action action) {
+            yield return null;
+            action();
         }
 
         private bool CreateRenderTexture(int width, int height) {

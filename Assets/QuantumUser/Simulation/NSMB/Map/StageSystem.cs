@@ -1,4 +1,4 @@
-using Unity.Collections.LowLevel.Unsafe;
+using Photon.Deterministic;
 
 namespace Quantum {
     public unsafe class StageSystem : SystemSignalsOnly, ISignalOnGameStarting, ISignalOnMapChanged {
@@ -13,15 +13,11 @@ namespace Quantum {
 
         public void OnMapChanged(Frame f, AssetRef<Map> previousMap) {
             if (f.Map != null && f.TryFindAsset(f.Map.UserAsset, out VersusStageData stage)) {
-                int count = stage.TileDimensions.X * stage.TileDimensions.Y;
+                int count = stage.TileData.Length;
                 f.ReallocStageTiles(count);
 
                 fixed (StageTileInstance* originalData = stage.TileData) {
-#if QUANTUM_3_1
-                    QuantumUnsafe.Copy(f.StageTiles, originalData, StageTileInstance.SIZE * count);
-#else
-                    UnsafeUtility.MemCpy(f.StageTiles, originalData, StageTileInstance.SIZE * count);
-#endif
+                    Native.Utils.Copy(f.StageTiles, originalData, StageTileInstance.SIZE * count);
                 }
             } else {
                 // Not a valid VersusStage

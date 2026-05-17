@@ -28,6 +28,7 @@ MonoBehaviour:
   BlockSpawnSoundEffect: 69
   Flags: 23
   MaxNumberOfItems: 0
+  TranslationKey: coinitem.propellermushroom
   CameraSpawnOffset:
     X:
       RawValue: 0
@@ -402,4 +403,5 @@ MonoBehaviour:
   StatePriority: 2
   ItemPriority: 2
   EnterReserveIfOverridden: 1
+  Instant: 0
   SfxOverrides: []

@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-3061604471713882216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8963c1eb6bcbe445abee72055f6918d, type: 3}
+  m_Name: RedPowerupStageTile
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: Resources/Tilemaps/Tiles/SpecialTiles/Red/RedPowerup|RedPowerupStageTile
+    Guid:
+      Value: 1384836678332451841
+  Tile: {fileID: 11400000}
+  CollisionData:
+    IsFullTile: 1
+    Shapes: []
+  IsSlipperyGround: 0
+  IsSlideableGround: 0
+  IsPolygon: 1
+  FootstepSound: 31
+  FootstepParticle: 0
+  ParticleColor: {r: 0.972549, g: 0.46624172, b: 0.12549019, a: 1}
+  BreakingRules: 320
+  BumpIfNotBroken: 0
+  BumpSize:
+    X:
+      RawValue: 32768
+    Y:
+      RawValue: 32768
+  BumpOffset:
+    X:
+      RawValue: 0
+    Y:
+      RawValue: 0
+  resultTile:
+    Tile:
+      Id:
+        Value: 2301033952668462260
+    Rotation: 0
+    Flags: 0
+  smallPowerup:
+    Id:
+      Value: 390055422968795145
+  largePowerup:
+    Id:
+      Value: 296548766860541996
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b75c95f34a00d4e8c04f76b73312e6, type: 3}
+  m_Name: RedPowerup
+  m_EditorClassIdentifier: 
+  m_AnimatedSprites:
+  - {fileID: 540265386, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: 289987601, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: -475932707, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: -679745394, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: 540265386, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  m_MinSpeed: 8
+  m_MaxSpeed: 8
+  m_AnimationStartTime: 0
+  m_AnimationStartFrame: 0
+  m_TileColliderType: 2
+  m_TileAnimationFlags: 0

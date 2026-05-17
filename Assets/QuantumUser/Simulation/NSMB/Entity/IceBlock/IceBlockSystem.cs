@@ -2,7 +2,7 @@ using Photon.Deterministic;
 
 namespace Quantum {
     public unsafe class IceBlockSystem : SystemMainThreadEntityFilter<IceBlock, IceBlockSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEntityBumped,
-        ISignalOnBeforeInteraction, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityChangeUnderwaterState {
+        ISignalOnBeforeInteraction, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityChangeUnderwaterState, ISignalOnMarioPlayerDied {
 
         public struct Filter {
             public EntityRef Entity;
@@ -275,6 +275,14 @@ namespace Quantum {
                 }
                 Destroy(f, contact->Entity, IceBlockBreakReason.Other, entity);
                 *allowCollision = false;
+            }
+        }
+
+        public void OnMarioPlayerDied(Frame f, EntityRef entity) {
+            var freezable = f.Unsafe.GetPointer<Freezable>(entity);
+
+            if (f.Exists(freezable->FrozenCubeEntity)) {
+                Destroy(f, freezable->FrozenCubeEntity, IceBlockBreakReason.Other, EntityRef.None);
             }
         }
         #endregion

@@ -37,8 +37,8 @@ namespace Quantum {
         }
 
         //---Culling
-        public readonly List<EntityRef> CullingIgnoredEntities = new();
-        public readonly List<FPVector2> CullingCameraPositions = new();
+        public readonly HashSet<EntityRef> CullingIgnoredEntities = new();
+        public readonly HashSet<FPVector2> CullingCameraPositions = new();
         public FP MaxCameraOrthoSize = 7;
 
         //---Interactions

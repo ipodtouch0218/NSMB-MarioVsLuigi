@@ -335,8 +335,14 @@ namespace NSMB.Networking {
         }
 
         private unsafe void OnLocalPlayerAddConfirmed(CallbackLocalPlayerAddConfirmed e) {
-            Frame f = e.Game.Frames.Predicted;
+            Frame f = e.Frame;
             RuntimePlayer player = f.GetPlayerData(e.Player);
+            if (player == null) {
+                // ??? Idk how, but this was null *sometimes*.
+                // I think I fixed it by changing `Frame f = e.Game.Frames.Predicted;`
+                // to `Frame f = e.Frame` but I'm not 100% sure. So if-checking just to be safe.
+                return;
+            }
 
             var bans = f.ResolveList(f.Global->BannedPlayerIds);
             foreach (var ban in bans) {

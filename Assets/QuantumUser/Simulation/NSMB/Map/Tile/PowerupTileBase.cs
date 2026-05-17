@@ -1,37 +1,39 @@
 using Photon.Deterministic;
-using Quantum;
 
-public unsafe abstract class PowerupTileBase : BreakableBrickTile {
+namespace Quantum {
+    public unsafe abstract class PowerupTileBase : BreakableBrickTile {
 
-    public StageTileInstance resultTile;
+        public StageTileInstance resultTile;
 
-    public override bool Interact(Frame f, EntityRef entity, InteractionDirection direction, IntVector2 tilePosition, StageTileInstance tileInstance, out bool playBumpSound) {
-        if (base.Interact(f, entity, direction, tilePosition, tileInstance, out playBumpSound)) {
-            return true;
-        }
+        public override bool Interact(Frame f, EntityRef entity, InteractionDirection direction, IntVector2 tilePosition, StageTileInstance tileInstance, out bool playBumpSound) {
+            if (base.Interact(f, entity, direction, tilePosition, tileInstance, out playBumpSound)) {
+                return true;
+            }
 
-        bool allowSelfDamage = false;
-        if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)
-            && f.Unsafe.TryGetPointer(entity, out Koopa* koopa)
-            && koopa->IsKicked
-            && f.Unsafe.TryGetPointer(entity, out Holdable* holdable)
-            && f.Exists(holdable->PreviousHolder)) {
+            bool allowSelfDamage = false;
+            if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)
+                && f.Unsafe.TryGetPointer(entity, out Koopa* koopa)
+                && koopa->IsKicked
+                && f.Unsafe.TryGetPointer(entity, out Holdable* holdable)
+                && f.Exists(holdable->PreviousHolder)) {
 
-            // Talk to my dad, his name is mario :)
-            f.Unsafe.TryGetPointer(holdable->PreviousHolder, out mario);
-            entity = holdable->PreviousHolder;
-            allowSelfDamage = true;
-        }
+                // Talk to my dad, his name is mario :)
+                f.Unsafe.TryGetPointer(holdable->PreviousHolder, out mario);
+                entity = holdable->PreviousHolder;
+                allowSelfDamage = true;
+            }
 
-        if (mario == null) {
-            playBumpSound = true;
+            if (mario == null) {
+                playBumpSound = true;
+                return false;
+            }
+
+            CoinItemAsset powerupToSpawn = GetItemAsset(f, entity, mario);
+            Bump(f, null, tilePosition, resultTile, direction, entity, allowSelfDamage, powerupToSpawn.Prefab);
+            playBumpSound = false;
             return false;
         }
 
-        Bump(f, null, tilePosition, resultTile, direction, entity, allowSelfDamage, GetItemAsset(f, entity, mario).Prefab);
-        playBumpSound = false;
-        return false;
+        public abstract CoinItemAsset GetItemAsset(Frame f, EntityRef marioEntity, MarioPlayer* mario);
     }
-
-    public abstract CoinItemAsset GetItemAsset(Frame f, EntityRef marioEntity, MarioPlayer* mario);
 }

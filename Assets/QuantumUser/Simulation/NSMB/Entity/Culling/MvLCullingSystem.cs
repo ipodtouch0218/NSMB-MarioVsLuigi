@@ -7,7 +7,7 @@ namespace Quantum {
         private TaskDelegateHandle updateTaskHandle;
 
         protected override TaskHandle Schedule(Frame f, TaskHandle taskHandle) {
-            if (f.IsVerified || f.ComponentCount<Cullable>() == 0 || f.Context.CullingCameraPositions.Count <= 0 || f.Map == null) {
+            if (f.IsVerified || f.ComponentCount<Cullable>() == 0 || f.Context.CullingCameraPositions.Count <= 0 || f.MapAssetRef == default) {
                 return taskHandle;
             }
 

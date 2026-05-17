@@ -211,6 +211,7 @@ namespace Quantum {
             }
 
             int droppedStars = 0;
+            var gamemode = (StarChasersGamemode) f.FindAsset(f.Global->Rules.Gamemode);
             while (amount > 0) {
                 if (starChasersData->Stars <= 0) {
                     break;
@@ -225,7 +226,6 @@ namespace Quantum {
                     };
                 }
 
-                var gamemode = f.FindAsset(f.Global->Rules.Gamemode) as StarChasersGamemode;
                 EntityRef newStarEntity = f.Create(gamemode.BigStarPrototype);
                 var newStar = f.Unsafe.GetPointer<BigStar>(newStarEntity);
                 var newStarTransform = f.Unsafe.GetPointer<Transform2D>(newStarEntity);

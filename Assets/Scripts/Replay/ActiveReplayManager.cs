@@ -144,14 +144,29 @@ namespace NSMB.Replay {
             try {
                 ref GameRules rules = ref f.Global->Rules;
                 var gamemodeSpecific = f.FindAsset(rules.Gamemode);
+
+                DictionaryEntry_AssetRefCoinItemAsset_FP[] customSpawnWeights;
+                if (f.TryResolveDictionary(rules.CoinItemCustomSpawnWeights, out var customWeights)) {
+                    customSpawnWeights = new DictionaryEntry_AssetRefCoinItemAsset_FP[customWeights.Count];
+                    int count = 0;
+                    foreach ((var key, var value) in customWeights) {
+                        customSpawnWeights[count++] = new DictionaryEntry_AssetRefCoinItemAsset_FP {
+                            Key = key,
+                            Value = value
+                        };
+                    }
+                } else {
+                    customSpawnWeights = null;
+                }
+
                 BinaryReplayHeader header = new() {
                     Version = GameVersion.Current,
                     UnixTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds(),
                     InitialFrameNumber = jsonReplay.InitialTick,
                     ReplayLengthInFrames = jsonReplay.LastTick - jsonReplay.InitialTick,
-                    
+
                     Rules = new GameRulesPrototype {
-                        Stage = rules.Stage,
+                        Stage = f.MapAssetRef,
                         Gamemode = rules.Gamemode,
                         StarsToWin = rules.StarsToWin,
                         CoinsForPowerup = rules.CoinsForPowerup,
@@ -162,6 +177,7 @@ namespace NSMB.Replay {
                         StarFountain = rules.StarFountain,
                         CoinDeathPenalty = rules.CoinDeathPenalty,
                         TeamAttack = rules.TeamAttack,
+                        CoinItemCustomSpawnWeights = customSpawnWeights,
                     },
                     PlayerInformation = playerInformation,
                     WinningTeam = winner,
@@ -191,7 +207,9 @@ namespace NSMB.Replay {
 #endif
 
                 // Register replay file immediately, because WebGL can't load replays from the filesystem.
-                ReplayListManager.Instance.AddReplay(binaryReplay);
+                if (ReplayListManager.Instance) {
+                    ReplayListManager.Instance.AddReplay(binaryReplay);
+                }
             } finally {
                 outputStream?.Dispose();
             }

@@ -7,7 +7,6 @@ AprilShade
 ArianLust
 Atwer
 Ave
-BluCorDev
 Cleeaf
 Cubby Crazes
 davart154
@@ -21,6 +20,7 @@ Jeffjewett27
 KingKittyTurnip
 kittenchilly
 Kraken
+LadyBlue (RosyRose)
 MiiBumm
 mindnomad
 Mixin
@@ -98,6 +98,7 @@ SLG64 <color=#AAAAAA>(es-la)</color>
 Snayp <color=#AAAAAA>(fr-fr)</color>
 Squidray <color=#AAAAAA>(pirate)</color>
 SwordCatMeow <color=#AAAAAA>(es-es, catspeak)</color>
+ТАРАФІ <color=#AAAAAA>(uk-ua)</color>
 Thebababois369 <color=#AAAAAA>(id-id)</color>
 Tombuntu <color=#AAAAAA>(ja-jp)</color>
 Windows10V <color=#AAAAAA>(pt-br)</color>
