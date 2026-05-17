@@ -538,7 +538,8 @@ namespace NSMB.Replay.Stats {
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             var translationSuffix = WasBlocked ? "bigcollectableblock" : "bigcollectablespawn";
-            stringBuilder.Append(tm.GetTranslationWithReplacements(translationPrefix + translationSuffix, "position", PositionIndex.ToString(), "spawnpoints", Spawnpoints.ToString()));
+            //! PositionIndex + 1 since it's zero indexed
+            stringBuilder.Append(tm.GetTranslationWithReplacements(translationPrefix + translationSuffix, "position", (PositionIndex+1).ToString(), "spawnpoints", Spawnpoints.ToString()));
         }
 
         public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append(CollectingPlayer);

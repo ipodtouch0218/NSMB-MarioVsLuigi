@@ -259,6 +259,26 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
             return temp.ToDictionary(kvp => (TimePoint) kvp.Key, kvp => kvp.Value);
         }
+        
+        private Dictionary<TimePoint, bool> GetPowerupSpawns() {
+            Dictionary<TimePoint, bool> temp = new();
+
+            bool randomOnly = statToggles[0].Value;
+
+            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+            foreach (var spawnPoint in stats[TargetPlayer].GetAllItemSpawnPoints()) {
+                bool show = true;
+                if (spawnPoint is PointBlockHit blockHitPoint) {
+                    if (randomOnly && !blockHitPoint.WasRandom) {
+                        show = false;
+                    }
+                }
+
+                temp.Add(spawnPoint, show);
+            }
+
+            return temp;
+        }
 
         #endregion
 
@@ -294,7 +314,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 StatOptions.ComboLanded => GetComboWithPlayer(),
                 StatOptions.ComboRecieved => stats[TargetPlayer].ComboReceivedPoints,
                 StatOptions.PowerupInfo => GetPowerupInfo(),
-                StatOptions.PowerupSpawns => stats[TargetPlayer].GetAllItemSpawnPoints(),
+                StatOptions.PowerupSpawns => GetPowerupSpawns(),
                 StatOptions.BigCollectableSpawns => GetBigCollectableSpawns(),
                 StatOptions.PowerupGrabs => stats[TargetPlayer].PowerupCollectPoints,
                 StatOptions.ReserveInfo => stats[TargetPlayer].ReserveChangePoints,
@@ -331,6 +351,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             };
         }
 
+        // the "value" of the dictionary is the default value
         private Dictionary<string, bool> GetToggleOptions(StatOptions? options = null) {
             Dictionary<string, bool> dictionary = new();
             StatOptions viewingOptions = options ?? ViewingStats;
@@ -349,8 +370,10 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             case StatOptions.PowerupInfo:
                 dictionary.Add(translationPrefix+"showinvincible", false);
                 break;
-            }
-            ;
+            case StatOptions.PowerupSpawns:
+                dictionary.Add(translationPrefix+"randomonly", false);
+                break;
+            };
 
             return dictionary;
         }

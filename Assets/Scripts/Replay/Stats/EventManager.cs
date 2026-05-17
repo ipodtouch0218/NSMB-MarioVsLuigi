@@ -284,6 +284,7 @@ namespace NSMB.Replay.Stats
             if (!wasBlocked) {
                 info.CurrBigCollectable = point;
             } else {
+                // attempt to find a player overlapping
                 var hits = f.Physics2D.OverlapShape(position, 0, f.Context.CircleRadiusTwo, f.Context.PlayerOnlyMask);
                 for (int i = 0; i < hits.Count; i++) {
                     var hit = hits[i];
