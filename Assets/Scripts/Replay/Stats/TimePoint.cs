@@ -444,7 +444,7 @@ namespace NSMB.Replay.Stats {
             if (PowerupState == PowerupState.NoPowerup) {
                 powerupTranslation = tm.GetTranslation("ui.generic.none");
             } else {
-                powerupTranslation = tm.GetTranslation("powerup."+PowerupState.ToString().ToLower());
+                powerupTranslation = tm.GetTranslation("coinitem."+PowerupState.ToString().ToLower());
             }
             stringBuilder.Append(tm.GetTranslationWithReplacements(translationPrefix+"powerup.state", "powerup", powerupTranslation));
         }

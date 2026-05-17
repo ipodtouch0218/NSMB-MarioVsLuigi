@@ -422,7 +422,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 button.UpdateUI(GlobalController.Instance.translationManager);
                 statsButtons.Add(button);
             }
-
+            
             UpdateStatsDropdown(GlobalController.Instance.translationManager);
             UpdatePlayerDropdown(GlobalController.Instance.translationManager);
             UpdateEntryCount(GlobalController.Instance.translationManager);
@@ -450,7 +450,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             }
             statsButtons.Clear();
 
-            foreach (var toggle in statToggles) {
+            /*foreach (var toggle in statToggles) {
                 Destroy(toggle.gameObject);
             }
             statToggles.Clear();
@@ -458,7 +458,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             foreach (var list in statLists) {
                 Destroy(list.gameObject);
             }
-            statLists.Clear();
+            statLists.Clear();*/
 
             foreach (var entry in timePointEnteries) {
                 Destroy(entry.gameObject);
