@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 794ee2c17f1b5a74cb023e08e9e5e641
+guid: 5692319d626eaa04a8e2f25ae09894ee
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -181727302845744690
-    second: luigi_tx_all_propellersuit_albedo_0
+      213: -8929729135195126430
+    second: luigi_tx_headcap_albedo_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -40,13 +40,13 @@ TextureImporter:
     filterMode: 0
     aniso: 1
     mipBias: 0
-    wrapU: 0
-    wrapV: 0
-    wrapW: 0
+    wrapU: 2
+    wrapV: 2
+    wrapW: 2
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -55,7 +55,7 @@ TextureImporter:
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
-  alphaIsTransparency: 1
+  alphaIsTransparency: 0
   spriteTessellationDetail: -1
   textureType: 0
   textureShape: 1
@@ -96,55 +96,16 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: Android
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: iOS
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: luigi_tx_all_propellersuit_albedo_0
+      name: luigi_tx_headcap_albedo_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 128
+        width: 32
         height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -154,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ec9b3eb1bff5a7df0800000000000000
-      internalID: -181727302845744690
+      spriteID: 2650d3cc9aa331480800000000000000
+      internalID: -8929729135195126430
       vertices: []
       indices: 
       edges: []
@@ -164,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -174,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      luigi_tx_all_propellersuit_albedo_0: -181727302845744690
+      luigi_tx_headcap_albedo_0: -8929729135195126430
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

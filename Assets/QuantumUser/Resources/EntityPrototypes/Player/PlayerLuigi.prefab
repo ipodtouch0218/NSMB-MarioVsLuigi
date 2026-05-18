@@ -1073,12 +1073,17 @@ MonoBehaviour:
         type: 3}
       ShirtMaskTexture: {fileID: 2800000, guid: 25584bb8bbd18ad42ad6e522db470286,
         type: 3}
-      CapMaskTexture: {fileID: 2800000, guid: 8ab7b4d669f46da44bf989603206923e, type: 3}
+      CapMaskTexture: {fileID: 0}
     - Material: {fileID: 2100000, guid: bfe0a50f3d6f5b64386c7392202ba06a, type: 2}
       AlbedoTexture: {fileID: 2800000, guid: dc09a3bb7c94a4545915912c9f3e7152, type: 3}
       OverallsMaskTexture: {fileID: 0}
       ShirtMaskTexture: {fileID: 0}
-      CapMaskTexture: {fileID: 2800000, guid: f640f42b881bd644d9fae4f284c815f4, type: 3}
+      CapMaskTexture: {fileID: 2800000, guid: c25cb06ff85ee84499def1a62650c019, type: 3}
+    - Material: {fileID: 2100000, guid: a401ae3a3c9e3bb4e8ba74ef85051b40, type: 2}
+      AlbedoTexture: {fileID: 2800000, guid: 5692319d626eaa04a8e2f25ae09894ee, type: 3}
+      OverallsMaskTexture: {fileID: 0}
+      ShirtMaskTexture: {fileID: 0}
+      CapMaskTexture: {fileID: 2800000, guid: 7862699c9b6d0d3439113f471fcaa1cb, type: 3}
     AnimationAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
     AnimatorOverrides: {fileID: 22100000, guid: 671e2adc5dbd26a45abdf5c18398a86e,
       type: 2}
@@ -1129,7 +1134,14 @@ MonoBehaviour:
     - Material: {fileID: 2100000, guid: bfe0a50f3d6f5b64386c7392202ba06a, type: 2}
       AlbedoTexture: {fileID: 2800000, guid: f36399c1e757fed41afe9929e98f8274, type: 3}
       OverallsMaskTexture: {fileID: 0}
-      ShirtMaskTexture: {fileID: 0}
+      ShirtMaskTexture: {fileID: 2800000, guid: c56ee039fe1399948bebda86c758953e,
+        type: 3}
+      CapMaskTexture: {fileID: 0}
+    - Material: {fileID: 2100000, guid: a401ae3a3c9e3bb4e8ba74ef85051b40, type: 2}
+      AlbedoTexture: {fileID: 2800000, guid: 8864aa072024a9d46852f2c24f84f693, type: 3}
+      OverallsMaskTexture: {fileID: 0}
+      ShirtMaskTexture: {fileID: 2800000, guid: dd203106953260f4baeb86f7ccd4c4ca,
+        type: 3}
       CapMaskTexture: {fileID: 0}
     AnimationAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
     AnimatorOverrides: {fileID: 22100000, guid: 671e2adc5dbd26a45abdf5c18398a86e,
@@ -1150,7 +1162,14 @@ MonoBehaviour:
     - Material: {fileID: 2100000, guid: bfe0a50f3d6f5b64386c7392202ba06a, type: 2}
       AlbedoTexture: {fileID: 2800000, guid: c83eef7134f10394dba851dc1cef66f9, type: 3}
       OverallsMaskTexture: {fileID: 0}
-      ShirtMaskTexture: {fileID: 0}
+      ShirtMaskTexture: {fileID: 2800000, guid: c56ee039fe1399948bebda86c758953e,
+        type: 3}
+      CapMaskTexture: {fileID: 0}
+    - Material: {fileID: 2100000, guid: a401ae3a3c9e3bb4e8ba74ef85051b40, type: 2}
+      AlbedoTexture: {fileID: 2800000, guid: f9ba98e59c7272a45971f890fd435858, type: 3}
+      OverallsMaskTexture: {fileID: 0}
+      ShirtMaskTexture: {fileID: 2800000, guid: dd203106953260f4baeb86f7ccd4c4ca,
+        type: 3}
       CapMaskTexture: {fileID: 0}
     AnimationAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
     AnimatorOverrides: {fileID: 22100000, guid: 671e2adc5dbd26a45abdf5c18398a86e,
@@ -1199,6 +1218,11 @@ MonoBehaviour:
       OverallsMaskTexture: {fileID: 0}
       ShirtMaskTexture: {fileID: 2800000, guid: b17d63742da247248a1024b007e091f3,
         type: 3}
+      CapMaskTexture: {fileID: 0}
+    - Material: {fileID: 2100000, guid: a401ae3a3c9e3bb4e8ba74ef85051b40, type: 2}
+      AlbedoTexture: {fileID: 2800000, guid: a9a6afabe2accf1498f8529cd7857b0e, type: 3}
+      OverallsMaskTexture: {fileID: 0}
+      ShirtMaskTexture: {fileID: 0}
       CapMaskTexture: {fileID: 0}
     AnimationAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
     AnimatorOverrides: {fileID: 22100000, guid: 671e2adc5dbd26a45abdf5c18398a86e,
@@ -7233,7 +7257,7 @@ PrefabInstance:
         type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 2100000, guid: 44b589e71dec4564d8b250647f07fb0a, type: 2}
+      objectReference: {fileID: 2100000, guid: a401ae3a3c9e3bb4e8ba74ef85051b40, type: 2}
     - target: {fileID: -8679921383154817045, guid: 77fa7e39322fd5440bec69cf0275d39d,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -7474,10 +7498,15 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 18
       objectReference: {fileID: 0}
+    - target: {fileID: -5430573481974842246, guid: 77fa7e39322fd5440bec69cf0275d39d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: -5356195424620648968, guid: 77fa7e39322fd5440bec69cf0275d39d,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -5356195424620648968, guid: 77fa7e39322fd5440bec69cf0275d39d,
         type: 3}
@@ -7613,6 +7642,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: -1755918832597639538, guid: 77fa7e39322fd5440bec69cf0275d39d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -1633328486884891652, guid: 77fa7e39322fd5440bec69cf0275d39d,
         type: 3}
