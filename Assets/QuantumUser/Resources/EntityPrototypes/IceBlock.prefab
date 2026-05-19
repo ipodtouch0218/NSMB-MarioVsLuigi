@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: 5466463427177246889}
   - component: {fileID: 3123853808942919971}
   - component: {fileID: -1116452901013867628}
+  - component: {fileID: 3738366428171607770}
   m_Layer: 19
   m_Name: IceBlock
   m_TagString: Untagged
@@ -492,8 +493,6 @@ MonoBehaviour:
       Value: 0
     IsWaterSolid:
       Value: 0
-    BreakMegaObjects:
-      Value: 0
 --- !u!114 &6061536990872593317
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -558,6 +557,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bb5ba24fc1efae4bab9294e76e613fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Prototype:
+    _empty_prototype_dummy_field_: 0
+--- !u!114 &3738366428171607770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4465303805189439310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb55c9faeb7d9444db037aeb19b9b790, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Quantum.Unity::Quantum.QPrototypeInteractionInitiator
   Prototype:
     _empty_prototype_dummy_field_: 0
 --- !u!1 &5906585881545024381

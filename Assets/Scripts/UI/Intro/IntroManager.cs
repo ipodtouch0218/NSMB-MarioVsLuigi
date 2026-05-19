@@ -27,6 +27,11 @@ namespace NSMB.UI.Intro {
         //private bool doneLoadingBundles;
 
         public void Start() {
+            if (GlobalController.Instance.bootedWithReplayArg) {
+                gameObject.SetActive(false);
+                return;
+            }
+            
             //StartCoroutine(LoadAssetBundles());
             StartCoroutine(IntroSequence());
             

@@ -230,6 +230,10 @@ namespace NSMB.UI.Pause {
             {
                 GlobalController.Instance.fader.FadeBehindUi = false;
                 QuantumRunner.Default.Shutdown();
+
+                if (GlobalController.Instance.bootedWithReplayArg) {
+                    Application.Quit();
+                }
             } else {
                 var game = QuantumRunner.DefaultGame;
                 Frame f = game.Frames.Predicted;

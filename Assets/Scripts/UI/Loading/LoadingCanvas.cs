@@ -125,7 +125,12 @@ namespace NSMB.UI.Loading {
 
         public void EndLoading(QuantumGame game) {
             if (running && endCoroutine == null) {
-                endCoroutine = StartCoroutine(EndLoadingRoutine(game, game.Frames.Predicted.Global->GameState));
+                if (gameObject.activeInHierarchy) {
+                    endCoroutine = StartCoroutine(EndLoadingRoutine(game, game.Frames.Predicted.Global->GameState));
+                } else {
+                    running = false;
+                    endCoroutine = null;
+                }
             }
         }
 
@@ -184,6 +189,8 @@ namespace NSMB.UI.Loading {
 
         public void EndAnimation() {
             gameObject.SetActive(false);
+            running = false;
+            endCoroutine = null;
         }
 
         public void AfterReadyFadeTakeover() {
@@ -194,6 +201,7 @@ namespace NSMB.UI.Loading {
             if (!this) {
                 return;
             }
+
             EndAnimation();
         }
 

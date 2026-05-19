@@ -244,9 +244,14 @@ namespace NSMB {
             Set(this);
             VersionUpdaters = new Action[] { LoadFromVersion0, LoadFromVersion1, LoadFromVersion2 };
             LoadSettings();
+            _controls.Enable();
 
             // Potential duplicate bindings not activating fix?
             InputSystem.settings.SetInternalFeatureFlag("DISABLE_SHORTCUT_SUPPORT", true);
+        }
+
+        public void OnDestroy() {
+            _controls.Disable();
         }
 
         public void SaveSettings() {

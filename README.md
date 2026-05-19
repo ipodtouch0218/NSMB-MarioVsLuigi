@@ -61,6 +61,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [davart154](https://github.com/davart154)
 * [DonKaiStorm](https://github.com/DonKaiStorm)
 * [dotjp](https://github.com/windows10isnotavailable)
+* [erickGtz](https://github.com/erickGtz)
 * [GithubSPerez](https://github.com/GithubSPerez)
 * [GoldyFredy9](https://github.com/GoldyFredy9)
 * GradedWarrior
