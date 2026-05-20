@@ -24,7 +24,7 @@ namespace NSMB.Utilities {
                 if (!UnityEditor.EditorApplication.isPlaying) {
                     DestroyImmediate(newMaterial);
                 } else {
-                    Destroy(material);
+                    Destroy(newMaterial);
                 }
 #else
                 Destroy(newMaterial);

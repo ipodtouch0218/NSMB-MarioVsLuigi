@@ -10,6 +10,7 @@ using UnityEngine.Profiling;
 namespace NSMB {
     public class GlobalKeybinds : MonoBehaviour {
 
+        //---Serialized Variables
         [SerializeField] private GameObject graphy;
 
         public void Start() {

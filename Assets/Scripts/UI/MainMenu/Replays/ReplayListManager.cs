@@ -132,9 +132,6 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
             Canvas.ForceUpdateCanvases();
 
-            ready = false;
-            _ = LoadReplays();
-
             Settings.Controls.UI.Next.performed += OnNext;
             Settings.Controls.UI.Previous.performed += OnPrevious;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
@@ -186,7 +183,8 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             UpdateNoReplaysText();
         }
 
-        private async Awaitable LoadReplays() {
+        public async Awaitable LoadReplays() {
+            ready = false;
             noReplaysText.text = "";
             await FindReplays(default);
             await SortReplays(default);
@@ -647,25 +645,27 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 bool sortAscending = SortAscending;
 
                 Func<BinaryReplayFile, object> getSortingCriteria = sortIndex switch {
-                    1 => (BinaryReplayFile replay) => replay.Header.GetDisplayName(),
-                    2 => (BinaryReplayFile replay) => AssetRepository<Map>.AllAssetRefs.IndexOf(replay.Header.Rules.Stage),
-                    _ => (BinaryReplayFile replay) => replay.Header.UnixTimestamp,
+                    1 => (replay) => replay.Header.GetDisplayName(),
+                    2 => (replay) => AssetRepository<Map>.AllAssetRefs.IndexOf(replay.Header.Rules.Stage),
+                    _ => (replay) => replay.Header.UnixTimestamp,
                 };
-                var newSortedReplays = allReplays.Select(r => (r, getSortingCriteria(r)));
+
+                var sortCriteriaPairs = allReplays.Select(r => (r, getSortingCriteria(r))).ToList();
 
                 await Awaitable.BackgroundThreadAsync();
 
+                List<BinaryReplayFile> newSortedReplays;
                 if (sortAscending) {
-                    newSortedReplays = newSortedReplays.OrderBy(t => t.Item2);
+                    newSortedReplays = sortCriteriaPairs.OrderBy(t => t.Item2).Select(t => t.Item1).ToList();
                 } else {
-                    newSortedReplays = newSortedReplays.OrderByDescending(t => t.Item2);
+                    newSortedReplays = sortCriteriaPairs.OrderByDescending(t => t.Item2).Select(t => t.Item1).ToList();
                 }
 
                 if (cancellationToken.IsCancellationRequested) {
                     return;
                 }
 
-                allReplays = newSortedReplays.Select(t => t.Item1).ToList();
+                allReplays = newSortedReplays;
             } catch {
                 // Move exceptions to the main thread so they're printed.
                 await Awaitable.MainThreadAsync();
