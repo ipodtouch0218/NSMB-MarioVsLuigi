@@ -80,6 +80,14 @@ namespace NSMB.UI.Game.Replay {
             if (ActiveReplayManager.Instance.ReplayStartFrame != null) {
                 resetFrame.Deserialize(ActiveReplayManager.Instance.ReplayStartFrame);
                 QuantumRunner.Default.Session.ResetReplay(resetFrame);
+
+                int indexMax = (resetFrame.Number - ActiveReplayManager.Instance.ReplayStart) / (5 * f.UpdateRate);
+
+                for (int i = 0; i < indexMax; i++) {
+                    ActiveReplayManager.Instance.ReplayFrameCache.Add(null);
+                }
+                ActiveReplayManager.Instance.ReplayFrameCache.Add(resetFrame.Serialize(DeterministicFrameSerializeMode.Serialize));
+                ActiveReplayManager.Instance.ReplayStartViewPoint = indexMax + 1;
             }
         }
 
@@ -209,8 +217,8 @@ namespace NSMB.UI.Game.Replay {
 
             Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
             int currentIndex = (f.Number - ActiveReplayManager.Instance.ReplayStart) / (5 * f.UpdateRate);
-            int newIndex = Mathf.Max(currentIndex - 1, 0);
-            int newFrame = (newIndex * (5 * f.UpdateRate)) + ActiveReplayManager.Instance.ReplayStart;
+            int newIndex = Mathf.Max(currentIndex - 1, ActiveReplayManager.Instance.ReplayStartViewPoint);
+            //int newFrame = (newIndex * (5 * f.UpdateRate)) + ActiveReplayManager.Instance.ReplayStart;
 
             var session = QuantumRunner.Default.Session;
 
@@ -316,8 +324,6 @@ namespace NSMB.UI.Game.Replay {
             QuantumRunner runner = QuantumRunner.Default;
             Frame f = runner.Game.Frames.Predicted;
 
-            ActiveReplayManager.Instance.DisableCaching = false;
-
             float newX = Mathf.Clamp(trackArrow.localPosition.x, minTrackX, maxTrackX);
             float percentage = (newX - minTrackX) / (maxTrackX - minTrackX);
             int newFrame = Mathf.RoundToInt(percentage * ActiveReplayManager.Instance.ReplayLength) + ActiveReplayManager.Instance.ReplayStart;
@@ -325,6 +331,15 @@ namespace NSMB.UI.Game.Replay {
 
             // Find the closest cached frame
             int newFrameCacheIndex = frameOffset / (5 * f.UpdateRate);
+
+            // 
+            bool isBeforeReplayStart = newFrameCacheIndex < ActiveReplayManager.Instance.ReplayStartViewPoint;
+            if (isBeforeReplayStart) {
+                ActiveReplayManager.Instance.ReplayStartViewPoint = 0;
+                ActiveReplayManager.Instance.ReplayFrameCache.Clear();
+                ActiveReplayManager.Instance.ReplayFrameCache.Add(ActiveReplayManager.Instance.ReplayInitFrame);
+            }
+
             newFrameCacheIndex = Mathf.Clamp(newFrameCacheIndex, 0, ActiveReplayManager.Instance.ReplayFrameCache.Count - 1);
             int cachedFrame = (newFrameCacheIndex * (5 * f.UpdateRate)) + ActiveReplayManager.Instance.ReplayStart;
 

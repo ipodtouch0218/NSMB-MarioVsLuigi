@@ -37,10 +37,11 @@ namespace NSMB.Replay {
         }
         public string SavedRecordingPath { get; set; }
         public byte[] ReplayStartFrame { get; private set; }
+        public byte[] ReplayInitFrame { get; private set; }
 
         //---Public Variables
         public readonly List<byte[]> ReplayFrameCache = new();
-        public bool DisableCaching;
+        public int ReplayStartViewPoint;
 
         //---Private Variables
         private bool _isReplayFastForwarding;
@@ -235,10 +236,6 @@ namespace NSMB.Replay {
 
             ReplayStartFrame = frameData;
 
-            if (frameData != null) {
-                DisableCaching = true;
-            }
-
             GlobalController.Instance.loadingCanvas.dontHideOnGameDestroy = true;
             GlobalController.Instance.loadingCanvas.Initialize(null);
 
@@ -297,8 +294,9 @@ namespace NSMB.Replay {
                 DeltaTimeType = SimulationUpdateTime.EngineDeltaTime,
             };
 
+            ReplayInitFrame = arguments.FrameData;
             ReplayFrameCache.Clear();
-            ReplayFrameCache.Add(arguments.FrameData);
+            ReplayFrameCache.Add(ReplayInitFrame);
 
             try {
                 NetworkHandler.Runner = await QuantumRunner.StartGameAsync(arguments);
@@ -308,7 +306,7 @@ namespace NSMB.Replay {
         }
 
         private void OnSimulateFinished(CallbackSimulateFinished e) {
-            if (!IsReplay || DisableCaching) {
+            if (!IsReplay) {
                 return;
             }
 
