@@ -54,6 +54,9 @@ namespace NSMB.UI.Game.Replay {
         private FieldInfo sessionSimulationField;
         private MethodInfo simulationAdjustTimeMethod;
 
+        //---Formulas
+        private int GetFastForwardTick(int frameNum) => frameNum + ActiveReplayManager.Instance.ReplayStart;
+
         public void OnValidate() {
             this.SetIfNull(ref playerElements, UnityExtensions.GetComponentType.Parent);
         }
@@ -78,16 +81,7 @@ namespace NSMB.UI.Game.Replay {
             Settings.Controls.UI.Pause.performed += OnPause;
 
             if (ActiveReplayManager.Instance.ReplayStartFrame != null) {
-                resetFrame.Deserialize(ActiveReplayManager.Instance.ReplayStartFrame);
-                QuantumRunner.Default.Session.ResetReplay(resetFrame);
-
-                int indexMax = (resetFrame.Number - ActiveReplayManager.Instance.ReplayStart) / (5 * f.UpdateRate);
-
-                for (int i = 0; i < indexMax; i++) {
-                    ActiveReplayManager.Instance.ReplayFrameCache.Add(null);
-                }
-                ActiveReplayManager.Instance.ReplayFrameCache.Add(resetFrame.Serialize(DeterministicFrameSerializeMode.Serialize));
-                ActiveReplayManager.Instance.ReplayStartViewPoint = indexMax + 1;
+                SetToFrame(f, ActiveReplayManager.Instance.ReplayStartFrame.Value);
             }
         }
 
@@ -217,7 +211,7 @@ namespace NSMB.UI.Game.Replay {
 
             Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
             int currentIndex = (f.Number - ActiveReplayManager.Instance.ReplayStart) / (5 * f.UpdateRate);
-            int newIndex = Mathf.Max(currentIndex - 1, ActiveReplayManager.Instance.ReplayStartViewPoint);
+            int newIndex = Mathf.Max(currentIndex - 1, 0);
             //int newFrame = (newIndex * (5 * f.UpdateRate)) + ActiveReplayManager.Instance.ReplayStart;
 
             var session = QuantumRunner.Default.Session;
@@ -332,14 +326,6 @@ namespace NSMB.UI.Game.Replay {
             // Find the closest cached frame
             int newFrameCacheIndex = frameOffset / (5 * f.UpdateRate);
 
-            // 
-            bool isBeforeReplayStart = newFrameCacheIndex < ActiveReplayManager.Instance.ReplayStartViewPoint;
-            if (isBeforeReplayStart) {
-                ActiveReplayManager.Instance.ReplayStartViewPoint = 0;
-                ActiveReplayManager.Instance.ReplayFrameCache.Clear();
-                ActiveReplayManager.Instance.ReplayFrameCache.Add(ActiveReplayManager.Instance.ReplayInitFrame);
-            }
-
             newFrameCacheIndex = Mathf.Clamp(newFrameCacheIndex, 0, ActiveReplayManager.Instance.ReplayFrameCache.Count - 1);
             int cachedFrame = (newFrameCacheIndex * (5 * f.UpdateRate)) + ActiveReplayManager.Instance.ReplayStart;
 
@@ -386,6 +372,49 @@ namespace NSMB.UI.Game.Replay {
             ActiveReplayManager.Instance.IsReplayFastForwarding = false;
             replayPaused = false;
             Time.timeScale = replaySpeed;
+        }
+
+        private bool SetToFrame(Frame f, int newFrame) {
+            int actualFrame = newFrame - ActiveReplayManager.Instance.ReplayStart;
+            int currentIndex = (actualFrame + ActiveReplayManager.Instance.ReplayStart) / (5 * f.UpdateRate);
+            int cachedIndex = Mathf.Clamp(currentIndex, 0, ActiveReplayManager.Instance.ReplayFrameCache.Count - 1);
+
+            QuantumRunner runner = QuantumRunner.Default;
+            var session = runner.Session;
+
+            // set the replay to the closest cache
+            ActiveReplayManager.Instance.IsReplayFastForwarding = true;
+            resetFrame.Deserialize(ActiveReplayManager.Instance.ReplayFrameCache[cachedIndex]);
+            session.ResetReplay(resetFrame);
+
+            // Fix accumulated time applying
+            ResetAdjustedTime(session);
+
+            ActiveReplayManager.Instance.IsReplayFastForwarding = false;
+
+            // now simulate if not valid
+            if (currentIndex != cachedIndex) {
+                ActiveReplayManager.Instance.IsReplayFastForwarding = true;
+                simulatingCanvas.SetActive(true);
+                fastForwardDestinationTick = GetFastForwardTick(newFrame);
+                QuantumRunner.Default.IsSessionUpdateDisabled = true;
+                Time.captureDeltaTime = 1/30f;
+                Time.timeScale = 8;
+                simulationTargetTrackArrow.position = trackArrow.position;
+                simulationTargetTrackArrow.gameObject.SetActive(true);
+            } else {
+                ActiveReplayManager.Instance.IsReplayFastForwarding = true;
+                simulatingCanvas.SetActive(true);
+                fastForwardDestinationTick = GetFastForwardTick(newFrame);
+                QuantumRunner.Default.IsSessionUpdateDisabled = true;
+                Time.captureDeltaTime = 1/30f;
+                Time.timeScale = 8;
+                simulationTargetTrackArrow.position = trackArrow.position;
+                simulationTargetTrackArrow.gameObject.SetActive(true);
+                return true;
+            }
+
+            return false;
         }
 
         private void ResetAdjustedTime(DeterministicSession session) {

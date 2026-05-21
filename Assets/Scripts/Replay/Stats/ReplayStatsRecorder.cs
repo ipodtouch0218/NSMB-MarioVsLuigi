@@ -62,7 +62,11 @@ namespace NSMB.Replay.Stats {
                 CallbackDispatcher = callbackDispatcher,
             };
 
+            ActiveReplayManager.Instance.ReplayFrameCache.Clear();
+            ActiveReplayManager.Instance.ReplayFrameCache.Add(arguments.FrameData);
             Runner = QuantumRunner.StartGame(arguments);
+
+            // data tracking variables
             GlobalInfo = new GlobalInfo();
             PlayerInfos = new();
         }

@@ -25,7 +25,6 @@ namespace NSMB.Replay.Stats {
         public readonly int OccurenceFrame;
         public readonly FP DeltaTime;
         public readonly int Id;
-        public readonly byte[] SerializedFrame;
         public readonly ReplayStatsRecorder StatsRecorder;
 
         //---static
@@ -51,7 +50,6 @@ namespace NSMB.Replay.Stats {
             OccurenceFrame = f.Number;
             DeltaTime = f.DeltaTime;
             Id = _index++;
-            SerializedFrame = f.Serialize(DeterministicFrameSerializeMode.Serialize);
         }
 
         // basic init - per player

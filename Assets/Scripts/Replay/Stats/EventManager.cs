@@ -351,6 +351,8 @@ namespace NSMB.Replay.Stats
                     }
                 }
             }
+
+            ActiveReplayManager.Instance.TryCacheReplayFrame(f);
         }
 
         private void HandleCombo(Frame f, MarioPlayer* marioPlayer, PlayerInfo playerInfo) {

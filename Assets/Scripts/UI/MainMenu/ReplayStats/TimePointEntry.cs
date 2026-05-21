@@ -63,7 +63,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         #region Button Methods
 
         public void StartReplayAtPart() {
-            ActiveReplayManager.Instance.StartReplayPlayback(timePoint.StatsRecorder.ReplayFile, timePoint.SerializedFrame, timePoint.PlayerRef);
+            ActiveReplayManager.Instance.StartReplayPlayback(timePoint.StatsRecorder.ReplayFile, timePoint.OccurenceFrame - timePoint.StatsRecorder.ReplayStart, timePoint.PlayerRef, true);
         }
 
         #endregion

@@ -36,12 +36,10 @@ namespace NSMB.Replay {
             }
         }
         public string SavedRecordingPath { get; set; }
-        public byte[] ReplayStartFrame { get; private set; }
-        public byte[] ReplayInitFrame { get; private set; }
+        public int? ReplayStartFrame { get; private set; }
 
         //---Public Variables
         public readonly List<byte[]> ReplayFrameCache = new();
-        public int ReplayStartViewPoint;
 
         //---Private Variables
         private bool _isReplayFastForwarding;
@@ -229,12 +227,12 @@ namespace NSMB.Replay {
             }
         }
 
-        public async void StartReplayPlayback(BinaryReplayFile replay, byte[] frameData = null, PlayerRef? playerRef = null) {
+        public async void StartReplayPlayback(BinaryReplayFile replay, int? startingFrame = null, PlayerRef? playerRef = null, bool noClearCache = false) {
             if (replay.LoadAllIfNeeded() != ReplayParseResult.Success) {
                 return;
             }
 
-            ReplayStartFrame = frameData;
+            ReplayStartFrame = startingFrame;
 
             GlobalController.Instance.loadingCanvas.dontHideOnGameDestroy = true;
             GlobalController.Instance.loadingCanvas.Initialize(null);
@@ -249,11 +247,11 @@ namespace NSMB.Replay {
             if (GlobalController.Instance.addonManager.isActiveAndEnabled) {
                 var loadAddonResult = await GlobalController.Instance.addonManager.LoadAllAddons(replay.Header.AddonGuids);
                 if (loadAddonResult.Result == LoadAllAddonsResult.Success) {
-                    _ = StartReplay(replay);
+                    _ = StartReplay(replay, noClearCache);
                 } else if (loadAddonResult.Result == LoadAllAddonsResult.DownloadRequired) {
                     AddonManager.RequestDownloadAddons(loadAddonResult.RequiredDownloads, (result) => {
                         if (result == AddonManager.AddonDownloadResult.Success) {
-                            _ = StartReplay(replay);
+                            _ = StartReplay(replay, noClearCache);
                         } else if (result == AddonManager.AddonDownloadResult.Cancelled) {
                             GlobalController.Instance.loadingCanvas.EndAnimation();
                         } else if (result == AddonManager.AddonDownloadResult.Failure) {
@@ -265,11 +263,11 @@ namespace NSMB.Replay {
                     return;
                 }
             } else {
-                _ = StartReplay(replay);
+                _ = StartReplay(replay, noClearCache);
             }
         }
 
-        private async Task StartReplay(BinaryReplayFile replay) {
+        private async Task StartReplay(BinaryReplayFile replay, bool noClearCache) {
             CurrentReplay = replay;
 
             var serializer = new QuantumUnityJsonSerializer();
@@ -294,9 +292,10 @@ namespace NSMB.Replay {
                 DeltaTimeType = SimulationUpdateTime.EngineDeltaTime,
             };
 
-            ReplayInitFrame = arguments.FrameData;
-            ReplayFrameCache.Clear();
-            ReplayFrameCache.Add(ReplayInitFrame);
+            if (!noClearCache) {
+                ReplayFrameCache.Clear();
+                ReplayFrameCache.Add(arguments.FrameData);
+            }
 
             try {
                 NetworkHandler.Runner = await QuantumRunner.StartGameAsync(arguments);
@@ -311,13 +310,7 @@ namespace NSMB.Replay {
             }
 
             Frame f = e.Frame;
-            if ((f.Number - ReplayStart) % (5 * f.UpdateRate) == 0) {
-                // Save this frame to the replay cache
-                int index = (f.Number - ReplayStart) / (5 * f.UpdateRate);
-                if (ReplayFrameCache.Count <= index) {
-                    ReplayFrameCache.Add(f.Serialize(DeterministicFrameSerializeMode.Serialize));
-                }
-            }
+            TryCacheReplayFrame(f);
         }
 
         private void OnGameDestroyed(CallbackGameDestroyed e) {
@@ -345,6 +338,16 @@ namespace NSMB.Replay {
         private void OnGameEnded(EventGameEnded e) {
             if (e.Game == currentlyRecordingGame) {
                 SaveReplay((sbyte) e.WinningTeam);
+            }
+        }
+
+        public void TryCacheReplayFrame(Frame f) {
+            if ((f.Number - ReplayStart) % (5 * f.UpdateRate) == 0) {
+                // Save this frame to the replay cache
+                int index = (f.Number - ReplayStart) / (5 * f.UpdateRate);
+                if (ReplayFrameCache.Count <= index) {
+                    ReplayFrameCache.Add(f.Serialize(DeterministicFrameSerializeMode.Serialize));
+                }
             }
         }
 
