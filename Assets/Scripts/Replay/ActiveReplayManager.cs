@@ -12,7 +12,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Playables;
 
 namespace NSMB.Replay {
     public class ActiveReplayManager : Singleton<ActiveReplayManager> {
