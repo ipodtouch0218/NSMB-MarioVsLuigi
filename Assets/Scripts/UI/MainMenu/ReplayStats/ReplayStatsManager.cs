@@ -26,6 +26,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         //---Public Variables
         public int selectedButton;
         public MainMenuCanvas canvas;
+        public bool IsReady;
 
         //---Static Variables
         public static ReplayStatsManager Instance { get; private set; }
@@ -44,6 +45,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         [Header("Top-left Panel")]
         [SerializeField] private TMP_Dropdown viewingStatisticDropdown, targetPlayerDropdown;
         [SerializeField] private TMP_Text entryCount;
+        [SerializeField] private GameObject loading;
 
         // bottom panel
         [Header("Bottom-left Panel")]
@@ -427,6 +429,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             buttonTemplate.gameObject.SetActive(false);
             toggleTemplate.gameObject.SetActive(false);
             listTemplate.gameObject.SetActive(false);
+            loading.SetActive(!IsReady);
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) leftTopLayout.transform);
             TranslationManager.OnLanguageChanged += UpdateStatsDropdown;
@@ -447,8 +450,10 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             }
             
             UpdateStatsDropdown(GlobalController.Instance.translationManager);
-            UpdatePlayerDropdown(GlobalController.Instance.translationManager);
-            UpdateEntryCount(GlobalController.Instance.translationManager);
+            if (IsReady) {
+                UpdatePlayerDropdown(GlobalController.Instance.translationManager);
+                UpdateEntryCount(GlobalController.Instance.translationManager);
+            }
             UpdateInformation(replayListEntry);
 
             ChangedViewingStats(true);
@@ -487,6 +492,14 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 Destroy(entry.gameObject);
             }
             timePointEnteries.Clear();
+        }
+
+        public void Prepare() {
+            IsReady = true;
+            UpdatePlayerDropdown(GlobalController.Instance.translationManager);
+            UpdateEntryCount(GlobalController.Instance.translationManager);
+            ChangedViewingStats(true);
+            loading.SetActive(false);
         }
 
         public void UpdateInformation(ReplayListEntry replay) {
@@ -671,6 +684,11 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 UpdateToggles();
                 UpdateLists(GlobalController.Instance.translationManager);
             }
+
+            if (!IsReady) {
+                return;
+            }
+
             UpdatePlayerDropdown(GlobalController.Instance.translationManager);
             bool targetPlayerSupported = OptionSupportTargetPlayer();
             targetPlayerDropdown.interactable = targetPlayerSupported;

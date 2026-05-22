@@ -161,13 +161,16 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         }
 
         public void OnWatchClick() {
-            ActiveReplayManager.Instance.StartReplayPlayback(ReplayFile);
+            var statsRecorder = ReplayStatsRecorder.Instance;
+            ActiveReplayManager.Instance.StartReplayPlayback(ReplayFile, noClearCache: ReplayFile == statsRecorder.ReplayFile);
         }
 
-        public void OnStatsClick() {
-            ReplayStatsRecorder.Instance.StartAnalyzing(ReplayFile);
+        public async void OnStatsClick() {
+            statsManager.IsReady = false;
             statsManager.Initialize(this);
             canvas.OpenMenu(manager.statsSubmenu);
+            await ReplayStatsRecorder.Instance.StartAnalyzing(ReplayFile);
+            statsManager.Prepare();
         }
 
         public void OnRenameClick() {

@@ -3,6 +3,12 @@ using Quantum;
 using UnityEngine;
 using NSMB.Utilities;
 using System.Collections.Generic;
+using NSMB.Networking;
+using System.Threading.Tasks;
+using NSMB.Addons;
+using NSMB.UI.MainMenu.Submenus.ReplayStats;
+using NSMB.UI.MainMenu;
+using System.Threading;
 
 namespace NSMB.Replay.Stats {
     public class ReplayStatsRecorder : Singleton<ReplayStatsRecorder> {
@@ -14,14 +20,34 @@ namespace NSMB.Replay.Stats {
         public GlobalInfo GlobalInfo { get; private set; }
         private SessionRunner Runner;
 
-        public void StartAnalyzing(BinaryReplayFile replayFile) {
+        public async Awaitable StartAnalyzing(BinaryReplayFile replayFile) {
             ReplayFile = replayFile;
 
             if (ReplayFile.LoadAllIfNeeded() != ReplayParseResult.Success) {
                 return;
             }
 
-            Init();
+            if (GlobalController.Instance.addonManager.isActiveAndEnabled) {
+                var loadAddonResult = await GlobalController.Instance.addonManager.LoadAllAddons(ReplayFile.Header.AddonGuids);
+                if (loadAddonResult.Result == LoadAllAddonsResult.Success) {
+                    await Init();
+                } else if (loadAddonResult.Result == LoadAllAddonsResult.DownloadRequired) {
+                    AddonManager.RequestDownloadAddons(loadAddonResult.RequiredDownloads, (result) => {
+                        if (result == AddonManager.AddonDownloadResult.Success) {
+                            _ = Init();
+                        } else if (result == AddonManager.AddonDownloadResult.Cancelled) {
+                            GlobalController.Instance.loadingCanvas.EndAnimation();
+                        } else if (result == AddonManager.AddonDownloadResult.Failure) {
+                            NetworkHandler.ThrowError("ui.error.replay.addons.downloadfailed", false);
+                        }
+                    });
+                } else if (loadAddonResult.Result == LoadAllAddonsResult.Failure) {
+                    NetworkHandler.ThrowError("ui.error.replay.addons.downloadfailed", false);
+                    return;
+                }
+            } else {
+                await Init();
+            }
             TimePoint.ResetIndex();
 
             while (Runner.Session.FramePredicted == null || Runner.Session.FramePredicted.Number < ReplayEnd) {
@@ -32,7 +58,11 @@ namespace NSMB.Replay.Stats {
             Runner.Shutdown();
         }
 
-        private void Init() {
+        private async Task Init() {
+            // data tracking variables
+            GlobalInfo = new GlobalInfo();
+            PlayerInfos = new();
+
             var serializer = new QuantumUnityJsonSerializer();
             RuntimeConfig runtimeConfig = serializer.ConfigFromByteArray<RuntimeConfig>(ReplayFile.DecompressedRuntimeConfigData, compressed: false);
             var deterministicConfig = DeterministicSessionConfig.FromByteArray(ReplayFile.DecompressedDeterministicConfigData);
@@ -64,11 +94,12 @@ namespace NSMB.Replay.Stats {
 
             ActiveReplayManager.Instance.ReplayFrameCache.Clear();
             ActiveReplayManager.Instance.ReplayFrameCache.Add(arguments.FrameData);
-            Runner = QuantumRunner.StartGame(arguments);
 
-            // data tracking variables
-            GlobalInfo = new GlobalInfo();
-            PlayerInfos = new();
+            try {
+                Runner = await QuantumRunner.StartGameAsync(arguments);
+            } catch {
+                NetworkHandler.ThrowError("ui.error.replay.corrupt", false);
+            }
         }
     }
 }
