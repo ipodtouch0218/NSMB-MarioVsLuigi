@@ -83,7 +83,7 @@ namespace Quantum {
             }
             
             if (newSize > 0) {
-                StageTiles = (StageTileInstance*) Context.Allocator.AllocAndClear(StageTileInstance.SIZE * newSize, StageTileInstance.ALIGNMENT);
+                StageTiles = (StageTileInstance*) Context.Allocator.Alloc(StageTileInstance.SIZE * newSize, StageTileInstance.ALIGNMENT);
             }
 
             StageTilesLength = newSize;

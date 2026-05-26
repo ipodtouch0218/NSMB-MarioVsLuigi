@@ -142,7 +142,7 @@ namespace NSMB.Utilities {
         };
 
         private static StringBuilder symbolStringBuilder = new();
-        public static string GetSymbolString(ReadOnlySpan<char> str, Dictionary<char, string> dict = null, Color32? color = null) {
+        public static string GetSymbolString(ReadOnlySpan<char> str, Dictionary<char, string> dict = null, int padUpToNLength = 0, Color32? color = null) {
             dict ??= uiSymbols;
 
             symbolStringBuilder.Clear();
@@ -157,6 +157,11 @@ namespace NSMB.Utilities {
                     symbolStringBuilder.Append(c);
                 }
             }
+            for (int i = str.Length; i < padUpToNLength; i++)
+            {
+                symbolStringBuilder.Append("<space=0.5em><size=0>.</size>"); // invisible character suffix because if <SPACE> is at the end of the text, the component would trim it.
+            }
+            
             return symbolStringBuilder.ToString();
         }
 
