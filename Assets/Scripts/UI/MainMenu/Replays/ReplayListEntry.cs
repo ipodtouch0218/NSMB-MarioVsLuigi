@@ -169,8 +169,13 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             statsManager.IsReady = false;
             statsManager.Initialize(this);
             canvas.OpenMenu(manager.statsSubmenu);
-            await ReplayStatsRecorder.Instance.StartAnalyzing(ReplayFile);
-            statsManager.Prepare();
+            await ReplayStatsRecorder.Instance.StartAnalyzing(ReplayFile, statsManager);
+
+            if (ReplayStatsRecorder.Instance.IsGameValid) {
+                statsManager.Prepare();
+            } else {
+                canvas.CloseSubmenu(manager.statsSubmenu);
+            }
         }
 
         public void OnRenameClick() {

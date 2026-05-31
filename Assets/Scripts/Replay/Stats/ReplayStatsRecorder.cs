@@ -18,10 +18,21 @@ namespace NSMB.Replay.Stats {
         public int ReplayEnd => ReplayStart + ReplayLength;
         public Dictionary<PlayerRef, PlayerInfo> PlayerInfos { get; private set; }
         public GlobalInfo GlobalInfo { get; private set; }
+        public bool IsGameValid => Runner != null;
         private SessionRunner Runner;
 
-        public async Awaitable StartAnalyzing(BinaryReplayFile replayFile) {
+        public bool TerminateReplayRunner() {
+            if (Runner != null) {
+                Runner.ShutdownAsync();
+                return true;
+            }
+            return false;
+        }
+
+        public async Awaitable StartAnalyzing(BinaryReplayFile replayFile, ReplayStatsManager statsManager) {
             ReplayFile = replayFile;
+            Runner = null;
+            statsManager.UpdateProgressBar(0, ReplayEnd);
 
             if (ReplayFile.LoadAllIfNeeded() != ReplayParseResult.Success) {
                 return;
@@ -50,12 +61,17 @@ namespace NSMB.Replay.Stats {
             }
             TimePoint.ResetIndex();
 
-            while (Runner.Session.FramePredicted == null || Runner.Session.FramePredicted.Number < ReplayEnd) {
-                Runner.Service(1);
-                //Console.WriteLine($"Simulating frame {Runner.Session.FramePredicted.Number - InitialFrameNumber} of {_maxFrame - InitialFrameNumber}");
+            if (!IsGameValid) {
+                return;
             }
 
-            Runner.Shutdown();
+            while (Runner.Session.FramePredicted == null || Runner.Session.FramePredicted.Number < ReplayEnd) {
+                Runner.Service(1);
+                statsManager.UpdateProgressBar(Runner.Session.FramePredicted.Number, ReplayEnd);
+                await Task.Delay(1);
+            }
+
+            await Runner.ShutdownAsync();
         }
 
         private async Task Init() {

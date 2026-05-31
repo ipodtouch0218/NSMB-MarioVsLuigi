@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
@@ -41,11 +42,15 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         [SerializeField] private ScrollRect scrollRect;
         [SerializeField] internal VerticalLayoutGroup layout, leftTopLayout;
 
+        [SerializeField] private GameObject loading;
+        [SerializeField] private GameObject progressBar;
+        [SerializeField] private TMP_Text progressBarText;
+        [SerializeField] private Image progressBarFill;
+
         // side panel
         [Header("Top-left Panel")]
         [SerializeField] private TMP_Dropdown viewingStatisticDropdown, targetPlayerDropdown;
         [SerializeField] private TMP_Text entryCount;
-        [SerializeField] private GameObject loading;
 
         // bottom panel
         [Header("Bottom-left Panel")]
@@ -436,6 +441,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             TranslationManager.OnLanguageChanged += UpdateEntryCount;
             TranslationManager.OnLanguageChanged += UpdateLists;
             TranslationManager.OnLanguageChanged += UpdatePlayerDropdown;
+            Settings.Controls.UI.Previous.performed += OnPrevious;
             Canvas.ForceUpdateCanvases();
 
             // create the buttons for cateGOries
@@ -472,6 +478,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             TranslationManager.OnLanguageChanged -= UpdateEntryCount;
             TranslationManager.OnLanguageChanged -= UpdateLists;
             TranslationManager.OnLanguageChanged -= UpdatePlayerDropdown;
+            Settings.Controls.UI.Previous.performed -= OnPrevious;
 
             foreach (var button in statsButtons) {
                 Destroy(button.gameObject);
@@ -500,6 +507,14 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             UpdateEntryCount(GlobalController.Instance.translationManager);
             ChangedViewingStats(true);
             loading.SetActive(false);
+        }
+
+        public void UpdateProgressBar(int progress, int max) {
+            if (progressBar.activeInHierarchy) {
+                float percentage =  (float) progress / max;
+                progressBarFill.fillAmount = percentage;
+                progressBarText.text = $"{progress} / {max} ({(percentage * 100):F0}%)";
+            }
         }
 
         public void UpdateInformation(ReplayListEntry replay) {
@@ -640,6 +655,11 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 }
                 statLists.Add(listObj);
             }
+        }
+
+        private void OnPrevious(InputAction.CallbackContext context) {
+            canvas.PlayCursorSound();
+            ReplayStatsRecorder.Instance.TerminateReplayRunner();
         }
 
         private void UpdatePlayerDropdown(TranslationManager tm) {

@@ -308,7 +308,7 @@ namespace NSMB.Replay.Stats
         }*/
 
         //! we have to use this janky setUP with a did loop bool since OnGameStarted doesn't work
-        public bool didLoop = false;
+        private bool didLoop = false;
         public void OnSimulationFinished(Frame f) {
             // scan all Marios
             var marios = f.Filter<MarioPlayer>();
