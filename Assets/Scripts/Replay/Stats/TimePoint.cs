@@ -291,7 +291,7 @@ namespace NSMB.Replay.Stats {
         public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             var color = Color.red;
             stringBuilder.Append("<sprite name=\"room_stars\" color=#").Append(Utils.ColorToHex(color, false)).Append('>');
-            stringBuilder.Append(Utils.GetSymbolString(StarsDropped.ToString(), Utils.smallSymbols, Color.red));
+            stringBuilder.Append(Utils.GetSymbolString(StarsDropped.ToString(), Utils.smallSymbols, color: Color.red));
         }
     }
 
@@ -395,7 +395,7 @@ namespace NSMB.Replay.Stats {
                 stringBuilder.Append("<sprite name=\"room_lives\" color=#").Append(Utils.ColorToHex(color, false)).Append('>');
             }
             stringBuilder.Append("<sprite name=\"room_stars\" color=#").Append(Utils.ColorToHex(color, false)).Append('>');
-            stringBuilder.Append(Utils.GetSymbolString(TotalStarsAfterCombo().ToString(), Utils.smallSymbols, Color.red));
+            stringBuilder.Append(Utils.GetSymbolString(TotalStarsAfterCombo().ToString(), Utils.smallSymbols, color: Color.red));
         }
 
         public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
@@ -548,9 +548,9 @@ namespace NSMB.Replay.Stats {
             var successCol = Color.green;
 
             stringBuilder.Append("<color=#").Append(Utils.ColorToHex(blockCol, false)).Append('>').Append("X");
-            stringBuilder.Append(Utils.GetSymbolString(FailedSpawnCount.ToString(), Utils.smallSymbols, blockCol));
+            stringBuilder.Append(Utils.GetSymbolString(FailedSpawnCount.ToString(), Utils.smallSymbols, color: blockCol));
             stringBuilder.Append("<sprite name=\"room_stars\" color=#").Append(Utils.ColorToHex(successCol, false)).Append('>');
-            stringBuilder.Append(Utils.GetSymbolString(SuccessfulSpawnCount.ToString(), Utils.smallSymbols, successCol));
+            stringBuilder.Append(Utils.GetSymbolString(SuccessfulSpawnCount.ToString(), Utils.smallSymbols, color: successCol));
         }
     }
 
