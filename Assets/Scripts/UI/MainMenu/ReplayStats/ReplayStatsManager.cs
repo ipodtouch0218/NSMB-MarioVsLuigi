@@ -218,6 +218,24 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             }
         }
 
+        private IEnumerable<TimePoint> GetTauntInfo() {
+            bool targetAll = TargetPlayer < 0;
+            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+
+            if (!targetAll) {
+                return stats[TargetPlayer].TauntPoints;
+            } else {
+                List<TimePoint> temp = new();
+
+                foreach (var playerInfo in stats.Values) {
+                    temp.AddRange(playerInfo.TauntPoints);
+                }
+
+                temp.Sort();
+                return temp;
+            }
+        }
+
         private Dictionary<TimePoint, bool> GetBigCollectableSpawns() {
             Dictionary<PointBigCollectableSpawned, bool> temp = new();
 
@@ -328,7 +346,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 StatOptions.ReserveInfo => stats[TargetPlayer].ReserveChangePoints,
                 StatOptions.Kills => GetKills(),
                 StatOptions.DamageDealt => GetDamageDealt(),
-                StatOptions.Taunts => stats[TargetPlayer].TauntPoints,
+                StatOptions.Taunts => GetTauntInfo(),
                 _ => throw new NotImplementedException(),
             };
         }
@@ -461,6 +479,9 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             UpdateStatsDropdown(GlobalController.Instance.translationManager);
             if (IsReady) {
                 UpdatePlayerDropdown(GlobalController.Instance.translationManager);
+            } else {
+                targetPlayerDropdown.ClearOptions();
+                targetPlayerDropdown.interactable = false;
             }
             UpdateEntryCount(GlobalController.Instance.translationManager);
             UpdateInformation(replayListEntry);
