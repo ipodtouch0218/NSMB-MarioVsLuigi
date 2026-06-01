@@ -434,7 +434,7 @@ namespace NSMB.Replay.Stats {
 
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             base.SetTimeText(tm, stringBuilder, displayArg);
-            if (EndFrame != null && EndFrame > 0) {
+            if (EndFrame != null) {
                 var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime;
                 stringBuilder.Append($" ({(float)lengthInSec:F2}s)");
             }
@@ -453,6 +453,8 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointStarmanChange : TimePoint {
+        public bool GameEnded;
+        public override bool ShowEndTime => !GameEnded;
         public PointStarmanChange(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) {}
 
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
@@ -468,6 +470,8 @@ namespace NSMB.Replay.Stats {
 
     public unsafe class PointReserveChange : TimePoint {
         public readonly PowerupAsset? Powerup;
+        public bool GameEnded;
+        public override bool ShowEndTime => !GameEnded;
         public PointReserveChange(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) => Powerup = f.FindAsset(mario->ReserveItem);
 
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {

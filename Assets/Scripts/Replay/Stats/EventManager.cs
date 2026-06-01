@@ -322,7 +322,6 @@ namespace NSMB.Replay.Stats
                 HandleCombo(f, marioPlayer, playerInfo);
                 HandleStateData(f, marioPlayer, playerInfo);
             }
-            didLoop = true;
 
             if (f.Global->GameState == GameState.Ended && StatRecorder.GlobalInfo.CurrBigCollectable != null) {
                 StatRecorder.GlobalInfo.CurrBigCollectable.EndFrame = -1;
@@ -353,6 +352,7 @@ namespace NSMB.Replay.Stats
             }
 
             ActiveReplayManager.Instance.TryCacheReplayFrame(f);
+            didLoop = true;
         }
 
         private void HandleCombo(Frame f, MarioPlayer* marioPlayer, PlayerInfo playerInfo) {
@@ -404,13 +404,15 @@ namespace NSMB.Replay.Stats
             }
 
             if (playerInfo.CurrReserveChangePoint is PointReserveChange currReserveChangePoint) {
-                currReserveChangePoint.EndFrame = gameEnded ? -1 : f.Number;
+                currReserveChangePoint.EndFrame = f.Number;
+                currReserveChangePoint.GameEnded = gameEnded;
             }
 
             /** Current Starman State **/
             if ((!marioPlayer->IsStarmanInvincible || gameEnded) && playerInfo.CurrStarmanChangePoint is PointStarmanChange currStarmanChangePoint) {
                 // set the end frame
-                currStarmanChangePoint.EndFrame = gameEnded ? -1 : f.Number;
+                currStarmanChangePoint.EndFrame = f.Number;
+                currStarmanChangePoint.GameEnded = gameEnded;
                 playerInfo.CurrStarmanChangePoint = null;
             } else if (marioPlayer->IsStarmanInvincible && playerInfo.CurrStarmanChangePoint == null) {
                 var point = new PointStarmanChange(StatRecorder, f, marioPlayer);
