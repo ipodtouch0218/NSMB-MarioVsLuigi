@@ -109,7 +109,10 @@ namespace NSMB.Replay.Stats {
             }
 
             await Runner.ShutdownAsync();
-            statsManager.Prepare();
+
+            if (!cancellationToken.IsCancellationRequested) {
+                statsManager.Prepare();
+            }
         }
 
         private async Task Init() {
