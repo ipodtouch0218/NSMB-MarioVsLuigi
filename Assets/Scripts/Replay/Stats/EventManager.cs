@@ -12,12 +12,17 @@ namespace NSMB.Replay.Stats
 
         public EventManager(ReplayStatsRecorder statRecorder, EventDispatcher eventDispatcher, CallbackDispatcher callbackDispatcher) {
             StatRecorder = statRecorder;
+
+            // player trackers
             eventDispatcher.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar);
             eventDispatcher.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
             eventDispatcher.Subscribe<EventMarioPlayerTookKnockback>(this, OnMarioPlayerKnockback);
             eventDispatcher.Subscribe<EventMarioPlayerTookDamage>(this, OnMarioPlayerTookDamage);
             eventDispatcher.Subscribe<EventMarioPlayerCollectedPowerup>(this, OnMarioPlayerCollectedPowerup);
             eventDispatcher.Subscribe<EventMarioPlayerCollectedCoin>(this, OnMarioPlayerCollectedCoin);
+            eventDispatcher.Subscribe<EventMarioPlayerTaunted>(this, OnMarioPlayerTaunted);
+
+            // global trackers
             eventDispatcher.Subscribe<EventBigCollectableAttemptedSpawn>(this, OnBigCollectableAttemptedSpawn);
 
             // callbackDispatcher.Subscribe<CallbackGameStarted>(this, e => OnGameStarted(e.Game.Frames.Predicted));
@@ -26,6 +31,7 @@ namespace NSMB.Replay.Stats
 
         #region Events
 
+        // player trackers
         public void OnMarioPlayerCollectedCoin(EventMarioPlayerCollectedCoin e) {
             Frame f = e.Game.Frames.Verified;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
@@ -272,6 +278,15 @@ namespace NSMB.Replay.Stats
             marioPlayerInfo.PowerupCollectPoints.Add(new PointPowerupCollect(StatRecorder, f, mario, e.Result, e.Scriptable));
         }
 
+
+        public void OnMarioPlayerTaunted(EventMarioPlayerTaunted e) {
+            Frame f = e.Game.Frames.Verified;
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+            var marioPlayerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
+            marioPlayerInfo.TauntPoints.Add(new PointTaunt(StatRecorder, f, mario));
+        }
+
+        // global trackers
         public void OnBigCollectableAttemptedSpawn(EventBigCollectableAttemptedSpawn e) {
             Frame f = e.Game.Frames.Predicted;
             FPVector2 position = e.Position;
@@ -279,7 +294,7 @@ namespace NSMB.Replay.Stats
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             var info = StatRecorder.GlobalInfo;
             var point = new PointBigCollectableSpawned(StatRecorder, f, e.UsedSpawnpoints, e.PositionIndex, wasBlocked, position, ref info, stage);
-            
+
             // set the curr big collectable
             if (!wasBlocked) {
                 info.CurrBigCollectable = point;

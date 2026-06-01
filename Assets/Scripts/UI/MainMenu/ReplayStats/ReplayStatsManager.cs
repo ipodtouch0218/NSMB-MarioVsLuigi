@@ -305,7 +305,8 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             PowerupGrabs,
             ReserveInfo,
             Kills,
-            DamageDealt
+            DamageDealt,
+            Taunts
         }
 
         private object GetTimePoints(StatOptions? options = null) {
@@ -327,6 +328,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 StatOptions.ReserveInfo => stats[TargetPlayer].ReserveChangePoints,
                 StatOptions.Kills => GetKills(),
                 StatOptions.DamageDealt => GetDamageDealt(),
+                StatOptions.Taunts => stats[TargetPlayer].TauntPoints,
                 _ => throw new NotImplementedException(),
             };
         }
@@ -354,6 +356,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             StatOptions viewingOptions = options ?? ViewingStats;
             return viewingOptions switch {
                 StatOptions.PowerupInfo => statToggles[0].Value,
+                StatOptions.Taunts => true,
                 _ => false
             };
         }

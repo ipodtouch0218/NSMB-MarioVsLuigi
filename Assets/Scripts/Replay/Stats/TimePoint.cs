@@ -139,7 +139,7 @@ namespace NSMB.Replay.Stats {
                 return null;
             }
             var itemTranslation = tm.GetTranslation(CoinItem.TranslationKey);
-            return tm.GetTranslationWithReplacements(translationPrefix+"tooltip.randomspawn", "item", itemTranslation, "chance", $"{ (float) SpawnChancePercentage.GetValueOrDefault():0.00}");
+            return tm.GetTranslationWithReplacements(translationPrefix+"tooltip.randomspawn", "item", itemTranslation, "chance", $"{(float) SpawnChancePercentage.GetValueOrDefault():0.00}");
         }
     }
 
@@ -333,7 +333,7 @@ namespace NSMB.Replay.Stats {
     public unsafe class PointCombo : TimePoint {
         // these are the things that are in the combo
         // we reuse TimePoints for this.
-        
+
         // tUPle, first is the elemnt, second is stars lost third is total stars lost
         public readonly List<(TimePoint Element, int StarsLost, int TotalStarsLost)> ComboElements = new();
         public Dictionary<PlayerRef, string> GetParticipants() {
@@ -436,7 +436,7 @@ namespace NSMB.Replay.Stats {
             base.SetTimeText(tm, stringBuilder, displayArg);
             if (EndFrame != null) {
                 var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime;
-                stringBuilder.Append($" ({(float)lengthInSec:F2}s)");
+                stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
             }
         }
 
@@ -455,7 +455,7 @@ namespace NSMB.Replay.Stats {
     public unsafe class PointStarmanChange : TimePoint {
         public bool GameEnded;
         public override bool ShowEndTime => !GameEnded;
-        public PointStarmanChange(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) {}
+        public PointStarmanChange(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) { }
 
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             base.SetTimeText(tm, stringBuilder, displayArg);
@@ -604,6 +604,14 @@ namespace NSMB.Replay.Stats {
             string translationKey = translationPrefix+"tooltip." + (WasRandom ? "randomspawn" : "itemspawn");
             string itemTranslation = tm.GetTranslation(SpawnedItem.TranslationKey);
             return tm.GetTranslationWithReplacements(translationKey, "item", itemTranslation, "chance", $"{(float) SpawnChancePercentage.GetValueOrDefault():0.00}");
+        }
+    }
+
+    public unsafe class PointTaunt : TimePoint {
+        public PointTaunt(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) { }
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
+            string translationKey = translationPrefix+"taunt";
+           stringBuilder.Append(tm.GetTranslation(translationKey));
         }
     }
 }

@@ -21,6 +21,7 @@ namespace NSMB.Replay.Stats {
         public readonly List<PointStarLoss> StarsLostPoints = new();
         public readonly List<PointCoinCollected> CoinsCollectedPoints = new();
         public readonly List<PointPowerupCollect> PowerupCollectPoints = new();
+        public readonly List<PointTaunt> TauntPoints = new();
 
         //--more complex points
         public PointKnockback? CurrKnockbackPoint = null;
