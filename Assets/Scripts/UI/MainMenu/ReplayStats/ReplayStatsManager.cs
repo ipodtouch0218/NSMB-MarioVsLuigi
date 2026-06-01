@@ -358,7 +358,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 StatOptions.ComboLanded or
                 StatOptions.Kills or
                 StatOptions.DamageDealt => TimePoint.DisplayArgs.FromAttacker,
-                _ => TimePoint.DisplayArgs.Normal
+                _ => TargetPlayer < 0 ? TimePoint.DisplayArgs.All : TimePoint.DisplayArgs.Normal
             };
         }
 

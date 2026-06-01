@@ -35,7 +35,8 @@ namespace NSMB.Replay.Stats {
         //---enums
         public enum DisplayArgs {
             Normal,
-            FromAttacker
+            FromAttacker,
+            All
         }
 
 
@@ -83,7 +84,12 @@ namespace NSMB.Replay.Stats {
 
         public virtual void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) { }
 
-        public virtual void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) { }
+        public virtual void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
+            if (displayArg == DisplayArgs.All) {
+                stringBuilder.Append(AffectedPlayerName);
+                return;
+            }
+        }
 
         public virtual string? GetTooltip(TranslationManager tm, DisplayArgs displayArg) => null;
 
