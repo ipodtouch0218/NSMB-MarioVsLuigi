@@ -149,9 +149,9 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 #endif
 
             CancelExistingTask();
-            _ = ClearReplayListEntries(default);
+            //_ = ClearReplayListEntries(default);
 
-            TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+            Settings.Controls.UI.Next.performed -= OnNext;
             Settings.Controls.UI.Previous.performed -= OnPrevious;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
@@ -170,17 +170,18 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         }
 
         public void AddReplay(BinaryReplayFile replayFile) {
-            lock (lockObject) {
-                if (!string.IsNullOrEmpty(replayFile.FilePath)) {
+            if (!string.IsNullOrEmpty(replayFile.FilePath)) {
+                // Add if we haven't loaded this replay already.
+                lock (lockObject) {
                     if (loadedFilepaths.Contains(replayFile.FilePath)) {
                         return;
                     }
 
                     loadedFilepaths.Add(replayFile.FilePath);
                 }
-                allReplays.Add(replayFile);
             }
 
+            allReplays.Add(replayFile);
             UpdateNoReplaysText();
         }
 
@@ -189,17 +190,29 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 return;
             }
 
-            initialFindStarted = true;
-            ready = false;
-            noReplaysText.text = "";
-            await FindReplays(default);
-            await SortReplays(default);
-            await FilterReplays(default);
-            await CreateReplayListEntries(default);
-            if (isActiveAndEnabled) {
-                StartCoroutine(SelectAtEndOfFrame());
+            if (ready || Application.platform == RuntimePlatform.WebGLPlayer) {
+                // Already loaded, just refresh the list.
+                await StartNewTaskSequence(async (cancellationToken) => {
+                    await SortReplays(cancellationToken);
+                    await FilterReplays(cancellationToken);
+                    await CreateReplayListEntries(cancellationToken);
+                });
+                return;
+            } else {
+                // Find replays from disk
+                initialFindStarted = true;
+                ready = false;
+                noReplaysText.text = "";
+                await FindReplays(default);
+                await SortReplays(default);
+                await FilterReplays(default);
+                await CreateReplayListEntries(default);
+                if (isActiveAndEnabled) {
+                    StartCoroutine(SelectAtEndOfFrame());
+                }
+                initialFindStarted = false;
+                ready = true;
             }
-            ready = true;
         }
 
         public override void OnSelect(BaseEventData eventData) {
@@ -512,18 +525,19 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 foreach (var filepath in foundReplayFiles) {
                     findFilesProcessed++;
 
+                    string normalizedFilepath = Path.GetFullPath(filepath);
                     if (cancellationToken.IsCancellationRequested) {
                         await ResetProgressBar();
                         return;
                     }
 
-                    if (newLoadedFilepaths.Contains(filepath)) {
+                    if (newLoadedFilepaths.Contains(normalizedFilepath)) {
                         // Already loaded
                         continue;
                     }
-                    newLoadedFilepaths.Add(filepath);
+                    newLoadedFilepaths.Add(normalizedFilepath);
 
-                    if (BinaryReplayFile.TryLoadNewFromFile(filepath, includeReplayData: false, out var parsedReplay) != ReplayParseResult.Success) {
+                    if (BinaryReplayFile.TryLoadNewFromFile(normalizedFilepath, includeReplayData: false, out var parsedReplay) != ReplayParseResult.Success) {
                         // Not a valid replay file
                         continue;
                     }
@@ -720,13 +734,13 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         private async Awaitable ImportFile(string filepath, bool makeCopy) {
             try {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            using UnityEngine.Networking.UnityWebRequest downloadRequest = new(filepath, "GET");
-            downloadRequest.downloadHandler = new UnityEngine.Networking.DownloadHandlerBuffer();
-            await downloadRequest.SendWebRequest();
-            byte[] replay = ((UnityEngine.Networking.DownloadHandlerBuffer) downloadRequest.downloadHandler).data;
-            using MemoryStream memStream = new MemoryStream(replay);
+                using UnityEngine.Networking.UnityWebRequest downloadRequest = new(filepath, "GET");
+                downloadRequest.downloadHandler = new UnityEngine.Networking.DownloadHandlerBuffer();
+                await downloadRequest.SendWebRequest();
+                byte[] replay = ((UnityEngine.Networking.DownloadHandlerBuffer) downloadRequest.downloadHandler).data;
+                using MemoryStream memStream = new MemoryStream(replay);
 
-            ReplayParseResult parseResult = BinaryReplayFile.TryLoadNewFromStream(memStream, true, out BinaryReplayFile parsedReplay);
+                ReplayParseResult parseResult = BinaryReplayFile.TryLoadNewFromStream(memStream, true, out BinaryReplayFile parsedReplay);
 #else
                 ReplayParseResult parseResult = BinaryReplayFile.TryLoadNewFromFile(filepath, true, out BinaryReplayFile parsedReplay);
 #endif
@@ -757,6 +771,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                     await CreateReplayListEntries(cancellationToken, parsedReplay);
                 });
             } catch {
+                await Awaitable.MainThreadAsync();
                 throw;
             }
         }
@@ -783,10 +798,12 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         }
 
         private void CancelExistingTask() {
-            if (currentCancellationSource != null) {
-                currentCancellationSource.Cancel();
-                currentCancellationSource.Dispose();
+            if (currentCancellationSource == null) {
+                return;
             }
+            
+            currentCancellationSource.Cancel();
+            currentCancellationSource.Dispose();
             currentCancellationSource = null;
         }
 

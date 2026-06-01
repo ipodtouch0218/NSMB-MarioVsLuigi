@@ -94,6 +94,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             IsOpen = false;
         }
 
+        [Preserve]
         public void OnClick() {
             manager.Select(this, true);
         }
@@ -138,6 +139,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         }
         */
 
+        [Preserve]
         public void OnFavoriteClicked() {
             string destination = ReplayListManager.ReplayDirectory;
             string path = ReplayFile.FilePath[destination.Length..];
@@ -160,11 +162,13 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             canvas.PlayConfirmSound();
         }
 
+        [Preserve]
         public void OnWatchClick() {
             var statsRecorder = ReplayStatsRecorder.Instance;
             ActiveReplayManager.Instance.StartReplayPlayback(ReplayFile, noClearCache: ReplayFile == statsRecorder.ReplayFile);
         }
 
+        [Preserve]
         public async void OnStatsClick() {
             statsManager.IsReady = false;
             statsManager.Initialize(this);
@@ -176,12 +180,18 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             }
         }
 
+        [Preserve]
         public void OnRenameClick() {
             manager.StartRename(this);
         }
 
+        [Preserve]
         public void OnExportClick() {
 #if UNITY_WEBGL && !UNITY_EDITOR
+            static void FileDownloadedCallback() {
+                // Cool... I don't care.
+            }
+
             if (ReplayFile.LoadAllIfNeeded() == ReplayParseResult.Success) {
                 using MemoryStream stream = new((int) ReplayFile.FileSize);
                 long replaySize = ReplayFile.WriteToStream(stream);
@@ -209,11 +219,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 #endif
         }
 
-        [Preserve]        
-        private void FileDownloadedCallback() {
-            // Cool... I don't care.
-        }
-
+        [Preserve]
         public void OnDeleteClick() {
             manager.StartDeletion(this);
         }

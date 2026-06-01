@@ -18,7 +18,17 @@ namespace NSMB.Replay {
         public byte[] CompressedInputData;
 
         //---Properties (don't serialize)
-        public string FilePath { get; set; }
+        private string _filePath;
+        public string FilePath {
+            get => _filePath;
+            set {
+                if (!string.IsNullOrEmpty(value)) {
+                    // Always store normalized.
+                    value = Path.GetFullPath(value);
+                }
+                _filePath = value;
+            }
+        }
         public long FileSize { get; private set; }
         public bool FullyLoaded => CompressedRuntimeConfigData != null;
         public byte[] DecompressedRuntimeConfigData => Compression.DecompressBytes(CompressedRuntimeConfigData);

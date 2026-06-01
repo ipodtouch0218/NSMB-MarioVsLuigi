@@ -5581,7 +5581,7 @@ PrefabInstance:
     - target: {fileID: 3332745724366257714, guid: c47ca8bcff624cc48bd8ce919f74072c,
         type: 3}
       propertyPath: Prototype.StartOffset.RawValue
-      value: 229376
+      value: 122334
       objectReference: {fileID: 0}
     - target: {fileID: 4423665312669468572, guid: c47ca8bcff624cc48bd8ce919f74072c,
         type: 3}
@@ -5792,7 +5792,7 @@ PrefabInstance:
     - target: {fileID: 3332745724366257714, guid: c47ca8bcff624cc48bd8ce919f74072c,
         type: 3}
       propertyPath: Prototype.StartOffset.RawValue
-      value: 458752
+      value: 244668
       objectReference: {fileID: 0}
     - target: {fileID: 4423665312669468572, guid: c47ca8bcff624cc48bd8ce919f74072c,
         type: 3}

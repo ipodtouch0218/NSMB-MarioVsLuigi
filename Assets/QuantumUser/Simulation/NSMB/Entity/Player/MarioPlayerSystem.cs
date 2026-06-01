@@ -1562,7 +1562,7 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
 
             // discard the current transition, we have to resolve the list anyways
-            if (!mario->GetCurrentPowerTransition(f, out _)) {
+            if (!mario->TryGetCurrentPowerTransition(f, out _)) {
                 return;
             }
 
@@ -1895,7 +1895,7 @@ namespace Quantum {
             var transform = filter.Transform;
             Shape2D shape = filter.PhysicsCollider->Shape;
 
-            if (physicsObject->IsBeingCrushed && !mario->GetCurrentPowerTransition(f, out _)) {
+            if (physicsObject->IsBeingCrushed && !mario->TryGetCurrentPowerTransition(f, out _)) {
                 // In a ceiling crusher
                 mario->Powerdown(f, filter.Entity, true, filter.Entity);
                 return false;
@@ -2171,7 +2171,7 @@ namespace Quantum {
             // Mario is in his Blue Shell and projectile doesn't affect blue Shell
             bool damageable = !mario->IsInKnockback
                 && mario->CurrentPowerupState != PowerupState.MegaMushroom
-                && mario->IsDamageable && (!mario->GetCurrentPowerTransition(f, out _) || mario->CurrentPowerupState != PowerupState.MiniMushroom)
+                && mario->IsDamageable(f) || (mario->TryGetCurrentPowerTransition(f, out _) && mario->CurrentPowerupState == PowerupState.MiniMushroom)
                 && !((mario->IsCrouchedInShell || mario->IsInShell) && projectileAsset.DoesntEffectBlueShell);
 
             // allow the projectiles to collide, but do no knockback if no team attack
@@ -2288,7 +2288,7 @@ namespace Quantum {
                     }
                 } else if (marioAMega) {
                     bool knockbacked;
-                    if (marioB->GetCurrentPowerTransition(f, out _) && !marioB->IsStarmanInvincible) {
+                    if (marioB->TryGetCurrentPowerTransition(f, out _) && !marioB->IsStarmanInvincible) {
                         // recalculate
                         marioBAbove = dot < -Constants._0_66 && FPMath.Abs(yDiff) > Constants._0_73 * (Constants._3_50 + FP._0_25);
                         goto NormalInteractions;
@@ -2310,7 +2310,7 @@ namespace Quantum {
                     }
                     return;
                 } else if (marioBMega) {
-                    if (marioA->GetCurrentPowerTransition(f, out _) && !marioA->IsStarmanInvincible) {
+                    if (marioA->TryGetCurrentPowerTransition(f, out _) && !marioA->IsStarmanInvincible) {
                         marioAAbove = dot > Constants._0_66 && FPMath.Abs(yDiff) > Constants._0_73 * (Constants._3_50 + FP._0_25);
                         goto NormalInteractions;
                     }
@@ -2351,13 +2351,13 @@ namespace Quantum {
                     }
                     return;
                 } else if (marioAStarman) {
-                    if (marioB->GetCurrentPowerTransition(f, out _) && !marioB->IsStarmanInvincible) {
+                    if (marioB->TryGetCurrentPowerTransition(f, out _) && !marioB->IsStarmanInvincible) {
                         goto NormalInteractions;
                     }
                     MarioMarioAttackStarman(f, marioAEntity, marioBEntity, fromRight, dropStars);
                     return;
                 } else if (marioBStarman) {
-                    if (marioA->GetCurrentPowerTransition(f, out _) && !marioA->IsStarmanInvincible) {
+                    if (marioA->TryGetCurrentPowerTransition(f, out _) && !marioA->IsStarmanInvincible) {
                         goto NormalInteractions;
                     }
                     MarioMarioAttackStarman(f, marioBEntity, marioAEntity, !fromRight, dropStars);
@@ -2981,6 +2981,7 @@ namespace Quantum {
             mario->IsGroundpounding = false;
             mario->IsGroundpoundActive = false;
             mario->IsSliding = false;
+            mario->TauntFrames = 0;
 
             if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable)) {
                 mario->HeldEntity = EntityRef.None;

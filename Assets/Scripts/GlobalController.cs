@@ -18,6 +18,8 @@ using UnityEngine.UI;
 
 #if UNITY_STANDALONE && !UNITY_EDITOR 
 using NSMB.Replay;
+using System.IO;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 #endif
 
@@ -79,6 +81,7 @@ namespace NSMB {
 
 #if UNITY_STANDALONE && !UNITY_EDITOR
             //todo: this jitters to hell
+            var keyboard = Keyboard.current;
             if (Screen.fullScreenMode == FullScreenMode.Windowed && keyboard.leftShiftKey.isPressed && (windowWidth != newWindowWidth || windowHeight != newWindowHeight)) {
                 newWindowHeight = (int) (newWindowWidth * (9f / 16f));
                 Screen.SetResolution(newWindowWidth, newWindowHeight, FullScreenMode.Windowed);

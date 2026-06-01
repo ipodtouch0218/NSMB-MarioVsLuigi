@@ -23,20 +23,20 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
         [Preserve]
         public void NextPage() {
-            if (replayList.CurrentPage + 1 == replayList.PageCount) {
-                return;
-            }
-            replayList.canvas.PlayCursorSound();
-            _ = replayList.CreateReplayListEntries(default, replayList.CurrentPage + 1);
+            ChangeToPage(replayList.CurrentPage + 1);
         }
 
         [Preserve]
         public void PreviousPage() {
-            if (replayList.CurrentPage - 1 == 0) {
+            ChangeToPage(replayList.CurrentPage - 1);
+        }
+
+        public void ChangeToPage(int newPage) {
+            if (newPage < 0 || newPage >= replayList.PageCount) {
                 return;
             }
             replayList.canvas.PlayCursorSound();
-            _ = replayList.CreateReplayListEntries(default, replayList.CurrentPage - 1);
+            _ = replayList.CreateReplayListEntries(default, newPage);
         }
     }
 }
