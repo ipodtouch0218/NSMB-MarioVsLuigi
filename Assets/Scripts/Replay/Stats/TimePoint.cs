@@ -26,6 +26,7 @@ namespace NSMB.Replay.Stats {
         public readonly FP DeltaTime;
         public readonly int Id;
         public readonly ReplayStatsRecorder StatsRecorder;
+        public virtual bool ShowEndTime => EndFrame > -1;
 
         //---static
         private static int _index;
@@ -74,7 +75,7 @@ namespace NSMB.Replay.Stats {
             if (EndFrame != null) {
                 stringBuilder.Append('-');
 
-                if (EndFrame > -1) {
+                if (ShowEndTime) {
                     stringBuilder.Append(EventManager.FrameToTime(EndFrame.Value, StatsRecorder.ReplayStart, DeltaTime));
                 }
             }
@@ -427,6 +428,8 @@ namespace NSMB.Replay.Stats {
 
     public unsafe class PointPowerChange : TimePoint {
         public readonly PowerupState PowerupState;
+        public bool GameEnded;
+        public override bool ShowEndTime => !GameEnded;
         public PointPowerChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) : base(statsRecorder, f, mario) => PowerupState = mario->CurrentPowerupState;
 
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {

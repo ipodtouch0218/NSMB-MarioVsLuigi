@@ -1,14 +1,15 @@
+using NSMB.Addons;
+using NSMB.Networking;
+using NSMB.UI.MainMenu;
+using NSMB.UI.MainMenu.Submenus.ReplayStats;
+using NSMB.Utilities;
 using Photon.Deterministic;
 using Quantum;
-using UnityEngine;
-using NSMB.Utilities;
+using System;
 using System.Collections.Generic;
-using NSMB.Networking;
-using System.Threading.Tasks;
-using NSMB.Addons;
-using NSMB.UI.MainMenu.Submenus.ReplayStats;
-using NSMB.UI.MainMenu;
 using System.Threading;
+using System.Threading.Tasks;
+using UnityEngine;
 
 namespace NSMB.Replay.Stats {
     public class ReplayStatsRecorder : Singleton<ReplayStatsRecorder> {
@@ -19,17 +20,53 @@ namespace NSMB.Replay.Stats {
         public Dictionary<PlayerRef, PlayerInfo> PlayerInfos { get; private set; }
         public GlobalInfo GlobalInfo { get; private set; }
         public bool IsGameValid => Runner != null;
+        public bool IsSimulating => Runner == null || Runner.State == SessionRunner.SessionState.Running;
         private SessionRunner Runner;
+        private CancellationTokenSource currentCancellationSource;
 
-        public bool TerminateReplayRunner() {
-            if (Runner != null) {
-                Runner.ShutdownAsync();
-                return true;
+        private async Awaitable StartNewTaskSequence(Func<CancellationToken, Awaitable> asyncTask) {
+            try {
+                CancelExistingTask();
+
+                var token = (currentCancellationSource = new()).Token;
+
+                if (token.IsCancellationRequested) {
+                    return;
+                }
+
+                await asyncTask(token);
+            } catch {
+                // Move exceptions to the main thread so they're printed.
+                await Awaitable.MainThreadAsync();
+                throw;
             }
-            return false;
+        }
+
+        private void CancelExistingTask() {
+            if (currentCancellationSource != null) {
+                currentCancellationSource.Cancel();
+                currentCancellationSource.Dispose();
+            }
+            currentCancellationSource = null;
+        }
+
+        public bool MurderRunner() {
+            CancelExistingTask();
+            return Runner != null;
         }
 
         public async Awaitable StartAnalyzing(BinaryReplayFile replayFile, ReplayStatsManager statsManager) {
+            await StartNewTaskSequence(async (cancellationToken) => {
+                await StartAnalyzing(cancellationToken, replayFile, statsManager);
+            });
+        }
+
+        private async Awaitable StartAnalyzing(CancellationToken cancellationToken, BinaryReplayFile replayFile, ReplayStatsManager statsManager) {
+            if (cancellationToken.IsCancellationRequested) {
+                return;
+            }
+
+            await Awaitable.MainThreadAsync();
             ReplayFile = replayFile;
             Runner = null;
             statsManager.UpdateProgressBar(0, ReplayEnd);
@@ -65,13 +102,14 @@ namespace NSMB.Replay.Stats {
                 return;
             }
 
-            while (Runner.Session.FramePredicted == null || Runner.Session.FramePredicted.Number < ReplayEnd) {
+            while ((Runner.Session.FramePredicted == null || Runner.Session.FramePredicted.Number < ReplayEnd) && !cancellationToken.IsCancellationRequested) {
                 Runner.Service(1);
                 statsManager.UpdateProgressBar(Runner.Session.FramePredicted.Number, ReplayEnd);
                 await Task.Delay(1);
             }
 
             await Runner.ShutdownAsync();
+            statsManager.Prepare();
         }
 
         private async Task Init() {

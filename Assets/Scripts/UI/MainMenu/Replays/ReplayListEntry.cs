@@ -171,9 +171,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             canvas.OpenMenu(manager.statsSubmenu);
             await ReplayStatsRecorder.Instance.StartAnalyzing(ReplayFile, statsManager);
 
-            if (ReplayStatsRecorder.Instance.IsGameValid) {
-                statsManager.Prepare();
-            } else {
+            if (!ReplayStatsRecorder.Instance.IsGameValid) {
                 canvas.CloseSubmenu(manager.statsSubmenu);
             }
         }

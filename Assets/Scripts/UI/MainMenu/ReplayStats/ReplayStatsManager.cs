@@ -435,13 +435,13 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             toggleTemplate.gameObject.SetActive(false);
             listTemplate.gameObject.SetActive(false);
             loading.SetActive(!IsReady);
+
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) leftTopLayout.transform);
             TranslationManager.OnLanguageChanged += UpdateStatsDropdown;
             TranslationManager.OnLanguageChanged += UpdateEntryCount;
             TranslationManager.OnLanguageChanged += UpdateLists;
             TranslationManager.OnLanguageChanged += UpdatePlayerDropdown;
-            Settings.Controls.UI.Previous.performed += OnPrevious;
             Canvas.ForceUpdateCanvases();
 
             // create the buttons for cateGOries
@@ -458,8 +458,8 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             UpdateStatsDropdown(GlobalController.Instance.translationManager);
             if (IsReady) {
                 UpdatePlayerDropdown(GlobalController.Instance.translationManager);
-                UpdateEntryCount(GlobalController.Instance.translationManager);
             }
+            UpdateEntryCount(GlobalController.Instance.translationManager);
             UpdateInformation(replayListEntry);
 
             ChangedViewingStats(true);
@@ -478,7 +478,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             TranslationManager.OnLanguageChanged -= UpdateEntryCount;
             TranslationManager.OnLanguageChanged -= UpdateLists;
             TranslationManager.OnLanguageChanged -= UpdatePlayerDropdown;
-            Settings.Controls.UI.Previous.performed -= OnPrevious;
 
             foreach (var button in statsButtons) {
                 Destroy(button.gameObject);
@@ -655,11 +654,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 }
                 statLists.Add(listObj);
             }
-        }
-
-        private void OnPrevious(InputAction.CallbackContext context) {
-            canvas.PlayCursorSound();
-            ReplayStatsRecorder.Instance.TerminateReplayRunner();
         }
 
         private void UpdatePlayerDropdown(TranslationManager tm) {

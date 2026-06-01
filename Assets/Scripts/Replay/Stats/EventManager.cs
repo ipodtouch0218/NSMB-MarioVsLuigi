@@ -390,7 +390,8 @@ namespace NSMB.Replay.Stats
 
             // set the end frame of the previous point if it exists
             if (playerInfo.CurrPowerChangePoint is PointPowerChange currPoint) {
-                currPoint.EndFrame = gameEnded ? -1 : f.Number;
+                currPoint.EndFrame = f.Number;
+                currPoint.GameEnded = gameEnded;
             }
 
             /** Current Reserve State **/

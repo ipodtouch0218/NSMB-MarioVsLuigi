@@ -759,7 +759,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 1234 / 5678
+  m_text: 1234 / 5678 (420%)
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 38e8769007229044bb229d69f8cbae74, type: 2}
   m_sharedMaterial: {fileID: 3023213983796840565, guid: 38e8769007229044bb229d69f8cbae74,
@@ -35141,10 +35141,13 @@ MonoBehaviour:
   scrollRect: {fileID: 743571157}
   layout: {fileID: 1184666178}
   leftTopLayout: {fileID: 1470955785}
+  loading: {fileID: 38664597}
+  progressBar: {fileID: 1146417364}
+  progressBarText: {fileID: 8684885}
+  progressBarFill: {fileID: 505102824}
   viewingStatisticDropdown: {fileID: 1277084953}
   targetPlayerDropdown: {fileID: 1519858399}
   entryCount: {fileID: 826628527}
-  loading: {fileID: 38664597}
   replayInformation: {fileID: 1261341350}
   entryTemplate: {fileID: 379502619}
   buttonTemplate: {fileID: 1185384253}
