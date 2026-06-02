@@ -66,19 +66,6 @@ namespace Quantum {
             return false;
         }
 
-        public bool CanItemSpawn(Frame f, CoinItemAsset coinItem, bool fromRouletteBlock) {
-            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            if (stage.BannedCoinItems.Contains(coinItem)) {
-                return false;
-            }
-
-            if (f.Global->Rules.IsCoinItemDisabled(f, coinItem)) {
-                return false;
-            }
-
-            return coinItem.CanSpawn(f, fromRouletteBlock);
-        }
-
         public virtual CoinItemAsset GetRandomItem(Frame f, MarioPlayer* mario, bool fromBlock) {
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
@@ -89,7 +76,7 @@ namespace Quantum {
             FP totalChance = 0;
             foreach (AssetRef<CoinItemAsset> coinItemAsset in AllCoinItems) {
                 CoinItemAsset coinItem = f.FindAsset(coinItemAsset);
-                if (!CanItemSpawn(f, coinItem, fromBlock)) {
+                if (!coinItem.CanSpawn(f, fromBlock)) {
                     continue;
                 }
 
@@ -99,7 +86,7 @@ namespace Quantum {
             FP rand = mario->RNG.Next(0, totalChance);
             foreach (AssetRef<CoinItemAsset> coinItemAsset in AllCoinItems) {
                 CoinItemAsset coinItem = f.FindAsset(coinItemAsset);
-                if (!CanItemSpawn(f, coinItem, fromBlock)) {
+                if (!coinItem.CanSpawn(f, fromBlock)) {
                     continue;
                 }
 

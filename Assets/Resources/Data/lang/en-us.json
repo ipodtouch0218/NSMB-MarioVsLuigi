@@ -404,6 +404,8 @@
   "ui.replay.stats.entry.deaths.starman": "Got killed by starman",
   "ui.replay.stats.entry.deaths.megamushroom": "Got killed by a mega player",
   "ui.replay.stats.entry.deaths.explode": "Died in an explosion",
+  "ui.replay.stats.entry.deaths.tooltip.ping": "Ping {ping}ms",
+  "ui.replay.stats.entry.deaths.tooltip.lives": "Lives remaining {lives}",
   "ui.replay.stats.entry.knockback.recieved.normal": "Got stomped",
   "ui.replay.stats.entry.knockback.recieved.groundpound": "Got groundpounded",
   "ui.replay.stats.entry.knockback.recieved.fireballbump": "Ran into a projectile",

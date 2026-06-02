@@ -475,20 +475,6 @@ namespace NSMB.Replay.Stats
             playerInfo.ComboEndTimer = PlayerInfo.ComboTimerStart;
         }
 
-        public static string FrameToTime(Frame f, int initalFrameNum) {
-            var seconds = (f.Number - initalFrameNum) * f.DeltaTime;
-            var secMod = FPMath.Floor(seconds % 60);
-            string time = $"{FPMath.Floor(seconds / 60)}:{FPMath.Floor(secMod / 10) % 10}{secMod % 10}";
-            return time;
-        }
-
-        public static string FrameToTime(int frameNumber, int initalFrameNum, FP deltaTime) {
-            var seconds = (frameNumber - initalFrameNum) * deltaTime;
-            var secMod = FPMath.Floor(seconds % 60);
-            string time = $"{FPMath.Floor(seconds / 60)}:{FPMath.Floor(secMod / 10) % 10}{secMod % 10}";
-            return time;
-        }
-
         #endregion
     }
 }

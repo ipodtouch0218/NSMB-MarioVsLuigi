@@ -114,6 +114,15 @@ public unsafe class CoinItemAsset : AssetObject {
         if (MaxNumberOfItems > 0 && CountItemsExisting(f) >= MaxNumberOfItems) {
             return false;
         }
+
+        var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+        if (stage.BannedCoinItems.Contains(this)) {
+            return false;
+        }
+
+        if (f.Global->Rules.IsCoinItemDisabled(f, this)) {
+            return false;
+        }
         return true;
     }
 

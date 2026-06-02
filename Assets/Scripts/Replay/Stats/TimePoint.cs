@@ -26,7 +26,8 @@ namespace NSMB.Replay.Stats {
         public readonly FP DeltaTime;
         public readonly int Id;
         public readonly ReplayStatsRecorder StatsRecorder;
-        public virtual bool ShowEndTime => EndFrame > -1;
+        public virtual bool ShowEndTime => EndFrame != null;
+        public virtual bool ShowLength => EndFrame != null;
 
         //---static
         private static int _index;
@@ -38,7 +39,6 @@ namespace NSMB.Replay.Stats {
             FromAttacker,
             All
         }
-
 
         public int CompareTo(TimePoint? other) {
             if (other == null) return 1;
@@ -62,7 +62,6 @@ namespace NSMB.Replay.Stats {
             }
         }
 
-
         //---abstractions, overrideables for time point enteries
         public abstract void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg);
 
@@ -71,13 +70,13 @@ namespace NSMB.Replay.Stats {
                 stringBuilder.Append("");
                 return;
             }
-            stringBuilder.Append($"@ {EventManager.FrameToTime(OccurenceFrame, StatsRecorder.ReplayStart, DeltaTime)}");
+            stringBuilder.Append($"@ {FrameToTime(OccurenceFrame, StatsRecorder.ReplayStart, DeltaTime)}");
 
             if (EndFrame != null) {
                 stringBuilder.Append('-');
 
                 if (ShowEndTime) {
-                    stringBuilder.Append(EventManager.FrameToTime(EndFrame.Value, StatsRecorder.ReplayStart, DeltaTime));
+                    stringBuilder.Append(FrameToTime(EndFrame.Value, StatsRecorder.ReplayStart, DeltaTime));
                 }
             }
         }
@@ -95,6 +94,20 @@ namespace NSMB.Replay.Stats {
 
         //---static methods
         public static void ResetIndex() => _index = 0;
+
+        public static string FrameToTime(Frame f, int initalFrameNum) {
+            var seconds = (f.Number - initalFrameNum) * f.DeltaTime;
+            var secMod = FPMath.Floor(seconds % 60);
+            string time = $"{FPMath.Floor(seconds / 60)}:{FPMath.Floor(secMod / 10) % 10}{secMod % 10}";
+            return time;
+        }
+
+        public static string FrameToTime(int frameNumber, int initalFrameNum, FP deltaTime) {
+            var seconds = (frameNumber - initalFrameNum) * deltaTime;
+            var secMod = FPMath.Floor(seconds % 60);
+            string time = $"{FPMath.Floor(seconds / 60)}:{FPMath.Floor(secMod / 10) % 10}{secMod % 10}";
+            return time;
+        }
 
         // any extra parameters can be GOtten
     }
@@ -118,9 +131,6 @@ namespace NSMB.Replay.Stats {
                 FP sum = 0;
                 foreach (var currCoinItemRef in gamemode.AllCoinItems) {
                     CoinItemAsset currCoinItemAsset = f.FindAsset(currCoinItemRef);
-
-                    var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-
                     if (!currCoinItemAsset.CanSpawn(f, false)) {
                         continue;
                     }
@@ -250,7 +260,17 @@ namespace NSMB.Replay.Stats {
             }
         }
 
-        public override string? GetTooltip(TranslationManager tm, DisplayArgs displayArg) => $"Ping: {Ping}ms";
+        public override string? GetTooltip(TranslationManager tm, DisplayArgs displayArg) {
+            bool livesEnabled = StatsRecorder.ReplayFile.Header.Rules.Lives > 0;
+            string translationKeyStart = translationPrefix+"deaths.tooltip.";
+
+            string tooltip = tm.GetTranslationWithReplacements(translationKeyStart+"ping", Ping.ToString());
+
+            if (livesEnabled) {
+                tooltip += "\n" + tm.GetTranslationWithReplacements(translationKeyStart+"lives", LivesRemaining.ToString());
+            }
+            return tooltip;
+        }
     }
 
     public unsafe class PointKnockback : TimePoint {
@@ -269,7 +289,7 @@ namespace NSMB.Replay.Stats {
 
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             base.SetTimeText(tm, stringBuilder, displayArg);
-            if (EndFrame != null && EndFrame > 0) {
+            if (ShowLength) {
                 stringBuilder.Append($" ({EndFrame - OccurenceFrame}F)");
             }
         }
@@ -390,7 +410,7 @@ namespace NSMB.Replay.Stats {
             }
 
             stringBuilder.Append(string.Join(", ", ComboElements.Select(
-                c => EventManager.FrameToTime(c.Element.OccurenceFrame, StatsRecorder.ReplayStart, c.Element.DeltaTime))
+                c => FrameToTime(c.Element.OccurenceFrame, StatsRecorder.ReplayStart, c.Element.DeltaTime))
             ));
         }
 
@@ -440,8 +460,8 @@ namespace NSMB.Replay.Stats {
 
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             base.SetTimeText(tm, stringBuilder, displayArg);
-            if (EndFrame != null) {
-                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime;
+            if (ShowLength) {
+                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime ?? 0;
                 stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
             }
         }
@@ -465,8 +485,8 @@ namespace NSMB.Replay.Stats {
 
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             base.SetTimeText(tm, stringBuilder, displayArg);
-            if (EndFrame != null && EndFrame > 0) {
-                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime;
+            if (ShowLength) {
+                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime ?? 0;
                 stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
             }
         }
@@ -482,8 +502,8 @@ namespace NSMB.Replay.Stats {
 
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             base.SetTimeText(tm, stringBuilder, displayArg);
-            if (EndFrame != null && EndFrame > 0) {
-                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime;
+            if (ShowLength) {
+                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime ?? 0;
                 stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
             }
         }
@@ -586,10 +606,7 @@ namespace NSMB.Replay.Stats {
                 FP sum = 0;
                 foreach (var currCoinItemRef in gamemode.AllCoinItems) {
                     CoinItemAsset currCoinItemAsset = f.FindAsset(currCoinItemRef);
-
-                    var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-
-                    if (!currCoinItemAsset.CanSpawn(f, false)) {
+                    if (!currCoinItemAsset.CanSpawn(f, true)) {
                         continue;
                     }
                     sum += gamemode.GetItemSpawnWeight(f, currCoinItemAsset, CurrStarCount);
@@ -617,7 +634,7 @@ namespace NSMB.Replay.Stats {
         public PointTaunt(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) { }
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             string translationKey = translationPrefix+"taunt";
-           stringBuilder.Append(tm.GetTranslation(translationKey));
+            stringBuilder.Append(tm.GetTranslation(translationKey));
         }
     }
 }
