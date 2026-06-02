@@ -420,7 +420,7 @@
   "ui.replay.stats.entry.combo.tooltip.knockback": "Took knockback by {attacker} at F{framenumber}",
   "ui.replay.stats.entry.coincollected": "Collected a coin",
   "ui.replay.stats.entry.tooltip.itemspawn": "Spawned an item {item}",
-  "ui.replay.stats.entry.tooltip.randomspawn": "Spawned an item {item}\nSpawn chance: {chance}%",
+  "ui.replay.stats.entry.tooltip.randomspawn": "Spawned an item {item}\nSpawn chance {chance}%",
   "ui.replay.stats.entry.blockhit.normal": "Hit a block",
   "ui.replay.stats.entry.blockhit.random": "Hit a red block",
   "ui.replay.stats.entry.bigcollectablespawn": "Spawned at position {position}/{spawnpoints}",

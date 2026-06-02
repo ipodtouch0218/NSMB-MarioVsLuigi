@@ -111,7 +111,8 @@ public unsafe class CoinItemAsset : AssetObject {
         if (secondsSinceStart < CanSpawnAfterSeconds) {
             return false;
         }
-        if (MaxNumberOfItems > 0 && CountItemsExisting(f) >= MaxNumberOfItems) {
+
+        if (f.Global->Rules.IsCoinItemDisabled(f, this)) {
             return false;
         }
 
@@ -120,7 +121,7 @@ public unsafe class CoinItemAsset : AssetObject {
             return false;
         }
 
-        if (f.Global->Rules.IsCoinItemDisabled(f, this)) {
+        if (MaxNumberOfItems > 0 && CountItemsExisting(f) >= MaxNumberOfItems) {
             return false;
         }
         return true;

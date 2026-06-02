@@ -264,10 +264,10 @@ namespace NSMB.Replay.Stats {
             bool livesEnabled = StatsRecorder.ReplayFile.Header.Rules.Lives > 0;
             string translationKeyStart = translationPrefix+"deaths.tooltip.";
 
-            string tooltip = tm.GetTranslationWithReplacements(translationKeyStart+"ping", Ping.ToString());
+            string tooltip = tm.GetTranslationWithReplacements(translationKeyStart+"ping", "ping", Ping.ToString());
 
             if (livesEnabled) {
-                tooltip += "\n" + tm.GetTranslationWithReplacements(translationKeyStart+"lives", LivesRemaining.ToString());
+                tooltip += "\n" + tm.GetTranslationWithReplacements(translationKeyStart+"lives", "lives", LivesRemaining.ToString());
             }
             return tooltip;
         }
