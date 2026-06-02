@@ -183,13 +183,14 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventBigCollectableAttemptedSpawn BigCollectableAttemptedSpawn(Int32 PositionIndex, FPVector2 Position, Int32 UsedSpawnpoints, QBoolean Success) {
+      public EventBigCollectableAttemptedSpawn BigCollectableAttemptedSpawn(Int32 PositionIndex, FPVector2 Position, Int32 UsedSpawnpoints, QBoolean Success, QListPtr<EntityRef> Blockers) {
         if (_f.IsPredicted) return null;
         var ev = _f.Context.AcquireEvent<EventBigCollectableAttemptedSpawn>(EventBigCollectableAttemptedSpawn.ID);
         ev.PositionIndex = PositionIndex;
         ev.Position = Position;
         ev.UsedSpawnpoints = UsedSpawnpoints;
         ev.Success = Success;
+        ev.Blockers = Blockers;
         _f.AddEvent(ev);
         return ev;
       }
@@ -940,6 +941,7 @@ namespace Quantum {
     public FPVector2 Position;
     public Int32 UsedSpawnpoints;
     public QBoolean Success;
+    public QListPtr<EntityRef> Blockers;
     protected EventBigCollectableAttemptedSpawn(Int32 id, EventFlags flags) : 
         base(id, flags) {
     }
@@ -961,6 +963,7 @@ namespace Quantum {
         hash = hash * 31 + Position.GetHashCode();
         hash = hash * 31 + UsedSpawnpoints.GetHashCode();
         hash = hash * 31 + Success.GetHashCode();
+        hash = hash * 31 + Blockers.GetHashCode();
         return hash;
       }
     }

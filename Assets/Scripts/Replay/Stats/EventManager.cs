@@ -3,6 +3,7 @@ using Photon.Deterministic;
 using Quantum;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace NSMB.Replay.Stats
 {
@@ -293,7 +294,20 @@ namespace NSMB.Replay.Stats
             bool wasBlocked = !e.Success;
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             var info = StatRecorder.GlobalInfo;
-            var point = new PointBigCollectableSpawned(StatRecorder, f, e.UsedSpawnpoints, e.PositionIndex, wasBlocked, position, ref info, stage);
+            List<string>? blockers = null;
+
+            if (wasBlocked) {
+                blockers = new();
+                var blockerRefs = f.ResolveList(e.Blockers);
+                foreach (var blockerRef in blockerRefs) {
+                    var mario = f.Unsafe.GetPointer<MarioPlayer>(blockerRef);
+                    var runtimeData = f.GetPlayerData(mario->PlayerRef);
+                    blockers.Add(runtimeData.PlayerNickname);
+                }
+                
+            }
+
+            var point = new PointBigCollectableSpawned(StatRecorder, f, e.UsedSpawnpoints, e.PositionIndex, wasBlocked, position, ref info, stage, blockers);
 
             // set the curr big collectable
             if (!wasBlocked) {

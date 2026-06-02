@@ -30,7 +30,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
 
             TranslationManager tm = GlobalController.Instance.translationManager;
 
-            entryNumText.text = entryNum.ToString();
+            entryNumText.text = timePointInfo.GetEntryNum(entryNum, displayArg);
             
             //--printing the time
             stringBuilder.Clear();

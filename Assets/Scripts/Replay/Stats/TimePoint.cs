@@ -90,6 +90,8 @@ namespace NSMB.Replay.Stats {
             }
         }
 
+        public virtual string? GetEntryNum(int entryNum, DisplayArgs displayArgs) => entryNum.ToString();
+
         public virtual string? GetTooltip(TranslationManager tm, DisplayArgs displayArg) => null;
 
         //---static methods
@@ -548,14 +550,15 @@ namespace NSMB.Replay.Stats {
 
         public readonly bool WasBlocked;
         public readonly FPVector2 Coordinates;
-        public readonly List<string> BlockingPlayers = new();
+        public readonly List<string>? BlockingPlayers;
         public string? CollectingPlayer; // if a player collected the big star this is their name
-        public PointBigCollectableSpawned(ReplayStatsRecorder stats, Frame f, int usedSpawns, int index, bool blocked, FPVector2 coordinates, ref GlobalInfo globalReplayInfo, VersusStageData stage) : base(stats, f) {
+        public PointBigCollectableSpawned(ReplayStatsRecorder stats, Frame f, int usedSpawns, int index, bool blocked, FPVector2 coordinates, ref GlobalInfo globalReplayInfo, VersusStageData stage, List<string>? blockers) : base(stats, f) {
             PositionIndex = index;
             UsedSpawns = usedSpawns;
             WasBlocked = blocked;
             Spawnpoints = stage.BigStarSpawnpoints.Length;
             Coordinates = coordinates;
+
 
             AttemptedSpawnCount = ++globalReplayInfo.AttemptedStarSpawns;
             if (!blocked) {
@@ -566,12 +569,13 @@ namespace NSMB.Replay.Stats {
 
             SuccessfulSpawnCount = globalReplayInfo.SuccessfulStarSpawns;
             FailedSpawnCount = globalReplayInfo.FailedStarSpawns;
+            BlockingPlayers = blockers;
         }
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
-            var translationSuffix = WasBlocked ? "bigcollectableblock" : "bigcollectablespawn";
+            var translationSuffix = WasBlocked ? "block" : "spawn";
             //! PositionIndex + 1 since it's zero indexed
-            stringBuilder.Append(tm.GetTranslationWithReplacements(translationPrefix + translationSuffix, "position", (PositionIndex+1).ToString(), "spawnpoints", Spawnpoints.ToString()));
+            stringBuilder.Append(tm.GetTranslationWithReplacements(translationPrefix + "bigcollectable." + translationSuffix, "position", (PositionIndex+1).ToString(), "spawnpoints", Spawnpoints.ToString()));
         }
 
         public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append(CollectingPlayer);
@@ -584,6 +588,17 @@ namespace NSMB.Replay.Stats {
             stringBuilder.Append(Utils.GetSymbolString(FailedSpawnCount.ToString(), Utils.smallSymbols, color: blockCol));
             stringBuilder.Append("<sprite name=\"room_stars\" color=#").Append(Utils.ColorToHex(successCol, false)).Append('>');
             stringBuilder.Append(Utils.GetSymbolString(SuccessfulSpawnCount.ToString(), Utils.smallSymbols, color: successCol));
+        }
+
+        public override string? GetTooltip(TranslationManager tm, DisplayArgs displayArg) {
+            var translationSuffix = "bigcollectable.tooltip.";
+
+            string spotsRemaining = tm.GetTranslationWithReplacements(translationPrefix+translationSuffix+"remaining", "spawnpoints", (Spawnpoints - UsedSpawns).ToString());
+            string blockers;
+            if (WasBlocked) {
+                blockers = string.Join(", ", BlockingPlayers);
+            }
+            return tm.GetTranslationWithReplacements(translationPrefix + "bigcollectable."+"tooltip.remaining", "spawnpoints", (Spawnpoints - UsedSpawns).ToString());
         }
     }
 

@@ -40,4 +40,5 @@ synced event BigCollectableAttemptedSpawn {
 	FPVector2 Position;
 	int UsedSpawnpoints;
 	bool Success;
+	list<EntityRef> Blockers;
 }
