@@ -359,7 +359,6 @@
   "ui.replay.stats.group.positive": "Positives",
   "ui.replay.stats.group.negative": "Negatives",
   "ui.replay.stats.group.powerup": "Powerup",
-  "ui.replay.stats.group.changes": "Changes",
   "ui.replay.stats.group.misc": "Misc",
   "ui.replay.stats.export": "Export to File",
   "ui.replay.stats.occurences": "Occurences in replay: {occurences}",

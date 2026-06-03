@@ -35163,12 +35163,9 @@ MonoBehaviour:
   - name: Powerup
     TranslationKey: ui.replay.stats.group.powerup
     StatOptions: 02000000080000000b0000000c000000
-  - name: Changes
-    TranslationKey: ui.replay.stats.group.changes
-    StatOptions: 10000000020000000c000000
   - name: Misc
     TranslationKey: ui.replay.stats.group.misc
-    StatOptions: 090000000f0000000a000000
+    StatOptions: 090000000f000000100000000a000000
 --- !u!1 &744346871
 GameObject:
   m_ObjectHideFlags: 0
