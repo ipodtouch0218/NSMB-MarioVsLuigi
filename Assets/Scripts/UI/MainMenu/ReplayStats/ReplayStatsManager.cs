@@ -324,7 +324,8 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             ReserveInfo,
             Kills,
             DamageDealt,
-            Taunts
+            Taunts,
+            StarCountChange,
         }
 
         private object GetTimePoints(StatOptions? options = null) {
@@ -347,6 +348,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 StatOptions.Kills => GetKills(),
                 StatOptions.DamageDealt => GetDamageDealt(),
                 StatOptions.Taunts => GetTauntInfo(),
+                StatOptions.StarCountChange => stats[TargetPlayer].StarCountChangePoints,
                 _ => throw new NotImplementedException(),
             };
         }

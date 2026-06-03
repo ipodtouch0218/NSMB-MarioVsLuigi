@@ -6,11 +6,11 @@ using System.Collections.Generic;
 
 namespace NSMB.Replay.Stats {
     public class PlayerInfo {
-        //--player info
+        //---player info
         public readonly PlayerRef PlayerRef;
         public readonly string PlayerName;
 
-        //--tracking information
+        //---tracking information
         public int Stars, Coins;
         public int StarsDropped, PurpleCoinsDropped;
 
@@ -23,7 +23,7 @@ namespace NSMB.Replay.Stats {
         public readonly List<PointPowerupCollect> PowerupCollectPoints = new();
         public readonly List<PointTaunt> TauntPoints = new();
 
-        //--more complex points
+        //---more complex points
         public PointKnockback? CurrKnockbackPoint = null;
         public readonly List<PointKnockback> KnockbackPoints = new();
 
@@ -36,6 +36,9 @@ namespace NSMB.Replay.Stats {
 
         public PointStarmanChange? CurrStarmanChangePoint = null;
         public readonly List<PointStarmanChange> StarmanChangePoints = new();
+
+        public PointStarCountChange? CurrStarCountChangePoint = null;
+        public readonly List<PointStarCountChange> StarCountChangePoints = new();
 
         // these are for reserve items
         public PointReserveChange? CurrReserveChangePoint = null;

@@ -657,4 +657,27 @@ namespace NSMB.Replay.Stats {
             stringBuilder.Append(tm.GetTranslation(translationKey));
         }
     }
+
+    public unsafe class PointStarCountChange : TimePoint {
+        public int StarCount;
+        public bool GameEnded;
+        public override bool ShowEndTime => !GameEnded;
+        public override bool ShowLength => OccurenceFrame != EndFrame;
+        public PointStarCountChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) : base(statsRecorder, f, mario) {
+            var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
+            StarCount = gamemode.GetObjectiveCount(f, mario);
+        }
+
+        public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
+            base.SetTimeText(tm, stringBuilder, displayArg);
+            if (ShowLength) {
+                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime ?? 0;
+                stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
+            }
+        }
+
+        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append("<sprite name=room_stars>").Append(Utils.GetSymbolString(StarCount.ToString(), Utils.smallSymbols));
+
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append(tm.GetTranslationWithReplacements("ui.replay.stats.entry.starcountchange", "stars", StarCount.ToString()));
+    }
 }

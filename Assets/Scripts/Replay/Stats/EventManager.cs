@@ -342,7 +342,7 @@ namespace NSMB.Replay.Stats
 
                 var playerInfo = StatRecorder.PlayerInfos[marioPlayer->PlayerRef];
                 HandleCombo(f, marioPlayer, playerInfo);
-                HandleStateData(f, marioPlayer, playerInfo);
+                HandleChangeData(f, marioPlayer, playerInfo);
             }
 
             if (f.Global->GameState == GameState.Ended && StatRecorder.GlobalInfo.CurrBigCollectable is PointBigCollectableSpawned currBigCollectable) {
@@ -399,7 +399,7 @@ namespace NSMB.Replay.Stats
             }
         }
 
-        private void HandleStateData(Frame f, MarioPlayer* marioPlayer, PlayerInfo playerInfo) {
+        private void HandleChangeData(Frame f, MarioPlayer* marioPlayer, PlayerInfo playerInfo) {
             bool gameEnded = f.Global->GameState == GameState.Ended;
 
             /** Current PowerUP State **/
@@ -428,6 +428,18 @@ namespace NSMB.Replay.Stats
             if (playerInfo.CurrReserveChangePoint is PointReserveChange currReserveChangePoint) {
                 currReserveChangePoint.EndFrame = f.Number;
                 currReserveChangePoint.GameEnded = gameEnded;
+            }
+
+            /** Current Star Count State **/
+            var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
+            if (playerInfo.CurrStarCountChangePoint == null || gamemode.GetObjectiveCount(f, marioPlayer) != playerInfo.CurrStarCountChangePoint.StarCount) {
+                var point = new PointStarCountChange(StatRecorder, f, marioPlayer);
+                playerInfo.StarCountChangePoints.Add(point);
+                playerInfo.CurrStarCountChangePoint = point;
+            }
+            if (playerInfo.CurrStarCountChangePoint is PointStarCountChange currStarCountChangePoint) {
+                currStarCountChangePoint.EndFrame = f.Number;
+                currStarCountChangePoint.GameEnded = gameEnded;
             }
 
             /** Current Starman State **/
