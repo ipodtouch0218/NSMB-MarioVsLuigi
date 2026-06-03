@@ -387,7 +387,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             case StatOptions.StarCountChange:
             case StatOptions.StarsCollected:
                 if (QuantumUnityDB.TryGetGlobalAsset(replayListEntry.ReplayFile.Header.Rules.Gamemode, out var gamemode)) {
-                    return gamemode is StarChasersGamemode;
+                    return gamemode is not StarChasersGamemode;
                 }
                 return false;
             default:
