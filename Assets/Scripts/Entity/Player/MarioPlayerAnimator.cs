@@ -223,7 +223,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventPhysicsObjectLanded>(this, OnPhysicsObjectLanded, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerLandedWithAnimation>(this, OnMarioPlayerLandedWithAnimation, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventEnemyKicked>(this, OnEnemyKicked, FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerTaunted>(this, OnMarioPlayerTaunted);
+            QuantumEvent.Subscribe<EventMarioPlayerTaunted>(this, OnMarioPlayerTaunted, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerUpdatePowerupQueue>(this, OnMarioPlayerUpdatePowerupQueue, FilterOutReplayFastForward);
         }
 
