@@ -381,6 +381,20 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             };
         }
 
+        private bool HideOption(StatOptions? options = null) {
+            StatOptions viewingOptions = options ?? ViewingStats;
+            switch(viewingOptions) {
+            case StatOptions.StarCountChange:
+            case StatOptions.StarsCollected:
+                if (QuantumUnityDB.TryGetGlobalAsset(replayListEntry.ReplayFile.Header.Rules.Gamemode, out var gamemode)) {
+                    return gamemode is StarChasersGamemode;
+                }
+                return false;
+            default:
+                return false;
+            };
+        }
+
         // the "value" of the dictionary is the default value
         private Dictionary<string, bool> GetToggleOptions(StatOptions? options = null) {
             Dictionary<string, bool> dictionary = new();
@@ -709,6 +723,9 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
             // loop through all replay stat options
             foreach (StatOptions value in CurrStatsGroup.StatOptions) {
+                if (HideOption(value)) {
+                    continue;
+                }
                 viewingStatisticDropdown.options.Add(new TMP_Dropdown.OptionData { text = prefix + tm.GetTranslation(tmPrefix + value.ToString().ToLower()) });
             }
             viewingStatisticDropdown.SetValueWithoutNotify(index);
