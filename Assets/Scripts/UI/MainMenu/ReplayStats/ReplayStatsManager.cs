@@ -287,7 +287,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
             return temp.ToDictionary(kvp => (TimePoint) kvp.Key, kvp => kvp.Value);
         }
-        
+
         private Dictionary<TimePoint, bool> GetPowerupSpawns() {
             Dictionary<TimePoint, bool> temp = new();
 
@@ -386,7 +386,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
         private bool HideOption(StatOptions? options = null) {
             StatOptions viewingOptions = options ?? ViewingStats;
-            switch(viewingOptions) {
+            switch (viewingOptions) {
             case StatOptions.StarCountChange:
             case StatOptions.StarsCollected:
                 if (QuantumUnityDB.TryGetGlobalAsset(replayListEntry.ReplayFile.Header.Rules.Gamemode, out var gamemode)) {
@@ -430,7 +430,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             StatOptions viewingOptions = options ?? ViewingStats;
             var listPrefix = "ui.replay.stats.list.";
             var translationPrefix = listPrefix+viewingOptions.ToString().ToLower()+".";
-            switch(viewingOptions) {
+            switch (viewingOptions) {
             case StatOptions.Kills:
             case StatOptions.DamageDealt:
             case StatOptions.KnockbackDealt:
@@ -467,10 +467,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 return;
             }
 
-            // reset these
-            selectedButton = 0;
-            viewingStatisticDropdown.value = 0;
-            targetPlayerDropdown.value = 0;
 
             // hide templates
             entryTemplate.gameObject.SetActive(false);
@@ -497,7 +493,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 button.UpdateUI(GlobalController.Instance.translationManager);
                 statsButtons.Add(button);
             }
-            
+
             UpdateStatsDropdown(GlobalController.Instance.translationManager);
             if (IsReady) {
                 UpdatePlayerDropdown(GlobalController.Instance.translationManager);
@@ -556,7 +552,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
         public void UpdateProgressBar(int progress, int max) {
             if (progressBar.activeInHierarchy) {
-                float percentage =  (float) progress / max;
+                float percentage = (float) progress / max;
                 progressBarFill.fillAmount = percentage;
                 progressBarText.text = $"{progress} / {max} ({(percentage * 100):F0}%)";
             }
@@ -811,6 +807,12 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
         public void ResetStatsDropdownPos() {
             viewingStatisticDropdown.value = 0;
+        }
+
+        public void ResetSelection() {
+            selectedButton = 0;
+            viewingStatisticDropdown.value = 0;
+            targetPlayerDropdown.value = 0;
         }
 
         #endregion

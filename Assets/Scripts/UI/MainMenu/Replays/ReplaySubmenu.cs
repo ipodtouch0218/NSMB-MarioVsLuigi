@@ -1,3 +1,4 @@
+using NSMB.Replay;
 using UnityEngine;
 
 namespace NSMB.UI.MainMenu.Submenus.Replays {
@@ -40,6 +41,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 return false;
             }
 
+            ActiveReplayManager.Instance.ReplayFrameCache.Clear();
             return base.TryGoBack(out playSound);
         }
     }

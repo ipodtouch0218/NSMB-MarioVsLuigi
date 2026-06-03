@@ -171,6 +171,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         [Preserve]
         public async void OnStatsClick() {
             statsManager.IsReady = false;
+            statsManager.ResetSelection();
             statsManager.Initialize(this);
             canvas.OpenMenu(manager.statsSubmenu);
             await ReplayStatsRecorder.Instance.StartAnalyzing(ReplayFile, statsManager);
