@@ -467,7 +467,7 @@ MonoBehaviour:
           Id:
             Value: 514613043730600723
         StartOffset:
-          RawValue: 458752
+          RawValue: 244668
     - rid: 3620598001065525252
       type: {class: MovingPlatformPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -667,7 +667,7 @@ MonoBehaviour:
           Id:
             Value: 514613043730600723
         StartOffset:
-          RawValue: 229376
+          RawValue: 122334
     - rid: 5727890311477198852
       type: {class: MovingPlatformPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -963,8 +963,6 @@ MonoBehaviour:
           Value: 1
         IsWaterSolid:
           Value: 0
-        BreakMegaObjects:
-          Value: 0
     - rid: 7591444679539818508
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -1245,8 +1243,6 @@ MonoBehaviour:
         SlowInLiquids:
           Value: 1
         IsWaterSolid:
-          Value: 0
-        BreakMegaObjects:
           Value: 0
     - rid: 8968679368100413450
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}

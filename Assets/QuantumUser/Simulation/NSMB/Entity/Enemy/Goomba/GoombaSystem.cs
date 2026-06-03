@@ -95,7 +95,7 @@ namespace Quantum {
                 marioPhysicsObject->Velocity.X = 0;
                 goombaEnemy->ChangeFacingRight(f, goombaEntity, ourPos.X > theirPos.X);
 
-            } else if (mario->IsDamageable && !mario->GetCurrentPowerTransition(f, out _) && goombaEnemy->IntangibilityFrames == 0) {
+            } else if (mario->IsDamageable(f) && goombaEnemy->IntangibilityFrames == 0) {
                 mario->Powerdown(f, marioEntity, false, goombaEntity);
                 goombaEnemy->ChangeFacingRight(f, goombaEntity, damageDirection.X > 0);
             }

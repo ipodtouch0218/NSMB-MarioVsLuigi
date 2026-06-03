@@ -20,7 +20,15 @@ namespace NSMB.Utilities {
         protected override void OnDestroy() {
             base.OnDestroy();
             if (newMaterial) {
+#if UNITY_EDITOR
+                if (!UnityEditor.EditorApplication.isPlaying) {
+                    DestroyImmediate(newMaterial);
+                } else {
+                    Destroy(newMaterial);
+                }
+#else
                 Destroy(newMaterial);
+#endif
             }
         }
 

@@ -88,8 +88,8 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged, onlyIfActiveAndEnabled: true);
         }
 
-        private void OnLocalPlayerAddFailed(CallbackLocalPlayerAddFailed callback) {
-            Debug.LogError("Failed to add local player! " + callback.Message);
+        private void OnLocalPlayerAddFailed(CallbackLocalPlayerAddFailed e) {
+            Debug.LogError($"[Network] Failed to add local player! Message: {e.Message}");
         }
 
         public void OnEnable() {

@@ -39,11 +39,12 @@ namespace NSMB.Entities.Player {
             }
         }
 
-        public void ApplyTextureReplacements() {
+        public void ApplyTextureReplacements(bool starman) {
             foreach (var replacement in TextureReplacements) {
                 Material material = replacement.Material;
-                material.SetTexture(MainTex, replacement.AlbedoTexture);
+                material.SetTexture(MainTex, (starman && replacement.StarmanAlbedoTexture) ? replacement.StarmanAlbedoTexture : replacement.AlbedoTexture);
                 material.SetTexture(OverallsMask, replacement.OverallsMaskTexture);
+                Debug.Log($"{material.name} OverallsMask set to {replacement.OverallsMaskTexture}");
                 material.SetTexture(ShirtMask, replacement.ShirtMaskTexture);
                 material.SetTexture(CapMask, replacement.CapMaskTexture);
             }
@@ -51,22 +52,24 @@ namespace NSMB.Entities.Player {
 
         public void SwapAnimations(MarioPlayerAnimator marioAnimator) {
             if (AnimationAvatar != marioAnimator.Animator.avatar) {
-                // Preserve Animations
-                int[] layers = { 0, 1, 3 };
-                AnimatorStateInfo[] layerInfo = new AnimatorStateInfo[marioAnimator.Animator.layerCount];
-                foreach (int i in layers) {
-                    layerInfo[i] = marioAnimator.Animator.GetCurrentAnimatorStateInfo(i);
-                }
+                return;
+            }
 
-                marioAnimator.Animator.avatar = AnimationAvatar;
-                marioAnimator.Animator.runtimeAnimatorController = AnimatorOverrides;
+            // Preserve Animations
+            int[] layers = { 0, 1, 3 };
+            AnimatorStateInfo[] layerInfo = new AnimatorStateInfo[marioAnimator.Animator.layerCount];
+            foreach (int i in layers) {
+                layerInfo[i] = marioAnimator.Animator.GetCurrentAnimatorStateInfo(i);
+            }
 
-                // Push back state 
-                marioAnimator.Animator.Rebind();
+            marioAnimator.Animator.avatar = AnimationAvatar;
+            marioAnimator.Animator.runtimeAnimatorController = AnimatorOverrides;
 
-                foreach (int i in layers) {
-                    marioAnimator.Animator.Play(layerInfo[i].fullPathHash, i, layerInfo[i].normalizedTime);
-                }
+            // Push back state 
+            marioAnimator.Animator.Rebind();
+
+            foreach (int i in layers) {
+                marioAnimator.Animator.Play(layerInfo[i].fullPathHash, i, layerInfo[i].normalizedTime);
             }
         }
 
@@ -95,6 +98,7 @@ namespace NSMB.Entities.Player {
         public class MaterialTextureReplacement {
             public Material Material;
             public Texture AlbedoTexture, OverallsMaskTexture, ShirtMaskTexture, CapMaskTexture;
+            public Texture StarmanAlbedoTexture;
         }
     }
 }

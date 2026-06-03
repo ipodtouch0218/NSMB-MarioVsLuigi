@@ -263,7 +263,7 @@ namespace NSMB.Networking {
                 GameParameters = QuantumRunnerUnityFactory.CreateGameParameters,
                 ClientId = Client.UserId,
                 RuntimeConfig = new RuntimeConfig {
-                    SimulationConfig = GlobalController.Instance.config,
+                    SimulationConfig = QuantumDefaultConfigs.Global.SimulationConfig,
                     Map = null,
                     // Seed = unchecked((int) DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
                     IsRealGame = true,

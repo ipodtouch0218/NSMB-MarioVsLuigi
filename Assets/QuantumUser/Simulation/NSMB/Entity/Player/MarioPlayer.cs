@@ -91,17 +91,17 @@ namespace Quantum {
         public readonly bool IsStarmanInvincible => InvincibilityFrames > 0;
         public readonly bool IsWallsliding => WallslideLeft || WallslideRight;
         public readonly bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && (IsCrouching || IsGroundpounding && GroundpoundStartFrames <= 11) && !IsInShell;
-        public readonly bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
         public readonly bool IsInKnockback => CurrentKnockback != KnockbackStrength.None;
         public readonly bool CanCollectOwnTeamsObjectiveCoins => !IsInKnockback && DamageInvincibilityFrames == 0;
         public readonly bool IsStarmanOrMega => IsStarmanInvincible || CurrentPowerupState == PowerupState.MegaMushroom;
         public readonly bool IsValid(Frame f) => !Disconnected && !(f.Global->Rules.IsLivesEnabled && Lives == 0);
+        public readonly bool IsDamageable(Frame f) => !IsStarmanInvincible && DamageInvincibilityFrames == 0 && !TryGetCurrentPowerTransition(f, out _);
 
         /**
          * <summary>Outputs a pointer to the current transition animation Mario is in, if he is in one.</summary>
          * <returns><strong>true</strong> if in a transition otherwise <strong>false</strong>.</returns>
          */
-        public readonly bool GetCurrentPowerTransition(Frame f, out PowerupTransitionAnimation* transition) {
+        public readonly bool TryGetCurrentPowerTransition(Frame f, out PowerupTransitionAnimation* transition) {
             transition = null;
             var queue = f.ResolveList(PowerupTransitionQueue);
 
@@ -109,7 +109,7 @@ namespace Quantum {
                 return false;
             }
 
-            transition = f.ResolveList(PowerupTransitionQueue).GetPointer(0);
+            transition = queue.GetPointer(0);
             return true;
         }
 
@@ -348,7 +348,7 @@ namespace Quantum {
         }
 
         public bool Powerdown(Frame f, EntityRef entity, bool ignoreInvincible, EntityRef attacker) {
-            if (!ignoreInvincible && (!IsDamageable || GetCurrentPowerTransition(f, out var _) || CurrentPowerupState == PowerupState.MegaMushroom)) {
+            if (!ignoreInvincible && (!IsDamageable(f) || CurrentPowerupState == PowerupState.MegaMushroom)) {
                 return false;
             }
 

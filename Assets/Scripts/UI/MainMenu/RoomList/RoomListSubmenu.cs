@@ -248,9 +248,9 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
                     }
 
                     if (tm.RightToLeft) {
-                        text = "<align=right>" + translation + "<line-height=0>\n<align=left><font=\"PauseFont\">" + _ping + "ms " + Utils.GetPingSymbol(_ping);
+                        text = $"<align=right>{translation} <sprite name=flag_{Region}><line-height=0>\n<align=left><font=\"PauseFont\">{_ping}ms {Utils.GetPingSymbol(_ping)}";
                     } else {
-                        text = "<margin-right=33%><align=left>" + translation + "<line-height=0>\n<margin-right=0%><margin-left=67%><align=right><font=\"PauseFont\">" + _ping + "ms " + Utils.GetPingSymbol(_ping);
+                        text = $"<margin-right=33%><align=left><sprite name=flag_{Region}> {translation}<line-height=0>\n<margin-right=0%><margin-left=67%><align=right><font=\"PauseFont\">{_ping}ms {Utils.GetPingSymbol(_ping)}";
                     }
                 }
             }

@@ -16,6 +16,7 @@ namespace NSMB.UI.Game.Scoreboard {
         //---Serialized Variables
         [SerializeField] private Image background, pingIndicator, teamSprite;
         [SerializeField] private TMP_Text nicknameText, scoreText;
+        [SerializeField] private LayoutElement nameLayoutElement;
 
         //---Private Variables
         private ScoreboardUpdater updater;
@@ -58,10 +59,12 @@ namespace NSMB.UI.Game.Scoreboard {
 
         public void OnEnable() {
             Settings.OnColorblindModeChanged += OnColorblindModeChanged;
+            Settings.OnCondensedScoreboardChanged += OnCondensedScoreboardChanged;
         }
 
         public void OnDisable() {
             Settings.OnColorblindModeChanged -= OnColorblindModeChanged;
+            Settings.OnCondensedScoreboardChanged -= OnCondensedScoreboardChanged;
         }
 
         public void Update() {
@@ -91,6 +94,9 @@ namespace NSMB.UI.Game.Scoreboard {
             Color backgroundColor = Utils.GetPlayerColor(f, info.PlayerRef, considerDisqualifications: true);
             backgroundColor.a = 0.6f;
             background.color = backgroundColor;
+            
+            nameLayoutElement.flexibleWidth = Settings.Instance.GeneralCondensedScoreboard ? 0 : 1;
+            nameLayoutElement.gameObject.SetActive(!Settings.Instance.GeneralCondensedScoreboard || !Settings.Instance.GraphicsColorblind);
 
             if (Settings.Instance.GraphicsColorblind) {
                 if (f.Global->Rules.TeamsEnabled) {
@@ -124,9 +130,9 @@ namespace NSMB.UI.Game.Scoreboard {
 
             stringBuilder.Clear();
             if (f.Global->Rules.IsLivesEnabled) {
-                stringBuilder.Append(character.UiString).Append(Utils.GetSymbolString(lives.ToString()));
+                stringBuilder.Append(character.UiString).Append(Utils.GetSymbolString(lives.ToString(), padUpToNLength: 2));
             }
-            stringBuilder.Append(Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + objective.ToString()));
+            stringBuilder.Append(Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix)).Append(Utils.GetSymbolString(objective.ToString(), padUpToNLength: 2));
 
             scoreText.SetText(stringBuilder);
             updater.RequestSorting = true;
@@ -203,6 +209,10 @@ namespace NSMB.UI.Game.Scoreboard {
         }
 
         private void OnColorblindModeChanged() {
+            UpdateEntry(QuantumRunner.DefaultGame.Frames.Predicted);
+        }
+        
+        private void OnCondensedScoreboardChanged() {
             UpdateEntry(QuantumRunner.DefaultGame.Frames.Predicted);
         }
     }

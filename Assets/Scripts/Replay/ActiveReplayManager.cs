@@ -113,8 +113,7 @@ namespace NSMB.Replay {
             initialFrameData = null;
 
             // Create directories and open file
-            string replayFolder = Path.Combine(ReplayListManager.ReplayDirectory, "temp");
-            Directory.CreateDirectory(replayFolder);
+            Directory.CreateDirectory(ReplayListManager.TempDirectory);
 
             // Find end-game data
             Frame f = game.Frames.Verified;
@@ -134,8 +133,8 @@ namespace NSMB.Replay {
 
             // Write binary replay
             string now = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
-            string finalFilePath = Path.Combine(replayFolder, $"Replay-{now}.mvlreplay");
 
+            string finalFilePath = Path.Combine(ReplayListManager.TempDirectory, $"Replay-{now}.mvlreplay");
             Stream outputStream = null;
             long writtenBytes;
             try {
@@ -193,11 +192,12 @@ namespace NSMB.Replay {
                         outputStream = new FileStream(finalFilePath, FileMode.Create);
                     } catch {
                         // Failed to create file; maybe they have two copies of the game open?
-                        finalFilePath = Path.Combine(replayFolder, $"Replay-{now}-{++attempts}.mvlreplay");
+                        finalFilePath = Path.Combine(ReplayListManager.TempDirectory, $"Replay-{now}-{++attempts}.mvlreplay");
                     }
                 } while (outputStream == null && attempts < 5);
 
                 writtenBytes = binaryReplay.WriteToStream(outputStream);
+                binaryReplay.FilePath = finalFilePath;
 #else
                 outputStream = new DummyStream();
                 writtenBytes = binaryReplay.WriteToStream(outputStream);

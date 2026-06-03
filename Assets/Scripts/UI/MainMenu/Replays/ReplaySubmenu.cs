@@ -23,6 +23,14 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             replayList.Initialize();
         }
 
+        public override void Show(bool first) {
+            base.Show(first);
+
+            if (first) {
+                _ = replayList.LoadReplays();
+            }
+        }
+
         public override bool TryGoBack(out bool playSound) {
             ReplayListEntry selected = replayList.Selected;
             if (selected && selected.IsOpen) {
