@@ -467,9 +467,12 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 return;
             }
 
+            // reset these
+            selectedButton = 0;
             viewingStatisticDropdown.value = 0;
             targetPlayerDropdown.value = 0;
-            scrollRect.verticalNormalizedPosition = 1;
+
+            // hide templates
             entryTemplate.gameObject.SetActive(false);
             buttonTemplate.gameObject.SetActive(false);
             toggleTemplate.gameObject.SetActive(false);
@@ -795,6 +798,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 }
             }
 
+            scrollRect.verticalNormalizedPosition = 1;
             UpdateEntryCount(GlobalController.Instance.translationManager);
         }
 
