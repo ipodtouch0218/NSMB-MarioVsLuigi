@@ -26,7 +26,7 @@ namespace NSMB.Replay.Stats {
         public readonly FP DeltaTime;
         public readonly int Id;
         public readonly ReplayStatsRecorder StatsRecorder;
-        public virtual bool ShowEndTime => EndFrame != null;
+        public virtual bool ShowEndTime => EndFrame != null && EndFrame != -1;
         public virtual bool ShowLength => EndFrame != null;
 
         //---static
@@ -578,7 +578,12 @@ namespace NSMB.Replay.Stats {
             stringBuilder.Append(tm.GetTranslationWithReplacements(translationPrefix + "bigcollectable." + translationSuffix, "position", (PositionIndex+1).ToString(), "spawnpoints", Spawnpoints.ToString()));
         }
 
-        public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append(CollectingPlayer);
+        public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
+            if (!WasBlocked && CollectingPlayer != null) {
+                string translationSuffix = "bigcollectable.";
+                stringBuilder.Append(tm.GetTranslationWithReplacements(translationPrefix + translationSuffix + "collector", "collector", CollectingPlayer));
+            }
+        }
 
         public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             var blockCol = Color.red;
@@ -594,11 +599,11 @@ namespace NSMB.Replay.Stats {
             var translationSuffix = "bigcollectable.tooltip.";
 
             string spotsRemaining = tm.GetTranslationWithReplacements(translationPrefix+translationSuffix+"remaining", "spawnpoints", (Spawnpoints - UsedSpawns).ToString());
-            string blockers;
+            string blockers = "";
             if (WasBlocked) {
-                blockers = string.Join(", ", BlockingPlayers);
+                blockers += '\n' + tm.GetTranslationWithReplacements(translationPrefix+translationSuffix+"blockers", "blockers", string.Join(", ", BlockingPlayers));
             }
-            return tm.GetTranslationWithReplacements(translationPrefix + "bigcollectable."+"tooltip.remaining", "spawnpoints", (Spawnpoints - UsedSpawns).ToString());
+            return spotsRemaining + blockers;
         }
     }
 

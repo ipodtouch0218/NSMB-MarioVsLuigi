@@ -245,11 +245,11 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             var attempts = ReplayStatsRecorder.Instance.GlobalInfo;
             foreach (var spawn in attempts.BigCollectablesSpawned) {
                 bool show = true;
-                if (hideSuccess && spawn.WasBlocked) {
+                if (hideSuccess && !spawn.WasBlocked) {
                     show = false;
                 }
 
-                if (hideBlocks && !spawn.WasBlocked) {
+                if (hideBlocks && spawn.WasBlocked) {
                     show = false;
                 }
 

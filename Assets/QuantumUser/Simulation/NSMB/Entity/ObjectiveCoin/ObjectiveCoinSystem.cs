@@ -1,5 +1,4 @@
 using Photon.Deterministic;
-using Quantum.Collections;
 using Quantum.Physics2D;
 
 namespace Quantum {
@@ -75,15 +74,10 @@ namespace Quantum {
                     var newStarCoinTransform = f.Unsafe.GetPointer<Transform2D>(newEntity);
                     newStarCoinTransform->Position = position;
                     spawnedStarCoin = true;
-                    QList<EntityRef> blockers = new();
-                    for (int k = 0; k < hits.Count; i++) {
-                        var hit = hits[i];
-                        blockers.Add(hit.Entity);
-                    }
-                    f.Events.BigCollectableAttemptedSpawn(index, position, usedSpawnpoints.GetSetCount(), true, blockers);
+                    f.Events.BigCollectableAttemptedSpawn(index, position, usedSpawnpoints.GetSetCount(), true);
                     break;
                 } else {
-                    f.Events.BigCollectableAttemptedSpawn(index, position, usedSpawnpoints.GetSetCount(), false, new());
+                    f.Events.BigCollectableAttemptedSpawn(index, position, usedSpawnpoints.GetSetCount(), false);
                 }
             }
 

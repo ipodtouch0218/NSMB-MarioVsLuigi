@@ -1,9 +1,10 @@
 ﻿#nullable enable
 using Photon.Deterministic;
 using Quantum;
+using Quantum.Physics2D;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NSMB.Replay.Stats
 {
@@ -298,9 +299,10 @@ namespace NSMB.Replay.Stats
 
             if (wasBlocked) {
                 blockers = new();
-                var blockerRefs = f.ResolveList(e.Blockers);
-                foreach (var blockerRef in blockerRefs) {
-                    var mario = f.Unsafe.GetPointer<MarioPlayer>(blockerRef);
+                HitCollection hits = f.Physics2D.OverlapShape(position, 0, f.Context.CircleRadiusTwo, f.Context.PlayerOnlyMask);;
+                for (int i = 0; i < hits.Count; i++) {
+                    var hit = hits[i];
+                    var mario = f.Unsafe.GetPointer<MarioPlayer>(hit.Entity);
                     var runtimeData = f.GetPlayerData(mario->PlayerRef);
                     blockers.Add(runtimeData.PlayerNickname);
                 }
@@ -312,15 +314,6 @@ namespace NSMB.Replay.Stats
             // set the curr big collectable
             if (!wasBlocked) {
                 info.CurrBigCollectable = point;
-            } else {
-                // attempt to find a player overlapping
-                var hits = f.Physics2D.OverlapShape(position, 0, f.Context.CircleRadiusTwo, f.Context.PlayerOnlyMask);
-                for (int i = 0; i < hits.Count; i++) {
-                    var hit = hits[i];
-                    var marioPtr = f.Unsafe.GetPointer<MarioPlayer>(hit.Entity);
-                    var runtimeData = f.GetPlayerData(marioPtr->PlayerRef);
-                    point.BlockingPlayers.Add(runtimeData.PlayerNickname);
-                }
             }
             info.BigCollectablesSpawned.Add(point);
         }
@@ -352,8 +345,8 @@ namespace NSMB.Replay.Stats
                 HandleStateData(f, marioPlayer, playerInfo);
             }
 
-            if (f.Global->GameState == GameState.Ended && StatRecorder.GlobalInfo.CurrBigCollectable != null) {
-                StatRecorder.GlobalInfo.CurrBigCollectable.EndFrame = -1;
+            if (f.Global->GameState == GameState.Ended && StatRecorder.GlobalInfo.CurrBigCollectable is PointBigCollectableSpawned currBigCollectable) {
+                currBigCollectable.EndFrame = -1;
             }
 
             var blockBumps = f.Filter<BlockBump>();
@@ -389,7 +382,7 @@ namespace NSMB.Replay.Stats
             if (!marioPlayer->IsInKnockback) {
                 if (playerInfo.ComboEndTimer > 0) {
                     if (--playerInfo.ComboEndTimer == 0) {
-                        EventManager.StatUtilStopCombo(f, playerInfo);
+                        StatUtilStopCombo(f, playerInfo);
                     }
                 }
 
@@ -402,7 +395,7 @@ namespace NSMB.Replay.Stats
 
             // end any remaining combos when game is over
             if (f.Global->GameState == GameState.Ended) {
-                EventManager.StatUtilStopCombo(f, playerInfo, noEndFrame: true);
+                StatUtilStopCombo(f, playerInfo, noEndFrame: true);
             }
         }
 
