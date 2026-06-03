@@ -1,9 +1,11 @@
+using JimmysUnityUtilities;
 using NSMB.Replay;
 using NSMB.Replay.Stats;
 using NSMB.UI.MainMenu.Submenus.Replays;
 using NSMB.UI.MainMenu.Submenus.RoomList;
 using NSMB.UI.Translation;
 using NSMB.Utilities;
+using Photon.Client.StructWrapping;
 using Quantum;
 using System;
 using System.Collections.Generic;
@@ -34,7 +36,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
         //---Properties
         private StatOptionsWrapper CurrStatsGroup => statOptionGroup[selectedButton];
-        private StatOptions ViewingStats => CurrStatsGroup.StatOptions[viewingStatisticDropdown.value];
+        private StatOptions ViewingStats => CurrStatsGroup.StatOptions[dropdownIndexMap[viewingStatisticDropdown.value]];
         private int TargetPlayer => OptionSupportsAllPlayer() ? targetPlayerDropdown.value - 1 : targetPlayerDropdown.value;
 
         //---Serialized Variables
@@ -73,6 +75,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         public readonly List<StatsButton> statsButtons = new();
         private readonly List<StatsToggle> statToggles = new();
         private readonly List<StatsList> statLists = new();
+        private readonly List<int> dropdownIndexMap = new();
 
         #region Point List Methods
 
@@ -722,11 +725,14 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             string tmPrefix = "ui.replay.stats.select.";
 
             // loop through all replay stat options
-            foreach (StatOptions value in CurrStatsGroup.StatOptions) {
+            dropdownIndexMap.Clear();
+            for (int i = 0; i < CurrStatsGroup.StatOptions.Count(); i++) {
+                StatOptions value = CurrStatsGroup.StatOptions.ElementAt(i);
                 if (HideOption(value)) {
                     continue;
                 }
                 viewingStatisticDropdown.options.Add(new TMP_Dropdown.OptionData { text = prefix + tm.GetTranslation(tmPrefix + value.ToString().ToLower()) });
+                dropdownIndexMap.Add(i);
             }
             viewingStatisticDropdown.SetValueWithoutNotify(index);
             viewingStatisticDropdown.RefreshShownValue();
