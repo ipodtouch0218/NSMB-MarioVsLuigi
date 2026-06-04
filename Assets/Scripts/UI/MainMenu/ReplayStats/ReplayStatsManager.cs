@@ -80,94 +80,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         #region Point List Methods
 
         //---dictionaries - the value is if false will hide the entry
-        private Dictionary<TimePoint, bool> GetKnockbackDealt() {
-            Dictionary<PointKnockback, bool> temp = new();
-
-            var target = statLists[0].Value;
-
-            // loop through all players
-            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
-            foreach (var currPlayer in stats) {
-                // exclude ourself of course <3
-                if (currPlayer.Key == TargetPlayer) {
-                    continue;
-                }
-
-                bool show = true;
-                if (target != -1 && currPlayer.Key != target) {
-                    show = false;
-                }
-
-                foreach (var kbPoint in currPlayer.Value.KnockbackPoints) {
-                    if (kbPoint.AttackerRef != null && kbPoint.AttackerRef == TargetPlayer) {
-                        temp.Add(kbPoint, show);
-                    }
-                }
-            }
-
-            return temp.ToDictionary(kvp => (TimePoint) kvp.Key, kvp => kvp.Value);
-        }
-
-        private Dictionary<TimePoint, bool> GetDamageDealt() {
-            Dictionary<PointDamage, bool> temp = new();
-
-            var target = statLists[0].Value;
-
-            // loop through all players
-            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
-            foreach (var currPlayer in stats) {
-                // exclude ourself of course <3
-                if (currPlayer.Key == TargetPlayer) {
-                    continue;
-                }
-
-                bool show = true;
-                if (target != -1 && currPlayer.Key != target) {
-                    show = false;
-                }
-
-                foreach (var dmgPoint in currPlayer.Value.DamagePoints) {
-                    if (dmgPoint.AttackerRef != null && dmgPoint.AttackerRef == TargetPlayer) {
-                        temp.Add(dmgPoint, show);
-                    }
-                }
-            }
-
-            return temp.ToDictionary(kvp => (TimePoint) kvp.Key, kvp => kvp.Value);
-        }
-
-        private Dictionary<TimePoint, bool> GetComboWithPlayer() {
-            Dictionary<PointCombo, bool> temp = new();
-
-            bool selfOnly = statToggles[0].Value;
-            bool deathOnly = statToggles[1].Value;
-
-            // loop through all enteries checking playerref
-            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
-            foreach (var playerInfo in stats) {
-                // don't include ourselves UwU
-                if (playerInfo.Key == TargetPlayer) {
-                    continue;
-                }
-
-                // now check the combo points
-                foreach (var comboPoint in playerInfo.Value.ComboReceivedPoints) {
-                    bool show = true;
-                    if (selfOnly && comboPoint.GetParticipants().Count > 1) {
-                        show = false;
-                    }
-                    if (deathOnly && !comboPoint.EndsInDeath()) {
-                        show = false;
-                    }
-                    if (comboPoint.GetParticipants().ContainsKey(TargetPlayer)) {
-                        temp.Add(comboPoint, show);
-                    }
-                }
-            }
-
-            return temp.ToDictionary(kvp => (TimePoint) kvp.Key, kvp => kvp.Value);
-        }
-
         private IEnumerable<TimePoint> GetPowerupInfo() {
             bool targetAll = TargetPlayer < 0;
             bool invincibleOnly = statToggles[0].Value;
@@ -239,6 +151,96 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             }
         }
 
+
+        private Dictionary<TimePoint, bool> GetKnockbackDealt() {
+            Dictionary<PointKnockback, bool> temp = new();
+
+            var target = statLists[0].Value;
+
+            // loop through all players
+            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+            foreach (var currPlayer in stats) {
+                // exclude ourself of course <3
+                if (currPlayer.Key == TargetPlayer) {
+                    continue;
+                }
+
+                foreach (var kbPoint in currPlayer.Value.KnockbackPoints) {
+                    if (kbPoint.AttackerRef != null && kbPoint.AttackerRef == TargetPlayer) {
+                        bool show = true;
+                        if (target != -1 && currPlayer.Key != target) {
+                            show = false;
+                        }
+
+                        temp.Add(kbPoint, show);
+                    }
+                }
+            }
+
+            return temp.ToDictionary(kvp => (TimePoint) kvp.Key, kvp => kvp.Value);
+        }
+
+        private Dictionary<TimePoint, bool> GetDamageDealt() {
+            Dictionary<PointDamage, bool> temp = new();
+
+            var target = statLists[0].Value;
+
+            // loop through all players
+            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+            foreach (var currPlayer in stats) {
+                // exclude ourself of course <3
+                if (currPlayer.Key == TargetPlayer) {
+                    continue;
+                }
+
+                foreach (var dmgPoint in currPlayer.Value.DamagePoints) {
+                    if (dmgPoint.AttackerRef != null && dmgPoint.AttackerRef == TargetPlayer) {
+                        bool show = true;
+                        if (target != -1 && currPlayer.Key != target) {
+                            show = false;
+                        }
+
+                        temp.Add(dmgPoint, show);
+                    }
+                }
+            }
+
+            return temp.ToDictionary(kvp => (TimePoint) kvp.Key, kvp => kvp.Value);
+        }
+
+        private Dictionary<TimePoint, bool> GetComboWithPlayer() {
+            Dictionary<PointCombo, bool> temp = new();
+
+            bool selfOnly = statToggles[0].Value;
+            bool deathOnly = statToggles[1].Value;
+
+            // loop through all enteries checking playerref
+            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+            foreach (var playerInfo in stats) {
+                // don't include ourselves UwU
+                if (playerInfo.Key == TargetPlayer) {
+                    continue;
+                }
+
+                // now check the combo points
+                foreach (var comboPoint in playerInfo.Value.ComboReceivedPoints) {
+                    if (comboPoint.GetParticipants().ContainsKey(TargetPlayer)) {
+                        bool show = true;
+                        if (selfOnly && comboPoint.GetParticipants().Count > 1) {
+                            show = false;
+                        }
+                        if (deathOnly && !comboPoint.EndsInDeath()) {
+                            show = false;
+                        }
+
+                        temp.Add(comboPoint, show);
+                    }
+                }
+            }
+
+            return temp.ToDictionary(kvp => (TimePoint) kvp.Key, kvp => kvp.Value);
+        }
+
         private Dictionary<TimePoint, bool> GetBigCollectableSpawns() {
             Dictionary<PointBigCollectableSpawned, bool> temp = new();
 
@@ -273,13 +275,13 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                     continue;
                 }
 
-                bool show = true;
-                if (target != -1 && playerInfoEntry.Key != target) {
-                    show = false;
-                }
-
                 foreach (var deathPoint in playerInfoEntry.Value.DeathPoints) {
                     if (deathPoint.AttackerRef == TargetPlayer) {
+                        bool show = true;
+                        if (target != -1 && playerInfoEntry.Key != target) {
+                            show = false;
+                        }
+
                         temp.Add(deathPoint, show);
                     }
                 }
