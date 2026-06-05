@@ -35156,7 +35156,7 @@ MonoBehaviour:
   statOptionGroup:
   - name: Positive
     TranslationKey: ui.replay.stats.group.positive
-    StatOptions: 0000000001000000030000000d0000000e000000
+    StatOptions: 1000000001000000030000000d0000000e000000
   - name: Negative
     TranslationKey: ui.replay.stats.group.negative
     StatOptions: 05000000070000000600000004000000
@@ -35165,7 +35165,7 @@ MonoBehaviour:
     StatOptions: 02000000080000000b0000000c000000
   - name: Misc
     TranslationKey: ui.replay.stats.group.misc
-    StatOptions: 090000000f000000100000000a000000
+    StatOptions: 090000000f0000000a000000
 --- !u!1 &744346871
 GameObject:
   m_ObjectHideFlags: 0
@@ -39685,14 +39685,14 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4294967295
   m_fontSize: 20
-  m_fontSizeBase: 24
+  m_fontSizeBase: 20
   m_fontWeight: 400
-  m_enableAutoSizing: 1
+  m_enableAutoSizing: 0
   m_fontSizeMin: 0
   m_fontSizeMax: 20
   m_fontStyle: 0
   m_HorizontalAlignment: 1
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_characterHorizontalScale: 1

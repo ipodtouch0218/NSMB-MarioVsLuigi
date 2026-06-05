@@ -380,7 +380,7 @@
   "ui.replay.stats.select.kills": "Kills",
   "ui.replay.stats.select.damagedealt": "Damage dealt",
   "ui.replay.stats.select.taunts": "Taunts",
-  "ui.replay.stats.select.starcountchange": "Star count changes",
+  "ui.replay.stats.select.starcountchange": "Star count info",
   "ui.replay.stats.toggles.combolanded.showselfonly": "Show self only",
   "ui.replay.stats.toggles.combolanded.killsonly": "Kills only",
   "ui.replay.stats.toggles.bigcollectablespawns.hidesuccess": "Hide spawns",
