@@ -355,30 +355,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             };
         }
 
-        private void UpdateLeftPanelText(TranslationManager tm, StringBuilder sb, StatOptions? options = null) {
-            StatOptions viewingOptions = options ?? ViewingStats;
-            switch (viewingOptions) {
-            case StatOptions.StarCountChange: {
-                UpdateEntryCount(tm, sb);
-                int highestStarCount = GetMostStarsHad(timePointEnteries);
-                sb.AppendLine($"Highest star count {highestStarCount}");
-                break;
-            }
-            case StatOptions.ComboLanded: {
-                UpdateEntryCount(tm, sb);
-                var longestCombo = GetLongestComboEntry(timePointEnteries);
-                if (longestCombo != null) {
-                    sb.AppendLine($"Longest combo {longestCombo.EntryInfo}");
-                }
-                break;
-            }
-            default: {
-                UpdateEntryCount(tm, sb);
-                break;
-            }
-            }
-        }
-
         private TimePoint.DisplayArgs GetDisplayArgs(StatOptions? options = null) {
             StatOptions viewingOptions = options ?? ViewingStats;
             return viewingOptions switch {
@@ -462,6 +438,46 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             }
 
             return dictionary;
+        }
+
+        private void UpdateLeftPanelText(TranslationManager tm, StringBuilder sb, StatOptions? options = null) {
+            StatOptions viewingOptions = options ?? ViewingStats;
+            var infoPrefix = "ui.replay.stats.info.";
+            var translationPrefix = infoPrefix+viewingOptions.ToString().ToLower()+".";
+            switch (viewingOptions) {
+            case StatOptions.StarCountChange: {
+                AddOccurenceCount(tm, sb, true);
+                int highestStarCount = GetMostStarsHad(timePointEnteries);
+                sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix+"highest", "highestStarCount", highestStarCount.ToString()));
+                break;
+            }
+            case StatOptions.ComboRecieved:
+            case StatOptions.ComboLanded: {
+                var comboPrefix = infoPrefix + "combo.";
+                AddOccurenceCount(tm, sb);
+                var longestCombo = GetLongestComboEntry(timePointEnteries);
+                if (longestCombo != null) {
+                    sb.AppendLine(tm.GetTranslationWithReplacements(comboPrefix, "longestComboId", longestCombo.EntryInfo, "frameCount", longestCombo.timePoint.Length.ToString()));
+                }
+                break;
+            }
+            case StatOptions.PowerupInfo: {
+                AddOccurenceCount(tm, sb, true);
+                if (statToggles[0].Value) {
+                    break;
+                }
+                var mostUsedState = GetMostUsedPowerupState(timePointEnteries);
+                if (mostUsedState != PowerupState.NoPowerup) {
+                    string powerupTranslation = tm.GetTranslation("coinitem."+mostUsedState.ToString().ToLower());
+                    sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix+"mostused", "powerup", powerupTranslation));
+                }
+                break;
+            }
+            default: {
+                AddOccurenceCount(tm, sb);
+                break;
+            }
+            }
         }
 
         #endregion
@@ -824,6 +840,40 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         }
 
         #region Other Methods
+        public PowerupState GetMostUsedPowerupState(List<TimePointEntry> timePointEntries) {
+            Dictionary<PowerupState, int> stateFrames = new();
+            foreach (PowerupState state in Enum.GetValues(typeof(PowerupState))) {
+                if (state == PowerupState.NoPowerup) {
+                    continue;
+                }
+                stateFrames[state] = 0;
+            }
+
+            // now check all time points
+            foreach (var timePointEntry in timePointEntries) {
+                var timePoint = timePointEntry.timePoint as PointPowerChange;
+                if (timePoint.PowerupState == PowerupState.NoPowerup) {
+                    continue;
+                }
+                stateFrames[timePoint.PowerupState] += timePoint.Length;
+            }
+
+            // now compare
+            PowerupState mostUsedState = PowerupState.NoPowerup;
+            int longestPoint = 0;
+            foreach (var kvp in stateFrames) {
+                var state = kvp.Key;
+                var duration = kvp.Value;
+
+                if (duration > longestPoint) {
+                    mostUsedState = state;
+                    longestPoint = duration;
+                }
+            }
+
+            return mostUsedState;
+        }
+
         public int GetMostStarsHad(List<TimePointEntry> timePointEnteries) {
             int highestStarCount = 0;
 
@@ -877,8 +927,13 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             return longestComboEntry;
         }
 
-        public void UpdateEntryCount(TranslationManager tm, StringBuilder sb) {
-            sb.AppendLine(tm.GetTranslationWithReplacements("ui.replay.stats.occurences", "occurences", timePointEnteries.Count.ToString()));
+        public void AddOccurenceCount(TranslationManager tm, StringBuilder sb, bool isChanges = false) {
+            string translationPrefix = "ui.replay.stats.info.";
+            if (isChanges) {
+                sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix+"changes", "changes", timePointEnteries.Count.ToString()));
+            } else {
+                sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix+"occurences", "occurences", timePointEnteries.Count.ToString()));
+            }
         }
 
         public void OnChangedViewingPlayer() {

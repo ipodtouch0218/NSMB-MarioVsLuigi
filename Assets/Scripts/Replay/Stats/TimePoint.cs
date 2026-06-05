@@ -31,7 +31,7 @@ namespace NSMB.Replay.Stats {
         //---properties (readonly)
         public bool IsGlobalPoint => PlayerRef == PlayerRef.None;
         public bool HasEndFrame => EndFrame != -1;
-        public int Length => !HasEndFrame ? -1 : OccurenceFrame - EndFrame;
+        public int Length => !HasEndFrame ? -1 : EndFrame - OccurenceFrame;
 
         //---static
         private static int _index;
