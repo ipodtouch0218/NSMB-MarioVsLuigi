@@ -1347,12 +1347,13 @@ MonoBehaviour:
     TextureReplacements:
     - Material: {fileID: 2100000, guid: 3c2958cf90b1bd64295f8ae254f80d0a, type: 2}
       AlbedoTexture: {fileID: 2800000, guid: 9cdd12fd70cf4b646b336f4d60f6ef38, type: 3}
-      OverallsMaskTexture: {fileID: 2800000, guid: faea6a302b599ce44844f23fb3123702,
+      OverallsMaskTexture: {fileID: 2800000, guid: 282392f331949904aa2f1d5a32fbc52e,
         type: 3}
       ShirtMaskTexture: {fileID: 2800000, guid: 6d071aa89f1a3be4ba8a642f2fe5c323,
         type: 3}
       CapMaskTexture: {fileID: 0}
-      StarmanAlbedoTexture: {fileID: 0}
+      StarmanAlbedoTexture: {fileID: 2800000, guid: d829385e81ca5e0478340c7225e59cc0,
+        type: 3}
     - Material: {fileID: 2100000, guid: 6a0ff0c8adb71d0469b702946398eb3d, type: 2}
       AlbedoTexture: {fileID: 2800000, guid: c7d0fedea93d5904ebb241dcbacf39c1, type: 3}
       OverallsMaskTexture: {fileID: 0}
