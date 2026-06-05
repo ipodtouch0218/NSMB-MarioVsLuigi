@@ -37,6 +37,11 @@ namespace NSMB.Replay.Stats
         public void OnMarioPlayerCollectedCoin(EventMarioPlayerCollectedCoin e) {
             Frame f = e.Game.Frames.Verified;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+
+            if (mario->PlayerRef == default) {
+                return;
+            }
+
             var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
 
             CoinItemAsset? coinItemAsset = null;
@@ -50,6 +55,12 @@ namespace NSMB.Replay.Stats
         public void OnMarioPlayerCollectedStar(EventMarioPlayerCollectedStar e) {
             Frame f = e.Game.Frames.Verified;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+            
+            // sanity check, somehow this can occur
+            if (mario->PlayerRef == default) {
+                return;
+            }
+
             var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
 
@@ -76,6 +87,12 @@ namespace NSMB.Replay.Stats
             PlayerRef attackerRef = default;
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+            
+            // sanity check, we will have a null PlayerRef if a player disconnects
+            if (mario->PlayerRef == default) {
+                return;
+            }
+
             var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
 
             if (wasDisconnect) {
@@ -175,9 +192,17 @@ namespace NSMB.Replay.Stats
             Frame f = e.Game.Frames.Verified;
             KnockbackStrength strength = e.Strength;
             var victimMario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+            if (victimMario->PlayerRef == default) {
+                return;
+            }
+
             var victimMarioInfo = StatRecorder.PlayerInfos[victimMario->PlayerRef];
 
             var attackerMario = f.Unsafe.GetPointer<MarioPlayer>(e.Attacker);
+            if (attackerMario->PlayerRef == default) {
+                return;
+            }
+
             var attackerMarioInfo = StatRecorder.PlayerInfos[attackerMario->PlayerRef];
            
             //bool isProjectile = e.ProjectileEffect != ProjectileEffectType.None;
@@ -210,6 +235,10 @@ namespace NSMB.Replay.Stats
             Frame f = e.Game.Frames.Verified;
             PointDamage.DamageCause damageCause = PointDamage.DamageCause.Enemy;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+            if (mario->PlayerRef == default) {
+                return;
+            }
+
             var marioPlayerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
 
             string attackerName = "";
@@ -276,6 +305,10 @@ namespace NSMB.Replay.Stats
         public void OnMarioPlayerCollectedPowerup(EventMarioPlayerCollectedPowerup e) {
             Frame f = e.Game.Frames.Verified;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+            if (mario->PlayerRef == default) {
+                return;
+            }
+
             var marioPlayerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
             marioPlayerInfo.PowerupCollectPoints.Add(new PointPowerupCollect(StatRecorder, f, mario, e.Result, e.Scriptable));
         }
@@ -284,6 +317,10 @@ namespace NSMB.Replay.Stats
         public void OnMarioPlayerTaunted(EventMarioPlayerTaunted e) {
             Frame f = e.Game.Frames.Verified;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+            if (mario->PlayerRef == default) {
+                return;
+            }
+
             var marioPlayerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
             marioPlayerInfo.TauntPoints.Add(new PointTaunt(StatRecorder, f, mario));
         }
@@ -335,18 +372,28 @@ namespace NSMB.Replay.Stats
             // scan all Marios
             var marios = f.Filter<MarioPlayer>();
             while (marios.NextUnsafe(out _, out var marioPlayer)) {
+                // sanity check, player who disconnects has null player ref
+                if (marioPlayer->PlayerRef == default) {
+                    continue;
+                }
+
+                bool livesEnabled = f.Global->Rules.IsLivesEnabled;
+                bool outOfLives = livesEnabled && marioPlayer->Lives < 1;
+
                 if (!didLoop) {
                     var runtimeData = f.GetPlayerData(marioPlayer->PlayerRef);
-                    StatRecorder.PlayerInfos.Add(marioPlayer->PlayerRef, new PlayerInfo(runtimeData.PlayerNickname, marioPlayer->PlayerRef));
+                    StatRecorder.PlayerInfos[marioPlayer->PlayerRef] = new PlayerInfo(runtimeData.PlayerNickname, marioPlayer->PlayerRef);
                 }
 
                 var playerInfo = StatRecorder.PlayerInfos[marioPlayer->PlayerRef];
                 HandleCombo(f, marioPlayer, playerInfo);
-                HandleChangeData(f, marioPlayer, playerInfo);
+                if (!outOfLives) {
+                    HandleChangeData(f, marioPlayer, playerInfo);
+                }
             }
 
             if (f.Global->GameState == GameState.Ended && StatRecorder.GlobalInfo.CurrBigCollectable is PointBigCollectableSpawned currBigCollectable) {
-                currBigCollectable.EndFrame = -1;
+                currBigCollectable.GameEnded = true;
             }
 
             var blockBumps = f.Filter<BlockBump>();
