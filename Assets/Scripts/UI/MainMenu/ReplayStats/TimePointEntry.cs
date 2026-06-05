@@ -12,6 +12,9 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         //---Public Variables
         public TimePoint timePoint;
 
+        //---Properties
+        public string EntryInfo { get; private set; }
+
         //---Serialized Variables
         [SerializeField] private TMP_Text entryNumText, timeText, symbolsText, descriptionText, additionalText;
         [SerializeField] private Image icon;
@@ -30,8 +33,9 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
 
             TranslationManager tm = GlobalController.Instance.translationManager;
 
-            entryNumText.text = timePointInfo.GetEntryNum(entryNum, displayArg);
-            
+            EntryInfo = timePointInfo.GetEntryNum(entryNum, displayArg);
+            entryNumText.SetText(EntryInfo);
+
             //--printing the time
             stringBuilder.Clear();
             timePointInfo.SetTimeText(tm, stringBuilder, displayArg);
@@ -53,7 +57,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
             additionalText.SetText(stringBuilder);
 
             var tooltip = timePointInfo.GetTooltip(tm, displayArg);
-            if (tooltip != null) {
+            if (!tooltip.IsNullOrEmpty()) {
                 infoButton.Initialize(this, displayArg);
             } else {
                 infoButton.gameObject.SetActive(false);

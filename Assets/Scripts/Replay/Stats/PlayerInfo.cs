@@ -1,5 +1,3 @@
-#nullable enable
-
 using Quantum;
 using System.Collections.Generic;
 
@@ -24,24 +22,24 @@ namespace NSMB.Replay.Stats {
         public readonly List<PointTaunt> TauntPoints = new();
 
         //---more complex points
-        public PointKnockback? CurrKnockbackPoint = null;
+        public PointKnockback CurrKnockbackPoint = null;
         public readonly List<PointKnockback> KnockbackPoints = new();
 
-        public PointCombo? CurrComboPoint;
+        public PointCombo CurrComboPoint;
         public readonly List<PointCombo> ComboReceivedPoints = new();
 
         // for powerUP changes
-        public PointPowerChange? CurrPowerChangePoint = null;
+        public PointPowerChange CurrPowerChangePoint = null;
         public readonly List<PointPowerChange> PowerChangePoints = new();
 
-        public PointStarmanChange? CurrStarmanChangePoint = null;
+        public PointStarmanChange CurrStarmanChangePoint = null;
         public readonly List<PointStarmanChange> StarmanChangePoints = new();
 
-        public PointStarCountChange? CurrStarCountChangePoint = null;
+        public PointStarCountChange CurrStarCountChangePoint = null;
         public readonly List<PointStarCountChange> StarCountChangePoints = new();
 
         // these are for reserve items
-        public PointReserveChange? CurrReserveChangePoint = null;
+        public PointReserveChange CurrReserveChangePoint = null;
         public readonly List<PointReserveChange> ReserveChangePoints = new();
 
         public readonly List<EntityRef> BlocksBumped = new();

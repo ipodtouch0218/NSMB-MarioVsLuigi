@@ -72,8 +72,8 @@ namespace NSMB.Replay.Stats
             bool wasPitDeath = e.Entity == e.Attacker;
             bool wasDisconnect = e.Entity == EntityRef.None;
 
-            string? attackerName = null;
-            PlayerRef? attackerRef = null;
+            string attackerName = "";
+            PlayerRef attackerRef = default;
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
@@ -212,8 +212,8 @@ namespace NSMB.Replay.Stats
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             var marioPlayerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
 
-            string? attackerName = null;
-            PlayerRef? attackerRef = null;
+            string attackerName = "";
+            PlayerRef attackerRef = default;
 
             // check if it's a shelled enemy
             if (f.Unsafe.TryGetPointer<Koopa>(e.Attacker, out _)) {

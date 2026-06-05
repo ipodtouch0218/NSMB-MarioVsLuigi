@@ -1,5 +1,4 @@
-﻿#nullable enable
-using NSMB.UI.Translation;
+﻿using NSMB.UI.Translation;
 using NSMB.Utilities;
 using Photon.Deterministic;
 using Quantum;
@@ -17,17 +16,22 @@ namespace NSMB.Replay.Stats {
      */
     public unsafe abstract class TimePoint : IComparable<TimePoint> {
         //---object-specific variables
-        public int? EndFrame { get; set; }
+        public int EndFrame { get; set; }
+        public virtual bool ShowEndTime => HasEndFrame;
+        public virtual bool ShowLength => HasEndFrame;
 
-        //---properties (read-only)
-        public readonly PlayerRef? PlayerRef;
-        public readonly string? AffectedPlayerName;
+        //---one-set variables
+        public readonly PlayerRef PlayerRef;
+        public readonly string AffectedPlayerName;
         public readonly int OccurenceFrame;
         public readonly FP DeltaTime;
         public readonly int Id;
         public readonly ReplayStatsRecorder StatsRecorder;
-        public virtual bool ShowEndTime => EndFrame != null && EndFrame != -1;
-        public virtual bool ShowLength => EndFrame != null;
+
+        //---properties (readonly)
+        public bool IsGlobalPoint => PlayerRef == PlayerRef.None;
+        public bool HasEndFrame => EndFrame != -1;
+        public int Length => !HasEndFrame ? -1 : OccurenceFrame - EndFrame;
 
         //---static
         private static int _index;
@@ -40,7 +44,7 @@ namespace NSMB.Replay.Stats {
             All
         }
 
-        public int CompareTo(TimePoint? other) {
+        public int CompareTo(TimePoint other) {
             if (other == null) return 1;
             return this.Id.CompareTo(other.Id);
         }
@@ -52,12 +56,13 @@ namespace NSMB.Replay.Stats {
             OccurenceFrame = f.Number;
             DeltaTime = f.DeltaTime;
             Id = _index++;
+            EndFrame = -1;
         }
 
         // basic init - per player
         public TimePoint(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : this(stats, f) {
-            PlayerRef = mario->PlayerRef;
             if (mario != null) {
+                PlayerRef = mario->PlayerRef;
                 AffectedPlayerName = f.GetPlayerData(mario->PlayerRef).PlayerNickname;
             }
         }
@@ -72,11 +77,11 @@ namespace NSMB.Replay.Stats {
             }
             stringBuilder.Append($"@ {FrameToTime(OccurenceFrame, StatsRecorder.ReplayStart, DeltaTime)}");
 
-            if (EndFrame != null) {
+            if (HasEndFrame) {
                 stringBuilder.Append('-');
 
                 if (ShowEndTime) {
-                    stringBuilder.Append(FrameToTime(EndFrame.Value, StatsRecorder.ReplayStart, DeltaTime));
+                    stringBuilder.Append(FrameToTime(EndFrame, StatsRecorder.ReplayStart, DeltaTime));
                 }
             }
         }
@@ -90,9 +95,9 @@ namespace NSMB.Replay.Stats {
             }
         }
 
-        public virtual string? GetEntryNum(int entryNum, DisplayArgs displayArgs) => entryNum.ToString();
+        public virtual string GetEntryNum(int entryNum, DisplayArgs displayArgs) => entryNum.ToString();
 
-        public virtual string? GetTooltip(TranslationManager tm, DisplayArgs displayArg) => null;
+        public virtual string GetTooltip(TranslationManager tm, DisplayArgs displayArg) => null;
 
         //---static methods
         public static void ResetIndex() => _index = 0;
@@ -115,12 +120,12 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointCoinCollected : TimePoint {
-        public readonly CoinItemAsset? CoinItem;
+        public readonly CoinItemAsset CoinItem;
         public readonly FP? SpawnChancePercentage, SpawnChanceRaw;
         public readonly int CoinCount, CoinCountTotal, CurrStarCount, LeaderStars;
         public readonly FP AverageStarCount;
 
-        public PointCoinCollected(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, int coinCount, CoinItemAsset? coinItemAsset) : base(statsRecorder, f, mario) {
+        public PointCoinCollected(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, int coinCount, CoinItemAsset coinItemAsset) : base(statsRecorder, f, mario) {
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             CurrStarCount = gamemode.GetTeamObjectiveCount(f, mario->GetTeam(f)) ?? -1;
             LeaderStars = gamemode.GetFirstPlaceObjectiveCount(f);
@@ -152,7 +157,7 @@ namespace NSMB.Replay.Stats {
             stringBuilder.Append("<sprite name=room_coins>").Append(Utils.GetSymbolString(CoinCount.ToString(), Utils.smallSymbols));
         }
 
-        public override string? GetTooltip(TranslationManager tm, DisplayArgs displayArg) {
+        public override string GetTooltip(TranslationManager tm, DisplayArgs displayArg) {
             if (CoinItem == null) {
                 return null;
             }
@@ -177,8 +182,8 @@ namespace NSMB.Replay.Stats {
     public unsafe class PointDamage : TimePoint {
         public readonly PowerupState NewState;
         public readonly DamageCause Reason;
-        public readonly string? AttackerName;
-        public readonly PlayerRef? AttackerRef;
+        public readonly string AttackerName;
+        public readonly PlayerRef AttackerRef;
         public enum DamageCause {
             Enemy,
             Shell,
@@ -188,7 +193,7 @@ namespace NSMB.Replay.Stats {
             Explode
         }
 
-        public PointDamage(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, DamageCause reason, string? attackerName, PlayerRef? attackerRef) : base(statsRecorder, f, mario) {
+        public PointDamage(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, DamageCause reason, string attackerName, PlayerRef attackerRef) : base(statsRecorder, f, mario) {
             NewState = mario->CurrentPowerupState;
             Reason = reason;
             AttackerName = attackerName;
@@ -200,14 +205,10 @@ namespace NSMB.Replay.Stats {
         public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             switch (displayArg) {
             case DisplayArgs.Normal:
-                if (AttackerName != null) {
-                    stringBuilder.Append(AttackerName);
-                }
+                stringBuilder.Append(AttackerName);
                 break;
             case DisplayArgs.FromAttacker:
-                if (AffectedPlayerName != null) {
-                    stringBuilder.Append(AffectedPlayerName);
-                }
+                stringBuilder.Append(AffectedPlayerName);
                 break;
             }
         }
@@ -216,8 +217,8 @@ namespace NSMB.Replay.Stats {
     public unsafe class PointDeath : TimePoint {
         public readonly int LivesRemaining, Ping;
         public readonly DeathCause Reason;
-        public readonly string? AttackerName;
-        public readonly PlayerRef? AttackerRef;
+        public readonly string AttackerName;
+        public readonly PlayerRef AttackerRef;
         public enum DeathCause {
             Enemy,
             Shell,
@@ -231,7 +232,7 @@ namespace NSMB.Replay.Stats {
             Disconnect
         }
 
-        public PointDeath(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, DeathCause reason, int ping, string? attackerName, PlayerRef? attackRef) : base(statsRecorder, f, mario) {
+        public PointDeath(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, DeathCause reason, int ping, string attackerName, PlayerRef attackRef) : base(statsRecorder, f, mario) {
             LivesRemaining = mario->Lives;
             Reason = reason;
             Ping = ping;
@@ -250,19 +251,15 @@ namespace NSMB.Replay.Stats {
         public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             switch (displayArg) {
             case DisplayArgs.Normal:
-                if (AttackerName != null) {
-                    stringBuilder.Append(AttackerName);
-                }
+                stringBuilder.Append(AttackerName);
                 break;
             case DisplayArgs.FromAttacker:
-                if (AffectedPlayerName != null) {
-                    stringBuilder.Append(AffectedPlayerName);
-                }
+                stringBuilder.Append(AffectedPlayerName);
                 break;
             }
         }
 
-        public override string? GetTooltip(TranslationManager tm, DisplayArgs displayArg) {
+        public override string GetTooltip(TranslationManager tm, DisplayArgs displayArg) {
             string translationKeyStart = translationPrefix+"deaths.tooltip.";
             string tooltip = tm.GetTranslationWithReplacements(translationKeyStart+"ping", "ping", Ping.ToString());
 
@@ -300,14 +297,10 @@ namespace NSMB.Replay.Stats {
         public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             switch (displayArg) {
             case DisplayArgs.Normal:
-                if (AttackerName != null) {
-                    stringBuilder.Append(AttackerName);
-                }
+                stringBuilder.Append(AttackerName);
                 break;
             case DisplayArgs.FromAttacker:
-                if (AffectedPlayerName != null) {
-                    stringBuilder.Append(AffectedPlayerName);
-                }
+                stringBuilder.Append(AffectedPlayerName);
                 break;
             }
         }
@@ -332,7 +325,7 @@ namespace NSMB.Replay.Stats {
             Damage
         }
         public StarLossCause Reason;
-        public string? AttackerName;
+        public string AttackerName;
         public readonly int StarAmount, StarDropCount, TotalStarsLost;
         public PointStarLoss(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo victimInfo, int starDropCount, StarLossCause reason, EntityRef attacker) : base(statsRecorder, f, mario) {
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
@@ -431,7 +424,7 @@ namespace NSMB.Replay.Stats {
             }
         }
 
-        public override string? GetTooltip(TranslationManager tm, DisplayArgs displayArg) {
+        public override string GetTooltip(TranslationManager tm, DisplayArgs displayArg) {
             StringBuilder sb = new();
             sb.AppendLine(tm.GetTranslation(translationPrefix + "combo.tooltip.parts"));
             foreach (var (Element, _, _) in ComboElements) {
@@ -458,7 +451,7 @@ namespace NSMB.Replay.Stats {
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             base.SetTimeText(tm, stringBuilder, displayArg);
             if (ShowLength) {
-                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime ?? 0;
+                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime;
                 stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
             }
         }
@@ -483,7 +476,7 @@ namespace NSMB.Replay.Stats {
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             base.SetTimeText(tm, stringBuilder, displayArg);
             if (ShowLength) {
-                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime ?? 0;
+                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime;
                 stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
             }
         }
@@ -492,7 +485,7 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointReserveChange : TimePoint {
-        public readonly PowerupAsset? Powerup;
+        public readonly PowerupAsset Powerup;
         public bool GameEnded;
         public override bool ShowEndTime => !GameEnded;
         public PointReserveChange(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) => Powerup = f.FindAsset(mario->ReserveItem);
@@ -500,7 +493,7 @@ namespace NSMB.Replay.Stats {
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             base.SetTimeText(tm, stringBuilder, displayArg);
             if (ShowLength) {
-                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime ?? 0;
+                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime;
                 stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
             }
         }
@@ -545,9 +538,9 @@ namespace NSMB.Replay.Stats {
 
         public readonly bool WasBlocked;
         public readonly FPVector2 Coordinates;
-        public readonly List<string>? BlockingPlayers;
-        public string? CollectingPlayer; // if a player collected the big star this is their name
-        public PointBigCollectableSpawned(ReplayStatsRecorder stats, Frame f, int usedSpawns, int index, bool blocked, FPVector2 coordinates, ref GlobalInfo globalReplayInfo, VersusStageData stage, List<string>? blockers) : base(stats, f) {
+        public readonly List<string> BlockingPlayers;
+        public string CollectingPlayer; // if a player collected the big star this is their name
+        public PointBigCollectableSpawned(ReplayStatsRecorder stats, Frame f, int usedSpawns, int index, bool blocked, FPVector2 coordinates, ref GlobalInfo globalReplayInfo, VersusStageData stage, List<string> blockers) : base(stats, f) {
             PositionIndex = index;
             UsedSpawns = usedSpawns;
             WasBlocked = blocked;
@@ -590,7 +583,7 @@ namespace NSMB.Replay.Stats {
             stringBuilder.Append(Utils.GetSymbolString(SuccessfulSpawnCount.ToString(), Utils.smallSymbols, color: successCol));
         }
 
-        public override string? GetTooltip(TranslationManager tm, DisplayArgs displayArg) {
+        public override string GetTooltip(TranslationManager tm, DisplayArgs displayArg) {
             var translationSuffix = "bigcollectable.tooltip.";
 
             string spotsRemaining = tm.GetTranslationWithReplacements(translationPrefix+translationSuffix+"remaining", "spawnpoints", (Spawnpoints - UsedSpawns).ToString());
@@ -604,12 +597,12 @@ namespace NSMB.Replay.Stats {
 
     public unsafe class PointBlockHit : TimePoint {
         public readonly bool WasRandom;
-        public readonly CoinItemAsset? SpawnedItem;
-        public readonly FP? SpawnChancePercentage, SpawnChanceRaw;
+        public readonly CoinItemAsset SpawnedItem;
+        public readonly FP SpawnChancePercentage, SpawnChanceRaw;
         public readonly int CurrStarCount, LeaderStars;
         public readonly FP AverageStarCount;
 
-        public PointBlockHit(Frame f, ReplayStatsRecorder stats, MarioPlayer* mario, bool wasRandom, CoinItemAsset? spawnedItem) : base(stats, f, mario) {
+        public PointBlockHit(Frame f, ReplayStatsRecorder stats, MarioPlayer* mario, bool wasRandom, CoinItemAsset spawnedItem) : base(stats, f, mario) {
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             WasRandom = wasRandom;
             SpawnedItem = spawnedItem;
@@ -635,13 +628,13 @@ namespace NSMB.Replay.Stats {
             stringBuilder.Append(tm.GetTranslation(translationKey));
         }
 
-        public override string? GetTooltip(TranslationManager tm, DisplayArgs displayArg) {
+        public override string GetTooltip(TranslationManager tm, DisplayArgs displayArg) {
             if (SpawnedItem == null) {
                 return null;
             }
             string translationKey = translationPrefix+"tooltip." + (WasRandom ? "randomspawn" : "itemspawn");
             string itemTranslation = tm.GetTranslation(SpawnedItem.TranslationKey);
-            return tm.GetTranslationWithReplacements(translationKey, "item", itemTranslation, "chance", $"{(float) SpawnChancePercentage.GetValueOrDefault():0.00}");
+            return tm.GetTranslationWithReplacements(translationKey, "item", itemTranslation, "chance", $"{(float) SpawnChancePercentage:0.00}");
         }
     }
 
@@ -666,7 +659,7 @@ namespace NSMB.Replay.Stats {
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             base.SetTimeText(tm, stringBuilder, displayArg);
             if (ShowLength) {
-                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime ?? 0;
+                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime;
                 stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
             }
         }

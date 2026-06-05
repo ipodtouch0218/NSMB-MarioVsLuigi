@@ -1,11 +1,9 @@
-using JimmysUnityUtilities;
 using NSMB.Replay;
 using NSMB.Replay.Stats;
 using NSMB.UI.MainMenu.Submenus.Replays;
 using NSMB.UI.MainMenu.Submenus.RoomList;
 using NSMB.UI.Translation;
 using NSMB.Utilities;
-using Photon.Client.StructWrapping;
 using Quantum;
 using System;
 using System.Collections.Generic;
@@ -13,7 +11,6 @@ using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
@@ -358,6 +355,30 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             };
         }
 
+        private void UpdateLeftPanelText(TranslationManager tm, StringBuilder sb, StatOptions? options = null) {
+            StatOptions viewingOptions = options ?? ViewingStats;
+            switch (viewingOptions) {
+            case StatOptions.StarCountChange: {
+                UpdateEntryCount(tm, sb);
+                int highestStarCount = GetMostStarsHad(timePointEnteries);
+                sb.AppendLine($"Highest star count {highestStarCount}");
+                break;
+            }
+            case StatOptions.ComboLanded: {
+                UpdateEntryCount(tm, sb);
+                var longestCombo = GetLongestComboEntry(timePointEnteries);
+                if (longestCombo != null) {
+                    sb.AppendLine($"Longest combo {longestCombo.EntryInfo}");
+                }
+                break;
+            }
+            default: {
+                UpdateEntryCount(tm, sb);
+                break;
+            }
+            }
+        }
+
         private TimePoint.DisplayArgs GetDisplayArgs(StatOptions? options = null) {
             StatOptions viewingOptions = options ?? ViewingStats;
             return viewingOptions switch {
@@ -480,7 +501,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) leftTopLayout.transform);
             TranslationManager.OnLanguageChanged += UpdateStatsDropdown;
-            TranslationManager.OnLanguageChanged += UpdateEntryCount;
+            TranslationManager.OnLanguageChanged += UpdateLeftPanelText;
             TranslationManager.OnLanguageChanged += UpdateLists;
             TranslationManager.OnLanguageChanged += UpdatePlayerDropdown;
             Canvas.ForceUpdateCanvases();
@@ -503,7 +524,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 targetPlayerDropdown.ClearOptions();
                 targetPlayerDropdown.interactable = false;
             }
-            UpdateEntryCount(GlobalController.Instance.translationManager);
+            UpdateLeftPanelText(GlobalController.Instance.translationManager);
             UpdateInformation(replayListEntry);
 
             ChangedViewingStats(true);
@@ -519,7 +540,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 #endif
 
             TranslationManager.OnLanguageChanged -= UpdateStatsDropdown;
-            TranslationManager.OnLanguageChanged -= UpdateEntryCount;
+            TranslationManager.OnLanguageChanged -= UpdateLeftPanelText;
             TranslationManager.OnLanguageChanged -= UpdateLists;
             TranslationManager.OnLanguageChanged -= UpdatePlayerDropdown;
 
@@ -547,7 +568,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         public void Prepare() {
             IsReady = true;
             UpdatePlayerDropdown(GlobalController.Instance.translationManager);
-            UpdateEntryCount(GlobalController.Instance.translationManager);
+            UpdateLeftPanelText(GlobalController.Instance.translationManager);
             ChangedViewingStats(true);
             loading.SetActive(false);
         }
@@ -739,8 +760,10 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             viewingStatisticDropdown.RefreshShownValue();
         }
 
-        private void UpdateEntryCount(TranslationManager tm) {
-            entryCount.text = tm.GetTranslationWithReplacements("ui.replay.stats.occurences", "occurences", timePointEnteries.Count.ToString());
+        private void UpdateLeftPanelText(TranslationManager tm) {
+            StringBuilder stringBuilder = new();
+            UpdateLeftPanelText(tm, stringBuilder);
+            entryCount.SetText(stringBuilder);
         }
 
         public void ChangedViewingStats(bool changeButtons) {
@@ -797,10 +820,66 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             }
 
             scrollRect.verticalNormalizedPosition = 1;
-            UpdateEntryCount(GlobalController.Instance.translationManager);
+            UpdateLeftPanelText(GlobalController.Instance.translationManager);
         }
 
         #region Other Methods
+        public int GetMostStarsHad(List<TimePointEntry> timePointEnteries) {
+            int highestStarCount = 0;
+
+            // loop through all enteries
+            foreach (var timePointEntry in timePointEnteries) {
+                var testPoint = timePointEntry.timePoint as PointStarCountChange;
+                if (testPoint.StarCount > highestStarCount) {
+                    highestStarCount = testPoint.StarCount;
+                }
+            }
+
+            return highestStarCount;
+        }
+
+        public TimePointEntry GetLongestComboEntry(List<TimePointEntry> timePointEnteries) {
+            TimePointEntry longestComboEntry = null;
+            int comboMaxLength = 0, comboMaxElements = 0;
+            bool prevComboHadKill = false;
+
+            // loop through all combos
+            foreach(var timePointEntry in timePointEnteries) {
+                // first check if the combo is longer
+                var testPoint = timePointEntry.timePoint as PointCombo;
+                if (testPoint.Length > comboMaxLength) {
+                    longestComboEntry = timePointEntry;
+                    comboMaxLength = testPoint.Length;
+                    comboMaxElements = testPoint.ComboElements.Count;
+                    prevComboHadKill = testPoint.EndsInDeath();
+                    continue;
+                }
+
+                // the combo matches length
+                if (testPoint.Length == comboMaxLength) {
+                    // discard combos with a shorter complexity
+                    if (testPoint.ComboElements.Count < comboMaxElements) {
+                        continue;
+                    }
+
+                    // prioritize a combo with a kill
+                    if (!testPoint.EndsInDeath() && prevComboHadKill) {
+                        continue;
+                    }
+
+                    longestComboEntry = timePointEntry;
+                    comboMaxLength = testPoint.Length;
+                    comboMaxElements = testPoint.ComboElements.Count;
+                    prevComboHadKill = testPoint.EndsInDeath();
+                }
+            }
+
+            return longestComboEntry;
+        }
+
+        public void UpdateEntryCount(TranslationManager tm, StringBuilder sb) {
+            sb.AppendLine(tm.GetTranslationWithReplacements("ui.replay.stats.occurences", "occurences", timePointEnteries.Count.ToString()));
+        }
 
         public void OnChangedViewingPlayer() {
             UpdateLists(GlobalController.Instance.translationManager);
