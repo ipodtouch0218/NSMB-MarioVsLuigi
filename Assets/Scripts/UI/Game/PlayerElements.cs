@@ -1,6 +1,7 @@
 ﻿using NSMB.Cameras;
 using NSMB.Entities.Player;
 using NSMB.Quantum;
+using NSMB.Replay;
 using NSMB.Sound;
 using NSMB.UI.Game.Replay;
 using NSMB.UI.Game.Scoreboard;
@@ -76,6 +77,11 @@ namespace NSMB.UI.Game {
 
             if (Game.Session.IsReplay) {
                 StartSpectating();
+
+                if (ActiveReplayManager.Instance.InitialSpectatingPlayer != PlayerRef.None) {
+                    SpectatePlayerIndex(ActiveReplayManager.Instance.InitialSpectatingPlayer);
+                    return;
+                }
                 
                 if (PlayerPrefs.HasKey("id")) {
                     string userId = PlayerPrefs.GetString("id");
@@ -310,6 +316,19 @@ namespace NSMB.UI.Game {
                 if (newTarget != EntityRef.None) {
                     CameraAnimator.Mode = CameraAnimator.CameraMode.FollowPlayer;
                     Entity = newTarget;
+                    UpdateSpectateUI();
+                }
+            }
+        }
+
+        private unsafe void SpectatePlayerIndex(PlayerRef playerRef) {
+            Frame f = Game.Frames.Predicted;
+            var marios = f.Filter<MarioPlayer>();
+
+            while (marios.NextUnsafe(out var marioEntity, out var marioPlayer)) {
+                if (marioPlayer->PlayerRef == playerRef) {
+                    CameraAnimator.Mode = CameraAnimator.CameraMode.FollowPlayer;
+                    Entity = marioEntity;
                     UpdateSpectateUI();
                 }
             }

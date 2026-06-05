@@ -21,15 +21,16 @@ namespace NSMB.Replay.Stats {
         public virtual bool ShowLength => HasEndFrame;
 
         //---one-set variables
-        public readonly PlayerRef PlayerRef;
+        public readonly PlayerRef AffectedPlayerRef;
         public readonly string AffectedPlayerName;
         public readonly int OccurenceFrame;
         public readonly FP DeltaTime;
         public readonly int Id;
+        public readonly int UpdateRate;
         public readonly ReplayStatsRecorder StatsRecorder;
 
         //---properties (readonly)
-        public bool IsGlobalPoint => PlayerRef == PlayerRef.None;
+        public bool IsGlobalPoint => AffectedPlayerRef == PlayerRef.None;
         public bool HasEndFrame => EndFrame != -1;
         public int Length => !HasEndFrame ? -1 : EndFrame - OccurenceFrame;
 
@@ -62,7 +63,7 @@ namespace NSMB.Replay.Stats {
         // basic init - per player
         public TimePoint(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : this(stats, f) {
             if (mario != null) {
-                PlayerRef = mario->PlayerRef;
+                AffectedPlayerRef = mario->PlayerRef;
                 AffectedPlayerName = f.GetPlayerData(mario->PlayerRef).PlayerNickname;
             }
         }
@@ -98,6 +99,8 @@ namespace NSMB.Replay.Stats {
         public virtual string GetEntryNum(int entryNum, DisplayArgs displayArgs) => entryNum.ToString();
 
         public virtual string GetTooltip(TranslationManager tm, DisplayArgs displayArg) => null;
+
+        public virtual PlayerRef GetSpectatingPlayer(DisplayArgs displayArg) => AffectedPlayerRef; 
 
         //---static methods
         public static void ResetIndex() => _index = 0;
@@ -200,7 +203,7 @@ namespace NSMB.Replay.Stats {
             AttackerRef = attackerRef;
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append(tm.GetTranslation("ui.replay.stats.entry.damage."+Reason.ToString().ToLower()));
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.AppendLine(tm.GetTranslation("ui.replay.stats.entry.damage."+Reason.ToString().ToLower()));
 
         public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             switch (displayArg) {
@@ -211,6 +214,13 @@ namespace NSMB.Replay.Stats {
                 stringBuilder.Append(AffectedPlayerName);
                 break;
             }
+        }
+
+        public override PlayerRef GetSpectatingPlayer(DisplayArgs displayArg) {
+            return displayArg switch {
+                DisplayArgs.FromAttacker => AttackerRef != PlayerRef.None ? AttackerRef : AffectedPlayerRef,
+                _ => AffectedPlayerRef
+            };
         }
     }
 
@@ -240,7 +250,7 @@ namespace NSMB.Replay.Stats {
             AttackerRef = attackRef;
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append(tm.GetTranslation("ui.replay.stats.entry.deaths."+Reason.ToString().ToLower()));
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.AppendLine(tm.GetTranslation("ui.replay.stats.entry.deaths."+Reason.ToString().ToLower()));
 
         public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             if (StatsRecorder != null && StatsRecorder.ReplayFile.Header.Rules.Lives > 0) {
@@ -265,6 +275,13 @@ namespace NSMB.Replay.Stats {
 
             return tooltip;
         }
+
+        public override PlayerRef GetSpectatingPlayer(DisplayArgs displayArg) {
+            return displayArg switch {
+                DisplayArgs.FromAttacker => AttackerRef != PlayerRef.None ? AttackerRef : AffectedPlayerRef,
+                _ => AffectedPlayerRef
+            };
+        }
     }
 
     public unsafe class PointKnockback : TimePoint {
@@ -284,13 +301,13 @@ namespace NSMB.Replay.Stats {
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             base.SetTimeText(tm, stringBuilder, displayArg);
             if (ShowLength) {
-                stringBuilder.Append($" ({EndFrame - OccurenceFrame}F)");
+                stringBuilder.Append($" ({Length}F)");
             }
         }
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             string recieveOrDealt = displayArg == DisplayArgs.FromAttacker ? "dealt" : "recieved";
-            string translationString = translationPrefix+"knockback." + recieveOrDealt + KnockbackStrength.ToString().ToLower();
+            string translationString = translationPrefix+"knockback." + recieveOrDealt + '.' + KnockbackStrength.ToString().ToLower();
             stringBuilder.Append(tm.GetTranslationWithReplacements(translationString, "victim", AffectedPlayerName));
         }
 
@@ -309,6 +326,13 @@ namespace NSMB.Replay.Stats {
             var color = Color.red;
             stringBuilder.Append("<sprite name=\"room_stars\" color=#").Append(Utils.ColorToHex(color, false)).Append('>');
             stringBuilder.Append(Utils.GetSymbolString(StarsDropped.ToString(), Utils.smallSymbols, color: Color.red));
+        }
+
+        public override PlayerRef GetSpectatingPlayer(DisplayArgs displayArg) {
+            return displayArg switch {
+                DisplayArgs.FromAttacker => AttackerRef,
+                _ => AffectedPlayerRef
+            };
         }
     }
 
@@ -416,11 +440,18 @@ namespace NSMB.Replay.Stats {
         }
 
         public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
-            var attackers = GetParticipants();
-            if (attackers.Count > 1) {
-                stringBuilder.Append(tm.GetTranslationWithReplacements(translationPrefix+"combo.participents", "number", attackers.Count.ToString()));
-            } else {
-                stringBuilder.Append(attackers.Values.First());
+            switch (displayArg) {
+            case DisplayArgs.Normal:
+                var attackers = GetParticipants();
+                if (attackers.Count > 1) {
+                    stringBuilder.Append(tm.GetTranslationWithReplacements(translationPrefix+"combo.participents", "number", attackers.Count.ToString()));
+                } else {
+                    stringBuilder.Append(attackers.Values.First());
+                }
+                break;
+            case DisplayArgs.FromAttacker:
+                stringBuilder.Append(AffectedPlayerName);
+                break;
             }
         }
 
@@ -430,7 +461,7 @@ namespace NSMB.Replay.Stats {
             foreach (var (Element, _, _) in ComboElements) {
                 if (Element is PointKnockback kb) {
                     int frame = kb.OccurenceFrame - OccurenceFrame;
-                    sb.Append(tm.GetTranslationWithReplacements(translationPrefix + "combo.tooltip.knockback", "attacker", kb.AttackerName, "framenumber", frame.ToString())).Append(" "+kb.StarsDropped+"★");
+                    sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix + "combo.tooltip.knockback", "attacker", kb.AttackerName, "framenumber", frame.ToString())).Append(" "+kb.StarsDropped+"★");
                 } else if (Element is PointDamage dmg) {
                     dmg.SetDescriptionText(tm, sb, displayArg);
                 } else if (Element is PointDeath death) {
@@ -439,6 +470,20 @@ namespace NSMB.Replay.Stats {
             }
 
             return sb.ToString();
+        }
+
+        public override PlayerRef GetSpectatingPlayer(DisplayArgs displayArg) {
+            switch(displayArg) {
+            case DisplayArgs.FromAttacker:
+                var attackers = GetParticipants();
+                if (attackers.Count > 1) {
+                    return AffectedPlayerRef;
+                } else {
+                    return attackers.First().Key;
+                }
+            default:
+                return AffectedPlayerRef;
+            }
         }
     }
 
@@ -540,6 +585,9 @@ namespace NSMB.Replay.Stats {
         public readonly FPVector2 Coordinates;
         public readonly List<string> BlockingPlayers;
         public string CollectingPlayer; // if a player collected the big star this is their name
+
+        public bool GameEnded;
+        public override bool ShowEndTime => !GameEnded;
         public PointBigCollectableSpawned(ReplayStatsRecorder stats, Frame f, int usedSpawns, int index, bool blocked, FPVector2 coordinates, ref GlobalInfo globalReplayInfo, VersusStageData stage, List<string> blockers) : base(stats, f) {
             PositionIndex = index;
             UsedSpawns = usedSpawns;

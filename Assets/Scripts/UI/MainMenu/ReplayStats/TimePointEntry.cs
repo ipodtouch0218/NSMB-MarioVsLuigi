@@ -14,6 +14,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
 
         //---Properties
         public string EntryInfo { get; private set; }
+        public TimePoint.DisplayArgs DisplayArg;
 
         //---Serialized Variables
         [SerializeField] private TMP_Text entryNumText, timeText, symbolsText, descriptionText, additionalText;
@@ -30,6 +31,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
 
         public void UpdateUI(TimePoint timePointInfo, int entryNum, TimePoint.DisplayArgs displayArg) {
             timePoint = timePointInfo;
+            DisplayArg = displayArg;
 
             TranslationManager tm = GlobalController.Instance.translationManager;
 
@@ -67,7 +69,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         #region Button Methods
 
         public void StartReplayAtPart() {
-            ActiveReplayManager.Instance.StartReplayPlayback(timePoint.StatsRecorder.ReplayFile, timePoint.OccurenceFrame - timePoint.StatsRecorder.ReplayStart, timePoint.PlayerRef, true);
+            ActiveReplayManager.Instance.StartReplayPlayback(timePoint.StatsRecorder.ReplayFile, timePoint.OccurenceFrame - timePoint.StatsRecorder.ReplayStart, timePoint.GetSpectatingPlayer(DisplayArg), true);
         }
 
         #endregion

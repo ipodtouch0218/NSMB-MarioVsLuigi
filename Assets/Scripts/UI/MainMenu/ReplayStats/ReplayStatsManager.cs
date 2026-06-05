@@ -445,23 +445,21 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             var infoPrefix = "ui.replay.stats.info.";
             var translationPrefix = infoPrefix+viewingOptions.ToString().ToLower()+".";
             switch (viewingOptions) {
-            case StatOptions.StarCountChange: {
+            case StatOptions.StarCountChange:
                 AddOccurenceCount(tm, sb, true);
                 int highestStarCount = GetMostStarsHad(timePointEnteries);
                 sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix+"highest", "highestStarCount", highestStarCount.ToString()));
                 break;
-            }
             case StatOptions.ComboRecieved:
-            case StatOptions.ComboLanded: {
+            case StatOptions.ComboLanded:
                 var comboPrefix = infoPrefix + "combo.";
                 AddOccurenceCount(tm, sb);
                 var longestCombo = GetLongestComboEntry(timePointEnteries);
                 if (longestCombo != null) {
-                    sb.AppendLine(tm.GetTranslationWithReplacements(comboPrefix, "longestComboId", longestCombo.EntryInfo, "frameCount", longestCombo.timePoint.Length.ToString()));
+                    sb.AppendLine(tm.GetTranslationWithReplacements(comboPrefix+"longest", "longestComboId", longestCombo.EntryInfo, "frameCount", longestCombo.timePoint.Length.ToString()));
                 }
                 break;
-            }
-            case StatOptions.PowerupInfo: {
+            case StatOptions.PowerupInfo:
                 AddOccurenceCount(tm, sb, true);
                 if (statToggles[0].Value) {
                     break;
@@ -472,11 +470,12 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                     sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix+"mostused", "powerup", powerupTranslation));
                 }
                 break;
-            }
-            default: {
+            case StatOptions.ReserveInfo:
+                AddOccurenceCount(tm, sb, true);
+                break;
+            default:
                 AddOccurenceCount(tm, sb);
                 break;
-            }
             }
         }
 
