@@ -18539,6 +18539,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f55ae926d741a3e4ab2b86a2e621773c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NSMB.UI.MainMenu.Submenus.RoomList.TimePointEntry
+  DisplayArg: 0
   entryNumText: {fileID: 1668917005}
   timeText: {fileID: 1593218325}
   symbolsText: {fileID: 253262536}
@@ -29687,7 +29688,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 8, y: -30}
-  m_SizeDelta: {x: 344, y: 136.34}
+  m_SizeDelta: {x: 344, y: 22.73}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &624177819
 MonoBehaviour:
@@ -29709,9 +29710,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: The original Mario vs Luigi gamemode from the DS era! Collect the randomly
-    spawning Big Stars to win, collect coins to spawn powerups, and attack other
-    players to get them to drop the Big Stars they're carrying.
+  m_text: =asdasdasd-
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 03bd50bb8343d1d4dbb0873e4c9abb95, type: 2}
   m_sharedMaterial: {fileID: -4437592673344618727, guid: 03bd50bb8343d1d4dbb0873e4c9abb95,
@@ -75443,7 +75442,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -9.3}
-  m_SizeDelta: {x: 360, y: 174.34}
+  m_SizeDelta: {x: 360, y: 60.73}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &1653722350
 MonoBehaviour:

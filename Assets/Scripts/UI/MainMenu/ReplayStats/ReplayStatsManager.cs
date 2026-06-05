@@ -513,13 +513,10 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             listTemplate.gameObject.SetActive(false);
             loading.SetActive(!IsReady);
 
-            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
-            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) leftTopLayout.transform);
             TranslationManager.OnLanguageChanged += UpdateStatsDropdown;
             TranslationManager.OnLanguageChanged += UpdateLeftPanelText;
             TranslationManager.OnLanguageChanged += UpdateLists;
             TranslationManager.OnLanguageChanged += UpdatePlayerDropdown;
-            Canvas.ForceUpdateCanvases();
 
             // create the buttons for cateGOries
             for (int i = 0; i < statOptionGroup.Length; i++) {
@@ -543,6 +540,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             UpdateInformation(replayListEntry);
 
             ChangedViewingStats(true);
+
         }
 
         protected override void OnDisable() {
@@ -834,8 +832,11 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 }
             }
 
-            scrollRect.verticalNormalizedPosition = 1;
             UpdateLeftPanelText(GlobalController.Instance.translationManager);
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) leftTopLayout.transform);
+            Canvas.ForceUpdateCanvases();
+            scrollRect.verticalNormalizedPosition = 1;
         }
 
         #region Other Methods

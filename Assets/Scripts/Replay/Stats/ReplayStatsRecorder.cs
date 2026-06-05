@@ -80,9 +80,9 @@ namespace NSMB.Replay.Stats {
                 if (loadAddonResult.Result == LoadAllAddonsResult.Success) {
                     await Init();
                 } else if (loadAddonResult.Result == LoadAllAddonsResult.DownloadRequired) {
-                    AddonManager.RequestDownloadAddons(loadAddonResult.RequiredDownloads, (result) => {
+                    AddonManager.RequestDownloadAddons(loadAddonResult.RequiredDownloads, async (result) => {
                         if (result == AddonManager.AddonDownloadResult.Success) {
-                            _ = Init();
+                            await Init();
                         } else if (result == AddonManager.AddonDownloadResult.Cancelled) {
                             GlobalController.Instance.loadingCanvas.EndAnimation();
                         } else if (result == AddonManager.AddonDownloadResult.Failure) {

@@ -376,6 +376,10 @@ namespace NSMB.Replay.Stats {
 
         // tUPle, first is the elemnt, second is stars lost third is total stars lost
         public readonly List<(TimePoint Element, int StarsLost, int TotalStarsLost)> ComboElements = new();
+        public bool GameEnded = false;
+        public override bool ShowEndTime => !GameEnded;
+
+
         public Dictionary<PlayerRef, string> GetParticipants() {
             Dictionary<PlayerRef, string> attackerNames = new();
 
@@ -461,7 +465,7 @@ namespace NSMB.Replay.Stats {
             foreach (var (Element, _, _) in ComboElements) {
                 if (Element is PointKnockback kb) {
                     int frame = kb.OccurenceFrame - OccurenceFrame;
-                    sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix + "combo.tooltip.knockback", "attacker", kb.AttackerName, "framenumber", frame.ToString())).Append(" "+kb.StarsDropped+"★");
+                    sb.Append(tm.GetTranslationWithReplacements(translationPrefix + "combo.tooltip.knockback", "attacker", kb.AttackerName, "framenumber", frame.ToString())).AppendLine(" "+kb.StarsDropped+"★");
                 } else if (Element is PointDamage dmg) {
                     dmg.SetDescriptionText(tm, sb, displayArg);
                 } else if (Element is PointDeath death) {
@@ -584,6 +588,7 @@ namespace NSMB.Replay.Stats {
         public readonly bool WasBlocked;
         public readonly FPVector2 Coordinates;
         public readonly List<string> BlockingPlayers;
+        public PlayerRef CollectingPlayerRef;
         public string CollectingPlayer; // if a player collected the big star this is their name
 
         public bool GameEnded;
@@ -641,6 +646,8 @@ namespace NSMB.Replay.Stats {
             }
             return spotsRemaining + blockers;
         }
+
+        public override PlayerRef GetSpectatingPlayer(DisplayArgs displayArg) => CollectingPlayerRef;
     }
 
     public unsafe class PointBlockHit : TimePoint {

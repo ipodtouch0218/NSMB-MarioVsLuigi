@@ -1,5 +1,4 @@
-﻿#nullable enable
-using Photon.Deterministic;
+﻿using Photon.Deterministic;
 using Quantum;
 using Quantum.Physics2D;
 using System;
@@ -44,7 +43,7 @@ namespace NSMB.Replay.Stats
 
             var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
 
-            CoinItemAsset? coinItemAsset = null;
+            CoinItemAsset coinItemAsset = null;
             if (e.ItemSpawned != EntityRef.None) {
                 var coinItemPtr = f.Unsafe.GetPointer<CoinItem>(e.ItemSpawned);
                 coinItemAsset = f.FindAsset(coinItemPtr->Scriptable);
@@ -64,13 +63,14 @@ namespace NSMB.Replay.Stats
             var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
 
-            playerInfo.StarsCollectedPoints.Add(new PointStarCollected(StatRecorder, f, mario, playerInfo, gamemode.GetObjectiveCount(f, mario)));
+            //playerInfo.StarsCollectedPoints.Add(new PointStarCollected(StatRecorder, f, mario, playerInfo, gamemode.GetObjectiveCount(f, mario)));
 
             // check if the big star is the main one
             if (e.StarEntity == f.Global->MainBigStar &&
                 StatRecorder.GlobalInfo.CurrBigCollectable is PointBigCollectableSpawned currBigCollectable) {
                 currBigCollectable.CollectingPlayer = playerInfo.PlayerName;
                 currBigCollectable.EndFrame = f.Number;
+                currBigCollectable.CollectingPlayerRef = mario->PlayerRef;
                 StatRecorder.GlobalInfo.CurrBigCollectable = null;
             }
         }
@@ -332,7 +332,7 @@ namespace NSMB.Replay.Stats
             bool wasBlocked = !e.Success;
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             var info = StatRecorder.GlobalInfo;
-            List<string>? blockers = null;
+            List<string> blockers = null;
 
             if (wasBlocked) {
                 blockers = new();
@@ -405,7 +405,7 @@ namespace NSMB.Replay.Stats
                 if (startTileAsset is PowerupTileBase powerupTile) {
                     if (!playerInfo.BlocksBumped.Contains(entityRef)) {
                         var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
-                        CoinItemAsset? coinItemAsset = null;
+                        CoinItemAsset coinItemAsset = null;
                         foreach (var coinItem in gamemode.AllCoinItems) {
                             var coinItemAsAsset = f.FindAsset(coinItem);
                             var entityPrototype = f.FindAsset(coinItemAsAsset.Prefab);
@@ -442,7 +442,7 @@ namespace NSMB.Replay.Stats
 
             // end any remaining combos when game is over
             if (f.Global->GameState == GameState.Ended) {
-                StatUtilStopCombo(f, playerInfo, noEndFrame: true);
+                StatUtilStopCombo(f, playerInfo, gameEnded: true);
             }
         }
 
@@ -505,7 +505,7 @@ namespace NSMB.Replay.Stats
 
         #region Static Methods
 
-        public static void StatUtilStopCombo(Frame f, PlayerInfo playerInfo, TimePoint? timePoint = null, int starsLost = 0, bool noEndFrame = false) {
+        public static void StatUtilStopCombo(Frame f, PlayerInfo playerInfo, TimePoint timePoint = null, int starsLost = 0, bool gameEnded = false) {
             var comb = playerInfo.CurrComboPoint;
             if (comb == null) {
                 return;
@@ -524,7 +524,8 @@ namespace NSMB.Replay.Stats
             }
 
             // length is in frames
-            comb.EndFrame = noEndFrame ? -1 : f.Number;
+            comb.EndFrame = f.Number;
+            comb.GameEnded = gameEnded;
             playerInfo.ComboEndTimer = 0;
             playerInfo.CurrComboPoint = null;
         }

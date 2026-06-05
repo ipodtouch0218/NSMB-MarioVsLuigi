@@ -235,7 +235,7 @@ namespace NSMB.UI.Game.Replay {
             int currentIndex = (f.Number - ActiveReplayManager.Instance.ReplayStart) / (5 * f.UpdateRate);
             int newIndex = currentIndex + 1;
             int newFrame = Mathf.Min((newIndex * (5 * f.UpdateRate)) + ActiveReplayManager.Instance.ReplayStart, ActiveReplayManager.Instance.ReplayEnd);
-
+            
             var session = QuantumRunner.Default.Session;
             if (newIndex < ActiveReplayManager.Instance.ReplayFrameCache.Count) {
                 // We already have this frame
