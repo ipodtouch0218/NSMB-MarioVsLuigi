@@ -2884,6 +2884,8 @@ namespace Quantum {
                 mario->DamageInvincibilityFrames = Constants.DamageInvincibilityFrames;
                 break;
 
+            case IceBlockBreakReason.Shell:
+            case IceBlockBreakReason.Explosion:
             case IceBlockBreakReason.InvincibleMario:
                 // Damage, i-frames.
                 strength = KnockbackStrength.Groundpound;
