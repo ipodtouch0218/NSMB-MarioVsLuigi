@@ -144,7 +144,7 @@ namespace NSMB.Replay.Stats
                     f.Unsafe.ComponentGetter<BobombSystem.Filter>().TryGet(f, e.Attacker, out var bobombFilter);
                     var bobomb = bobombFilter.Bobomb;
                     var holdable = bobombFilter.Holdable;
-                    if (bobomb->CurrentDetonationFrames > 0) {
+                    if (bobomb->CurrentDetonationFrames <= 0) {
                         if (f.Exists(holdable->PreviousHolder)) {
                             var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
                             attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;

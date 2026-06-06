@@ -746,7 +746,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             BinaryReplayHeader header = replayListEntry.ReplayFile.Header;
             for (int i = 0; i < header.PlayerInformation.Length; i++) {
                 ref ReplayPlayerInformation info = ref header.PlayerInformation[i];
-                targetPlayerDropdown.options.Add(new TMP_Dropdown.OptionData { text = info.Nickname });
+                targetPlayerDropdown.options.Add(new TMP_Dropdown.OptionData { text = ReplayStatsRecorder.Instance.PlayerInfos[i].PlayerName });
             }
             targetPlayerDropdown.SetValueWithoutNotify(index);
             targetPlayerDropdown.RefreshShownValue();

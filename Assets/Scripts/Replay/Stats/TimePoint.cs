@@ -216,7 +216,7 @@ namespace NSMB.Replay.Stats {
             case DisplayArgs.Normal:
                 stringBuilder.Append(AttackerName);
                 break;
-            case DisplayArgs.FromAttacker:
+            default:
                 stringBuilder.Append(AffectedPlayerName);
                 break;
             }
@@ -269,7 +269,7 @@ namespace NSMB.Replay.Stats {
             case DisplayArgs.Normal:
                 stringBuilder.Append(AttackerName);
                 break;
-            case DisplayArgs.FromAttacker:
+            default:
                 stringBuilder.Append(AffectedPlayerName);
                 break;
             }
