@@ -36,7 +36,7 @@ namespace NSMB.Replay {
         }
         public string SavedRecordingPath { get; set; }
         public int? ReplayStartFrame { get; private set; }
-        public PlayerRef InitialSpectatingPlayer { get; private set; }
+        public object InitialCameraArg { get; private set; }
 
         //---Public Variables
         public readonly List<byte[]> ReplayFrameCache = new();
@@ -227,13 +227,13 @@ namespace NSMB.Replay {
             }
         }
 
-        public async void StartReplayPlayback(BinaryReplayFile replay, int? startingFrame = null, PlayerRef? playerRef = null, bool noClearCache = false) {
+        public async void StartReplayPlayback(BinaryReplayFile replay, int? startingFrame = null, bool noClearCache = false, object cameraArg = null) {
             if (replay.LoadAllIfNeeded() != ReplayParseResult.Success) {
                 return;
             }
 
             ReplayStartFrame = startingFrame;
-            InitialSpectatingPlayer = playerRef ?? PlayerRef.None;
+            InitialCameraArg = cameraArg;
 
             GlobalController.Instance.loadingCanvas.dontHideOnGameDestroy = true;
             GlobalController.Instance.loadingCanvas.Initialize(null);

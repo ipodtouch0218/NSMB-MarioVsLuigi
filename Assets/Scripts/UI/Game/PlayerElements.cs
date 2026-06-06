@@ -78,11 +78,14 @@ namespace NSMB.UI.Game {
             if (Game.Session.IsReplay) {
                 StartSpectating();
 
-                if (ActiveReplayManager.Instance.InitialSpectatingPlayer != PlayerRef.None) {
-                    SpectatePlayerIndex(ActiveReplayManager.Instance.InitialSpectatingPlayer);
+                if (ActiveReplayManager.Instance.InitialCameraArg is PlayerRef specPlayer) {
+                    SpectatePlayerIndex(specPlayer);
+                    return;
+                } else if (ActiveReplayManager.Instance.InitialCameraArg is Vector3 cameraPos) {
+                    SetCameraToPos(cameraPos);
                     return;
                 }
-                
+
                 if (PlayerPrefs.HasKey("id")) {
                     string userId = PlayerPrefs.GetString("id");
                     for (int i = 0; i < f.MaxPlayerCount; i++) {
@@ -332,6 +335,12 @@ namespace NSMB.UI.Game {
                     UpdateSpectateUI();
                 }
             }
+        }
+
+        private unsafe void SetCameraToPos(Vector3 pos) {
+            CameraAnimator.Mode = CameraAnimator.CameraMode.Freecam;
+            CameraAnimator.SetCameraToPos(pos);
+            UpdateSpectateUI();
         }
 
         private void OnNametagVisibilityChanged() {

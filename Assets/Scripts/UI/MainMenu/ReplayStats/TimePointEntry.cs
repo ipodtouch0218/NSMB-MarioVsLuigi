@@ -2,6 +2,7 @@
 using NSMB.Replay.Stats;
 using NSMB.UI.Translation;
 using NSMB.Utilities.Extensions;
+using System;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -70,7 +71,8 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         #region Button Methods
 
         public void StartReplayAtPart() {
-            ActiveReplayManager.Instance.StartReplayPlayback(timePoint.StatsRecorder.ReplayFile, timePoint.OccurenceFrame - timePoint.StatsRecorder.ReplayStart - timePoint.StartFrameOffset, timePoint.GetSpectatingPlayer(DisplayArg), true);
+            int targetFrame = timePoint.OccurenceFrame - timePoint.StatsRecorder.ReplayStart - timePoint.StartFrameOffset;
+            ActiveReplayManager.Instance.StartReplayPlayback(timePoint.StatsRecorder.ReplayFile, Math.Max(targetFrame, 0), true, timePoint.GetCameraPos(DisplayArg));
         }
 
         #endregion

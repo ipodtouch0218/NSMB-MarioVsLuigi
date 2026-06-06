@@ -366,5 +366,9 @@ namespace NSMB.Cameras {
         public enum CameraMode {
             FollowPlayer, Freecam
         }
+
+        public void SetCameraToPos(Vector3 pos) {
+            truePosition = pos;
+        }
     }
 }

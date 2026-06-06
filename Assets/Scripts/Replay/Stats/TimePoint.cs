@@ -104,7 +104,7 @@ namespace NSMB.Replay.Stats {
 
         public virtual string GetTooltipLabel(TranslationManager tm, DisplayArgs displayArg) => "!";
 
-        public virtual PlayerRef GetSpectatingPlayer(DisplayArgs displayArg) => AffectedPlayerRef;
+        public virtual object GetCameraPos(DisplayArgs displayArg) => AffectedPlayerRef;
 
 
         public virtual bool ShowTooltipIcon(TranslationManager tm, DisplayArgs displayArg) => GetTooltip(tm, displayArg) != null;
@@ -224,7 +224,7 @@ namespace NSMB.Replay.Stats {
             }
         }
 
-        public override PlayerRef GetSpectatingPlayer(DisplayArgs displayArg) {
+        public override object GetCameraPos(DisplayArgs displayArg) {
             return displayArg switch {
                 DisplayArgs.FromAttacker => AttackerRef != PlayerRef.None ? AttackerRef : AffectedPlayerRef,
                 _ => AffectedPlayerRef
@@ -284,7 +284,7 @@ namespace NSMB.Replay.Stats {
             return tooltip;
         }
 
-        public override PlayerRef GetSpectatingPlayer(DisplayArgs displayArg) {
+        public override object GetCameraPos(DisplayArgs displayArg) {
             return displayArg switch {
                 DisplayArgs.FromAttacker => AttackerRef != PlayerRef.None ? AttackerRef : AffectedPlayerRef,
                 _ => AffectedPlayerRef
@@ -336,7 +336,7 @@ namespace NSMB.Replay.Stats {
             stringBuilder.Append(Utils.GetSymbolString(StarsDropped.ToString(), Utils.smallSymbols, color: Color.red));
         }
 
-        public override PlayerRef GetSpectatingPlayer(DisplayArgs displayArg) {
+        public override object GetCameraPos(DisplayArgs displayArg) {
             return displayArg switch {
                 DisplayArgs.FromAttacker => AttackerRef,
                 _ => AffectedPlayerRef
@@ -486,7 +486,7 @@ namespace NSMB.Replay.Stats {
             return sb.ToString();
         }
 
-        public override PlayerRef GetSpectatingPlayer(DisplayArgs displayArg) {
+        public override object GetCameraPos(DisplayArgs displayArg) {
             switch(displayArg) {
             case DisplayArgs.FromAttacker:
                 var attackers = GetParticipants();
@@ -661,7 +661,7 @@ namespace NSMB.Replay.Stats {
             return spotsRemaining + blockers;
         }
 
-        public override PlayerRef GetSpectatingPlayer(DisplayArgs displayArg) => CollectingPlayerRef;
+        public override object GetCameraPos(DisplayArgs displayArg) => Coordinates.ToUnityVector3();
         public override string GetTooltipLabel(TranslationManager tm, DisplayArgs displayArg) => (Spawnpoints - UsedSpawns).ToString();
     }
 
