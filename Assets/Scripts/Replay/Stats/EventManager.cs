@@ -4,6 +4,7 @@ using Quantum.Physics2D;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static UnityEngine.Analytics.IAnalytic;
 
 namespace NSMB.Replay.Stats
 {
@@ -26,7 +27,7 @@ namespace NSMB.Replay.Stats
             // global trackers
             eventDispatcher.Subscribe<EventBigCollectableAttemptedSpawn>(this, OnBigCollectableAttemptedSpawn);
 
-            // callbackDispatcher.Subscribe<CallbackGameStarted>(this, e => OnGameStarted(e.Game.Frames.Predicted));
+            callbackDispatcher.Subscribe<CallbackGameResynced>(this, e => OnGameStarted(e.Game.Frames.Predicted));
             callbackDispatcher.Subscribe<CallbackSimulateFinished>(this, e => OnSimulationFinished(e.Frame));
         }
 
@@ -34,7 +35,7 @@ namespace NSMB.Replay.Stats
 
         // player trackers
         public void OnMarioPlayerCollectedCoin(EventMarioPlayerCollectedCoin e) {
-            Frame f = e.Game.Frames.Verified;
+            Frame f = e.Game.Frames.Predicted;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
 
             if (mario->PlayerRef == default) {
@@ -52,7 +53,7 @@ namespace NSMB.Replay.Stats
         }
 
         public void OnMarioPlayerCollectedStar(EventMarioPlayerCollectedStar e) {
-            Frame f = e.Game.Frames.Verified;
+            Frame f = e.Game.Frames.Predicted;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             
             // sanity check, somehow this can occur
@@ -76,7 +77,7 @@ namespace NSMB.Replay.Stats
         }
 
         public void OnMarioPlayerDied(EventMarioPlayerDied e) {
-            Frame f = e.Game.Frames.Verified;
+            Frame f = e.Game.Frames.Predicted;
             PointDeath.DeathCause deathCause = PointDeath.DeathCause.Enemy;
 
             // for some reason when dying via pit the entity and attacker are the same
@@ -189,7 +190,7 @@ namespace NSMB.Replay.Stats
         }
 
         public void OnMarioPlayerKnockback(EventMarioPlayerTookKnockback e) {
-            Frame f = e.Game.Frames.Verified;
+            Frame f = e.Game.Frames.Predicted;
             KnockbackStrength strength = e.Strength;
             var victimMario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             if (victimMario->PlayerRef == default) {
@@ -232,7 +233,7 @@ namespace NSMB.Replay.Stats
         }
 
         public void OnMarioPlayerTookDamage(EventMarioPlayerTookDamage e) {
-            Frame f = e.Game.Frames.Verified;
+            Frame f = e.Game.Frames.Predicted;
             PointDamage.DamageCause damageCause = PointDamage.DamageCause.Enemy;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             if (mario->PlayerRef == default) {
@@ -303,7 +304,7 @@ namespace NSMB.Replay.Stats
         }
 
         public void OnMarioPlayerCollectedPowerup(EventMarioPlayerCollectedPowerup e) {
-            Frame f = e.Game.Frames.Verified;
+            Frame f = e.Game.Frames.Predicted;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             if (mario->PlayerRef == default) {
                 return;
@@ -315,7 +316,7 @@ namespace NSMB.Replay.Stats
 
 
         public void OnMarioPlayerTaunted(EventMarioPlayerTaunted e) {
-            Frame f = e.Game.Frames.Verified;
+            Frame f = e.Game.Frames.Predicted;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             if (mario->PlayerRef == default) {
                 return;
@@ -359,15 +360,14 @@ namespace NSMB.Replay.Stats
 
 
         #region Simulation Callbacks
-        // buggy
-        /*public void OnGameStarted(Frame f) {
+        public void OnGameStarted(Frame f) {
             // register all the players
-            
-            UnityEngine.Debug.Log("Hello");
-        }*/
+            foreach ((_, var data) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
+                var runtimeData = f.GetPlayerData(data->PlayerRef);
+                StatRecorder.PlayerInfos[data->PlayerRef] = new PlayerInfo(runtimeData.PlayerNickname, data->PlayerRef);
+            }
+        }
 
-        //! we have to use this janky setUP with a did loop bool since OnGameStarted doesn't work
-        private bool didLoop = false;
         public void OnSimulationFinished(Frame f) {
             // scan all Marios
             var marios = f.Filter<MarioPlayer>();
@@ -379,11 +379,6 @@ namespace NSMB.Replay.Stats
 
                 bool livesEnabled = f.Global->Rules.IsLivesEnabled;
                 bool outOfLives = livesEnabled && marioPlayer->Lives < 1;
-
-                if (!didLoop) {
-                    var runtimeData = f.GetPlayerData(marioPlayer->PlayerRef);
-                    StatRecorder.PlayerInfos[marioPlayer->PlayerRef] = new PlayerInfo(runtimeData.PlayerNickname, marioPlayer->PlayerRef);
-                }
 
                 var playerInfo = StatRecorder.PlayerInfos[marioPlayer->PlayerRef];
                 HandleCombo(f, marioPlayer, playerInfo);
@@ -421,7 +416,6 @@ namespace NSMB.Replay.Stats
             }
 
             ActiveReplayManager.Instance.TryCacheReplayFrame(f);
-            didLoop = true;
         }
 
         private void HandleCombo(Frame f, MarioPlayer* marioPlayer, PlayerInfo playerInfo) {
