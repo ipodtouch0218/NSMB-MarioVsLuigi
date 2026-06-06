@@ -48,7 +48,7 @@ namespace NSMB.Replay.Stats {
         // when a combo starts, this gets set
         // when this reaches 0 then the combo is over
         // this is needed to count combos where player dies in a pit
-        public const int ComboTimerStart = 15;
+        public const int ComboTimerStart = 30;
         public int ComboEndTimer;
 
         //--methods

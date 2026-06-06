@@ -15,8 +15,9 @@ namespace NSMB.Replay.Stats {
      * when a star is GOtten, when a star is dropped etc.
      */
     public unsafe abstract class TimePoint : IComparable<TimePoint> {
-        //---object-specific variables
-        public int EndFrame { get; set; }
+        //---public variables
+        public int StartFrameOffset = defaultFrameOffset;
+        public int EndFrame = -1;
         public virtual bool ShowEndTime => HasEndFrame;
         public virtual bool ShowLength => HasEndFrame;
 
@@ -37,6 +38,7 @@ namespace NSMB.Replay.Stats {
         //---static
         private static int _index;
         public const string translationPrefix = "ui.replay.stats.entry.";
+        public const int defaultFrameOffset = 15;
 
         //---enums
         public enum DisplayArgs {
@@ -57,7 +59,6 @@ namespace NSMB.Replay.Stats {
             OccurenceFrame = f.Number;
             DeltaTime = f.DeltaTime;
             Id = _index++;
-            EndFrame = -1;
         }
 
         // basic init - per player
@@ -104,6 +105,7 @@ namespace NSMB.Replay.Stats {
         public virtual string GetTooltipLabel(TranslationManager tm, DisplayArgs displayArg) => "!";
 
         public virtual PlayerRef GetSpectatingPlayer(DisplayArgs displayArg) => AffectedPlayerRef;
+
 
         public virtual bool ShowTooltipIcon(TranslationManager tm, DisplayArgs displayArg) => GetTooltip(tm, displayArg) != null;
 
@@ -418,7 +420,9 @@ namespace NSMB.Replay.Stats {
             return totalStars;
         }
 
-        public PointCombo(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, TimePoint comboElement, int starsLost) : base(statsRecorder, f, mario) => AddComboElement(comboElement, starsLost);
+        public PointCombo(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, TimePoint comboElement, int starsLost) : base(statsRecorder, f, mario) {
+            AddComboElement(comboElement, starsLost);
+        }
 
         public void AddComboElement(TimePoint timePoint, int starsLost) {
             int totalStarsLost = starsLost;
@@ -501,7 +505,9 @@ namespace NSMB.Replay.Stats {
         public readonly PowerupState PowerupState;
         public bool GameEnded;
         public override bool ShowEndTime => !GameEnded;
-        public PointPowerChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) : base(statsRecorder, f, mario) => PowerupState = mario->CurrentPowerupState;
+        public PointPowerChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) : base(statsRecorder, f, mario) {
+            PowerupState = mario->CurrentPowerupState;
+        }
 
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             base.SetTimeText(tm, stringBuilder, displayArg);
@@ -543,7 +549,9 @@ namespace NSMB.Replay.Stats {
         public readonly PowerupAsset Powerup;
         public bool GameEnded;
         public override bool ShowEndTime => !GameEnded;
-        public PointReserveChange(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) => Powerup = f.FindAsset(mario->ReserveItem);
+        public PointReserveChange(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) {
+            Powerup = f.FindAsset(mario->ReserveItem);
+        }
 
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             base.SetTimeText(tm, stringBuilder, displayArg);

@@ -78,6 +78,13 @@ namespace NSMB.Replay.Stats
 
         public void OnMarioPlayerDied(EventMarioPlayerDied e) {
             Frame f = e.Game.Frames.Predicted;
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+
+            // sanity check, we will have a null PlayerRef if a player disconnects
+            if (mario->PlayerRef == default) {
+                return;
+            }
+
             PointDeath.DeathCause deathCause = PointDeath.DeathCause.Enemy;
 
             // for some reason when dying via pit the entity and attacker are the same
@@ -87,14 +94,8 @@ namespace NSMB.Replay.Stats
             string attackerName = "";
             PlayerRef attackerRef = default;
 
-            var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
-            
-            // sanity check, we will have a null PlayerRef if a player disconnects
-            if (mario->PlayerRef == default) {
-                return;
-            }
-
             var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
+            int startFrameOffset = TimePoint.defaultFrameOffset;
 
             if (wasDisconnect) {
                 deathCause = PointDeath.DeathCause.Disconnect;
@@ -123,6 +124,7 @@ namespace NSMB.Replay.Stats
                     if (lastComboElement.Element is PointKnockback lastKbPoint) {
                         attackerName = lastKbPoint.AttackerName;
                         attackerRef = lastKbPoint.AttackerRef;
+                        startFrameOffset += f.Number - lastKbPoint.OccurenceFrame;
                     }
                 }
             } else {
@@ -179,6 +181,7 @@ namespace NSMB.Replay.Stats
             var deathPoint = new PointDeath(StatRecorder, f, mario, playerInfo, deathCause, playerData->Ping, attackerName, attackerRef);
             var starsToDrop = Math.Min(1, e.OldObjectiveCount);
 
+            deathPoint.StartFrameOffset = startFrameOffset;
             playerInfo.DeathPoints.Add(deathPoint);
             playerInfo.StarsLostPoints.Add(new PointStarLoss(StatRecorder, f, mario, playerInfo, starsToDrop, PointStarLoss.StarLossCause.Death, EntityRef.None));
 
@@ -191,19 +194,17 @@ namespace NSMB.Replay.Stats
 
         public void OnMarioPlayerKnockback(EventMarioPlayerTookKnockback e) {
             Frame f = e.Game.Frames.Predicted;
-            KnockbackStrength strength = e.Strength;
             var victimMario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             if (victimMario->PlayerRef == default) {
                 return;
             }
-
-            var victimMarioInfo = StatRecorder.PlayerInfos[victimMario->PlayerRef];
-
             var attackerMario = f.Unsafe.GetPointer<MarioPlayer>(e.Attacker);
             if (attackerMario->PlayerRef == default) {
                 return;
             }
 
+            KnockbackStrength strength = e.Strength;
+            var victimMarioInfo = StatRecorder.PlayerInfos[victimMario->PlayerRef];
             var attackerMarioInfo = StatRecorder.PlayerInfos[attackerMario->PlayerRef];
            
             //bool isProjectile = e.ProjectileEffect != ProjectileEffectType.None;
