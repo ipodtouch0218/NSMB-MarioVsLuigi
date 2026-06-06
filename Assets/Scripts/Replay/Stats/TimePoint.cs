@@ -44,6 +44,7 @@ namespace NSMB.Replay.Stats {
         public enum DisplayArgs {
             Normal,
             FromAttacker,
+            ComboNoParticipate,
             All
         }
 
@@ -71,7 +72,6 @@ namespace NSMB.Replay.Stats {
 
         //---abstractions, overrideables for time point enteries
         public abstract void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg);
-
         public virtual void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             if (StatsRecorder == null) {
                 stringBuilder.Append("");
@@ -87,9 +87,7 @@ namespace NSMB.Replay.Stats {
                 }
             }
         }
-
         public virtual void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) { }
-
         public virtual void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             if (displayArg == DisplayArgs.All) {
                 stringBuilder.Append(AffectedPlayerName);
@@ -97,18 +95,12 @@ namespace NSMB.Replay.Stats {
             }
         }
 
-
         public virtual string GetEntryNum(int entryNum, DisplayArgs displayArgs) => entryNum.ToString();
-
         public virtual string GetTooltip(TranslationManager tm, DisplayArgs displayArg) => null;
-
         public virtual string GetTooltipLabel(TranslationManager tm, DisplayArgs displayArg) => "!";
-
         public virtual object GetCameraPos(DisplayArgs displayArg) => AffectedPlayerRef;
 
-
         public virtual bool ShowTooltipIcon(TranslationManager tm, DisplayArgs displayArg) => GetTooltip(tm, displayArg) != null;
-
 
         //---static methods
         public static void ResetIndex() => _index = 0;
@@ -442,7 +434,21 @@ namespace NSMB.Replay.Stats {
             ));
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append(tm.GetTranslationWithReplacements("ui.replay.stats.entry.combo", "victim", AffectedPlayerName, "count", ComboElements.Count.ToString()));
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
+            string translationSuffix = "combo.";
+            switch(displayArg) {
+            case DisplayArgs.FromAttacker:
+                translationSuffix += "participated";
+                break;
+            case DisplayArgs.ComboNoParticipate:
+                translationSuffix += "landed";
+                break;
+            default:
+                translationSuffix += "received";
+                break;
+            }
+            stringBuilder.Append(tm.GetTranslationWithReplacements(translationPrefix + translationSuffix, "count", ComboElements.Count.ToString()));
+        }
 
         public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             var color = Color.red;
@@ -463,7 +469,7 @@ namespace NSMB.Replay.Stats {
                     stringBuilder.Append(attackers.Values.First());
                 }
                 break;
-            case DisplayArgs.FromAttacker:
+            case DisplayArgs.FromAttacker | DisplayArgs.ComboNoParticipate:
                 stringBuilder.Append(AffectedPlayerName);
                 break;
             }
@@ -506,6 +512,7 @@ namespace NSMB.Replay.Stats {
         public bool GameEnded;
         public override bool ShowEndTime => !GameEnded;
         public PointPowerChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) : base(statsRecorder, f, mario) {
+            StartFrameOffset = 10;
             PowerupState = mario->CurrentPowerupState;
         }
 
@@ -542,7 +549,7 @@ namespace NSMB.Replay.Stats {
             }
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append(tm.GetTranslation("ui.replay.stats.entry.powerup.starman"));
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append(tm.GetTranslation(translationPrefix+"powerup.starman"));
     }
 
     public unsafe class PointReserveChange : TimePoint {
@@ -602,17 +609,20 @@ namespace NSMB.Replay.Stats {
         public readonly bool WasBlocked;
         public readonly FPVector2 Coordinates;
         public readonly List<string> BlockingPlayers;
+        public readonly GamemodeAsset GamemodeAsset;
         public PlayerRef CollectingPlayerRef;
         public string CollectingPlayer; // if a player collected the big star this is their name
 
         public bool GameEnded;
         public override bool ShowEndTime => !GameEnded;
         public PointBigCollectableSpawned(ReplayStatsRecorder stats, Frame f, int usedSpawns, int index, bool blocked, FPVector2 coordinates, ref GlobalInfo globalReplayInfo, VersusStageData stage, List<string> blockers) : base(stats, f) {
+            StartFrameOffset = 30;
             PositionIndex = index;
             UsedSpawns = usedSpawns;
             WasBlocked = blocked;
             Spawnpoints = stage.BigStarSpawnpoints.Length;
             Coordinates = coordinates;
+            GamemodeAsset = f.FindAsset(f.Global->Rules.Gamemode);
 
 
             AttemptedSpawnCount = ++globalReplayInfo.AttemptedStarSpawns;
@@ -628,9 +638,10 @@ namespace NSMB.Replay.Stats {
         }
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
+            var translationMid = GamemodeAsset is CoinRunnersGamemode ? "starcoin." : "star.";
             var translationSuffix = WasBlocked ? "block" : "spawn";
             //! PositionIndex + 1 since it's zero indexed
-            stringBuilder.Append(tm.GetTranslationWithReplacements(translationPrefix + "bigcollectable." + translationSuffix, "position", (PositionIndex+1).ToString(), "spawnpoints", Spawnpoints.ToString()));
+            stringBuilder.Append(tm.GetTranslationWithReplacements(translationPrefix + "bigcollectable." + translationMid + translationSuffix, "position", (PositionIndex+1).ToString(), "spawnpoints", Spawnpoints.ToString()));
         }
 
         public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {

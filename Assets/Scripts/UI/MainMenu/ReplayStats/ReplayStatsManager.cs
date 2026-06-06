@@ -358,9 +358,9 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         private TimePoint.DisplayArgs GetDisplayArgs(StatOptions? options = null) {
             StatOptions viewingOptions = options ?? ViewingStats;
             return viewingOptions switch {
+                StatOptions.ComboLanded => statToggles[0].Value ? TimePoint.DisplayArgs.ComboNoParticipate : TimePoint.DisplayArgs.FromAttacker,
                 StatOptions.KnockbackDealt or
                 StatOptions.ComboLanded or
-                StatOptions.Kills or
                 StatOptions.DamageDealt => TimePoint.DisplayArgs.FromAttacker,
                 _ => TargetPlayer < 0 ? TimePoint.DisplayArgs.All : TimePoint.DisplayArgs.Normal
             };
@@ -383,17 +383,17 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             };
         }
 
-        private bool HideOption(StatOptions? options = null) {
+        private bool ShowOption(StatOptions? options = null) {
             StatOptions viewingOptions = options ?? ViewingStats;
             switch (viewingOptions) {
             case StatOptions.StarCountChange:
             case StatOptions.StarsCollected:
                 if (QuantumUnityDB.TryGetGlobalAsset(replayListEntry.ReplayFile.Header.Rules.Gamemode, out var gamemode)) {
-                    return gamemode is not StarChasersGamemode;
+                    return gamemode is StarChasersGamemode;
                 }
                 return false;
             default:
-                return false;
+                return true;
             };
         }
 
@@ -763,7 +763,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             dropdownIndexMap.Clear();
             for (int i = 0; i < CurrStatsGroup.StatOptions.Count(); i++) {
                 StatOptions value = CurrStatsGroup.StatOptions.ElementAt(i);
-                if (HideOption(value)) {
+                if (!ShowOption(value)) {
                     continue;
                 }
                 viewingStatisticDropdown.options.Add(new TMP_Dropdown.OptionData { text = prefix + tm.GetTranslation(tmPrefix + value.ToString().ToLower()) });
@@ -782,7 +782,11 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         public void ChangedViewingStats(bool changeButtons) {
             if (changeButtons) {
                 UpdateToggles();
-                UpdateLists(GlobalController.Instance.translationManager);
+                
+                // the target list requires the player info, might as well wait for simulation to complete
+                if (IsReady) {
+                    UpdateLists(GlobalController.Instance.translationManager);
+                }
             }
 
             if (!IsReady) {
