@@ -388,7 +388,9 @@ namespace NSMB.Replay.Stats
             }
 
             if (f.Global->GameState == GameState.Ended && StatRecorder.GlobalInfo.CurrBigCollectable is PointBigCollectableSpawned currBigCollectable) {
+                currBigCollectable.EndFrame = f.Number;
                 currBigCollectable.GameEnded = true;
+                StatRecorder.GlobalInfo.CurrBigCollectable = null;
             }
 
             var blockBumps = f.Filter<BlockBump>();

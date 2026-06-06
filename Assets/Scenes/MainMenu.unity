@@ -57103,6 +57103,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NSMB.UI.MainMenu.Submenus.RoomList.EntryInfoButton
   tooltipText: {fileID: 624177819}
+  labelText: {fileID: 1139887272}
 --- !u!1 &1199200179
 GameObject:
   m_ObjectHideFlags: 0

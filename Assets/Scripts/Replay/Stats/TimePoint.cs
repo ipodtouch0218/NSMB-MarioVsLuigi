@@ -96,11 +96,17 @@ namespace NSMB.Replay.Stats {
             }
         }
 
+
         public virtual string GetEntryNum(int entryNum, DisplayArgs displayArgs) => entryNum.ToString();
 
         public virtual string GetTooltip(TranslationManager tm, DisplayArgs displayArg) => null;
 
-        public virtual PlayerRef GetSpectatingPlayer(DisplayArgs displayArg) => AffectedPlayerRef; 
+        public virtual string GetTooltipLabel(TranslationManager tm, DisplayArgs displayArg) => "!";
+
+        public virtual PlayerRef GetSpectatingPlayer(DisplayArgs displayArg) => AffectedPlayerRef;
+
+        public virtual bool ShowTooltipIcon(TranslationManager tm, DisplayArgs displayArg) => GetTooltip(tm, displayArg) != null;
+
 
         //---static methods
         public static void ResetIndex() => _index = 0;
@@ -648,6 +654,7 @@ namespace NSMB.Replay.Stats {
         }
 
         public override PlayerRef GetSpectatingPlayer(DisplayArgs displayArg) => CollectingPlayerRef;
+        public override string GetTooltipLabel(TranslationManager tm, DisplayArgs displayArg) => (Spawnpoints - UsedSpawns).ToString();
     }
 
     public unsafe class PointBlockHit : TimePoint {

@@ -59,8 +59,9 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
             additionalText.SetText(stringBuilder);
 
             var tooltip = timePointInfo.GetTooltip(tm, displayArg);
+            var tooltipLabel = timePointInfo.GetTooltipLabel(tm, displayArg);
             if (!string.IsNullOrEmpty(tooltip)) {
-                infoButton.Initialize(this, displayArg);
+                infoButton.Initialize(this, tooltip, tooltipLabel);
             } else {
                 infoButton.gameObject.SetActive(false);
             }

@@ -5,14 +5,15 @@ using NSMB.Replay.Stats;
 namespace NSMB.UI.MainMenu.Submenus.RoomList {
     public class EntryInfoButton : MonoBehaviour {
         [SerializeField] private TMP_Text tooltipText;
+        [SerializeField] private TMP_Text labelText;
 
         private TimePointEntry timePointEntry;
 
-        public void Initialize(TimePointEntry timePointEntry, TimePoint.DisplayArgs displayArg) {
+        public void Initialize(TimePointEntry timePointEntry, string text, string label) {
             this.timePointEntry = timePointEntry;
-            this.gameObject.SetActive(true);
 
-            tooltipText.text = timePointEntry.timePoint.GetTooltip(GlobalController.Instance.translationManager, displayArg);
+            tooltipText.SetText(text);
+            labelText.SetText(label);
         }
     }
 }
