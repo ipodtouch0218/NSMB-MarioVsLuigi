@@ -390,7 +390,7 @@ namespace Quantum {
             }
 
             if (koopa->IsInShell && koopa->IsKicked) {
-                IceBlockSystem.Destroy(f, iceBlockEntity, IceBlockBreakReason.Other, koopaEntity);
+                IceBlockSystem.Destroy(f, iceBlockEntity, IceBlockBreakReason.Shell, koopaEntity);
             }
             return false;
         }

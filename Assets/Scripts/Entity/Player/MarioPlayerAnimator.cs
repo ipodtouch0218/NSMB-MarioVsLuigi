@@ -164,7 +164,8 @@ namespace NSMB.Entities.Player {
             this.SetIfNull(ref animator);
         }
 
-        public void Start() {
+        public void Awake() {
+            // This has to go in awake, otherwise OnUpdateView will get called first and mess up the un-cloned materials
             renderers.AddRange(GetComponentsInChildren<MeshRenderer>(true));
             renderers.AddRange(GetComponentsInChildren<SkinnedMeshRenderer>(true));
             foreach (Renderer r in renderers) {
@@ -185,7 +186,9 @@ namespace NSMB.Entities.Player {
                 visual.InitializeMaterials(clonedMaterials);
             }
             fallbackPowerupVisuals.InitializeMaterials(clonedMaterials);
+        }
 
+        public void Start() {
             modelRotationTarget = modelRoot.transform.rotation;
 
             StartCoroutine(BlinkRoutine());
@@ -600,7 +603,7 @@ namespace NSMB.Entities.Player {
             materialBlock.SetVector(ParamMultiplyColor, giantMultiply);
 
             foreach (Renderer r in renderers) {
-                // r.SetPropertyBlock(materialBlock);
+                r.SetPropertyBlock(materialBlock);
             }
 
             var newShader = mario->IsStarmanInvincible ? rainbowShader : normalShader;
@@ -712,15 +715,11 @@ namespace NSMB.Entities.Player {
         }
 
         private unsafe void URPOnPreRender(ScriptableRenderContext context, Camera camera) {
-            try {
-                if (materialBlock == null) {
-                    return;
-                }
-                bool teams = PredictedFrame.Global->Rules.TeamsEnabled;
-                materialBlock.SetColor(ParamGlowColor, teams || !IsCameraFocus(camera) ? GlowColor : Color.clear);
-            } catch { 
-                // Catches spurious warnings when changing back to the in-room submenu
+            if (materialBlock == null) {
+                return;
             }
+            bool teams = PredictedFrame.Global->Rules.TeamsEnabled;
+            materialBlock.SetColor(ParamGlowColor, teams || !IsCameraFocus(camera) ? GlowColor : Color.clear);
         }
 
         private bool IsCameraFocus(Camera camera) {

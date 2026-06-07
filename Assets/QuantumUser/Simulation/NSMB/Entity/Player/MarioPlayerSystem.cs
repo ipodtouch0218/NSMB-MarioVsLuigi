@@ -2435,11 +2435,15 @@ namespace Quantum {
                 }
 
                 // Normal stomps
-                if (marioAAbove && marioA->LastAttacker != marioBEntity && (marioAPhysics->Velocity.Y <= 0 || marioBPhysics->Velocity.Y > 0)) {
-                    MarioMarioStomp(f, marioAEntity, marioBEntity, fromRight, dropStars, avgPosition);
+                if (marioAAbove && marioA->LastAttacker != marioBEntity) {
+                    if (marioAPhysics->Velocity.Y <= 0 || marioBPhysics->Velocity.Y > 0) {
+                        MarioMarioStomp(f, marioAEntity, marioBEntity, fromRight, dropStars, avgPosition);
+                    }
                     return;
-                } else if (marioBAbove && marioB->LastAttacker != marioAEntity && (marioBPhysics->Velocity.Y <= 0 || marioAPhysics->Velocity.Y > 0)) {
-                    MarioMarioStomp(f, marioBEntity, marioAEntity, !fromRight, dropStars, avgPosition);
+                } else if (marioBAbove && marioB->LastAttacker != marioAEntity) {
+                    if (marioBPhysics->Velocity.Y <= 0 || marioAPhysics->Velocity.Y > 0) {
+                        MarioMarioStomp(f, marioBEntity, marioAEntity, !fromRight, dropStars, avgPosition);
+                    }
                     return;
                 }
 
@@ -2884,6 +2888,8 @@ namespace Quantum {
                 mario->DamageInvincibilityFrames = Constants.DamageInvincibilityFrames;
                 break;
 
+            case IceBlockBreakReason.Shell:
+            case IceBlockBreakReason.Explosion:
             case IceBlockBreakReason.InvincibleMario:
                 // Damage, i-frames.
                 strength = KnockbackStrength.Groundpound;

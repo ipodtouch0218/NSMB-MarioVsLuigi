@@ -135,7 +135,7 @@ namespace Quantum {
                 // Side
                 bool rightContact = contact.Normal.X > 0;
                 if (mario->IsInShell) {
-                    Destroy(f, iceBlockEntity, IceBlockBreakReason.HitWall, marioEntity);
+                    Destroy(f, iceBlockEntity, IceBlockBreakReason.Shell, marioEntity);
                     return false;
                 } else if (iceBlock->IsSliding && iceBlock->FacingRight == rightContact) {
                     var holdable = f.Unsafe.GetPointer<Holdable>(iceBlockEntity);
@@ -233,7 +233,7 @@ namespace Quantum {
 
         public void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity) {
             if (f.Has<IceBlock>(entity)) {
-                Destroy(f, entity, IceBlockBreakReason.None, bobomb);
+                Destroy(f, entity, IceBlockBreakReason.Explosion, bobomb);
             }
         }
 

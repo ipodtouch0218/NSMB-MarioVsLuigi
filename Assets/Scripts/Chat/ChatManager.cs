@@ -1,5 +1,4 @@
 using NSMB.UI.Translation;
-using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
 using Quantum;
 using System;
@@ -25,7 +24,7 @@ namespace NSMB.Chat {
         //---Private Variables
         private AssetRef<Map> currentMap;
         private AssetRef<GamemodeAsset> currentGamemode;
-        private ChatMessageData changeMapMessage, changeGamemodeMessage, randomizeTeamMessage;
+        private ChatMessageData changeMapMessage, changeGamemodeMessage, assignTeamMessage, randomizeTeamMessage;
 
         public void Awake() {
             Instance = this;
@@ -193,30 +192,35 @@ namespace NSMB.Chat {
         }
 
         private void OnHostChanged(EventHostChanged e) {
-            if (e.Game.PlayerIsLocal(e.NewHost)) {
+            if (!e.Game.PlayerIsLocal(e.NewHost)) {
                 AddSystemMessage("ui.inroom.chat.hostreminder", Red);
             }
         }
 
         private void OnPlayerTeamChangedByHost(EventPlayerTeamChangedByHost e) {
-            if (e.Game.PlayerIsLocal(e.Player)) {
+            if (!e.Game.PlayerIsLocal(e.Player)) {
+                return;
+            }
+
+            RemoveChatMessage(assignTeamMessage);
+            if (e.Clear) {
+                assignTeamMessage = AddSystemMessage("ui.inroom.chat.player.changeteam.unlocked", Blue);
+            } else {
                 Frame f = e.Game.Frames.Predicted;
                 var teams = f.Context.GetAllAssets<TeamAsset>();
-                if (e.Team < teams.Count) {
-                    AddSystemMessage("ui.inroom.chat.player.changeteam", Blue, "team", teams[e.Team].nameTranslationKey);
-                } else {
-                    AddSystemMessage("ui.inroom.chat.player.changeteam.unlocked", Blue);
-                }
+                assignTeamMessage = AddSystemMessage("ui.inroom.chat.player.changeteam", Blue, "team", teams[e.Team].nameTranslationKey);
             }
         }
 
         private void OnPlayerTeamRandomized(EventPlayerTeamRandomized e) {
-            if (e.Game.PlayerIsLocal(e.Player)) {
-                RemoveChatMessage(randomizeTeamMessage);
-                Frame f = e.Game.Frames.Predicted;
-                var teams = f.Context.GetAllAssets<TeamAsset>();
-                randomizeTeamMessage = AddSystemMessage("ui.inroom.chat.player.randomizeteam", Blue, "team", teams[e.Team].nameTranslationKey);
+            if (!e.Game.PlayerIsLocal(e.Player)) {
+                return;
             }
+
+            RemoveChatMessage(randomizeTeamMessage);
+            Frame f = e.Game.Frames.Predicted;
+            var teams = f.Context.GetAllAssets<TeamAsset>();
+            randomizeTeamMessage = AddSystemMessage("ui.inroom.chat.player.randomizeteam", Blue, "team", teams[e.Team].nameTranslationKey);
         }
     }
 }

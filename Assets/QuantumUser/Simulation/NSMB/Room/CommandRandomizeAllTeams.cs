@@ -6,14 +6,26 @@ namespace Quantum {
     public class CommandRandomizeAllTeams : DeterministicCommand, ILobbyCommand {
 
         public int Teams;
+        public bool Clear;
 
         public override void Serialize(BitStream stream) {
             stream.Serialize(ref Teams);
+            stream.Serialize(ref Clear);
         }
 
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* senderData) {
             // GOtta stop those filthy cheaters :/
-            if (Teams < 2 || Teams > 5 || !senderData->IsRoomHost) {
+            if (!senderData->IsRoomHost) {
+                return;
+            }
+
+            if (Clear) {
+                foreach ((_, var playerData) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
+                    if (playerData->IsTeamLocked) {
+                        playerData->IsTeamLocked = false;
+                        f.Events.PlayerTeamChangedByHost(playerData->PlayerRef, 0, true);
+                    }
+                }
                 return;
             }
 
