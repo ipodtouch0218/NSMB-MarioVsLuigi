@@ -1087,15 +1087,8 @@ MonoBehaviour:
       AlbedoTexture: {fileID: 2800000, guid: 5692319d626eaa04a8e2f25ae09894ee, type: 3}
       OverallsMaskTexture: {fileID: 0}
       ShirtMaskTexture: {fileID: 0}
-      CapMaskTexture: {fileID: 2800000, guid: c25cb06ff85ee84499def1a62650c019, type: 3}
+      CapMaskTexture: {fileID: 2800000, guid: 7862699c9b6d0d3439113f471fcaa1cb, type: 3}
       StarmanAlbedoTexture: {fileID: 2800000, guid: 77a67ff65965fab4e93b8d14b37d74f6,
-        type: 3}
-    - Material: {fileID: 2100000, guid: 55b5b34a9f439904b808df197a2bc8bd, type: 2}
-      AlbedoTexture: {fileID: 2800000, guid: 6c78f6c7ac9f207458a4aa44557c78a4, type: 3}
-      OverallsMaskTexture: {fileID: 0}
-      ShirtMaskTexture: {fileID: 0}
-      CapMaskTexture: {fileID: 0}
-      StarmanAlbedoTexture: {fileID: 2800000, guid: 6c78f6c7ac9f207458a4aa44557c78a4,
         type: 3}
     AnimationAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
     AnimatorOverrides: {fileID: 22100000, guid: 671e2adc5dbd26a45abdf5c18398a86e,
@@ -1162,13 +1155,6 @@ MonoBehaviour:
       CapMaskTexture: {fileID: 0}
       StarmanAlbedoTexture: {fileID: 2800000, guid: 77a67ff65965fab4e93b8d14b37d74f6,
         type: 3}
-    - Material: {fileID: 2100000, guid: 55b5b34a9f439904b808df197a2bc8bd, type: 2}
-      AlbedoTexture: {fileID: 2800000, guid: 6c78f6c7ac9f207458a4aa44557c78a4, type: 3}
-      OverallsMaskTexture: {fileID: 0}
-      ShirtMaskTexture: {fileID: 0}
-      CapMaskTexture: {fileID: 0}
-      StarmanAlbedoTexture: {fileID: 2800000, guid: 6c78f6c7ac9f207458a4aa44557c78a4,
-        type: 3}
     AnimationAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
     AnimatorOverrides: {fileID: 22100000, guid: 671e2adc5dbd26a45abdf5c18398a86e,
       type: 2}
@@ -1202,13 +1188,6 @@ MonoBehaviour:
         type: 3}
       CapMaskTexture: {fileID: 0}
       StarmanAlbedoTexture: {fileID: 2800000, guid: 77a67ff65965fab4e93b8d14b37d74f6,
-        type: 3}
-    - Material: {fileID: 2100000, guid: 55b5b34a9f439904b808df197a2bc8bd, type: 2}
-      AlbedoTexture: {fileID: 2800000, guid: 6c78f6c7ac9f207458a4aa44557c78a4, type: 3}
-      OverallsMaskTexture: {fileID: 0}
-      ShirtMaskTexture: {fileID: 0}
-      CapMaskTexture: {fileID: 0}
-      StarmanAlbedoTexture: {fileID: 2800000, guid: 6c78f6c7ac9f207458a4aa44557c78a4,
         type: 3}
     AnimationAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
     AnimatorOverrides: {fileID: 22100000, guid: 671e2adc5dbd26a45abdf5c18398a86e,
@@ -1246,13 +1225,6 @@ MonoBehaviour:
       CapMaskTexture: {fileID: 0}
       StarmanAlbedoTexture: {fileID: 2800000, guid: 77a67ff65965fab4e93b8d14b37d74f6,
         type: 3}
-    - Material: {fileID: 2100000, guid: 55b5b34a9f439904b808df197a2bc8bd, type: 2}
-      AlbedoTexture: {fileID: 2800000, guid: 6c78f6c7ac9f207458a4aa44557c78a4, type: 3}
-      OverallsMaskTexture: {fileID: 0}
-      ShirtMaskTexture: {fileID: 0}
-      CapMaskTexture: {fileID: 0}
-      StarmanAlbedoTexture: {fileID: 2800000, guid: 6c78f6c7ac9f207458a4aa44557c78a4,
-        type: 3}
     AnimationAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
     AnimatorOverrides: {fileID: 22100000, guid: 671e2adc5dbd26a45abdf5c18398a86e,
       type: 2}
@@ -1273,6 +1245,7 @@ MonoBehaviour:
     - {fileID: 880582643022226802}
     - {fileID: 2229351969153277470}
     - {fileID: 5295268034335504878}
+    - {fileID: 4835436906010040340}
     BaseModel: {fileID: 2209300530651413591}
     ModelScale: {x: 1, y: 1, z: 1}
     ModelHeightInBlocks: 1
@@ -1285,6 +1258,14 @@ MonoBehaviour:
       CapMaskTexture: {fileID: 0}
       StarmanAlbedoTexture: {fileID: 2800000, guid: 290f358be6599584db28453134e4d6a0,
         type: 3}
+    - Material: {fileID: 2100000, guid: bfe0a50f3d6f5b64386c7392202ba06a, type: 2}
+      AlbedoTexture: {fileID: 2800000, guid: f36399c1e757fed41afe9929e98f8274, type: 3}
+      OverallsMaskTexture: {fileID: 0}
+      ShirtMaskTexture: {fileID: 2800000, guid: c56ee039fe1399948bebda86c758953e,
+        type: 3}
+      CapMaskTexture: {fileID: 0}
+      StarmanAlbedoTexture: {fileID: 2800000, guid: 75aafcd20c983254cae711357353f442,
+        type: 3}
     - Material: {fileID: 2100000, guid: a401ae3a3c9e3bb4e8ba74ef85051b40, type: 2}
       AlbedoTexture: {fileID: 2800000, guid: 8864aa072024a9d46852f2c24f84f693, type: 3}
       OverallsMaskTexture: {fileID: 0}
@@ -1292,13 +1273,6 @@ MonoBehaviour:
         type: 3}
       CapMaskTexture: {fileID: 0}
       StarmanAlbedoTexture: {fileID: 2800000, guid: 77a67ff65965fab4e93b8d14b37d74f6,
-        type: 3}
-    - Material: {fileID: 2100000, guid: 55b5b34a9f439904b808df197a2bc8bd, type: 2}
-      AlbedoTexture: {fileID: 2800000, guid: 6c78f6c7ac9f207458a4aa44557c78a4, type: 3}
-      OverallsMaskTexture: {fileID: 0}
-      ShirtMaskTexture: {fileID: 0}
-      CapMaskTexture: {fileID: 0}
-      StarmanAlbedoTexture: {fileID: 2800000, guid: 6c78f6c7ac9f207458a4aa44557c78a4,
         type: 3}
     AnimationAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
     AnimatorOverrides: {fileID: 22100000, guid: 671e2adc5dbd26a45abdf5c18398a86e,
@@ -7785,7 +7759,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 77fa7e39322fd5440bec69cf0275d39d,
         type: 3}
       propertyPath: m_Name
-      value: luigi_big
+      value: LargeLuigi
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 77fa7e39322fd5440bec69cf0275d39d,
         type: 3}
@@ -7795,7 +7769,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 77fa7e39322fd5440bec69cf0275d39d,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1085477864501492945, guid: 77fa7e39322fd5440bec69cf0275d39d,
         type: 3}
@@ -9744,7 +9718,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: b9c007ad3b94b184fa982b69cd7b6c49,
         type: 3}
       propertyPath: m_Name
-      value: luigi_small
+      value: SmallLuigi
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b9c007ad3b94b184fa982b69cd7b6c49,
         type: 3}
