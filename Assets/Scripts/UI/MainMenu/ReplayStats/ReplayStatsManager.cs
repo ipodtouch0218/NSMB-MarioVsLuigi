@@ -919,7 +919,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                     }
 
                     // prioritize a combo with a kill
-                    if (!testPoint.EndsInDeath() && prevComboHadKill) {
+                    if (prevComboHadKill && !testPoint.EndsInDeath()) {
                         continue;
                     }
 

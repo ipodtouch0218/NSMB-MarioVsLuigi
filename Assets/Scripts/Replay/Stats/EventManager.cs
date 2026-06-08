@@ -430,11 +430,9 @@ namespace NSMB.Replay.Stats
         private void HandleCombo(Frame f, MarioPlayer* marioPlayer, EntityRef marioEntity, PlayerInfo playerInfo) {
             /**Knockback Handling**/
             if (!marioPlayer->IsInKnockback) {
-                if (playerInfo.ComboEndTimer > 0) {
-                    var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
-                    if (--playerInfo.ComboEndTimer == 0 && physicsObject->IsTouchingGround) {
-                        StatUtilStopCombo(f, playerInfo);
-                    }
+                var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
+                if (playerInfo.CurrComboPoint != null && --playerInfo.ComboEndTimer <= 0 && physicsObject->IsTouchingGround) {
+                    StatUtilStopCombo(f, playerInfo);
                 }
 
                 // end knockback
