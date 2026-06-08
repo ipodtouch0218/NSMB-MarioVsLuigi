@@ -559,7 +559,7 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventMarioPlayerUpdatePowerupQueue MarioPlayerUpdatePowerupQueue(EntityRef Entity, PowerupTransitionAnimation* Anim) {
+      public EventMarioPlayerUpdatePowerupQueue MarioPlayerUpdatePowerupQueue(EntityRef Entity, PowerupTransitionAnimation Anim) {
         var ev = _f.Context.AcquireEvent<EventMarioPlayerUpdatePowerupQueue>(EventMarioPlayerUpdatePowerupQueue.ID);
         ev.Entity = Entity;
         ev.Anim = Anim;
@@ -2320,7 +2320,7 @@ namespace Quantum {
   public unsafe partial class EventMarioPlayerUpdatePowerupQueue : EventBase {
     public new const Int32 ID = 57;
     public EntityRef Entity;
-    public PowerupTransitionAnimation* Anim;
+    public PowerupTransitionAnimation Anim;
     protected EventMarioPlayerUpdatePowerupQueue(Int32 id, EventFlags flags) : 
         base(id, flags) {
     }

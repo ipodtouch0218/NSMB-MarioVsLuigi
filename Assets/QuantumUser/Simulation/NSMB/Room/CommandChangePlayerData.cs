@@ -52,10 +52,6 @@ namespace Quantum {
                 playerData->IsSpectator = Spectating;
             }
 
-            if (f.Global->GameStartFrames > 0 && !QuantumUtils.IsGameStartable(f)) {
-                GameLogicSystem.StopCountdown(f);
-            }
-
             f.Events.PlayerDataChanged(playerData->PlayerRef);
         }
 

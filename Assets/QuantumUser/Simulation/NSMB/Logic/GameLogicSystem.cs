@@ -48,10 +48,15 @@ namespace Quantum {
 #endif
             }
 
-            // Gaem state logic
+            // Game state logic
             switch (f.Global->GameState) {
             case GameState.PreGameRoom:
                 if (f.Global->GameStartFrames > 0) {
+                    if (!QuantumUtils.IsGameStartable(f)) {
+                        StopCountdown(f);
+                        break;
+                    }
+
                     if (QuantumUtils.Decrement(ref f.Global->GameStartFrames)) {
                         // Start the game!
                         if (f.IsVerified) {
@@ -63,7 +68,7 @@ namespace Quantum {
                                 break;
                             case StageChooseMode.Random: {
                                 // Pick a random map
-                                var allMaps = f.Context.GetAllAssets<Map>();
+                                var allMaps = f.Context.GetAllAssets<Map>().ToList();
 
                                 // Exclude disabled maps.
                                 if (f.TryResolveHashSet(f.Global->Rules.RandomDisabledStages, out var disabledStages)) {
@@ -218,6 +223,7 @@ namespace Quantum {
 
         public static void StopCountdown(Frame f) {
             f.Global->GameStartFrames = 0;
+            f.Global->IsStartGameCountdownActive = false;
             f.Events.StartingCountdownChanged(false);
         }
 

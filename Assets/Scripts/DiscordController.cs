@@ -114,8 +114,8 @@ namespace NSMB {
                     },
                     Id = realtimeRoom.Name + "1",
                 };
-                activity.State = realtimeRoom.IsVisible ? tm.GetTranslation("discord.public") : tm.GetTranslation("discord.private");
-                activity.Details = tm.GetTranslation("discord.online");
+                activity.State = realtimeRoom.IsVisible ? tm.GetTranslation("discord.public", false) : tm.GetTranslation("discord.private", false);
+                activity.Details = tm.GetTranslation("discord.online", false);
                 activity.Secrets = new() { Join = realtimeRoom.Name };
             }
 
@@ -126,9 +126,9 @@ namespace NSMB {
                     // In a level
                     if (activity.Details == null) {
                         if (runner.Session.IsReplay) {
-                            activity.Details = tm.GetTranslation("discord.replay");
+                            activity.Details = tm.GetTranslation("discord.replay", false);
                         } else {
-                            activity.Details = tm.GetTranslation("discord.offline");
+                            activity.Details = tm.GetTranslation("discord.offline", false);
                         }
                     }
                     var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
@@ -136,9 +136,9 @@ namespace NSMB {
 
                     activity.Assets = new ActivityAssets {
                         LargeImage = !string.IsNullOrWhiteSpace(stage.DiscordStageImage) ? stage.DiscordStageImage : "mainmenu",
-                        LargeText = tm.GetTranslation(stage.TranslationKey),
+                        LargeText = tm.GetTranslation(stage.TranslationKey, false),
                         SmallImage = gamemode.DiscordRpcKey,
-                        SmallText = tm.GetTranslation(gamemode.TranslationKey),
+                        SmallText = tm.GetTranslation(gamemode.TranslationKey, false),
                     };
 
                     long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -150,7 +150,7 @@ namespace NSMB {
                 }
             } else {
                 // In the main menu, not in a room
-                activity.Details = tm.GetTranslation("discord.mainmenu");
+                activity.Details = tm.GetTranslation("discord.mainmenu", false);
                 activity.Assets = new() { LargeImage = "mainmenu" };
             }
 

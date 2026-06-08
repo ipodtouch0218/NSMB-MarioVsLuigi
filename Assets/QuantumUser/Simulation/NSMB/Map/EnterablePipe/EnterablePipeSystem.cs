@@ -17,7 +17,8 @@ namespace Quantum {
             }
 
             if (mario->IsCrouchedInShell || mario->IsInKnockback || mario->IsStuckInBlock
-                || mario->CurrentPowerupState == PowerupState.MegaMushroom || mario->MegaMushroomEndFrames > 0) {
+                || mario->CurrentPowerupState == PowerupState.MegaMushroom || mario->MegaMushroomEndFrames > 0
+                || mario->TauntFrames > 0) {
                 return;
             }
 

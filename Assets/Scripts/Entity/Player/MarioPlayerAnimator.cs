@@ -170,17 +170,16 @@ namespace NSMB.Entities.Player {
             renderers.AddRange(GetComponentsInChildren<SkinnedMeshRenderer>(true));
             foreach (Renderer r in renderers) {
                 // Get a copy of all materials.
-                var materials = r.sharedMaterials;
-                for (int i = 0; i < materials.Length; i++) {
-                    if (!clonedMaterials.TryGetValue(materials[i], out Material clonedMaterial)) {
-                        clonedMaterials[materials[i]] = clonedMaterial = Instantiate(materials[i]);
-                        clonedMaterial.SetColor(ParamOverallsColor, skin?.OverallsColor.AsColor ?? Color.clear);
-                        clonedMaterial.SetColor(ParamShirtColor, skin?.ShirtColor.AsColor ?? Color.clear);
-                        clonedMaterial.SetFloat(ParamCapUsesOverallsColor, (skin?.HatUsesOverallsColor ?? false) ? 1 : 0);
+                List<Material> sharedMaterials = new();
+                r.GetSharedMaterials(sharedMaterials);
+                for (int i = 0; i < sharedMaterials.Count; i++) {
+                    Material material = sharedMaterials[i];
+                    if (!clonedMaterials.TryGetValue(material, out Material clonedMaterial)) {
+                        clonedMaterials[material] = clonedMaterial = Instantiate(material);
                     }
-                    materials[i] = clonedMaterial;
+                    sharedMaterials[i] = clonedMaterial;
                 }
-                r.sharedMaterials = materials;
+                r.SetSharedMaterials(sharedMaterials);
             }
             foreach (PowerupVisuals visual in powerupVisuals) {
                 visual.InitializeMaterials(clonedMaterials);
@@ -592,6 +591,9 @@ namespace NSMB.Entities.Player {
             materialBlock ??= new();
             materialBlock.SetFloat(ParamEyeState, (int) (mario->IsDead || mario->IsInKnockback ? Enums.PlayerEyeState.Death : eyeState));
             materialBlock.SetFloat(ParamModelScale, modelRoot.transform.lossyScale.x * (mario->CurrentPowerupState >= PowerupState.Mushroom ? 1f : 0.5f));
+            materialBlock.SetColor(ParamOverallsColor, skin?.OverallsColor.AsColor ?? Color.clear);
+            materialBlock.SetColor(ParamShirtColor, skin?.ShirtColor.AsColor ?? Color.clear);
+            materialBlock.SetFloat(ParamCapUsesOverallsColor, (skin?.HatUsesOverallsColor ?? false) ? 1 : 0);
 
             Vector3 giantMultiply = Vector3.one;
             float giantTimeRemaining = mario->MegaMushroomFrames / 60f;
@@ -1342,15 +1344,13 @@ namespace NSMB.Entities.Player {
             }
 
             var anim = e.Anim;
-
-            if (anim->IsPowerdown) {
+            if (anim.IsPowerdown) {
                 PlaySound(SoundEffect.Player_Sound_Powerdown);
             } else {
                 Frame f = PredictedFrame;
-                var powerup = f.FindAsset(anim->Scriptable);
+                var powerup = f.FindAsset(anim.Scriptable);
                 PlaySound(powerup.SoundEffect, new[] { powerup });
             }
-                
         }
     }
 }

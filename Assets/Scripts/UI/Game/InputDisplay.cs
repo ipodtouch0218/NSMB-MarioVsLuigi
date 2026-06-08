@@ -55,15 +55,19 @@ namespace NSMB.UI.Game {
 
         private unsafe void OnSimulateFinished(CallbackSimulateFinished e) {
             Frame f = e.Game.Frames.Verified;
-            if (!f.Unsafe.TryGetPointer(playerElements.Entity, out MarioPlayer* mario)
-                || inputType != InputType.ReserveItem) {
+            if (!f.Unsafe.TryGetPointer(playerElements.Entity, out MarioPlayer* mario)) {
                 return;
             }
 
             PlayerRef player = mario->PlayerRef;
-
-            if (f.GetPlayerCommand(player) is CommandSpawnReserveItem) {
-                commandFrame = f.Number;
+            if (inputType == InputType.ReserveItem) {
+                if (f.GetPlayerCommand(player) is CommandSpawnReserveItem) {
+                    commandFrame = f.Number;
+                }
+            } else if (inputType == InputType.Taunt) {
+                if (f.GetPlayerCommand(player) is CommandTaunt) {
+                    commandFrame = f.Number;
+                }
             }
         }
 
@@ -82,7 +86,8 @@ namespace NSMB.UI.Game {
 
         public enum InputType {
             Up, Down, Left, Right,
-            Jump, Sprint, PowerupAction, ReserveItem
+            Jump, Sprint, PowerupAction,
+            ReserveItem, Taunt
         }
     }
 }

@@ -90,7 +90,7 @@ namespace Quantum {
 
         public readonly bool IsStarmanInvincible => InvincibilityFrames > 0;
         public readonly bool IsWallsliding => WallslideLeft || WallslideRight;
-        public readonly bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && (IsCrouching || IsGroundpounding && GroundpoundStartFrames <= 11) && !IsInShell;
+        public readonly bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && (IsCrouching || (IsGroundpounding && GroundpoundStartFrames <= 11)) && !IsInShell;
         public readonly bool IsInKnockback => CurrentKnockback != KnockbackStrength.None;
         public readonly bool CanCollectOwnTeamsObjectiveCoins => !IsInKnockback && DamageInvincibilityFrames == 0;
         public readonly bool IsStarmanOrMega => IsStarmanInvincible || CurrentPowerupState == PowerupState.MegaMushroom;
@@ -271,7 +271,7 @@ namespace Quantum {
                 var secondAnim = list.GetPointer(1);
                 secondAnim->Timer = firstAnim->Timer;
 
-                f.Events.MarioPlayerUpdatePowerupQueue(marioEntity, secondAnim);
+                f.Events.MarioPlayerUpdatePowerupQueue(marioEntity, *secondAnim);
 
                 // delete the current powerUP transition
                 list.RemoveAt(0);

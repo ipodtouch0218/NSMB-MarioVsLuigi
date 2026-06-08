@@ -22,25 +22,18 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
         public void Initialize() {
             QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
+            QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
         }
 
         public void OnEnable() {
             var game = QuantumRunner.DefaultGame;
             if (game != null) {
-                OnRulesChanged(new EventRulesChanged {
-                    Game = game,
-                    Tick = game.Frames.Predicted.Number,
-                });
+                UpdateButtonState(game);
             }
         }
 
         public void OnDisable() {
             Close(false);
-        }
-
-        public void SetEnabled(bool value) {
-            button.interactable = value;
-            Close(true);
         }
 
         [Preserve]
@@ -113,20 +106,30 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
         }
 
-        private unsafe void UpdateButtonInteractable(QuantumGame game) {
+        private unsafe void UpdateButtonState(QuantumGame game) {
             Frame f = game.Frames.Predicted;
 
-            if (f.Global->Rules.TeamsEnabled) {
-                flag.sprite = enabledSprite;
-                button.interactable = true;
+            if (QuantumViewUtils.TryGetHostPlayerSlot(game, out _)) {
+                // We are host
+                if (f.Global->Rules.TeamsEnabled) {
+                    flag.sprite = enabledSprite;
+                    button.interactable = true;
+                } else {
+                    flag.sprite = disabledSprite;
+                    button.interactable = false;
+                }
+                button.gameObject.SetActive(true);
             } else {
-                flag.sprite = disabledSprite;
-                button.interactable = false;
+                button.gameObject.SetActive(false);
             }
         }
 
-        private unsafe void OnRulesChanged(EventRulesChanged e) {
-            UpdateButtonInteractable(e.Game);
+        private void OnRulesChanged(EventRulesChanged e) {
+            UpdateButtonState(e.Game);
+        }
+
+        private void OnHostChanged(EventHostChanged e) {
+            UpdateButtonState(e.Game);
         }
     }
 }

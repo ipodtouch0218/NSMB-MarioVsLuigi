@@ -102,6 +102,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * AprilShade *(en-gb)*
 * ArianLust *(de-de)*
 * Atwer *(fr-FR)*
+* beocly *(sr-rs)*
 * Bilhal *(el-gr, pirate)*
 * Cecilia <3 *(es-es)*
 * Cleeaf *(sv-SE)*
@@ -130,7 +131,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Mark19 *(es-es)*
 * MasterMindo *(it-it)*
 * Med Animations *(ar-eg)*
-* Meddourk95 *(ar-eg)*
+* Meddourk *(ar-eg)*
 * Moddimation *(de-de)*
 * MODSTER_TAFFY *(af-za)*
 * miyavmeow *(tr-tr)*

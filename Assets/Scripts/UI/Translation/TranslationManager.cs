@@ -48,17 +48,21 @@ namespace NSMB.UI.Translation {
         }
 
         public string GetTranslation(string key) {
-            _ = TryGetTranslation(key, out var result);
+            return GetTranslation(key, fixRtl: true);
+        }
+
+        public string GetTranslation(string key, bool fixRtl) {
+            _ = TryGetTranslation(key, out var result, fixRtl);
             return result;
         }
 
-        public bool TryGetTranslation(string key, out string result) {
+        public bool TryGetTranslation(string key, out string result, bool fixRtl = true) {
             Initialize();
 
-            if (TryGetTranslationForLocale(CurrentLocale, key, out result)) {
+            if (TryGetTranslationForLocale(CurrentLocale, key, out result, fixRtl)) {
                 return true;
             }
-            if (TryGetTranslationForLocale(fallbackLocale, key, out result)) {
+            if (TryGetTranslationForLocale(fallbackLocale, key, out result, fixRtl)) {
                 return true;
             }
             // Default to returning the key.
@@ -133,7 +137,7 @@ namespace NSMB.UI.Translation {
             return sourceList.Remove(source);
         }
 
-        public bool TryGetTranslationForLocale(string locale, string key, out string result) {
+        public bool TryGetTranslationForLocale(string locale, string key, out string result, bool fixRtl = true) {
             key ??= "null";
             key = key.ToLowerInvariant();
 
@@ -141,7 +145,7 @@ namespace NSMB.UI.Translation {
                 for (int i = sources.Count - 1; i >= 0; i--) {
                     // No foreach, we want backwards iteration- list is ascending sorted by priority.
                     if (sources[i].TryGetTranslation(key, out result)) {
-                        if (IsLocaleRTL(locale)) {
+                        if (IsLocaleRTL(locale) && fixRtl) {
                             result = ArabicFixerTool.FixLine(result);
                         }
                         return true;
