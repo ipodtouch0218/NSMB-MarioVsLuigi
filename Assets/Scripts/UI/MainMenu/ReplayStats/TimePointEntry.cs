@@ -71,7 +71,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         #region Button Methods
 
         public void StartReplayAtPart() {
-            int targetFrame = timePoint.OccurenceFrame - timePoint.StatsRecorder.ReplayStart - timePoint.StartFrameOffset;
+            int targetFrame = timePoint.OccurenceFrame - timePoint.StatsRecorder.ReplayStart - timePoint.FrameOffset;
             ActiveReplayManager.Instance.StartReplayPlayback(timePoint.StatsRecorder.ReplayFile, Math.Max(targetFrame, 0), true, timePoint.GetCameraPos(DisplayArg));
         }
 

@@ -4,6 +4,7 @@ using NSMB.UI.MainMenu.Submenus.Replays;
 using NSMB.UI.MainMenu.Submenus.RoomList;
 using NSMB.UI.Translation;
 using NSMB.Utilities;
+using Photon.Deterministic;
 using Quantum;
 using System;
 using System.Collections.Generic;
@@ -358,10 +359,11 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         private TimePoint.DisplayArgs GetDisplayArgs(StatOptions? options = null) {
             StatOptions viewingOptions = options ?? ViewingStats;
             return viewingOptions switch {
-                StatOptions.ComboLanded => statToggles[0].Value ? TimePoint.DisplayArgs.ComboNoParticipate : TimePoint.DisplayArgs.FromAttacker,
+                StatOptions.ComboLanded or
                 StatOptions.KnockbackDealt or
                 StatOptions.ComboLanded or
-                StatOptions.DamageDealt => TimePoint.DisplayArgs.FromAttacker,
+                StatOptions.DamageDealt or
+                StatOptions.Kills => TimePoint.DisplayArgs.FromAttacker,
                 _ => TargetPlayer < 0 ? TimePoint.DisplayArgs.All : TimePoint.DisplayArgs.Normal
             };
         }
@@ -586,11 +588,16 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             loading.SetActive(false);
         }
 
-        public void UpdateProgressBar(int progress, int max) {
+        public void UpdateProgressBar(int framesLoaded, int frameTotal, FP deltaTime) {
             if (progressBar.activeInHierarchy) {
-                float percentage = (float) progress / max;
+                var tm = GlobalController.Instance.translationManager;
+                float percentage = (float) framesLoaded / frameTotal;
+
+                string loading = tm.GetTranslation("ui.loading.loading");
+                string loadedAsTime = TimePoint.FrameToTime(framesLoaded, 0, deltaTime);
+                string totalAsTime = TimePoint.FrameToTime(frameTotal, 0, deltaTime);
                 progressBarFill.fillAmount = percentage;
-                progressBarText.text = $"{progress} / {max} ({(percentage * 100):F0}%)";
+                progressBarText.text = $"{loading} {loadedAsTime} / {totalAsTime} - {framesLoaded} / {frameTotal} ({percentage * 100:F0}%)";
             }
         }
 

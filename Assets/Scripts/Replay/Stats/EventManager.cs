@@ -119,12 +119,15 @@ namespace NSMB.Replay.Stats
                     attackerRef = attackerMario->PlayerRef;
                 }*/
 
+
+                startFrameOffset = 60;
+
                 if (playerInfo.CurrComboPoint != null) {
                     var lastComboElement = playerInfo.CurrComboPoint.ComboElements.Last();
                     if (lastComboElement.Element is PointKnockback lastKbPoint) {
                         attackerName = lastKbPoint.AttackerName;
                         attackerRef = lastKbPoint.AttackerRef;
-                        startFrameOffset += f.Number - lastKbPoint.OccurenceFrame;
+                        startFrameOffset = f.Number - lastKbPoint.OccurenceFrame + TimePoint.defaultFrameOffset;
                     }
                 }
             } else {
@@ -134,6 +137,7 @@ namespace NSMB.Replay.Stats
                     var koopa = koopaFilter.Koopa;
                     var holdable = koopaFilter.Holdable;
                     if (koopa->IsKicked) {
+                        startFrameOffset = 60;
                         deathCause = PointDeath.DeathCause.Shell;
                         if (f.Exists(holdable->PreviousHolder) && koopa->IsKicked) {
                             var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
@@ -148,6 +152,7 @@ namespace NSMB.Replay.Stats
                     var holdable = bobombFilter.Holdable;
                     if (bobomb->CurrentDetonationFrames <= 0) {
                         if (f.Exists(holdable->PreviousHolder)) {
+                            startFrameOffset = bobomb->DetonationFrames;
                             var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
                             attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
                             attackerRef = holdableMario->PlayerRef;
@@ -156,6 +161,7 @@ namespace NSMB.Replay.Stats
                     }
                 } else if (f.Unsafe.TryGetPointer<MarioPlayer>(e.Attacker, out var attackerMario)) {
                     // else it was Mario
+                    startFrameOffset = 40;
                     attackerName = f.GetPlayerData(attackerMario->PlayerRef).PlayerNickname;
                     attackerRef = attackerMario->PlayerRef;
 
@@ -167,6 +173,7 @@ namespace NSMB.Replay.Stats
                         deathCause = PointDeath.DeathCause.BlueShell;
                     }
                 } else if (f.Unsafe.TryGetPointer<Enemy>(e.Attacker, out _)) {
+                    startFrameOffset = 40;
                     if (playerInfo.CurrComboPoint != null) {
                         var lastComboElement = playerInfo.CurrComboPoint.ComboElements.Last();
                         if (lastComboElement.Element is PointKnockback lastKbPoint) {
@@ -178,10 +185,9 @@ namespace NSMB.Replay.Stats
             }
 
             var playerData = QuantumUtils.GetPlayerData(f, mario->PlayerRef);
-            var deathPoint = new PointDeath(StatRecorder, f, mario, playerInfo, deathCause, playerData->Ping, attackerName, attackerRef);
+            var deathPoint = new PointDeath(StatRecorder, f, mario, playerInfo, deathCause, playerData->Ping, attackerName, attackerRef, startFrameOffset);
             var starsToDrop = Math.Min(1, e.OldObjectiveCount);
 
-            deathPoint.StartFrameOffset = startFrameOffset;
             playerInfo.DeathPoints.Add(deathPoint);
             playerInfo.StarsLostPoints.Add(new PointStarLoss(StatRecorder, f, mario, playerInfo, starsToDrop, PointStarLoss.StarLossCause.Death, EntityRef.None));
 
@@ -372,7 +378,7 @@ namespace NSMB.Replay.Stats
         public void OnSimulationFinished(Frame f) {
             // scan all Marios
             var marios = f.Filter<MarioPlayer>();
-            while (marios.NextUnsafe(out _, out var marioPlayer)) {
+            while (marios.NextUnsafe(out var marioEntity, out var marioPlayer)) {
                 // sanity check, player who disconnects has null player ref
                 if (marioPlayer->PlayerRef == default) {
                     continue;
@@ -382,7 +388,7 @@ namespace NSMB.Replay.Stats
                 bool outOfLives = livesEnabled && marioPlayer->Lives < 1;
 
                 var playerInfo = StatRecorder.PlayerInfos[marioPlayer->PlayerRef];
-                HandleCombo(f, marioPlayer, playerInfo);
+                HandleCombo(f, marioPlayer, marioEntity, playerInfo);
                 if (!outOfLives) {
                     HandleChangeData(f, marioPlayer, playerInfo);
                 }
@@ -421,11 +427,12 @@ namespace NSMB.Replay.Stats
             ActiveReplayManager.Instance.TryCacheReplayFrame(f);
         }
 
-        private void HandleCombo(Frame f, MarioPlayer* marioPlayer, PlayerInfo playerInfo) {
+        private void HandleCombo(Frame f, MarioPlayer* marioPlayer, EntityRef marioEntity, PlayerInfo playerInfo) {
             /**Knockback Handling**/
             if (!marioPlayer->IsInKnockback) {
                 if (playerInfo.ComboEndTimer > 0) {
-                    if (--playerInfo.ComboEndTimer == 0) {
+                    var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
+                    if (--playerInfo.ComboEndTimer == 0 && physicsObject->IsTouchingGround) {
                         StatUtilStopCombo(f, playerInfo);
                     }
                 }

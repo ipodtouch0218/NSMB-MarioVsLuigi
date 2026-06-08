@@ -69,7 +69,7 @@ namespace NSMB.Replay.Stats {
             await Awaitable.MainThreadAsync();
             ReplayFile = replayFile;
             Runner = null;
-            statsManager.UpdateProgressBar(0, ReplayEnd);
+            statsManager.UpdateProgressBar(0, ReplayEnd, 0);
 
             if (ReplayFile.LoadAllIfNeeded() != ReplayParseResult.Success) {
                 return;
@@ -104,7 +104,7 @@ namespace NSMB.Replay.Stats {
 
             while ((Runner.Session.FramePredicted == null || Runner.Session.FramePredicted.Number < ReplayEnd) && !cancellationToken.IsCancellationRequested) {
                 Runner.Service(1/3d);
-                statsManager.UpdateProgressBar(Runner.Session.FramePredicted.Number - ReplayStart, ReplayLength);
+                statsManager.UpdateProgressBar(Runner.Session.FramePredicted.Number - ReplayStart, ReplayLength, Runner.Session.DeltaTime);
                 await Task.Delay(1);
             }
 

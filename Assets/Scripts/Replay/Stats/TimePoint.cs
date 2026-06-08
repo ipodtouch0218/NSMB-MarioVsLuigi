@@ -16,10 +16,10 @@ namespace NSMB.Replay.Stats {
      */
     public unsafe abstract class TimePoint : IComparable<TimePoint> {
         //---public variables
-        public int StartFrameOffset = defaultFrameOffset;
         public int EndFrame = -1;
         public virtual bool ShowEndTime => HasEndFrame;
         public virtual bool ShowLength => HasEndFrame;
+        public abstract int FrameOffset { get; }
 
         //---one-set variables
         public readonly PlayerRef AffectedPlayerRef;
@@ -38,13 +38,12 @@ namespace NSMB.Replay.Stats {
         //---static
         private static int _index;
         public const string translationPrefix = "ui.replay.stats.entry.";
-        public const int defaultFrameOffset = 15;
+        public const int defaultFrameOffset = 30;
 
         //---enums
         public enum DisplayArgs {
             Normal,
             FromAttacker,
-            ComboNoParticipate,
             All
         }
 
@@ -123,6 +122,7 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointCoinCollected : TimePoint {
+        public override int FrameOffset => 10;
         public readonly CoinItemAsset CoinItem;
         public readonly FP? SpawnChancePercentage, SpawnChanceRaw;
         public readonly int CoinCount, CoinCountTotal, CurrStarCount, LeaderStars;
@@ -170,6 +170,7 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointStarCollected : TimePoint {
+        public override int FrameOffset => 10;
         public readonly int StarCount, TotalStarCount;
         public PointStarCollected(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo info, int starCount) : base(statsRecorder, f, mario) {
             StarCount = starCount;
@@ -183,6 +184,7 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointDamage : TimePoint {
+        public override int FrameOffset => defaultFrameOffset;
         public readonly PowerupState NewState;
         public readonly DamageCause Reason;
         public readonly string AttackerName;
@@ -225,10 +227,12 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointDeath : TimePoint {
+        public override int FrameOffset => frameOffset;
         public readonly int LivesRemaining, Ping;
         public readonly DeathCause Reason;
         public readonly string AttackerName;
         public readonly PlayerRef AttackerRef;
+        private int frameOffset;
         public enum DeathCause {
             Enemy,
             Shell,
@@ -242,12 +246,13 @@ namespace NSMB.Replay.Stats {
             Disconnect
         }
 
-        public PointDeath(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, DeathCause reason, int ping, string attackerName, PlayerRef attackRef) : base(statsRecorder, f, mario) {
+        public PointDeath(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, DeathCause reason, int ping, string attackerName, PlayerRef attackRef, int frameOffset) : base(statsRecorder, f, mario) {
             LivesRemaining = mario->Lives;
             Reason = reason;
             Ping = ping;
             AttackerName = attackerName;
             AttackerRef = attackRef;
+            this.frameOffset = frameOffset;
         }
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.AppendLine(tm.GetTranslation("ui.replay.stats.entry.deaths."+Reason.ToString().ToLower()));
@@ -285,6 +290,7 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointKnockback : TimePoint {
+        public override int FrameOffset => defaultFrameOffset;
         public readonly int StarsDropped;
         public readonly string AttackerName;
         public readonly PlayerRef AttackerRef;
@@ -337,6 +343,7 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointStarLoss : TimePoint {
+        public override int FrameOffset => defaultFrameOffset;
         public enum StarLossCause {
             Unknown,
             Death,
@@ -375,6 +382,7 @@ namespace NSMB.Replay.Stats {
         // we reuse TimePoints for this.
 
         // tUPle, first is the elemnt, second is stars lost third is total stars lost
+        public override int FrameOffset => defaultFrameOffset;
         public readonly List<(TimePoint Element, int StarsLost, int TotalStarsLost)> ComboElements = new();
         public bool GameEnded = false;
         public override bool ShowEndTime => !GameEnded;
@@ -425,10 +433,7 @@ namespace NSMB.Replay.Stats {
         }
 
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
-            if (StatsRecorder == null) {
-                return;
-            }
-
+            stringBuilder.Append("@ ");
             stringBuilder.Append(string.Join(", ", ComboElements.Select(
                 c => FrameToTime(c.Element.OccurenceFrame, StatsRecorder.ReplayStart, c.Element.DeltaTime))
             ));
@@ -438,10 +443,8 @@ namespace NSMB.Replay.Stats {
             string translationSuffix = "combo.";
             switch(displayArg) {
             case DisplayArgs.FromAttacker:
-                translationSuffix += "participated";
-                break;
-            case DisplayArgs.ComboNoParticipate:
-                translationSuffix += "landed";
+                var attackers = GetParticipants();
+                translationSuffix += attackers.Count != 1 ? "participated" : "landed";
                 break;
             default:
                 translationSuffix += "received";
@@ -469,7 +472,7 @@ namespace NSMB.Replay.Stats {
                     stringBuilder.Append(attackers.Values.First());
                 }
                 break;
-            case DisplayArgs.FromAttacker | DisplayArgs.ComboNoParticipate:
+            case DisplayArgs.FromAttacker:
                 stringBuilder.Append(AffectedPlayerName);
                 break;
             }
@@ -508,11 +511,11 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointPowerChange : TimePoint {
+        public override int FrameOffset => 10;
         public readonly PowerupState PowerupState;
         public bool GameEnded;
         public override bool ShowEndTime => !GameEnded;
         public PointPowerChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) : base(statsRecorder, f, mario) {
-            StartFrameOffset = 10;
             PowerupState = mario->CurrentPowerupState;
         }
 
@@ -537,6 +540,7 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointStarmanChange : TimePoint {
+        public override int FrameOffset => defaultFrameOffset;
         public bool GameEnded;
         public override bool ShowEndTime => !GameEnded;
         public PointStarmanChange(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) { }
@@ -553,6 +557,7 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointReserveChange : TimePoint {
+        public override int FrameOffset => defaultFrameOffset;
         public readonly PowerupAsset Powerup;
         public bool GameEnded;
         public override bool ShowEndTime => !GameEnded;
@@ -580,6 +585,7 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointPowerupCollect : TimePoint {
+        public override int FrameOffset => defaultFrameOffset;
         public readonly PowerupReserveResult ReserveResult;
         public readonly PowerupAsset Powerup;
         public PointPowerupCollect(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario, PowerupReserveResult reserveResult, PowerupAsset powerupAsset) : base(stats, f, mario) {
@@ -603,6 +609,7 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointBigCollectableSpawned : TimePoint {
+        public override int FrameOffset => defaultFrameOffset;
         public readonly int AttemptedSpawnCount, SuccessfulSpawnCount, FailedSpawnCount;
         public readonly int Spawnpoints, PositionIndex, UsedSpawns;
 
@@ -616,7 +623,6 @@ namespace NSMB.Replay.Stats {
         public bool GameEnded;
         public override bool ShowEndTime => !GameEnded;
         public PointBigCollectableSpawned(ReplayStatsRecorder stats, Frame f, int usedSpawns, int index, bool blocked, FPVector2 coordinates, ref GlobalInfo globalReplayInfo, VersusStageData stage, List<string> blockers) : base(stats, f) {
-            StartFrameOffset = 30;
             PositionIndex = index;
             UsedSpawns = usedSpawns;
             WasBlocked = blocked;
@@ -677,6 +683,7 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointBlockHit : TimePoint {
+        public override int FrameOffset => defaultFrameOffset;
         public readonly bool WasRandom;
         public readonly CoinItemAsset SpawnedItem;
         public readonly FP SpawnChancePercentage, SpawnChanceRaw;
@@ -720,6 +727,7 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointTaunt : TimePoint {
+        public override int FrameOffset => defaultFrameOffset;
         public PointTaunt(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) { }
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             string translationKey = translationPrefix+"taunt";
@@ -728,6 +736,7 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointStarCountChange : TimePoint {
+        public override int FrameOffset => defaultFrameOffset;
         public int StarCount;
         public bool GameEnded;
         public override bool ShowEndTime => !GameEnded;
