@@ -583,7 +583,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         public void Prepare() {
             IsReady = true;
             UpdatePlayerDropdown(GlobalController.Instance.translationManager);
-            UpdateLeftPanelText(GlobalController.Instance.translationManager);
             ChangedViewingStats(true);
             loading.SetActive(false);
         }
@@ -704,9 +703,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 toggleObj.Initialize(translationKey, defaultValue);
                 statToggles.Add(toggleObj);
             }
-
-            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) leftTopLayout.transform);
-            Canvas.ForceUpdateCanvases();
         }
 
         private void UpdateLists(TranslationManager tm) {
@@ -846,7 +842,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             UpdateLeftPanelText(GlobalController.Instance.translationManager);
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) leftTopLayout.transform);
-            Canvas.ForceUpdateCanvases();
             scrollRect.verticalNormalizedPosition = 1;
         }
 
