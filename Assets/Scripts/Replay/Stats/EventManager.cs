@@ -15,27 +15,46 @@ namespace NSMB.Replay.Stats
         public EventManager(ReplayStatsRecorder statRecorder, EventDispatcher eventDispatcher, CallbackDispatcher callbackDispatcher) {
             StatRecorder = statRecorder;
 
-            // player trackers
-            eventDispatcher.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar);
-            eventDispatcher.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
-            eventDispatcher.Subscribe<EventMarioPlayerTookKnockback>(this, OnMarioPlayerKnockback);
-            eventDispatcher.Subscribe<EventMarioPlayerTookDamage>(this, OnMarioPlayerTookDamage);
-            eventDispatcher.Subscribe<EventMarioPlayerCollectedPowerup>(this, OnMarioPlayerCollectedPowerup);
-            eventDispatcher.Subscribe<EventMarioPlayerCollectedCoin>(this, OnMarioPlayerCollectedCoin);
-            eventDispatcher.Subscribe<EventMarioPlayerTaunted>(this, OnMarioPlayerTaunted);
-
-            // global trackers
-            eventDispatcher.Subscribe<EventBigCollectableAttemptedSpawn>(this, OnBigCollectableAttemptedSpawn);
-
             callbackDispatcher.Subscribe<CallbackGameResynced>(this, e => OnGameStarted(e.Game.Frames.Predicted));
             callbackDispatcher.Subscribe<CallbackSimulateFinished>(this, e => OnSimulationFinished(e.Frame));
+        }
+
+        public void HandleEvent(EventBase ev, Frame f) {
+            switch (ev) {
+            // player trackers
+            case EventMarioPlayerCollectedStar starEvent:
+                OnMarioPlayerCollectedStar(starEvent, f);
+                break;
+            case EventMarioPlayerDied diedEvent:
+                OnMarioPlayerDied(diedEvent, f);
+                break;
+            case EventMarioPlayerTookKnockback kbEvent:
+                OnMarioPlayerKnockback(kbEvent, f);
+                break;
+            case EventMarioPlayerTookDamage damageEvent:
+                OnMarioPlayerTookDamage(damageEvent, f);
+                break;
+            case EventMarioPlayerCollectedPowerup powerupEvent:
+                OnMarioPlayerCollectedPowerup(powerupEvent, f);
+                break;
+            case EventMarioPlayerCollectedCoin coinEvent:
+                OnMarioPlayerCollectedCoin(coinEvent, f);
+                break;
+            case EventMarioPlayerTaunted tauntedEvent:
+                OnMarioPlayerTaunted(tauntedEvent, f);
+                break;
+
+            // global trackers
+            case EventBigCollectableAttemptedSpawn bigSpawnEvent:
+                OnBigCollectableAttemptedSpawn(bigSpawnEvent, f);
+                break;
+            }
         }
 
         #region Events
 
         // player trackers
-        public void OnMarioPlayerCollectedCoin(EventMarioPlayerCollectedCoin e) {
-            Frame f = e.Game.Frames.Predicted;
+        public void OnMarioPlayerCollectedCoin(EventMarioPlayerCollectedCoin e, Frame f) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
 
             if (mario->PlayerRef == default) {
@@ -52,8 +71,7 @@ namespace NSMB.Replay.Stats
             playerInfo.CoinsCollectedPoints.Add(new PointCoinCollected(StatRecorder, f, mario, playerInfo, e.Coins, coinItemAsset));
         }
 
-        public void OnMarioPlayerCollectedStar(EventMarioPlayerCollectedStar e) {
-            Frame f = e.Game.Frames.Predicted;
+        public void OnMarioPlayerCollectedStar(EventMarioPlayerCollectedStar e, Frame f) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             
             // sanity check, somehow this can occur
@@ -76,8 +94,7 @@ namespace NSMB.Replay.Stats
             }
         }
 
-        public void OnMarioPlayerDied(EventMarioPlayerDied e) {
-            Frame f = e.Game.Frames.Predicted;
+        public void OnMarioPlayerDied(EventMarioPlayerDied e, Frame f) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
 
             // sanity check, we will have a null PlayerRef if a player disconnects
@@ -198,8 +215,7 @@ namespace NSMB.Replay.Stats
             }
         }
 
-        public void OnMarioPlayerKnockback(EventMarioPlayerTookKnockback e) {
-            Frame f = e.Game.Frames.Predicted;
+        public void OnMarioPlayerKnockback(EventMarioPlayerTookKnockback e, Frame f) {
             var victimMario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             if (victimMario->PlayerRef == default) {
                 return;
@@ -239,8 +255,7 @@ namespace NSMB.Replay.Stats
             StatUtilSetCombo(StatRecorder, f, victimMario, victimMarioInfo, knockbackPoint, starsToDrop);
         }
 
-        public void OnMarioPlayerTookDamage(EventMarioPlayerTookDamage e) {
-            Frame f = e.Game.Frames.Predicted;
+        public void OnMarioPlayerTookDamage(EventMarioPlayerTookDamage e, Frame f) {
             PointDamage.DamageCause damageCause = PointDamage.DamageCause.Enemy;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             if (mario->PlayerRef == default) {
@@ -310,8 +325,7 @@ namespace NSMB.Replay.Stats
             }
         }
 
-        public void OnMarioPlayerCollectedPowerup(EventMarioPlayerCollectedPowerup e) {
-            Frame f = e.Game.Frames.Predicted;
+        public void OnMarioPlayerCollectedPowerup(EventMarioPlayerCollectedPowerup e, Frame f) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             if (mario->PlayerRef == default) {
                 return;
@@ -322,8 +336,7 @@ namespace NSMB.Replay.Stats
         }
 
 
-        public void OnMarioPlayerTaunted(EventMarioPlayerTaunted e) {
-            Frame f = e.Game.Frames.Predicted;
+        public void OnMarioPlayerTaunted(EventMarioPlayerTaunted e, Frame f) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             if (mario->PlayerRef == default) {
                 return;
@@ -334,8 +347,7 @@ namespace NSMB.Replay.Stats
         }
 
         // global trackers
-        public void OnBigCollectableAttemptedSpawn(EventBigCollectableAttemptedSpawn e) {
-            Frame f = e.Game.Frames.Predicted;
+        public void OnBigCollectableAttemptedSpawn(EventBigCollectableAttemptedSpawn e, Frame f) {
             FPVector2 position = e.Position;
             bool wasBlocked = !e.Success;
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
@@ -424,14 +436,19 @@ namespace NSMB.Replay.Stats
                 }
             }
 
+            // handle queued events
+            while (f.Context.Events.Count > 0)
+            {
+                var ev = f.Context.Events.PopHead();
+                HandleEvent(ev, f);
+            }
             ActiveReplayManager.Instance.TryCacheReplayFrame(f);
         }
 
         private void HandleCombo(Frame f, MarioPlayer* marioPlayer, EntityRef marioEntity, PlayerInfo playerInfo) {
             /**Knockback Handling**/
             if (!marioPlayer->IsInKnockback) {
-                var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
-                if (playerInfo.CurrComboPoint != null && --playerInfo.ComboEndTimer <= 0 && physicsObject->IsTouchingGround) {
+                if (playerInfo.CurrComboPoint != null && --playerInfo.ComboEndTimer <= 0) {
                     StatUtilStopCombo(f, playerInfo);
                 }
 
