@@ -80,57 +80,70 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         #region Point List Methods
 
         //---dictionaries - the value is if false will hide the entry
-        private IEnumerable<TimePoint> GetPowerupInfo() {
+        private Dictionary<TimePoint, bool> GetPowerupInfo() {
             bool targetAll = TargetPlayer < 0;
             bool invincibleOnly = statToggles[0].Value;
 
+            int targetState = statLists[0].Value;
+            bool showAllStates = targetState == -1;
+
             var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+            Dictionary<TimePoint, bool> temp = new();
             if (!targetAll) {
                 if (!invincibleOnly) {
-                    return stats[TargetPlayer].PowerChangePoints;
-                } else {
-                    List<TimePoint> temp = new();
+                    foreach (var powerstate in stats[TargetPlayer].PowerChangePoints) {
+                        bool show = true;
+                        if (!showAllStates && powerstate.PowerupState != (PowerupState)targetState) {
+                            show = false;
+                        }
 
-                    temp.AddRange(stats[TargetPlayer].StarmanChangePoints);
+                        temp.Add(powerstate, show);
+                    }
+                } else {
+                    List<TimePoint> tempList = new();
+                    foreach (var starmanPoint in stats[TargetPlayer].StarmanChangePoints) {
+                        tempList.Add(starmanPoint);
+                    }
 
                     foreach (var powerPoint in stats[TargetPlayer].PowerChangePoints) {
                         if (powerPoint.PowerupState == PowerupState.MegaMushroom) {
-                            temp.Add(powerPoint);
+                            tempList.Add(powerPoint);
                         }
                     }
 
-                    temp.Sort();
-
-                    return temp;
+                    tempList.Sort();
+                    temp = tempList.ToDictionary(key => key, value => true);
                 }
             } else {
                 if (!invincibleOnly) {
-                    List<PointPowerChange> temp = new();
                     foreach (var playerInfo in stats.Values) {
-                        temp.AddRange(playerInfo.PowerChangePoints);
-                    }
+                        foreach (var powerstate in playerInfo.PowerChangePoints) {
+                            bool show = true;
+                            if (!showAllStates && powerstate.PowerupState != (PowerupState) targetState) {
+                                show = false;
+                            }
 
-                    temp.Sort();
-                    return temp;
+                            temp.Add(powerstate, show);
+                        }
+                    }
                 } else {
-                    List<TimePoint> temp = new();
-
+                    List<TimePoint> tempList = new();
                     foreach (var playerInfo in stats.Values) {
-                        temp.AddRange(playerInfo.StarmanChangePoints);
-                    }
-
-                    foreach (var playerInfo in stats.Values) {
+                        foreach (var starmanPoint in playerInfo.StarmanChangePoints) {
+                            tempList.Add(starmanPoint);
+                        }
                         foreach (var powerPoint in playerInfo.PowerChangePoints) {
                             if (powerPoint.PowerupState == PowerupState.MegaMushroom) {
-                                temp.Add(powerPoint);
+                                tempList.Add(powerPoint);
                             }
                         }
                     }
 
-                    temp.Sort();
-                    return temp;
+                    tempList.Sort();
+                    temp = tempList.ToDictionary(key => key, value => true);
                 }
             }
+            return temp;
         }
 
         private IEnumerable<TimePoint> GetTauntInfo() {
@@ -314,6 +327,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
         #region Switches
         public enum StatOptions {
+            StarsCollected, // can't be removed
             KnockbackDealt,
             PowerupInfo,
             ComboLanded,
@@ -425,8 +439,13 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             return dictionary;
         }
 
-        private Dictionary<string, int> GetListOptions(StatOptions? options = null) {
-            Dictionary<string, int> dictionary = new();
+        private enum ListType {
+            TargetPlayer,
+            Powerup
+        }
+
+        private List<(string translation, int defaultValue, ListType listType)> GetListOptions(StatOptions? options = null) {
+            List<(string translation, int defaultValue, ListType listType)> list = new();
             StatOptions viewingOptions = options ?? ViewingStats;
             var listPrefix = "ui.replay.stats.list.";
             var translationPrefix = listPrefix+viewingOptions.ToString().ToLower()+".";
@@ -434,11 +453,16 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             case StatOptions.Kills:
             case StatOptions.DamageDealt:
             case StatOptions.KnockbackDealt:
-                dictionary.Add(listPrefix+"target", 0);
+                list.Add((listPrefix+"target", 0, ListType.TargetPlayer));
+                break;
+            case StatOptions.PowerupInfo:
+                if (!statToggles[0].Value) {
+                    list.Add((listPrefix+"powerupfilter", 0, ListType.Powerup));
+                }
                 break;
             }
 
-            return dictionary;
+            return list;
         }
 
         private void UpdateLeftPanelText(TranslationManager tm, StringBuilder sb, StatOptions? options = null) {
@@ -573,16 +597,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             }
             statsButtons.Clear();
 
-            /*foreach (var toggle in statToggles) {
-                Destroy(toggle.gameObject);
-            }
-            statToggles.Clear();
-
-            foreach (var list in statLists) {
-                Destroy(list.gameObject);
-            }
-            statLists.Clear();*/
-
             foreach (var entry in timePointEnteries) {
                 Destroy(entry.gameObject);
             }
@@ -601,11 +615,10 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 var tm = GlobalController.Instance.translationManager;
                 float percentage = (float) framesLoaded / frameTotal;
 
-                string loading = tm.GetTranslation("ui.loading.loading");
                 string loadedAsTime = TimePoint.FrameToTime(framesLoaded, 0, deltaTime);
                 string totalAsTime = TimePoint.FrameToTime(frameTotal, 0, deltaTime);
                 progressBarFill.fillAmount = percentage;
-                progressBarText.text = $"{loading} {loadedAsTime} / {totalAsTime} - {framesLoaded} / {frameTotal} ({percentage * 100:F0}%)";
+                progressBarText.text = $"{loadedAsTime} / {totalAsTime} - {framesLoaded} / {frameTotal} ({percentage * 100:F0}%)";
             }
         }
 
@@ -719,28 +732,44 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 Destroy(entry.gameObject);
             }
             statLists.Clear();
-
             var listsOptions = GetListOptions();
 
             for (int i = 0; i < listsOptions.Count; i++) {
-                var list = listsOptions.ElementAt(i);
-                var translationKey = list.Key;
-                var defaultValue = list.Value;
+                var (translationKey, defaultValue, type) = listsOptions.ElementAt(i);
                 var listObj = Instantiate(listTemplate, listTemplate.transform.parent);
                 listObj.name = $"List{i}";
                 listObj.gameObject.SetActive(true);
                 listObj.Initialize(translationKey, defaultValue);
-                // just have it be a player list for now
-                listObj.AddToDropdown(tm.GetTranslation("ui.generic.all"), -1);
 
-                var stats = ReplayStatsRecorder.Instance.PlayerInfos;
-                for (int j = 0; j < stats.Count; j++) {
-                    // exclude ourselves
-                    if (j == TargetPlayer) {
-                        continue;
+                switch (type) {
+                case ListType.TargetPlayer:
+                    listObj.AddToDropdown(tm.GetTranslation("ui.generic.all"), -1);
+
+                    var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+                    for (int j = 0; j < stats.Count; j++) {
+                        // exclude ourselves
+                        if (j == TargetPlayer) {
+                            continue;
+                        }
+                        var info = stats.Values.ElementAt(j);
+                        listObj.AddToDropdown(info.PlayerName, j);
                     }
-                    var info = stats.Values.ElementAt(j);
-                    listObj.AddToDropdown(info.PlayerName, j);
+                    break;
+                case ListType.Powerup:
+                    listObj.AddToDropdown(tm.GetTranslation("ui.generic.all"), -1);
+
+                    var powerupStateArray = Enum.GetValues(typeof(PowerupState)).Cast<PowerupState>().ToList();
+                    for (int j = 0; j < powerupStateArray.Count; j++) {
+                        string powerupTranslation;
+                        var powerupState = powerupStateArray[j];
+                        if (powerupState == PowerupState.NoPowerup) {
+                            powerupTranslation = tm.GetTranslation("ui.generic.none");
+                        } else {
+                            powerupTranslation = tm.GetTranslation("coinitem."+powerupState.ToString().ToLower());
+                        }
+                        listObj.AddToDropdown(powerupTranslation, j);
+                    }
+                    break;
                 }
                 statLists.Add(listObj);
             }
@@ -1056,6 +1085,18 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             selectedButton = 0;
             viewingStatisticDropdown.value = 0;
             targetPlayerDropdown.value = 0;
+        }
+
+        public void PurgeObjects() {
+            foreach (var toggle in statToggles) {
+                Destroy(toggle.gameObject);
+            }
+            statToggles.Clear();
+
+            foreach (var list in statLists) {
+                Destroy(list.gameObject);
+            }
+            statLists.Clear();
         }
 
         #endregion

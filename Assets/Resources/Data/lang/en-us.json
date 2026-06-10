@@ -387,6 +387,7 @@
   "ui.replay.stats.toggles.powerupinfo.showinvincible": "Show invincible",
   "ui.replay.stats.toggles.powerupspawns.randomonly": "Random only",
   "ui.replay.stats.list.target": "Target",
+  "ui.replay.stats.list.powerupfilter": "Powerup Filter",
   "ui.replay.stats.info.occurences": "Occurences in replay: {occurences}",
   "ui.replay.stats.info.changes": "Changes in replay: {changes}",
   "ui.replay.stats.info.starcountchange": "Highest star count: {highestStarCount}\nStars grabbed: {starGrabCount}\nStars lost: {starLostCount}",
