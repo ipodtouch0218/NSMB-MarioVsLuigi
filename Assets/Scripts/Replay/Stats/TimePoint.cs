@@ -169,20 +169,6 @@ namespace NSMB.Replay.Stats {
         }
     }
 
-    public unsafe class PointStarCollected : TimePoint {
-        public override int FrameOffset => 10;
-        public readonly int StarCount, TotalStarCount;
-        public PointStarCollected(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo info, int starCount) : base(statsRecorder, f, mario) {
-            StarCount = starCount;
-            TotalStarCount = ++info.Stars;
-        }
-
-
-        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append("<sprite name=room_stars>").Append(Utils.GetSymbolString(StarCount.ToString(), Utils.smallSymbols));
-
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append(tm.GetTranslationWithReplacements("ui.replay.stats.entry.starscollected", "total", TotalStarCount.ToString()));
-    }
-
     public unsafe class PointDamage : TimePoint {
         public override int FrameOffset => defaultFrameOffset;
         public readonly PowerupState NewState;
@@ -345,41 +331,6 @@ namespace NSMB.Replay.Stats {
                 _ => AffectedPlayerRef
             };
         }
-    }
-
-    public unsafe class PointStarLoss : TimePoint {
-        public override int FrameOffset => defaultFrameOffset;
-        public enum StarLossCause {
-            Unknown,
-            Death,
-            Stomp,
-            CollisionBump,
-            HipDrop,
-            Fireball,
-            BlueShell,
-            Iceball,
-            Damage
-        }
-        public StarLossCause Reason;
-        public string AttackerName;
-        public readonly int StarAmount, StarDropCount, TotalStarsLost;
-        public PointStarLoss(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo victimInfo, int starDropCount, StarLossCause reason, EntityRef attacker) : base(statsRecorder, f, mario) {
-            var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
-            StarAmount = gamemode.GetObjectiveCount(f, mario);
-            StarDropCount = starDropCount;
-            Reason = reason;
-            TotalStarsLost = victimInfo.StarsDropped += starDropCount;
-            if (attacker == EntityRef.None) return;
-
-            if (f.Unsafe.TryGetPointer<MarioPlayer>(attacker, out var AttackerMario)) {
-                var attackerPlayer = f.GetPlayerData(AttackerMario->PlayerRef);
-                AttackerName = attackerPlayer.PlayerNickname;
-            }
-        }
-
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append($"Lost a star due to {Reason}");
-
-        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append("X").Append(Utils.GetSymbolString(StarAmount.ToString(), Utils.smallSymbols));
     }
 
     public unsafe class PointCombo : TimePoint {

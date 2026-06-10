@@ -206,7 +206,6 @@ namespace NSMB.Replay.Stats
             var starsToDrop = Math.Min(1, e.OldObjectiveCount);
 
             playerInfo.DeathPoints.Add(deathPoint);
-            playerInfo.StarsLostPoints.Add(new PointStarLoss(StatRecorder, f, mario, playerInfo, starsToDrop, PointStarLoss.StarLossCause.Death, EntityRef.None));
 
             // end a combo as a finisher finisher
             if (playerInfo.CurrComboPoint != null) {
@@ -236,19 +235,7 @@ namespace NSMB.Replay.Stats
            
             //bool isProjectile = e.ProjectileEffect != ProjectileEffectType.None;
             bool dropStars = e.StarsToDrop != 0;
-
-            var lossCause = strength switch {
-                KnockbackStrength.FireballBump => PointStarLoss.StarLossCause.Fireball,
-                KnockbackStrength.CollisionBump => PointStarLoss.StarLossCause.CollisionBump,
-                KnockbackStrength.Normal => PointStarLoss.StarLossCause.Stomp,
-                KnockbackStrength.Groundpound => PointStarLoss.StarLossCause.HipDrop,
-                _ => PointStarLoss.StarLossCause.Unknown
-            };
-
             int starsToDrop = Math.Min(e.StarsToDrop, e.OldObjectiveCount);
-            if (dropStars) {
-                victimMarioInfo.StarsLostPoints.Add(new PointStarLoss(StatRecorder, f, victimMario, victimMarioInfo, starsToDrop, lossCause, e.Attacker));
-            }
 
             // end the current knockback setting the end frame
             if (victimMarioInfo.CurrKnockbackPoint is PointKnockback currKnockbackPoint) {
@@ -323,7 +310,6 @@ namespace NSMB.Replay.Stats
             var damagePoint = new PointDamage(StatRecorder, f, mario, damageCause, attackerName, attackerRef);
 
             var starsToDrop = Math.Min(1, e.OldObjectiveCount);
-            marioPlayerInfo.StarsLostPoints.Add(new PointStarLoss(StatRecorder, f, mario, marioPlayerInfo, starsToDrop, PointStarLoss.StarLossCause.Damage, EntityRef.None));
             marioPlayerInfo.DamagePoints.Add(damagePoint);
             if (marioPlayerInfo.CurrComboPoint != null) {
                 StartOrUpdateCombo(StatRecorder, f, mario, marioPlayerInfo, damagePoint, starsToDrop);

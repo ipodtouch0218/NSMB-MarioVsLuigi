@@ -314,7 +314,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
         #region Switches
         public enum StatOptions {
-            StarsCollected,
             KnockbackDealt,
             PowerupInfo,
             ComboLanded,
@@ -337,7 +336,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             StatOptions viewingOptions = options ?? ViewingStats;
             var stats = ReplayStatsRecorder.Instance.PlayerInfos;
             return viewingOptions switch {
-                StatOptions.StarsCollected => stats[TargetPlayer].StarsCollectedPoints,
                 StatOptions.CoinsCollected => stats[TargetPlayer].CoinsCollectedPoints,
                 StatOptions.Death => stats[TargetPlayer].DeathPoints,
                 StatOptions.KnockbackReceived => stats[TargetPlayer].KnockbackPoints,
@@ -391,7 +389,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             StatOptions viewingOptions = options ?? ViewingStats;
             switch (viewingOptions) {
             case StatOptions.StarCountChange:
-            case StatOptions.StarsCollected:
                 if (QuantumUnityDB.TryGetGlobalAsset(replayListEntry.ReplayFile.Header.Rules.Gamemode, out var gamemode)) {
                     return gamemode is StarChasersGamemode;
                 }
