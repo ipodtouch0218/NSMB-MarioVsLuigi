@@ -106,6 +106,12 @@ namespace Quantum {
                 if (mario->IsDead) {
                     continue;
                 }
+                if (mario->IsStarmanInvincible || mario->CurrentPowerupState == PowerupState.MegaMushroom) {
+                    continue;
+                }
+                if (mario->IsCrouchingInBlueShell) {
+                    continue;
+                }
 
                 FP newDistance = QuantumUtils.WrappedDistance(stage, booPosition, marioTransform->Position);
 
