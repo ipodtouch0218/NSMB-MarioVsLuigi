@@ -1,3 +1,4 @@
+using JimmysUnityUtilities;
 using NSMB.Replay;
 using NSMB.Replay.Stats;
 using NSMB.UI.MainMenu.Submenus.Replays;
@@ -7,6 +8,7 @@ using NSMB.Utilities;
 using Photon.Deterministic;
 using Quantum;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -445,21 +447,31 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         private void UpdateLeftPanelText(TranslationManager tm, StringBuilder sb, StatOptions? options = null) {
             StatOptions viewingOptions = options ?? ViewingStats;
             var infoPrefix = "ui.replay.stats.info.";
-            var translationPrefix = infoPrefix+viewingOptions.ToString().ToLower()+".";
+            var translationPrefix = infoPrefix+viewingOptions.ToString().ToLower();
             switch (viewingOptions) {
             case StatOptions.StarCountChange:
                 AddOccurenceCount(tm, sb, true);
                 int highestStarCount = GetMostStarsHad(timePointEnteries);
-                sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix+"highest", "highestStarCount", highestStarCount.ToString()));
+                var (mostStarsGet, mostStarsLost)= GetStarGrabLost(timePointEnteries);
+                sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix, "highestStarCount", highestStarCount.ToString(), "starGrabCount", mostStarsGet.ToString(), "starLostCount", mostStarsLost.ToString()));
                 break;
             case StatOptions.ComboRecieved:
             case StatOptions.ComboLanded:
-                var comboPrefix = infoPrefix + "combo.";
+                var comboPrefix = infoPrefix + "combo";
                 AddOccurenceCount(tm, sb);
-                var longestCombo = GetLongestComboEntry(timePointEnteries);
-                if (longestCombo != null) {
-                    sb.AppendLine(tm.GetTranslationWithReplacements(comboPrefix+"longest", "longestComboId", longestCombo.EntryInfo, "frameCount", longestCombo.timePoint.Length.ToString()));
+
+                if (timePointEnteries.IsEmpty()) {
+                    break;
                 }
+
+                var longestCombo = GetLongestComboEntry(timePointEnteries);
+                var mostComplexCombo = GetMostComplexComboEntry(timePointEnteries);
+                var mostStarsCombo = GetMostStarsComboEntry(timePointEnteries);
+                sb.AppendLine(tm.GetTranslationWithReplacements(comboPrefix,
+                    "longestComboID", longestCombo.EntryInfo, "frameCount", longestCombo.timePoint.Length.ToString(),
+                    "mostComplexComboID", mostComplexCombo.EntryInfo, "elements", (mostComplexCombo.timePoint as PointCombo).ComboElements.Count.ToString(),
+                    "mostStarsComboID", mostStarsCombo.EntryInfo, "stars", (mostStarsCombo.timePoint as PointCombo).TotalStarsAfterCombo().ToString())
+                );
                 break;
             case StatOptions.PowerupInfo:
                 AddOccurenceCount(tm, sb, true);
@@ -469,7 +481,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 var mostUsedState = GetMostUsedPowerupState(timePointEnteries);
                 if (mostUsedState != PowerupState.NoPowerup) {
                     string powerupTranslation = tm.GetTranslation("coinitem."+mostUsedState.ToString().ToLower());
-                    sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix+"mostused", "powerup", powerupTranslation));
+                    sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix+".mostused", "powerup", powerupTranslation));
                 }
                 break;
             case StatOptions.ReserveInfo:
@@ -793,7 +805,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             }
 
             if (!IsReady) {
-                return;
+                goto UpdatePanels;
             }
 
             UpdatePlayerDropdown(GlobalController.Instance.translationManager);
@@ -839,13 +851,26 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 }
             }
 
+        UpdatePanels:
             UpdateLeftPanelText(GlobalController.Instance.translationManager);
-            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
-            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) leftTopLayout.transform);
+
+            // what a stUPid hack
+            // but we have to delay layout rebuilds by one frame or the info on the left will not display properly
+            // thanks Unity <3
+            StartCoroutine(WaitOneFrame(() => {
+                LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
+                LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) leftTopLayout.transform);
+            }));
             scrollRect.verticalNormalizedPosition = 1;
         }
 
         #region Other Methods
+
+        private IEnumerator WaitOneFrame(Action action) {
+            yield return null;
+            action?.Invoke();
+        }
+
         public PowerupState GetMostUsedPowerupState(List<TimePointEntry> timePointEntries) {
             Dictionary<PowerupState, int> stateFrames = new();
             foreach (PowerupState state in Enum.GetValues(typeof(PowerupState))) {
@@ -880,6 +905,25 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             return mostUsedState;
         }
 
+        public (int MostStarsGet, int MostStarsLost) GetStarGrabLost(List<TimePointEntry> timePointEntries) {
+            int starsGrabbed = 0, starsLost = 0;
+
+            for (int i = 0; i < timePointEnteries.Count - 1; i++) {
+                var currEntry = timePointEnteries[i].timePoint as PointStarCountChange;
+                var nextEntry = timePointEnteries[i + 1].timePoint as PointStarCountChange;
+
+                int diff = nextEntry.StarCount - currEntry.StarCount;
+                bool isLoss = diff < 0;
+
+                if (isLoss) {
+                    starsLost += -diff;
+                } else {
+                    starsGrabbed += diff;
+                }
+            }
+            return (starsGrabbed, starsLost);
+        }
+
         public int GetMostStarsHad(List<TimePointEntry> timePointEnteries) {
             int highestStarCount = 0;
 
@@ -894,10 +938,71 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             return highestStarCount;
         }
 
+        public TimePointEntry GetMostStarsComboEntry(List<TimePointEntry> timePointEnteries) {
+            TimePointEntry starsComboEntry = null;
+            int comboMaxElements = 0, comboMostStars = 0;
+
+            // loop through all combos
+            foreach (var timePointEntry in timePointEnteries) {
+                // first check if the combo is more complex
+                var testPoint = timePointEntry.timePoint as PointCombo;
+                if (testPoint.TotalStarsAfterCombo() > comboMostStars) {
+                    starsComboEntry = timePointEntry;
+                    comboMaxElements = testPoint.ComboElements.Count;
+                    comboMostStars = testPoint.TotalStarsAfterCombo();
+                    continue;
+                }
+
+                // the combo matches element count
+                if (testPoint.TotalStarsAfterCombo() == comboMostStars) {
+                    // discard combos that lost less stars
+                    if (testPoint.ComboElements.Count < comboMaxElements) {
+                        continue;
+                    }
+
+                    starsComboEntry = timePointEntry;
+                    comboMaxElements = testPoint.ComboElements.Count;
+                    comboMostStars = testPoint.TotalStarsAfterCombo();
+                }
+            }
+
+            return starsComboEntry;
+        }
+
+        public TimePointEntry GetMostComplexComboEntry(List<TimePointEntry> timePointEnteries) {
+            TimePointEntry complexComboEntry = null;
+            int comboMaxElements = 0, comboMostStars = 0;
+
+            // loop through all combos
+            foreach (var timePointEntry in timePointEnteries) {
+                // first check if the combo is more complex
+                var testPoint = timePointEntry.timePoint as PointCombo;
+                if (testPoint.ComboElements.Count > comboMaxElements) {
+                    complexComboEntry = timePointEntry;
+                    comboMaxElements = testPoint.ComboElements.Count;
+                    comboMostStars = testPoint.TotalStarsAfterCombo();
+                    continue;
+                }
+
+                // the combo matches element count
+                if (testPoint.ComboElements.Count == comboMaxElements) {
+                    // discard combos that lost less stars
+                    if (testPoint.TotalStarsAfterCombo() < comboMostStars) {
+                        continue;
+                    }
+
+                    complexComboEntry = timePointEntry;
+                    comboMaxElements = testPoint.ComboElements.Count;
+                    comboMostStars = testPoint.TotalStarsAfterCombo();
+                }
+            }
+
+            return complexComboEntry;
+        }
+
         public TimePointEntry GetLongestComboEntry(List<TimePointEntry> timePointEnteries) {
             TimePointEntry longestComboEntry = null;
-            int comboMaxLength = 0, comboMaxElements = 0;
-            bool prevComboHadKill = false;
+            int comboMaxLength = 0, comboMaxElements = 0, comboMostStars = 0;
 
             // loop through all combos
             foreach(var timePointEntry in timePointEnteries) {
@@ -907,7 +1012,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                     longestComboEntry = timePointEntry;
                     comboMaxLength = testPoint.Length;
                     comboMaxElements = testPoint.ComboElements.Count;
-                    prevComboHadKill = testPoint.EndsInDeath();
+                    comboMostStars = testPoint.TotalStarsAfterCombo();
                     continue;
                 }
 
@@ -918,15 +1023,14 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                         continue;
                     }
 
-                    // prioritize a combo with a kill
-                    if (prevComboHadKill && !testPoint.EndsInDeath()) {
+                    if (testPoint.TotalStarsAfterCombo() < comboMostStars) {
                         continue;
                     }
 
                     longestComboEntry = timePointEntry;
                     comboMaxLength = testPoint.Length;
                     comboMaxElements = testPoint.ComboElements.Count;
-                    prevComboHadKill = testPoint.EndsInDeath();
+                    comboMostStars = testPoint.TotalStarsAfterCombo();
                 }
             }
 

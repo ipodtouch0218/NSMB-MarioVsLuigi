@@ -192,8 +192,8 @@ namespace NSMB.Replay.Stats
                 } else if (f.Unsafe.TryGetPointer<Enemy>(e.Attacker, out _)) {
                     startFrameOffset = 40;
                     if (playerInfo.CurrComboPoint != null) {
-                        var lastComboElement = playerInfo.CurrComboPoint.ComboElements.Last();
-                        if (lastComboElement.Element is PointKnockback lastKbPoint) {
+                        var (Element, _, _)= playerInfo.CurrComboPoint.ComboElements.Last();
+                        if (Element is PointKnockback lastKbPoint) {
                             attackerName = lastKbPoint.AttackerName;
                             attackerRef = lastKbPoint.AttackerRef;
                         }
@@ -210,8 +210,13 @@ namespace NSMB.Replay.Stats
 
             // end a combo as a finisher finisher
             if (playerInfo.CurrComboPoint != null) {
+                // that knockback ended in death
+                var (Element, _, _)= playerInfo.CurrComboPoint.ComboElements.Last();
+                if (Element is PointKnockback lastKbPoint) {
+                    lastKbPoint.EndsInDeath = true;
+                }
                 bool includeInCombo = playerInfo.CurrComboPoint.ComboElements.Count > 1 || !wasPitDeath && !wasDisconnect;
-                StatUtilStopCombo(f, playerInfo, includeInCombo ? deathPoint : null, starsToDrop);
+                StopCombo(f, playerInfo, includeInCombo ? deathPoint : null, starsToDrop);
             }
         }
 
@@ -252,7 +257,7 @@ namespace NSMB.Replay.Stats
             var knockbackPoint = new PointKnockback(StatRecorder, f, victimMario, e.Attacker, starsToDrop, strength);
             victimMarioInfo.KnockbackPoints.Add(knockbackPoint);
             victimMarioInfo.CurrKnockbackPoint = knockbackPoint;
-            StatUtilSetCombo(StatRecorder, f, victimMario, victimMarioInfo, knockbackPoint, starsToDrop);
+            StartOrUpdateCombo(StatRecorder, f, victimMario, victimMarioInfo, knockbackPoint, starsToDrop);
         }
 
         public void OnMarioPlayerTookDamage(EventMarioPlayerTookDamage e, Frame f) {
@@ -321,7 +326,7 @@ namespace NSMB.Replay.Stats
             marioPlayerInfo.StarsLostPoints.Add(new PointStarLoss(StatRecorder, f, mario, marioPlayerInfo, starsToDrop, PointStarLoss.StarLossCause.Damage, EntityRef.None));
             marioPlayerInfo.DamagePoints.Add(damagePoint);
             if (marioPlayerInfo.CurrComboPoint != null) {
-                StatUtilSetCombo(StatRecorder, f, mario, marioPlayerInfo, damagePoint, starsToDrop);
+                StartOrUpdateCombo(StatRecorder, f, mario, marioPlayerInfo, damagePoint, starsToDrop);
             }
         }
 
@@ -449,7 +454,7 @@ namespace NSMB.Replay.Stats
             /**Knockback Handling**/
             if (!marioPlayer->IsInKnockback) {
                 if (playerInfo.CurrComboPoint != null && --playerInfo.ComboEndTimer <= 0) {
-                    StatUtilStopCombo(f, playerInfo);
+                    StopCombo(f, playerInfo);
                 }
 
                 // end knockback
@@ -461,7 +466,7 @@ namespace NSMB.Replay.Stats
 
             // end any remaining combos when game is over
             if (f.Global->GameState == GameState.Ended) {
-                StatUtilStopCombo(f, playerInfo, gameEnded: true);
+                StopCombo(f, playerInfo, gameEnded: true);
             }
         }
 
@@ -524,7 +529,7 @@ namespace NSMB.Replay.Stats
 
         #region Static Methods
 
-        public static void StatUtilStopCombo(Frame f, PlayerInfo playerInfo, TimePoint timePoint = null, int starsLost = 0, bool gameEnded = false) {
+        public static void StopCombo(Frame f, PlayerInfo playerInfo, TimePoint timePoint = null, int starsLost = 0, bool gameEnded = false) {
             var comb = playerInfo.CurrComboPoint;
             if (comb == null) {
                 return;
@@ -549,7 +554,7 @@ namespace NSMB.Replay.Stats
             playerInfo.CurrComboPoint = null;
         }
 
-        public static void StatUtilSetCombo(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* victimMario, PlayerInfo playerInfo, TimePoint timePoint, int starsLost) {
+        public static void StartOrUpdateCombo(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* victimMario, PlayerInfo playerInfo, TimePoint timePoint, int starsLost) {
             // no current combo, make a new one :3
             if (playerInfo.CurrComboPoint == null) {
                 var currCombo = new PointCombo(statsRecorder, f, victimMario, timePoint, starsLost);

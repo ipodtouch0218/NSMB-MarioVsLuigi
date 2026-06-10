@@ -295,6 +295,8 @@ namespace NSMB.Replay.Stats {
         public readonly string AttackerName;
         public readonly PlayerRef AttackerRef;
         public readonly KnockbackStrength KnockbackStrength;
+        
+        public bool EndsInDeath;
         public PointKnockback(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, EntityRef attacker, int starDropCount, KnockbackStrength knockbackStrength) : base(statsRecorder, f, mario) {
             var attackerMario = f.Unsafe.GetPointer<MarioPlayer>(attacker);
             var attackerPlayer = f.GetPlayerData(attackerMario->PlayerRef);
@@ -330,6 +332,9 @@ namespace NSMB.Replay.Stats {
 
         public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             var color = Color.red;
+            if (EndsInDeath) {
+                stringBuilder.Append("<sprite name=\"room_lives\" color=#").Append(Utils.ColorToHex(color, false)).Append('>');
+            }
             stringBuilder.Append("<sprite name=\"room_stars\" color=#").Append(Utils.ColorToHex(color, false)).Append('>');
             stringBuilder.Append(Utils.GetSymbolString(StarsDropped.ToString(), Utils.smallSymbols, color: Color.red));
         }
@@ -652,8 +657,7 @@ namespace NSMB.Replay.Stats {
 
         public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             if (!WasBlocked && CollectingPlayer != null) {
-                string translationSuffix = "bigcollectable.";
-                stringBuilder.Append(tm.GetTranslationWithReplacements(translationPrefix + translationSuffix + "collector", "collector", CollectingPlayer));
+                stringBuilder.Append(CollectingPlayer);
             }
         }
 
