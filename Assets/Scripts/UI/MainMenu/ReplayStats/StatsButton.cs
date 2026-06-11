@@ -43,10 +43,13 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 var button = statButton.GetComponent<Button>();
                 button.interactable = true;
             }
+            var tm = GlobalController.Instance.translationManager;
             statsManager.selectedButton = Index;
-            statsManager.UpdateStatsDropdown(GlobalController.Instance.translationManager);
-            statsManager.ChangedViewingStats(true);
+            statsManager.ResetListValues();
+            statsManager.UpdateLists(tm);
             statsManager.ResetStatsDropdownPos();
+            statsManager.UpdateStatsDropdown(tm);
+            statsManager.ChangedViewingStats(true);
         }
     }
 }

@@ -7,7 +7,11 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
     public class StatsList : MonoBehaviour {
         //---property
-        public int Value => dropdownValues[dropdown.value];
+        public ReplayStatsManager.ListType ListType { get; private set; }
+        public int Value {
+            get => dropdownValues[dropdown.value];
+            set => dropdown.value = value;
+        }
 
         //---serialized
         [SerializeField] private TMP_Text label;
@@ -17,8 +21,9 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         private string translationKey;
         private readonly List<int> dropdownValues = new();
 
-        public void Initialize(string translationKey, int value) {
+        public void Initialize(string translationKey, int value, ReplayStatsManager.ListType listType) {
             this.translationKey = translationKey;
+            ListType = listType;
             dropdown.SetValueWithoutNotify(value);
 
             TranslationManager tm = GlobalController.Instance.translationManager;

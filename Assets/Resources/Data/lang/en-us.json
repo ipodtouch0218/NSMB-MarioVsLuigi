@@ -393,6 +393,8 @@
   "ui.replay.stats.info.starcountchange": "Highest star count: {highestStarCount}\nStars grabbed: {starGrabCount}\nStars lost: {starLostCount}",
   "ui.replay.stats.info.combo": "Longest combo: {frameCount}F ({longestComboID})\nMost complex combo: {elements}-parts ({mostComplexComboID})\nMost stars taken: {stars} ({mostStarsComboID})",
   "ui.replay.stats.info.powerupinfo.mostused": "Most used powerup: {powerup}",
+  "ui.replay.stats.info.powerupinfo.timespent": "Total time used: {time}s",
+  "ui.replay.stats.info.powerupinfo.timeinvincible": "Total time with starman: {starmantime}s\nTotal time while Mega: {megatime}s",
   "ui.replay.stats.entry.damage.enemy": "Got damage from an enemy",
   "ui.replay.stats.entry.damage.shell": "Got damage from a shell",
   "ui.replay.stats.entry.damage.starman": "Got damage from starman",

@@ -33,7 +33,7 @@ namespace NSMB.Replay.Stats {
         //---properties (readonly)
         public bool IsGlobalPoint => AffectedPlayerRef == PlayerRef.None;
         public bool HasEndFrame => EndFrame != -1;
-        public int Length => !HasEndFrame ? -1 : EndFrame - OccurenceFrame;
+        public int Length => !HasEndFrame ? 0 : EndFrame - OccurenceFrame;
 
         //---static
         private static int _index;
@@ -478,7 +478,7 @@ namespace NSMB.Replay.Stats {
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             base.SetTimeText(tm, stringBuilder, displayArg);
             if (ShowLength) {
-                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime;
+                var lengthInSec = Length * DeltaTime;
                 stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
             }
         }
@@ -504,7 +504,7 @@ namespace NSMB.Replay.Stats {
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             base.SetTimeText(tm, stringBuilder, displayArg);
             if (ShowLength) {
-                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime;
+                var lengthInSec = Length * DeltaTime;
                 stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
             }
         }
@@ -524,7 +524,7 @@ namespace NSMB.Replay.Stats {
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             base.SetTimeText(tm, stringBuilder, displayArg);
             if (ShowLength) {
-                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime;
+                var lengthInSec = Length * DeltaTime;
                 stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
             }
         }
