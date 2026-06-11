@@ -66,7 +66,9 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
         [Header("Lists")]
         [SerializeField] private StatOptionsWrapper[] statOptionGroup;
-        //[SerializeField] private StatOptions[] positiveStats, negativeStats, stageStats, miscStats;
+
+        [Header("Others")]
+        [SerializeField] public ReplayStatsSubmenu statsSubmenu;
 
         //---Private Variables
         private ReplayListEntry replayListEntry;
@@ -505,6 +507,14 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                     sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix+".mostused", "powerup", powerupTranslation));
                 }
                 break;
+            case StatOptions.PowerupSpawns:
+                var itemSpawnData = GetItemSpawnCount(timePointEnteries);
+                foreach (var entry in itemSpawnData) {
+                    var item = entry.Key;
+                    var count = entry.Value;
+                    sb.AppendLine(tm.GetTranslationWithReplacements(item.TranslationKey) + " " + count);
+                }
+                break;
             case StatOptions.ReserveInfo:
                 AddOccurenceCount(tm, sb, true);
                 break;
@@ -879,6 +889,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
         UpdatePanels:
             UpdateLeftPanelText(GlobalController.Instance.translationManager);
+            scrollRect.verticalNormalizedPosition = 1;
 
             // what a stUPid hack
             // but we have to delay layout rebuilds by one frame or the info on the left will not display properly
@@ -887,7 +898,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
                 LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) leftTopLayout.transform);
             }));
-            scrollRect.verticalNormalizedPosition = 1;
         }
 
         #region Other Methods
@@ -931,7 +941,35 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             return mostUsedState;
         }
 
-        public (int MostStarsGet, int MostStarsLost) GetStarGrabLost(List<TimePointEntry> timePointEntries) {
+        private Dictionary<CoinItemAsset, int> GetItemSpawnCount(List<TimePointEntry> timePointEnteries) {
+            Dictionary<CoinItemAsset, int> dictionary = new();
+            foreach (var timePointEntry in timePointEnteries) {
+                var timePoint = timePointEntry.timePoint;
+
+                if (timePoint is PointCoinCollected coinCollected) {
+                    // this shouldn't happen
+                    if (coinCollected.CoinItem == null) {
+                        continue;
+                    }
+
+                    if (!dictionary.TryAdd(coinCollected.CoinItem, 1)) {
+                        dictionary[coinCollected.CoinItem]++;
+                    }
+                } else if (timePoint is PointBlockHit blockHit) {
+                    if (blockHit.SpawnedItem == null) {
+                        continue;
+                    }
+
+                    if (!dictionary.TryAdd(blockHit.SpawnedItem, 1)) {
+                        dictionary[blockHit.SpawnedItem]++;
+                    }
+                }
+            }
+
+            return dictionary;
+        } 
+
+        private (int MostStarsGet, int MostStarsLost) GetStarGrabLost(List<TimePointEntry> timePointEntries) {
             int starsGrabbed = 0, starsLost = 0;
 
             for (int i = 0; i < timePointEnteries.Count - 1; i++) {
@@ -950,7 +988,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             return (starsGrabbed, starsLost);
         }
 
-        public int GetMostStarsHad(List<TimePointEntry> timePointEnteries) {
+        private int GetMostStarsHad(List<TimePointEntry> timePointEnteries) {
             int highestStarCount = 0;
 
             // loop through all enteries
@@ -964,7 +1002,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             return highestStarCount;
         }
 
-        public TimePointEntry GetMostStarsComboEntry(List<TimePointEntry> timePointEnteries) {
+        private TimePointEntry GetMostStarsComboEntry(List<TimePointEntry> timePointEnteries) {
             TimePointEntry starsComboEntry = null;
             int comboMaxElements = 0, comboMostStars = 0;
 
@@ -995,7 +1033,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             return starsComboEntry;
         }
 
-        public TimePointEntry GetMostComplexComboEntry(List<TimePointEntry> timePointEnteries) {
+        private TimePointEntry GetMostComplexComboEntry(List<TimePointEntry> timePointEnteries) {
             TimePointEntry complexComboEntry = null;
             int comboMaxElements = 0, comboMostStars = 0;
 
@@ -1026,7 +1064,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             return complexComboEntry;
         }
 
-        public TimePointEntry GetLongestComboEntry(List<TimePointEntry> timePointEnteries) {
+        private TimePointEntry GetLongestComboEntry(List<TimePointEntry> timePointEnteries) {
             TimePointEntry longestComboEntry = null;
             int comboMaxLength = 0, comboMaxElements = 0, comboMostStars = 0;
 
@@ -1063,7 +1101,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             return longestComboEntry;
         }
 
-        public void AddOccurenceCount(TranslationManager tm, StringBuilder sb, bool isChanges = false) {
+        private void AddOccurenceCount(TranslationManager tm, StringBuilder sb, bool isChanges = false) {
             string translationPrefix = "ui.replay.stats.info.";
             if (isChanges) {
                 sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix+"changes", "changes", timePointEnteries.Count.ToString()));
@@ -1097,6 +1135,10 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 Destroy(list.gameObject);
             }
             statLists.Clear();
+        }
+
+        public void CloseSubmenu() {
+            canvas.CloseSubmenu(statsSubmenu);
         }
 
         #endregion

@@ -1,5 +1,6 @@
 using NSMB.Replay;
 using NSMB.UI.MainMenu.Submenus.Replays;
+using NSMB.UI.MainMenu.Submenus.ReplayStats;
 using NSMB.UI.Translation;
 using NSMB.Utilities.Extensions;
 using Quantum;
@@ -184,6 +185,7 @@ namespace NSMB.UI.Game.Results {
                     if (success) {
                         _ = replayManager.CreateReplayListEntries(default, newReplay);
                         ActiveReplayManager.Instance.StartReplayPlayback(newReplay);
+                        ReplayStatsManager.Instance.CloseSubmenu();
                     } else {
                         labels[0].text = "» " + GlobalController.Instance.translationManager.GetTranslation("ui.game.results.nextreplay.nomore");
                         sfx.PlayOneShot(SoundEffect.UI_Error);
