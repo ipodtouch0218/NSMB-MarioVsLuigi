@@ -51,5 +51,17 @@ namespace NSMB.Utilities {
         public static SoundEffect GetComboSoundEffect(int combo) {
             return ComboSounds[Mathf.Clamp(combo, 0, ComboSounds.Length - 1)];
         }
+
+        public static unsafe bool TryGetHostPlayerSlot(QuantumGame game, out int slot) {
+            Frame f = game.Frames.Predicted;
+            int index = game.GetLocalPlayers().IndexOf(f.Global->Host);
+            if (index == -1) {
+                slot = -1;
+                return false;
+            } else {
+                slot = game.GetLocalPlayerSlots()[index];
+                return true;
+            }
+        }
     }
 }

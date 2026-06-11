@@ -208,7 +208,7 @@ event MarioPlayerUsedReserveItem {
 
 event MarioPlayerUpdatePowerupQueue {
 	EntityRef Entity;
-	nothashed PowerupTransitionAnimation* Anim;
+	nothashed PowerupTransitionAnimation Anim;
 }
 
 event MarioPlayerWalljumped {

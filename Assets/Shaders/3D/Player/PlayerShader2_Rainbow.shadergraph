@@ -1122,8 +1122,8 @@
     "m_ObjectId": "17751287c29f4fa9980522129d3328a8",
     "m_Title": "Overalls",
     "m_Position": {
-        "x": -1248.0,
-        "y": -2145.0
+        "x": -1248.0001220703125,
+        "y": -2145.000244140625
     }
 }
 
@@ -1153,7 +1153,7 @@
     "m_PerRendererData": false,
     "m_customAttributes": [],
     "m_Value": {
-        "m_SerializedTexture": "{\"texture\":{\"fileID\":2800000,\"guid\":\"027c0cc20477d9449a771cca38f723da\",\"type\":3}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "isMainTexture": false,
@@ -2293,8 +2293,8 @@
     "m_ObjectId": "4ef8620a9e8a4d17ba05e6fceb6e557b",
     "m_Title": "Shirt",
     "m_Position": {
-        "x": -743.0,
-        "y": -2145.0
+        "x": -743.0001220703125,
+        "y": -2145.000244140625
     }
 }
 
@@ -2918,7 +2918,7 @@
     "m_PerRendererData": false,
     "m_customAttributes": [],
     "m_Value": {
-        "m_SerializedTexture": "{\"texture\":{\"fileID\":2800000,\"guid\":\"bf5f4ebd679e6474399c9aa14e6bdbb7\",\"type\":3}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "isMainTexture": false,
@@ -2934,8 +2934,8 @@
     "m_ObjectId": "6dcc57c7efa340ecb802c4862d445a58",
     "m_Title": "RAINBOWS!!!!",
     "m_Position": {
-        "x": -1100.9998779296875,
-        "y": -1537.0
+        "x": -1101.000244140625,
+        "y": -1537.000244140625
     }
 }
 
@@ -3861,8 +3861,8 @@
     "m_ObjectId": "a58929416252421d867488bb228ed99e",
     "m_Title": "Hat",
     "m_Position": {
-        "x": -237.0,
-        "y": -2144.0
+        "x": -237.0001220703125,
+        "y": -2144.000244140625
     }
 }
 
@@ -3892,7 +3892,7 @@
     "m_PerRendererData": false,
     "m_customAttributes": [],
     "m_Value": {
-        "m_SerializedTexture": "{\"texture\":{\"fileID\":2800000,\"guid\":\"d5a82e89d71842c4c9ac25792b1b167b\",\"type\":3}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "isMainTexture": false,
@@ -3986,8 +3986,8 @@
     "m_ObjectId": "ab2eed6b8c52469196bbfccd3239e277",
     "m_Title": "Base",
     "m_Position": {
-        "x": -1637.0,
-        "y": -2145.0
+        "x": -1637.000244140625,
+        "y": -2145.000244140625
     }
 }
 

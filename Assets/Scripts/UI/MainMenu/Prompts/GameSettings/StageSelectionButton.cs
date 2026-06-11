@@ -18,7 +18,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         //---Serialized Variables
         [SerializeField] private MainMenuCanvas canvas;
         [SerializeField] private ScrollRect scroll;
-        [SerializeField] private Image stageImage;
+        [SerializeField] private Image stageImage, disabledImage;
         [SerializeField] private Material enabledMaterial, disabledMaterial;
         [SerializeField] private TMP_Text stageName, stageAuthor, stageComposer;
 
@@ -35,7 +35,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
         protected override void OnEnable() {
             base.OnEnable();
-            UpdateMaterial();
+            UpdateEnabledVisuals();
         }
 
         protected override void Start() {
@@ -80,16 +80,16 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             OnSubmit(eventData);
         }
 
-        private unsafe void UpdateMaterial(bool? isDisabledNullable = null) {
+        private unsafe void UpdateEnabledVisuals(bool? isDisabledNullable = null) {
             QuantumGame game = QuantumRunner.DefaultGame;
             if (game == null) {
-                stageImage.material = enabledMaterial;
+                SetEnableVisuals(true);
                 return;
             }
 
             Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
             if (f.Global->Rules.ChooseMode != StageChooseMode.Random) {
-                stageImage.material = enabledMaterial;
+                SetEnableVisuals(true);
                 return;
             } 
             
@@ -101,11 +101,21 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 }
             }
 
-            stageImage.material = isDisabledNullable.Value ? disabledMaterial : enabledMaterial;
+            SetEnableVisuals(!isDisabledNullable.Value);
+        }
+
+        private void SetEnableVisuals(bool enabled) {
+            if (enabled) {
+                stageImage.material = enabledMaterial;
+                disabledImage.gameObject.SetActive(false);
+            } else {
+                stageImage.material = disabledMaterial;
+                disabledImage.gameObject.SetActive(true);
+            }
         }
 
         private void OnRulesChanged(EventRulesChanged e) {
-            UpdateMaterial();
+            UpdateEnabledVisuals();
         }
 
         private void OnRandomStageToggled(EventRandomStageToggled e) {
@@ -113,7 +123,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 return;
             }
 
-            UpdateMaterial(e.IsDisabled);
+            UpdateEnabledVisuals(e.IsDisabled);
         }
 
         public void UpdateText() {

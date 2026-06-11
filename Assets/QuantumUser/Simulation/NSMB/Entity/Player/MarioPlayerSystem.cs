@@ -74,13 +74,6 @@ namespace Quantum {
                 return;
             }
 
-            if (HandleTaunting(f, ref filter, command is CommandTaunt)) {
-                HandlePowerups(f, ref filter, physics, stage);
-                HandleKnockback(f, ref filter);
-                HandleHitbox(f, ref filter, physics);
-                return;
-            }
-
             if (HandleStuckInBlock(f, ref filter, stage)) {
                 HandleCrouching(f, ref filter, physics);
                 HandleFacingDirection(f, ref filter, physics);
@@ -89,6 +82,14 @@ namespace Quantum {
                 HandleHitbox(f, ref filter, physics);
                 return;
             }
+
+            if (HandleTaunting(f, ref filter, command is CommandTaunt)) {
+                HandlePowerups(f, ref filter, physics, stage);
+                HandleKnockback(f, ref filter);
+                HandleHitbox(f, ref filter, physics);
+                return;
+            }
+
             HandleKnockback(f, ref filter);
 
             if (mario->IsInKnockback) {
@@ -126,12 +127,10 @@ namespace Quantum {
             if (!physicsObject->IsTouchingGround || FPMath.Abs(physicsObject->Velocity.X) > 2 || physicsObject->IsUnderwater
                 || mario->IsWallsliding || mario->IsGroundpounding || f.Exists(mario->CurrentPipe) || mario->IsInKnockback
                 || mario->IsPropellerFlying || mario->IsSpinnerFlying || mario->IsSkidding || mario->IsSliding || mario->IsCrouching
-                || mario->IsInShell || mario->IsTurnaround || mario->IsStuckInBlock || f.Exists(mario->HeldEntity)) {
+                || mario->IsInShell || mario->IsTurnaround || mario->IsStuckInBlock || f.Exists(mario->HeldEntity) || mario->DoEntityBounce) {
                 // Disgusting.
 
-                if (mario->TauntFrames > 0) {
-                    mario->TauntFrames = 0;
-                }
+                mario->TauntFrames = 0;
                 return false;
             }
 
@@ -139,6 +138,7 @@ namespace Quantum {
 
             if (start && mario->TauntFrames == 0) {
                 mario->TauntFrames = 125;
+                mario->JumpBufferFrames = 0;
                 physicsObject->Velocity.X = 0;
                 f.Events.MarioPlayerTaunted(filter.Entity);
             }
@@ -243,8 +243,8 @@ namespace Quantum {
                 // Can't fast turnaround on ice.
                 mario->IsTurnaround = physicsObject->IsTouchingGround && !mario->IsCrouching && xVelAbs < physics.WalkMaxVelocity[1] && !physicsObject->IsTouchingLeftWall && !physicsObject->IsTouchingRightWall;
                 mario->IsSkidding = mario->IsTurnaround;
-
                 physicsObject->Velocity.X += (physics.FastTurnaroundAcceleration * (mario->FacingRight ? -1 : 1) * f.DeltaTime);
+
             } else if ((inputs.Left ^ inputs.Right)
                        && (!mario->IsCrouching || (mario->IsCrouching && !physicsObject->IsTouchingGround && mario->CurrentPowerupState != PowerupState.BlueShell))
                        && !mario->IsInKnockback
@@ -279,7 +279,7 @@ namespace Quantum {
                 if (reverse) {
                     mario->IsTurnaround = false;
                     if (physicsObject->IsTouchingGround) {
-                        if (!swimming && xVelAbs >= physics.SkiddingMinimumVelocity && !mario->HeldEntity.IsValid && mario->CurrentPowerupState != PowerupState.MegaMushroom) {
+                        if (!swimming && xVelAbs >= physics.SkiddingMinimumVelocity && !f.Exists(mario->HeldEntity) && mario->CurrentPowerupState != PowerupState.MegaMushroom) {
                             mario->IsSkidding = true;
                             mario->FacingRight = sign == 1;
                         }
@@ -300,6 +300,7 @@ namespace Quantum {
                             } else {
                                 mario->SlowTurnaroundFrames = (byte) FPMath.Clamp(mario->SlowTurnaroundFrames + 1, 0,
                                     physics.SlowTurnaroundAcceleration.Length - 1);
+
                                 acc = mario->CurrentPowerupState == PowerupState.MegaMushroom
                                     ? physics.SlowTurnaroundMegaAcceleration[mario->SlowTurnaroundFrames]
                                     : physics.SlowTurnaroundAcceleration[mario->SlowTurnaroundFrames];
@@ -361,7 +362,7 @@ namespace Quantum {
                 }
 
                 FP newX = xVel + acc * f.DeltaTime * sign;
-                FP target = (angle > 30 && physicsObject->IsOnSlideableGround) ? FPMath.Sign(physicsObject->FloorAngle) * physics.WalkMaxVelocity[0] : 0;
+                FP target = (angle > 30 && physicsObject->IsOnSlideableGround && !mario->IsInKnockback) ? FPMath.Sign(physicsObject->FloorAngle) * physics.WalkMaxVelocity[0] : 0;
                 if ((sign == -1) ^ (newX <= target)) {
                     newX = target;
                 }
@@ -390,7 +391,9 @@ namespace Quantum {
             }
 
             // ignore when blue shell, allowing Mario to both "crouch" while sliding
-            if (mario->CurrentPowerupState != PowerupState.BlueShell) mario->IsCrouching &= !mario->IsSliding;
+            if (mario->CurrentPowerupState != PowerupState.BlueShell) {
+                mario->IsCrouching &= !mario->IsSliding;
+            }
             /*
             if (!wasInShell && mario->IsInShell) {
                 f.Events.MarioPlayerCrouched(filter.Entity, mario->CurrentPowerupState);
@@ -1572,7 +1575,7 @@ namespace Quantum {
 
             // do the event!
             if (currAnim->Timer == Constants.PowerupTransitionLength) {
-                f.Events.MarioPlayerUpdatePowerupQueue(filter.Entity, currAnim);
+                f.Events.MarioPlayerUpdatePowerupQueue(filter.Entity, *currAnim);
             }
 
             // now we're GOing to tick down the timer
@@ -1933,6 +1936,7 @@ namespace Quantum {
             mario->IsPropellerFlying = false;
             mario->IsDrilling = false;
             mario->IsSpinnerFlying = false;
+            mario->TauntFrames = 0;
             physicsObject->IsTouchingGround = false;
             physicsObject->Gravity = FPVector2.Zero;
             physicsObject->Velocity = FPVector2.Right * 2;
@@ -2171,7 +2175,7 @@ namespace Quantum {
             // Mario is in his Blue Shell and projectile doesn't affect blue Shell
             bool damageable = !mario->IsInKnockback
                 && mario->CurrentPowerupState != PowerupState.MegaMushroom
-                && mario->IsDamageable(f) || (mario->TryGetCurrentPowerTransition(f, out _) && mario->CurrentPowerupState == PowerupState.MiniMushroom)
+                && (mario->IsDamageable(f) || (mario->TryGetCurrentPowerTransition(f, out _) && mario->CurrentPowerupState == PowerupState.MiniMushroom))
                 && !((mario->IsCrouchedInShell || mario->IsInShell) && projectileAsset.DoesntEffectBlueShell);
 
             // allow the projectiles to collide, but do no knockback if no team attack
@@ -2435,11 +2439,15 @@ namespace Quantum {
                 }
 
                 // Normal stomps
-                if (marioAAbove && marioA->LastAttacker != marioBEntity && (marioAPhysics->Velocity.Y <= 0 || marioBPhysics->Velocity.Y > 0)) {
-                    MarioMarioStomp(f, marioAEntity, marioBEntity, fromRight, dropStars, avgPosition);
+                if (marioAAbove && marioA->LastAttacker != marioBEntity) {
+                    if (marioAPhysics->Velocity.Y <= 0 || marioBPhysics->Velocity.Y > 0) {
+                        MarioMarioStomp(f, marioAEntity, marioBEntity, fromRight, dropStars, avgPosition);
+                    }
                     return;
-                } else if (marioBAbove && marioB->LastAttacker != marioAEntity && (marioBPhysics->Velocity.Y <= 0 || marioAPhysics->Velocity.Y > 0)) {
-                    MarioMarioStomp(f, marioBEntity, marioAEntity, !fromRight, dropStars, avgPosition);
+                } else if (marioBAbove && marioB->LastAttacker != marioAEntity) {
+                    if (marioBPhysics->Velocity.Y <= 0 || marioAPhysics->Velocity.Y > 0) {
+                        MarioMarioStomp(f, marioBEntity, marioAEntity, !fromRight, dropStars, avgPosition);
+                    }
                     return;
                 }
 

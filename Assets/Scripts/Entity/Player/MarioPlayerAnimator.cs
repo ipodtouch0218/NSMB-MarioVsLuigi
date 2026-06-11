@@ -164,28 +164,30 @@ namespace NSMB.Entities.Player {
             this.SetIfNull(ref animator);
         }
 
-        public void Start() {
+        public void Awake() {
+            // This has to go in awake, otherwise OnUpdateView will get called first and mess up the un-cloned materials
             renderers.AddRange(GetComponentsInChildren<MeshRenderer>(true));
             renderers.AddRange(GetComponentsInChildren<SkinnedMeshRenderer>(true));
             foreach (Renderer r in renderers) {
                 // Get a copy of all materials.
-                var materials = r.sharedMaterials;
-                for (int i = 0; i < materials.Length; i++) {
-                    if (!clonedMaterials.TryGetValue(materials[i], out Material clonedMaterial)) {
-                        clonedMaterials[materials[i]] = clonedMaterial = Instantiate(materials[i]);
-                        clonedMaterial.SetColor(ParamOverallsColor, skin?.OverallsColor.AsColor ?? Color.clear);
-                        clonedMaterial.SetColor(ParamShirtColor, skin?.ShirtColor.AsColor ?? Color.clear);
-                        clonedMaterial.SetFloat(ParamCapUsesOverallsColor, (skin?.HatUsesOverallsColor ?? false) ? 1 : 0);
+                List<Material> sharedMaterials = new();
+                r.GetSharedMaterials(sharedMaterials);
+                for (int i = 0; i < sharedMaterials.Count; i++) {
+                    Material material = sharedMaterials[i];
+                    if (!clonedMaterials.TryGetValue(material, out Material clonedMaterial)) {
+                        clonedMaterials[material] = clonedMaterial = Instantiate(material);
                     }
-                    materials[i] = clonedMaterial;
+                    sharedMaterials[i] = clonedMaterial;
                 }
-                r.sharedMaterials = materials;
+                r.SetSharedMaterials(sharedMaterials);
             }
             foreach (PowerupVisuals visual in powerupVisuals) {
                 visual.InitializeMaterials(clonedMaterials);
             }
             fallbackPowerupVisuals.InitializeMaterials(clonedMaterials);
+        }
 
+        public void Start() {
             modelRotationTarget = modelRoot.transform.rotation;
 
             StartCoroutine(BlinkRoutine());
@@ -589,6 +591,9 @@ namespace NSMB.Entities.Player {
             materialBlock ??= new();
             materialBlock.SetFloat(ParamEyeState, (int) (mario->IsDead || mario->IsInKnockback ? Enums.PlayerEyeState.Death : eyeState));
             materialBlock.SetFloat(ParamModelScale, modelRoot.transform.lossyScale.x * (mario->CurrentPowerupState >= PowerupState.Mushroom ? 1f : 0.5f));
+            materialBlock.SetColor(ParamOverallsColor, skin?.OverallsColor.AsColor ?? Color.clear);
+            materialBlock.SetColor(ParamShirtColor, skin?.ShirtColor.AsColor ?? Color.clear);
+            materialBlock.SetFloat(ParamCapUsesOverallsColor, (skin?.HatUsesOverallsColor ?? false) ? 1 : 0);
 
             Vector3 giantMultiply = Vector3.one;
             float giantTimeRemaining = mario->MegaMushroomFrames / 60f;
@@ -600,7 +605,7 @@ namespace NSMB.Entities.Player {
             materialBlock.SetVector(ParamMultiplyColor, giantMultiply);
 
             foreach (Renderer r in renderers) {
-                // r.SetPropertyBlock(materialBlock);
+                r.SetPropertyBlock(materialBlock);
             }
 
             var newShader = mario->IsStarmanInvincible ? rainbowShader : normalShader;
@@ -712,15 +717,11 @@ namespace NSMB.Entities.Player {
         }
 
         private unsafe void URPOnPreRender(ScriptableRenderContext context, Camera camera) {
-            try {
-                if (materialBlock == null) {
-                    return;
-                }
-                bool teams = PredictedFrame.Global->Rules.TeamsEnabled;
-                materialBlock.SetColor(ParamGlowColor, teams || !IsCameraFocus(camera) ? GlowColor : Color.clear);
-            } catch { 
-                // Catches spurious warnings when changing back to the in-room submenu
+            if (materialBlock == null) {
+                return;
             }
+            bool teams = PredictedFrame.Global->Rules.TeamsEnabled;
+            materialBlock.SetColor(ParamGlowColor, teams || !IsCameraFocus(camera) ? GlowColor : Color.clear);
         }
 
         private bool IsCameraFocus(Camera camera) {
@@ -1343,15 +1344,13 @@ namespace NSMB.Entities.Player {
             }
 
             var anim = e.Anim;
-
-            if (anim->IsPowerdown) {
+            if (anim.IsPowerdown) {
                 PlaySound(SoundEffect.Player_Sound_Powerdown);
             } else {
                 Frame f = PredictedFrame;
-                var powerup = f.FindAsset(anim->Scriptable);
+                var powerup = f.FindAsset(anim.Scriptable);
                 PlaySound(powerup.SoundEffect, new[] { powerup });
             }
-                
         }
     }
 }

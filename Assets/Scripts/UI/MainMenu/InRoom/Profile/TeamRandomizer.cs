@@ -1,8 +1,7 @@
 using NSMB.Utilities;
 using Quantum;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using UnityEngine.Scripting;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 
@@ -13,25 +12,23 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         [SerializeField] private MainMenuCanvas canvas;
         [SerializeField] private GameObject blockerTemplate;
         [SerializeField] public GameObject content;
-        [SerializeField] private TeamRandButton[] buttons;
         [SerializeField] private Button button;
         [SerializeField] private Image flag;
         [SerializeField] private Sprite enabledSprite, disabledSprite;
+        [SerializeField] private GameObject defaultSelection;
 
         //---Private Variables
         private GameObject blockerInstance;
 
         public void Initialize() {
             QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
+            QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
         }
 
         public void OnEnable() {
             var game = QuantumRunner.DefaultGame;
             if (game != null) {
-                OnRulesChanged(new EventRulesChanged {
-                    Game = game,
-                    Tick = game.Frames.Predicted.Number,
-                });
+                UpdateButtonState(game);
             }
         }
 
@@ -39,31 +36,50 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             Close(false);
         }
 
-        public void SetEnabled(bool value) {
-            button.interactable = value;
-            Close(true);
-        }
-
-        public unsafe void RandomizeTeam(TeamRandButton team) {
+        [Preserve]
+        public unsafe void RandomizeTeam(int teamCount) {
             var game = QuantumRunner.DefaultGame;
-            Frame f = game.Frames.Predicted;
-            PlayerRef host = f.Global->Host;
 
-            game.SendCommand(game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)], new CommandRandomizeAllTeams {
-                Teams = team.teamCount
+            if (!QuantumViewUtils.TryGetHostPlayerSlot(game, out int slot)) {
+                canvas.PlaySound(SoundEffect.UI_Error);
+                Close(false);
+                canvas.EventSystem.SetSelectedGameObject(button.gameObject);
+                return;
+            }
+
+            game.SendCommand(slot, new CommandRandomizeAllTeams {
+                Teams = teamCount
             });
 
-            Close(false);
             canvas.PlayConfirmSound();
+            Close(false);
             canvas.EventSystem.SetSelectedGameObject(button.gameObject);
         }
 
+        [Preserve]
+        public void UnlockTeams() {
+            var game = QuantumRunner.DefaultGame;
+
+            if (!QuantumViewUtils.TryGetHostPlayerSlot(game, out int slot)) {
+                canvas.PlaySound(SoundEffect.UI_Error);
+                Close(false);
+                canvas.EventSystem.SetSelectedGameObject(button.gameObject);
+                return;
+            }
+
+            game.SendCommand(slot, new CommandRandomizeAllTeams {
+                Clear = true
+            });
+
+            canvas.PlayConfirmSound();
+            Close(false);
+            canvas.EventSystem.SetSelectedGameObject(button.gameObject);
+        }
+
+        [Preserve]
         public unsafe void Open() {
             var game = QuantumRunner.DefaultGame;
-            Frame f = game.Frames.Predicted;
-            PlayerRef host = f.Global->Host;
-
-            if (!game.PlayerIsLocal(host)) {
+            if (!QuantumViewUtils.TryGetHostPlayerSlot(game, out _)) {
                 canvas.PlaySound(SoundEffect.UI_Error);
                 return;
             }
@@ -73,7 +89,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             content.SetActive(true);
 
             canvas.PlayCursorSound();
-            canvas.EventSystem.SetSelectedGameObject(buttons[0].gameObject);
+            canvas.EventSystem.SetSelectedGameObject(defaultSelection);
         }
 
         public void Close(bool playSound) {
@@ -90,20 +106,30 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
         }
 
-        private unsafe void UpdateButtonInteractable(QuantumGame game) {
+        private unsafe void UpdateButtonState(QuantumGame game) {
             Frame f = game.Frames.Predicted;
 
-            if (f.Global->Rules.TeamsEnabled) {
-                flag.sprite = enabledSprite;
-                button.interactable = true;
+            if (QuantumViewUtils.TryGetHostPlayerSlot(game, out _)) {
+                // We are host
+                if (f.Global->Rules.TeamsEnabled) {
+                    flag.sprite = enabledSprite;
+                    button.interactable = true;
+                } else {
+                    flag.sprite = disabledSprite;
+                    button.interactable = false;
+                }
+                button.gameObject.SetActive(true);
             } else {
-                flag.sprite = disabledSprite;
-                button.interactable = false;
+                button.gameObject.SetActive(false);
             }
         }
 
-        private unsafe void OnRulesChanged(EventRulesChanged e) {
-            UpdateButtonInteractable(e.Game);
+        private void OnRulesChanged(EventRulesChanged e) {
+            UpdateButtonState(e.Game);
+        }
+
+        private void OnHostChanged(EventHostChanged e) {
+            UpdateButtonState(e.Game);
         }
     }
 }

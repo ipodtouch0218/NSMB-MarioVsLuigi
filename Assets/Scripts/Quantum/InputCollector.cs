@@ -50,6 +50,11 @@ namespace NSMB.Quantum {
                     CommandId = CommandMvLDebugCmd.DebugCommand.FreezeSelf,
                 });
             }
+            if (keyboard[Key.I].wasPressedThisFrame) {
+                game.SendCommand(new CommandMvLDebugCmd {
+                    CommandId = CommandMvLDebugCmd.DebugCommand.KnockbackSelf,
+                });
+            }
         }
 
         public void OnPowerupAction(InputAction.CallbackContext context) {

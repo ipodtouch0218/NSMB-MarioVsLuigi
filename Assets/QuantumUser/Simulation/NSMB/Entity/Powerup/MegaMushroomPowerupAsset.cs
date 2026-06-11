@@ -40,6 +40,7 @@ public unsafe class MegaMushroomPowerupAsset : PowerupAsset {
         mario->IsSliding = false;
         mario->CurrentKnockback = KnockbackStrength.None;
         mario->KnockbackGetupFrames = 0;
+        mario->TauntFrames = 0;
         if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable)) {
             holdable->DropWithoutThrowing(f, mario->HeldEntity);
         }

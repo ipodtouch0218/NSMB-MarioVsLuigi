@@ -18,7 +18,9 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
 
         private void OnRulesChanged(EventRulesChanged e) {
-            ApplyText();
+            if (selected) {
+                ApplyText();
+            }
         }
 
         public override unsafe string GetText() {

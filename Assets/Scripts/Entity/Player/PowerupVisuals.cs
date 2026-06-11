@@ -44,14 +44,14 @@ namespace NSMB.Entities.Player {
                 Material material = replacement.Material;
                 material.SetTexture(MainTex, (starman && replacement.StarmanAlbedoTexture) ? replacement.StarmanAlbedoTexture : replacement.AlbedoTexture);
                 material.SetTexture(OverallsMask, replacement.OverallsMaskTexture);
-                Debug.Log($"{material.name} OverallsMask set to {replacement.OverallsMaskTexture}");
                 material.SetTexture(ShirtMask, replacement.ShirtMaskTexture);
                 material.SetTexture(CapMask, replacement.CapMaskTexture);
             }
         }
 
         public void SwapAnimations(MarioPlayerAnimator marioAnimator) {
-            if (AnimationAvatar != marioAnimator.Animator.avatar) {
+            if (AnimationAvatar == marioAnimator.Animator.avatar) {
+                //marioAnimator.Animator.Rebind();
                 return;
             }
 

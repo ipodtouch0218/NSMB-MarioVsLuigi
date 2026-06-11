@@ -2392,7 +2392,7 @@ TextureImporter:
       name: random
       rect:
         serializedVersion: 2
-        x: 225
+        x: 219
         y: 185
         width: 16
         height: 16
@@ -2529,7 +2529,7 @@ TextureImporter:
         width: 21
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -2551,7 +2551,7 @@ TextureImporter:
         width: 21
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -2560,6 +2560,28 @@ TextureImporter:
       bones: []
       spriteID: ea5d41a9c912cd342968d7ec56e1dba9
       internalID: 353410421
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: unlock
+      rect:
+        serializedVersion: 2
+        x: 237
+        y: 185
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7533e10238a30ee428b22766d745082a
+      internalID: -1138012097
       vertices: []
       indices: 
       edges: []
@@ -2685,6 +2707,7 @@ TextureImporter:
       team_yellow: -769868482
       team_yellow_alt: 712068762
       team_yellow_alt_big: 1936513099
+      unlock: -1138012097
       x_button: 2096157750
       y_button: -600503074
   mipmapLimitGroupName: 

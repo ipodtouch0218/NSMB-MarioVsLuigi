@@ -13,7 +13,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
         //---Serialized Variables
         [SerializeField] protected int minValue = 0, maxValue = 20, step = 1;
-        [SerializeField] protected bool minimumValueIsOff;
+        [SerializeField] protected bool minimumValueIsOff, applyPrefixSuffixWhenOff = true;
         [SerializeField] private NumberValueTranslationOverride[] translationOverrides;
 
         protected override void IncreaseValueInternal() {
@@ -76,12 +76,24 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             TranslationManager tm = GlobalController.Instance.translationManager;
             if (value is int intValue) {
                 string text;
+                bool applyPrefixSuffix;
                 if (translationOverrides.FirstOrDefault(to => to.Value == intValue) is { } translationOverride) {
                     text = tm.GetTranslation(translationOverride.Key);
+                    applyPrefixSuffix = false;
                 } else {
-                    text = (minimumValueIsOff && intValue == minValue) ? tm.GetTranslation("ui.generic.off") : intValue.ToString();
+                    if (minimumValueIsOff && intValue == minValue) {
+                        text = tm.GetTranslation("ui.generic.off");
+                        applyPrefixSuffix = applyPrefixSuffixWhenOff;
+                    } else {
+                        text = intValue.ToString();
+                        applyPrefixSuffix = true;
+                    }
                 }
-                label.text = labelPrefix + text + labelSuffix;
+
+                if (applyPrefixSuffix) {
+                    text = labelPrefix + text + labelSuffix;
+                }
+                label.text = text;
             }
         }
 
