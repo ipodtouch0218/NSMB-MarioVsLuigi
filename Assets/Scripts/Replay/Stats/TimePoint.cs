@@ -72,18 +72,17 @@ namespace NSMB.Replay.Stats {
         //---abstractions, overrideables for time point enteries
         public abstract void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg);
         public virtual void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
-            if (StatsRecorder == null) {
-                stringBuilder.Append("");
-                return;
-            }
             stringBuilder.Append($"@ {FrameToTime(OccurenceFrame, StatsRecorder.ReplayStart, DeltaTime)}");
 
             if (HasEndFrame) {
                 stringBuilder.Append('-');
-
-                if (ShowEndTime) {
-                    stringBuilder.Append(FrameToTime(EndFrame, StatsRecorder.ReplayStart, DeltaTime));
-                }
+            }
+            if (ShowEndTime) {
+                stringBuilder.Append(FrameToTime(EndFrame, StatsRecorder.ReplayStart, DeltaTime));
+            }
+            if (ShowLength) {
+                var lengthInSec = Length * DeltaTime;
+                stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
             }
         }
         public virtual void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) { }
@@ -304,9 +303,19 @@ namespace NSMB.Replay.Stats {
         }
 
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
-            base.SetTimeText(tm, stringBuilder, displayArg);
-            if (ShowLength) {
-                stringBuilder.Append($" ({Length}F)");
+            if (StatsRecorder == null) {
+                stringBuilder.Append("");
+                return;
+            }
+            stringBuilder.Append($"@ {FrameToTime(OccurenceFrame, StatsRecorder.ReplayStart, DeltaTime)}");
+
+            if (HasEndFrame) {
+                stringBuilder.Append('-');
+
+                if (ShowLength) {
+                    stringBuilder.Append(FrameToTime(EndFrame, StatsRecorder.ReplayStart, DeltaTime));
+                    stringBuilder.Append($" ({Length}F)");
+                }
             }
         }
 
@@ -404,6 +413,7 @@ namespace NSMB.Replay.Stats {
             stringBuilder.Append(string.Join(", ", ComboElements.Select(
                 c => FrameToTime(c.Element.OccurenceFrame, StatsRecorder.ReplayStart, c.Element.DeltaTime))
             ));
+            stringBuilder.Append($" ({Length}F)");
         }
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
@@ -491,14 +501,6 @@ namespace NSMB.Replay.Stats {
             PowerupState = mario->CurrentPowerupState;
         }
 
-        public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
-            base.SetTimeText(tm, stringBuilder, displayArg);
-            if (ShowLength) {
-                var lengthInSec = Length * DeltaTime;
-                stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
-            }
-        }
-
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             // annoyingly powerUP state doesn't reference powerUP asset
             string powerupTranslation;
@@ -516,15 +518,6 @@ namespace NSMB.Replay.Stats {
         public bool GameEnded;
         public override bool ShowEndTime => !GameEnded;
         public PointStarmanChange(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) { }
-
-        public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
-            base.SetTimeText(tm, stringBuilder, displayArg);
-            if (ShowLength) {
-                var lengthInSec = Length * DeltaTime;
-                stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
-            }
-        }
-
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append(tm.GetTranslation(translationPrefix+"powerup.starman"));
     }
 
@@ -535,14 +528,6 @@ namespace NSMB.Replay.Stats {
         public override bool ShowEndTime => !GameEnded;
         public PointReserveChange(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) {
             Powerup = f.FindAsset(mario->ReserveItem);
-        }
-
-        public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
-            base.SetTimeText(tm, stringBuilder, displayArg);
-            if (ShowLength) {
-                var lengthInSec = Length * DeltaTime;
-                stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
-            }
         }
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
@@ -715,14 +700,6 @@ namespace NSMB.Replay.Stats {
         public PointStarCountChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) : base(statsRecorder, f, mario) {
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             StarCount = gamemode.GetObjectiveCount(f, mario);
-        }
-
-        public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
-            base.SetTimeText(tm, stringBuilder, displayArg);
-            if (ShowLength) {
-                var lengthInSec = (EndFrame - OccurenceFrame) * DeltaTime;
-                stringBuilder.Append($" ({(float) lengthInSec:F2}s)");
-            }
         }
 
         public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append("<sprite name=room_stars>").Append(Utils.GetSymbolString(StarCount.ToString(), Utils.smallSymbols));
