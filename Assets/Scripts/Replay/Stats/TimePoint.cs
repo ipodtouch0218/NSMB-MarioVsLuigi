@@ -182,7 +182,8 @@ namespace NSMB.Replay.Stats {
             Starman,
             MegaMushroom,
             BlueShell,
-            Explode
+            Explode,
+            Crush
         }
 
         public PointDamage(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, DamageCause reason, string attackerName, PlayerRef attackerRef, int frameOffset) : base(statsRecorder, f, mario) {
@@ -194,7 +195,7 @@ namespace NSMB.Replay.Stats {
         }
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
-            string damageOrDealt = displayArg == DisplayArgs.FromAttacker ? ".damagedealt." : ".damage.";
+            string damageOrDealt = displayArg == DisplayArgs.FromAttacker ? "damagedealt." : "damage.";
             stringBuilder.AppendLine(tm.GetTranslation(translationPrefix+damageOrDealt+Reason.ToString().ToLower()));
         }
 
@@ -234,7 +235,8 @@ namespace NSMB.Replay.Stats {
             Pit,
             Lava,
             Poison,
-            Disconnect
+            Disconnect,
+            Crush
         }
 
         public PointDeath(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, DeathCause reason, int ping, string attackerName, PlayerRef attackRef, int frameOffset) : base(statsRecorder, f, mario) {
@@ -247,7 +249,7 @@ namespace NSMB.Replay.Stats {
         }
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
-            string deathsOrKills = displayArg == DisplayArgs.FromAttacker ? ".kill." : ".death.";
+            string deathsOrKills = displayArg == DisplayArgs.FromAttacker ? "kill." : "death.";
             stringBuilder.AppendLine(tm.GetTranslation(translationPrefix+deathsOrKills+Reason.ToString().ToLower()));
         }
 
@@ -709,7 +711,7 @@ namespace NSMB.Replay.Stats {
         public int StarCount;
         public bool GameEnded;
         public override bool ShowEndTime => !GameEnded;
-        public override bool ShowLength => OccurenceFrame != EndFrame;
+        public override bool ShowLength => base.ShowLength && OccurenceFrame != EndFrame;
         public PointStarCountChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) : base(statsRecorder, f, mario) {
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             StarCount = gamemode.GetObjectiveCount(f, mario);

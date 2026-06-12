@@ -116,7 +116,7 @@ namespace NSMB.Replay.Stats
 
             var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
             var lastKbPoint = playerInfo.LastKnockbackPointForDeath;
-            int startFrameOffset = TimePoint.defaultFrameOffset;
+            int startFrameOffset = 45;
 
             void SetDetailsFromKb() {
                 if (lastKbPoint != null) {
@@ -144,7 +144,8 @@ namespace NSMB.Replay.Stats
                 if (e.IsLava) {
                     deathCause = PointDeath.DeathCause.Lava;
                 } else if (transform->Position.Y > stage.StageWorldMin.Y) {
-                    deathCause = PointDeath.DeathCause.Poison;
+                    var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(e.Entity);
+                    deathCause = physicsObject->WasBeingCrushed ? PointDeath.DeathCause.Crush : PointDeath.DeathCause.Poison;
                 } else {
                     deathCause = PointDeath.DeathCause.Pit;
                 }
@@ -163,7 +164,7 @@ namespace NSMB.Replay.Stats
                     // maybe it's a bobomb...
                     f.Unsafe.ComponentGetter<BobombSystem.Filter>().TryGet(f, e.Attacker, out var bobombFilter);
                     if (bobombFilter.Bobomb->CurrentDetonationFrames <= 0) {
-                        startFrameOffset = bobombFilter.Bobomb->DetonationFrames;
+                        startFrameOffset = bobombFilter.Bobomb->DetonationFrames + TimePoint.defaultFrameOffset;
                         SetDetailsFromHoldable(bobombFilter.Holdable);
                         deathCause = PointDeath.DeathCause.Explode;
                     } else {
@@ -214,7 +215,7 @@ namespace NSMB.Replay.Stats
 
             var marioPlayerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
             var lastKbPoint = marioPlayerInfo.LastKnockbackPointForDeath;
-            int startFrameOffset = TimePoint.defaultFrameOffset;
+            int startFrameOffset = 45;
 
             string attackerName = "";
             PlayerRef attackerRef = default;
@@ -235,8 +236,13 @@ namespace NSMB.Replay.Stats
                 }
             }
 
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(e.Entity);
+
             // check if it's a shelled enemy
-            if (f.Unsafe.TryGetPointer<Koopa>(e.Attacker, out _)) {
+            if (physicsObject->IsBeingCrushed) {
+                damageCause = PointDamage.DamageCause.Crush;
+                SetDetailsFromKb();
+            } else if (f.Unsafe.TryGetPointer<Koopa>(e.Attacker, out _)) {
                 f.Unsafe.ComponentGetter<KoopaSystem.Filter>().TryGet(f, e.Attacker, out var koopaFilter);
                 if (koopaFilter.Koopa->IsKicked) {
                     damageCause = PointDamage.DamageCause.Shell;
@@ -248,7 +254,7 @@ namespace NSMB.Replay.Stats
                 // maybe it's a bobomb...
                 f.Unsafe.ComponentGetter<BobombSystem.Filter>().TryGet(f, e.Attacker, out var bobombFilter);
                 if (bobombFilter.Bobomb->CurrentDetonationFrames > 0) {
-                    startFrameOffset = bobombFilter.Bobomb->DetonationFrames;
+                    startFrameOffset = bobombFilter.Bobomb->DetonationFrames + TimePoint.defaultFrameOffset;
                     SetDetailsFromHoldable(bobombFilter.Holdable);
                     damageCause = PointDamage.DamageCause.Explode;
                 }

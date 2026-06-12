@@ -458,7 +458,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             case StatOptions.Kills:
             case StatOptions.DamageDealt:
             case StatOptions.KnockbackDealt:
-                if (ReplayStatsRecorder.Instance.PlayerInfos.Count > 2) {
+                if (ReplayStatsRecorder.Instance != null && ReplayStatsRecorder.Instance.PlayerInfos.Count > 2) {
                     list.Add((listPrefix+"target", 0, ListType.TargetPlayer));
                 }
                 break;
@@ -851,6 +851,9 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         }
 
         private void UpdatePlayerDropdown(TranslationManager tm) {
+            if (replayListEntry == null) {
+                return;
+            }
             // initializes as 0 though
             bool showAll = OptionSupportsAllPlayer();
             int index;
@@ -961,10 +964,12 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             // what a stUPid hack
             // but we have to delay layout rebuilds by one frame or the info on the left will not display properly
             // thanks Unity <3
-            StartCoroutine(WaitOneFrame(() => {
-                LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
-                LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) leftTopLayout.transform);
-            }));
+            if (scrollRect.IsActive()) {
+                StartCoroutine(WaitOneFrame(() => {
+                    LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
+                    LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) leftTopLayout.transform);
+                }));
+            }
         }
 
         #region Other Methods
