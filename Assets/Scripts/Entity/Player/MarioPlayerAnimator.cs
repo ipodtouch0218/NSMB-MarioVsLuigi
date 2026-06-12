@@ -141,6 +141,7 @@ namespace NSMB.Entities.Player {
         public GameObject PropellerBlades => propeller;
         public Animator Animator => animator;
         public GameObject ModelRoot => modelRoot;
+        public bool IsBelowDeathplane => transform.position.y <= ViewContext.Stage.StageWorldMin.Y.AsFloat;
         
         //---Private Variables
         private Enums.PlayerEyeState eyeState;
@@ -279,7 +280,7 @@ namespace NSMB.Entities.Player {
 
             if (VerifiedFrame.Global->GameState >= GameState.Ended && !forceUpdate) {
                 animator.speed = 0;
-                modelRoot.SetActive(!mario->IsRespawning);
+                modelRoot.SetActive(!mario->IsRespawning && !(mario->IsDead && IsBelowDeathplane));
                 SetParticleEmission(drillParticle, false);
                 SetParticleEmission(sparkles, false);
                 SetParticleEmission(iceSkiddingParticle, false);
@@ -617,8 +618,19 @@ namespace NSMB.Entities.Player {
 
             // Hit flash
             float remainingDamageInvincibility = mario->DamageInvincibilityFrames / 60f;
-            modelRoot.SetActive(f.Global->GameState >= GameState.Playing && (mario->KnockbackGetupFrames > 0 || mario->MegaMushroomStartFrames > 0 || (!mario->IsRespawning && (mario->IsDead || !(remainingDamageInvincibility > 0 && (f.Number * f.DeltaTime.AsFloat) * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)))));
 
+            bool modelShouldBeInvisible = f.Global->GameState < GameState.Playing
+                || mario->IsRespawning
+                || (mario->IsDead && IsBelowDeathplane)
+                || (remainingDamageInvincibility > 0 && (f.Number * f.DeltaTime.AsFloat) * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f);
+
+            // Exclusions- knockback getup and mega mushroom start (special animations)
+            modelShouldBeInvisible &= mario->KnockbackGetupFrames == 0 && mario->MegaMushroomStartFrames == 0;
+
+            if (modelShouldBeInvisible == modelRoot.activeSelf) {
+                modelRoot.SetActive(!modelShouldBeInvisible);
+            } 
+            
             // Z-positioning
             float newZ = -4;
             if (mario->IsDead) {
@@ -1305,6 +1317,8 @@ namespace NSMB.Entities.Player {
                     animator.Play(StateMegaCancel, 0, 1f - (mario->MegaMushroomEndFrames / 90f));
                 }
             }
+
+            previousPowerupVisuals = null;
         }
 
         private void OnMarioPlayerLandedWithAnimation(EventMarioPlayerLandedWithAnimation e) {

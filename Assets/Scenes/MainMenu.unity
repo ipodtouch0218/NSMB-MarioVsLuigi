@@ -40079,7 +40079,6 @@ GameObject:
   - component: {fileID: 836379548}
   - component: {fileID: 836379550}
   - component: {fileID: 836379551}
-  - component: {fileID: 836379549}
   - component: {fileID: 836379552}
   m_Layer: 5
   m_Name: Label
@@ -40107,20 +40106,6 @@ RectTransform:
   m_AnchoredPosition: {x: 16, y: -0.000015258789}
   m_SizeDelta: {x: 62.01, y: 0}
   m_Pivot: {x: 0, y: 0.5}
---- !u!114 &836379549
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 836379547}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  key: ui.inroom.player.mute
-  text: {fileID: 836379551}
 --- !u!222 &836379550
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -75394,6 +75379,7 @@ GameObject:
   - component: {fileID: 1664022744}
   - component: {fileID: 1664022743}
   - component: {fileID: 1664022741}
+  - component: {fileID: 1664022745}
   - component: {fileID: 1664022740}
   - component: {fileID: 1664022742}
   m_Layer: 5
@@ -75546,6 +75532,22 @@ RectTransform:
   m_AnchoredPosition: {x: 25, y: -145}
   m_SizeDelta: {x: 255, y: 30}
   m_Pivot: {x: 0, y: 0.5}
+--- !u!114 &1664022745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1664022739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67601780e054dd94c8f1d1374eedd0a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NSMB.UI.Elements.ContextMenuMuteButton
+  muteTranslationKey: ui.inroom.player.mute
+  unmuteTranslationKey: ui.inroom.player.unmute
+  text: {fileID: 836379551}
+  parent: {fileID: 1527067842}
 --- !u!1 &1665059709
 GameObject:
   m_ObjectHideFlags: 0

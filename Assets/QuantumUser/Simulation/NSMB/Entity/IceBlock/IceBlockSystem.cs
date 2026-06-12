@@ -10,6 +10,7 @@ namespace Quantum {
             public IceBlock* IceBlock;
             public PhysicsObject* PhysicsObject;
             public PhysicsCollider2D* PhysicsCollider;
+            public Holdable* Holdable;
         }
 
         public override void OnInit(Frame f) {
@@ -51,7 +52,7 @@ namespace Quantum {
                 physicsObject->Velocity.X = iceBlock->SlidingSpeed * (iceBlock->FacingRight ? 1 : -1);
 
                 if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
-                    Destroy(f, entity, IceBlockBreakReason.HitWall, EntityRef.None);
+                    Destroy(f, entity, IceBlockBreakReason.HitWall, filter.Holdable->PreviousHolder);
                     return;
                 }
             } else if (iceBlock->IsFlying) {

@@ -2843,10 +2843,10 @@ namespace Quantum {
             foreach (var contact in liquidContacts) {
                 var liquid = f.Unsafe.GetPointer<Liquid>(contact);
                 if (liquid->LiquidType == LiquidType.Poison) {
-                    mario->Death(f, entity, false, true, brokenIceBlock);
+                    mario->Death(f, entity, false, true, attacker);
                     return;
                 } else if (liquid->LiquidType == LiquidType.Lava) {
-                    mario->Death(f, entity, true, true, brokenIceBlock);
+                    mario->Death(f, entity, true, true, attacker);
                     return;
                 }
             }
@@ -2875,20 +2875,20 @@ namespace Quantum {
             other:
                 // Weak knockback, i-frames.
                 strength = KnockbackStrength.FireballBump;
-                damaged = mario->DoKnockback(f, entity, mario->FacingRight, 1, strength, brokenIceBlock);
+                damaged = mario->DoKnockback(f, entity, mario->FacingRight, 1, strength, attacker);
                 mario->DamageInvincibilityFrames = Constants.DamageInvincibilityFrames;
                 break;
 
             case IceBlockBreakReason.BlockBump:
                 // Soft knockback, no i-frames.
                 strength = KnockbackStrength.Normal;
-                damaged = mario->DoKnockback(f, entity, mario->FacingRight, 1, strength, brokenIceBlock);
+                damaged = mario->DoKnockback(f, entity, mario->FacingRight, 1, strength, attacker);
                 break;
 
             case IceBlockBreakReason.Groundpounded:
                 // Hard knockback, i-frames.
                 strength = KnockbackStrength.Groundpound;
-                damaged = mario->DoKnockback(f, entity, mario->FacingRight, 2, strength, brokenIceBlock);
+                damaged = mario->DoKnockback(f, entity, mario->FacingRight, 2, strength, attacker);
                 mario->DamageInvincibilityFrames = Constants.DamageInvincibilityFrames;
                 break;
 
@@ -2897,8 +2897,8 @@ namespace Quantum {
             case IceBlockBreakReason.InvincibleMario:
                 // Damage, i-frames.
                 strength = KnockbackStrength.Groundpound;
-                if (mario->Powerdown(f, entity, false, brokenIceBlock)) {
-                    mario->DoKnockback(f, entity, mario->FacingRight, 0, KnockbackStrength.FireballBump, brokenIceBlock);
+                if (mario->Powerdown(f, entity, false, attacker)) {
+                    mario->DoKnockback(f, entity, mario->FacingRight, 0, KnockbackStrength.FireballBump, attacker);
                 }
                 damaged = false; // No "bump" effect.
                 mario->DamageInvincibilityFrames = Constants.DamageInvincibilityFrames;
