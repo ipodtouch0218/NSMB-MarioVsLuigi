@@ -170,11 +170,12 @@ namespace NSMB.Replay.Stats {
     }
 
     public unsafe class PointDamage : TimePoint {
-        public override int FrameOffset => defaultFrameOffset;
+        public override int FrameOffset => frameOffset;
         public readonly PowerupState NewState;
         public readonly DamageCause Reason;
         public readonly string AttackerName;
         public readonly PlayerRef AttackerRef;
+        private readonly int frameOffset;
         public enum DamageCause {
             Enemy,
             Shell,
@@ -184,11 +185,12 @@ namespace NSMB.Replay.Stats {
             Explode
         }
 
-        public PointDamage(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, DamageCause reason, string attackerName, PlayerRef attackerRef) : base(statsRecorder, f, mario) {
+        public PointDamage(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, DamageCause reason, string attackerName, PlayerRef attackerRef, int frameOffset) : base(statsRecorder, f, mario) {
             NewState = mario->CurrentPowerupState;
             Reason = reason;
             AttackerName = attackerName;
             AttackerRef = attackerRef;
+            this.frameOffset = frameOffset;
         }
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
@@ -221,7 +223,7 @@ namespace NSMB.Replay.Stats {
         public readonly DeathCause Reason;
         public readonly string AttackerName;
         public readonly PlayerRef AttackerRef;
-        private int frameOffset;
+        private readonly int frameOffset;
         public enum DeathCause {
             Enemy,
             Shell,

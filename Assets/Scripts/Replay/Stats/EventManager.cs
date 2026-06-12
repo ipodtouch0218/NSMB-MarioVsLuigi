@@ -115,7 +115,24 @@ namespace NSMB.Replay.Stats
             PlayerRef attackerRef = default;
 
             var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
+            var lastKbPoint = playerInfo.LastKnockbackPointForDeath;
             int startFrameOffset = TimePoint.defaultFrameOffset;
+
+            void SetDetailsFromKb() {
+                if (lastKbPoint != null) {
+                    attackerName = lastKbPoint.AttackerName;
+                    attackerRef = lastKbPoint.AttackerRef;
+                    startFrameOffset = f.Number - lastKbPoint.OccurenceFrame + TimePoint.defaultFrameOffset;
+                }
+            }
+
+            void SetDetailsFromHoldable(Holdable* holdable) {
+                if (f.Exists(holdable->PreviousHolder)) {
+                    var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
+                    attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
+                    attackerRef = holdableMario->PlayerRef;
+                }
+            }
 
             if (wasDisconnect) {
                 deathCause = PointDeath.DeathCause.Disconnect;
@@ -131,47 +148,30 @@ namespace NSMB.Replay.Stats
                 } else {
                     deathCause = PointDeath.DeathCause.Pit;
                 }
-
-                var lastKbPoint = playerInfo.LastKnockbackPointForDeath;
-                if (lastKbPoint != null) {
-                    attackerName = lastKbPoint.AttackerName;
-                    attackerRef = lastKbPoint.AttackerRef;
-                    startFrameOffset = f.Number - lastKbPoint.OccurenceFrame + TimePoint.defaultFrameOffset;
-                } else {
-                    startFrameOffset = 60;
-                }
+                SetDetailsFromKb();
             } else {
                 // check if it's a shelled enemy
                 if (f.Unsafe.TryGetPointer<Koopa>(e.Attacker, out _)) {
                     f.Unsafe.ComponentGetter<KoopaSystem.Filter>().TryGet(f, e.Attacker, out var koopaFilter);
-                    var koopa = koopaFilter.Koopa;
-                    var holdable = koopaFilter.Holdable;
-                    if (koopa->IsKicked) {
-                        startFrameOffset = 60;
+                    if (koopaFilter.Koopa->IsKicked) {
                         deathCause = PointDeath.DeathCause.Shell;
-                        if (f.Exists(holdable->PreviousHolder) && koopa->IsKicked) {
-                            var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
-                            attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
-                            attackerRef = holdableMario->PlayerRef;
-                        }
+                        SetDetailsFromHoldable(koopaFilter.Holdable);
+                    } else {
+                        SetDetailsFromKb();
                     }
                 } else if (f.Unsafe.TryGetPointer<Bobomb>(e.Attacker, out _)) {
                     // maybe it's a bobomb...
                     f.Unsafe.ComponentGetter<BobombSystem.Filter>().TryGet(f, e.Attacker, out var bobombFilter);
-                    var bobomb = bobombFilter.Bobomb;
-                    var holdable = bobombFilter.Holdable;
-                    if (bobomb->CurrentDetonationFrames <= 0) {
-                        if (f.Exists(holdable->PreviousHolder)) {
-                            startFrameOffset = bobomb->DetonationFrames;
-                            var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
-                            attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
-                            attackerRef = holdableMario->PlayerRef;
-                        }
+                    if (bobombFilter.Bobomb->CurrentDetonationFrames <= 0) {
+                        startFrameOffset = bobombFilter.Bobomb->DetonationFrames;
+                        SetDetailsFromHoldable(bobombFilter.Holdable);
                         deathCause = PointDeath.DeathCause.Explode;
+                    } else {
+                        SetDetailsFromKb();
                     }
                 } else if (f.Unsafe.TryGetPointer<MarioPlayer>(e.Attacker, out var attackerMario)) {
                     // else it was Mario
-                    startFrameOffset = 40;
+                    startFrameOffset = 60;
                     attackerName = f.GetPlayerData(attackerMario->PlayerRef).PlayerNickname;
                     attackerRef = attackerMario->PlayerRef;
 
@@ -183,14 +183,7 @@ namespace NSMB.Replay.Stats
                         deathCause = PointDeath.DeathCause.BlueShell;
                     }
                 } else if (f.Unsafe.TryGetPointer<Enemy>(e.Attacker, out _)) {
-                    var lastKbPoint = playerInfo.LastKnockbackPointForDeath;
-                    if (lastKbPoint != null) {
-                        attackerName = lastKbPoint.AttackerName;
-                        attackerRef = lastKbPoint.AttackerRef;
-                        startFrameOffset = f.Number - lastKbPoint.OccurenceFrame + TimePoint.defaultFrameOffset;
-                    } else {
-                        startFrameOffset = 60;
-                    }
+                    SetDetailsFromKb();
                 }
             }
 
@@ -200,15 +193,87 @@ namespace NSMB.Replay.Stats
 
             playerInfo.DeathPoints.Add(deathPoint);
 
+            if (lastKbPoint != null) {
+                lastKbPoint.EndsInDeath = true;
+            }
+
             // end a combo as a finisher finisher
             if (playerInfo.CurrComboPoint != null) {
                 // that knockback ended in death
-                var (Element, _, _)= playerInfo.CurrComboPoint.ComboElements.Last();
-                if (Element is PointKnockback lastKbPoint) {
-                    lastKbPoint.EndsInDeath = true;
-                }
                 bool includeInCombo = playerInfo.CurrComboPoint.ComboElements.Count > 1 || !wasPitDeath && !wasDisconnect;
                 StopCombo(f, playerInfo, includeInCombo ? deathPoint : null, starsToDrop);
+            }
+        }
+
+        public void OnMarioPlayerTookDamage(EventMarioPlayerTookDamage e, Frame f) {
+            PointDamage.DamageCause damageCause = PointDamage.DamageCause.Enemy;
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+            if (mario->PlayerRef == default) {
+                return;
+            }
+
+            var marioPlayerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
+            var lastKbPoint = marioPlayerInfo.LastKnockbackPointForDeath;
+            int startFrameOffset = TimePoint.defaultFrameOffset;
+
+            string attackerName = "";
+            PlayerRef attackerRef = default;
+
+            void SetDetailsFromKb() {
+                if (lastKbPoint != null) {
+                    attackerName = lastKbPoint.AttackerName;
+                    attackerRef = lastKbPoint.AttackerRef;
+                    startFrameOffset = f.Number - lastKbPoint.OccurenceFrame + TimePoint.defaultFrameOffset;
+                }
+            }
+
+            void SetDetailsFromHoldable(Holdable* holdable) {
+                if (f.Exists(holdable->PreviousHolder)) {
+                    var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
+                    attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
+                    attackerRef = holdableMario->PlayerRef;
+                }
+            }
+
+            // check if it's a shelled enemy
+            if (f.Unsafe.TryGetPointer<Koopa>(e.Attacker, out _)) {
+                f.Unsafe.ComponentGetter<KoopaSystem.Filter>().TryGet(f, e.Attacker, out var koopaFilter);
+                if (koopaFilter.Koopa->IsKicked) {
+                    damageCause = PointDamage.DamageCause.Shell;
+                    SetDetailsFromHoldable(koopaFilter.Holdable);
+                } else {
+                    SetDetailsFromKb();
+                }
+            } else if (f.Unsafe.TryGetPointer<Bobomb>(e.Attacker, out _)) {
+                // maybe it's a bobomb...
+                f.Unsafe.ComponentGetter<BobombSystem.Filter>().TryGet(f, e.Attacker, out var bobombFilter);
+                if (bobombFilter.Bobomb->CurrentDetonationFrames > 0) {
+                    startFrameOffset = bobombFilter.Bobomb->DetonationFrames;
+                    SetDetailsFromHoldable(bobombFilter.Holdable);
+                    damageCause = PointDamage.DamageCause.Explode;
+                }
+            } else if (f.Unsafe.TryGetPointer<MarioPlayer>(e.Attacker, out var attackerMario)) {
+                // else it was Mario
+                attackerName = f.GetPlayerData(attackerMario->PlayerRef).PlayerNickname;
+                attackerRef = attackerMario->PlayerRef;
+
+                if (attackerMario->IsStarmanInvincible) {
+                    damageCause = PointDamage.DamageCause.Starman;
+                } else if (attackerMario->CurrentPowerupState == PowerupState.MegaMushroom) {
+                    damageCause = PointDamage.DamageCause.MegaMushroom;
+                } else if (attackerMario->IsInShell) {
+                    damageCause = PointDamage.DamageCause.BlueShell;
+                }
+            } else if (f.Unsafe.TryGetPointer<Enemy>(e.Attacker, out _)) {
+                SetDetailsFromKb();
+            }
+
+            var damagePoint = new PointDamage(StatRecorder, f, mario, damageCause, attackerName, attackerRef, startFrameOffset);
+
+            var starsToDrop = Math.Min(1, e.OldObjectiveCount);
+            marioPlayerInfo.DamagePoints.Add(damagePoint);
+            if (marioPlayerInfo.CurrComboPoint != null) {
+                StartOrUpdateCombo(StatRecorder, f, mario, marioPlayerInfo, damagePoint, starsToDrop);
             }
         }
 
@@ -243,75 +308,6 @@ namespace NSMB.Replay.Stats
             victimMarioInfo.CurrKnockbackPoint = knockbackPoint;
             victimMarioInfo.LastKnockbackPointForDeath = knockbackPoint;
             StartOrUpdateCombo(StatRecorder, f, victimMario, victimMarioInfo, knockbackPoint, starsToDrop);
-        }
-
-        public void OnMarioPlayerTookDamage(EventMarioPlayerTookDamage e, Frame f) {
-            PointDamage.DamageCause damageCause = PointDamage.DamageCause.Enemy;
-            var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
-            if (mario->PlayerRef == default) {
-                return;
-            }
-
-            var marioPlayerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
-
-            string attackerName = "";
-            PlayerRef attackerRef = default;
-
-            // check if it's a shelled enemy
-            if (f.Unsafe.TryGetPointer<Koopa>(e.Attacker, out _)) {
-                f.Unsafe.ComponentGetter<KoopaSystem.Filter>().TryGet(f, e.Attacker, out var koopaFilter);
-                var koopa = koopaFilter.Koopa;
-                var holdable = koopaFilter.Holdable;
-                if (koopa->IsKicked) {
-                    damageCause = PointDamage.DamageCause.Shell;
-                    if (f.Exists(holdable->PreviousHolder) && koopa->IsKicked) {
-                        var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
-                        attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
-                        attackerRef = holdableMario->PlayerRef;
-                    }
-                }
-            } else if (f.Unsafe.TryGetPointer<Bobomb>(e.Attacker, out _)) {
-                // maybe it's a bobomb...
-                f.Unsafe.ComponentGetter<BobombSystem.Filter>().TryGet(f, e.Attacker, out var bobombFilter);
-                var bobomb = bobombFilter.Bobomb;
-                var holdable = bobombFilter.Holdable;
-                if (bobomb->CurrentDetonationFrames > 0) {
-                    if (f.Exists(holdable->PreviousHolder)) {
-                        var holdableMario = f.Unsafe.GetPointer<MarioPlayer>(holdable->PreviousHolder);
-                        attackerName = f.GetPlayerData(holdableMario->PlayerRef).PlayerNickname;
-                        attackerRef = holdableMario->PlayerRef;
-                    }
-                    damageCause = PointDamage.DamageCause.Explode;
-                }
-            } else if (f.Unsafe.TryGetPointer<MarioPlayer>(e.Attacker, out var attackerMario)) {
-                // else it was Mario
-                attackerName = f.GetPlayerData(attackerMario->PlayerRef).PlayerNickname;
-                attackerRef = attackerMario->PlayerRef;
-
-                if (attackerMario->IsStarmanInvincible) {
-                    damageCause = PointDamage.DamageCause.Starman;
-                } else if (attackerMario->CurrentPowerupState == PowerupState.MegaMushroom) {
-                    damageCause = PointDamage.DamageCause.MegaMushroom;
-                } else if (attackerMario->IsInShell) {
-                    damageCause = PointDamage.DamageCause.BlueShell;
-                }
-            } else if (f.Unsafe.TryGetPointer<Enemy>(e.Attacker, out _)) {
-                if (marioPlayerInfo.CurrComboPoint != null) {
-                    var lastComboElement = marioPlayerInfo.CurrComboPoint.ComboElements.Last();
-                    if (lastComboElement.Element is PointKnockback lastKbPoint) {
-                        attackerName = lastKbPoint.AttackerName;
-                        attackerRef = lastKbPoint.AttackerRef;
-                    }
-                }
-            }
-
-            var damagePoint = new PointDamage(StatRecorder, f, mario, damageCause, attackerName, attackerRef);
-
-            var starsToDrop = Math.Min(1, e.OldObjectiveCount);
-            marioPlayerInfo.DamagePoints.Add(damagePoint);
-            if (marioPlayerInfo.CurrComboPoint != null) {
-                StartOrUpdateCombo(StatRecorder, f, mario, marioPlayerInfo, damagePoint, starsToDrop);
-            }
         }
 
         public void OnMarioPlayerCollectedPowerup(EventMarioPlayerCollectedPowerup e, Frame f) {
