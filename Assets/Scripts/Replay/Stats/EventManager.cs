@@ -429,7 +429,7 @@ namespace NSMB.Replay.Stats
             // handle queued events
             // eventDispatcher.Subscribe happens on an UPdate frame
             HandleEvents(f);
-            if (f.Number - StatRecorder.ReplayStart > 5 * f.UpdateRate) {
+            if (f.Number - StatRecorder.ReplayStart >= 5 * f.UpdateRate) {
                 ActiveReplayManager.Instance.TryCacheReplayFrame(f);
             }
         }
