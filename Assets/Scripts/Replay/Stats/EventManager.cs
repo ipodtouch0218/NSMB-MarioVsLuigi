@@ -395,10 +395,9 @@ namespace NSMB.Replay.Stats
                 }
             }
 
-            if (f.Global->GameState == GameState.Ended && StatRecorder.GlobalInfo.CurrBigCollectable is PointBigCollectableSpawned currBigCollectable) {
+            if (StatRecorder.GlobalInfo.CurrBigCollectable is PointBigCollectableSpawned currBigCollectable) {
                 currBigCollectable.EndFrame = f.Number;
-                currBigCollectable.GameEnded = true;
-                StatRecorder.GlobalInfo.CurrBigCollectable = null;
+                currBigCollectable.GameEnded = f.Global->GameState == GameState.Ended;
             }
 
             var blockBumps = f.Filter<BlockBump>();
@@ -433,16 +432,17 @@ namespace NSMB.Replay.Stats
 
         private void HandleCombo(Frame f, MarioPlayer* marioPlayer, EntityRef marioEntity, PlayerInfo playerInfo) {
             /**Knockback Handling**/
+            if (playerInfo.CurrKnockbackPoint is PointKnockback currKnockbackPoint) {
+                currKnockbackPoint.EndFrame = f.Number;
+            }
+            
             if (!marioPlayer->IsInKnockback) {
                 if (playerInfo.CurrComboPoint != null && --playerInfo.ComboEndTimer <= 0) {
                     StopCombo(f, playerInfo);
                 }
 
                 // end knockback
-                if (playerInfo.CurrKnockbackPoint is PointKnockback currKnockbackPoint) {
-                    currKnockbackPoint.EndFrame = f.Number;
-                    playerInfo.CurrKnockbackPoint = null;
-                }
+                playerInfo.CurrKnockbackPoint = null;
 
                 // check if Mario's touching the ground
                 if (playerInfo.LastKnockbackPointForDeath != null) {
