@@ -191,7 +191,10 @@ namespace NSMB.Replay.Stats {
             AttackerRef = attackerRef;
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.AppendLine(tm.GetTranslation("ui.replay.stats.entry.damage."+Reason.ToString().ToLower()));
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
+            string damageOrDealt = displayArg == DisplayArgs.FromAttacker ? ".damagedealt." : ".damage.";
+            stringBuilder.AppendLine(tm.GetTranslation(translationPrefix+damageOrDealt+Reason.ToString().ToLower()));
+        }
 
         public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             switch (displayArg) {
@@ -241,7 +244,10 @@ namespace NSMB.Replay.Stats {
             this.frameOffset = frameOffset;
         }
 
-        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.AppendLine(tm.GetTranslation("ui.replay.stats.entry.deaths."+Reason.ToString().ToLower()));
+        public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
+            string deathsOrKills = displayArg == DisplayArgs.FromAttacker ? ".kill." : ".death.";
+            stringBuilder.AppendLine(tm.GetTranslation(translationPrefix+deathsOrKills+Reason.ToString().ToLower()));
+        }
 
         public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             if (StatsRecorder != null && StatsRecorder.ReplayFile.Header.Rules.Lives > 0) {
@@ -261,7 +267,7 @@ namespace NSMB.Replay.Stats {
         }
 
         public override string GetTooltip(TranslationManager tm, DisplayArgs displayArg) {
-            string translationKeyStart = translationPrefix+"deaths.tooltip.";
+            string translationKeyStart = translationPrefix+"death.tooltip.";
             string tooltip = tm.GetTranslationWithReplacements(translationKeyStart+"ping", "ping", Ping.ToString());
 
             return tooltip;
