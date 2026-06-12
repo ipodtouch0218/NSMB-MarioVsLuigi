@@ -3,8 +3,6 @@ using Quantum;
 using Quantum.Physics2D;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using static UnityEngine.Analytics.IAnalytic;
 
 namespace NSMB.Replay.Stats
 {

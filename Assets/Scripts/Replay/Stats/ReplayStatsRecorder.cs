@@ -1,6 +1,5 @@
 using NSMB.Addons;
 using NSMB.Networking;
-using NSMB.UI.MainMenu;
 using NSMB.UI.MainMenu.Submenus.ReplayStats;
 using NSMB.Utilities;
 using Photon.Deterministic;
