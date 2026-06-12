@@ -538,11 +538,18 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 foreach (var entry in itemSpawnData) {
                     var item = entry.Key;
                     var count = entry.Value;
-                    sb.AppendLine(tm.GetTranslationWithReplacements(item.TranslationKey) + " " + count);
+                    string itemName = tm.GetTranslation(item.TranslationKey);
+
+                    sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix, "powerup", itemName, "spawncount", count.ToString()));
                 }
                 break;
             case StatOptions.ReserveInfo:
                 AddOccurenceCount(tm, sb, true);
+                break;
+            case StatOptions.CoinsCollected:
+                AddOccurenceCount(tm, sb);
+                int itemSpawnCount = GetItemSpawnCountInt(timePointEnteries);
+                sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix+".itemspawns", "spawncount", itemSpawnCount.ToString()));
                 break;
             default:
                 AddOccurenceCount(tm, sb);
@@ -1032,6 +1039,23 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             }
 
             return mostUsedState;
+        }
+
+        private int GetItemSpawnCountInt(List<TimePointEntry> timePointEnteries) {
+            int count = 0;
+            foreach (var timePointEntry in timePointEnteries) {
+                var timePoint = timePointEntry.timePoint;
+
+                if (timePoint is PointCoinCollected coinCollected) {
+                    if (coinCollected.CoinItem == null) {
+                        continue;
+                    }
+
+                    count++;
+                }
+            }
+
+            return count;
         }
 
         private Dictionary<CoinItemAsset, int> GetItemSpawnCount(List<TimePointEntry> timePointEnteries) {

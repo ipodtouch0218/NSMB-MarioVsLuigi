@@ -14,6 +14,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         }
 
         //---serialized
+        [SerializeField] private ReplayStatsManager statsManager;
         [SerializeField] private TMP_Text label;
         [SerializeField] private TMP_Dropdown dropdown;
 
@@ -25,6 +26,10 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             this.translationKey = translationKey;
             ListType = listType;
             dropdown.SetValueWithoutNotify(value);
+
+            if (!statsManager.IsReady) {
+                dropdown.interactable = false;
+            }
 
             TranslationManager tm = GlobalController.Instance.translationManager;
             TranslationManager.OnLanguageChanged += UpdateLabel;

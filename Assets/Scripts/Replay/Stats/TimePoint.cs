@@ -284,12 +284,13 @@ namespace NSMB.Replay.Stats {
         
         public bool EndsInDeath;
         public PointKnockback(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, EntityRef attacker, int starDropCount, KnockbackStrength knockbackStrength) : base(statsRecorder, f, mario) {
-            var attackerMario = f.Unsafe.GetPointer<MarioPlayer>(attacker);
-            var attackerPlayer = f.GetPlayerData(attackerMario->PlayerRef);
-            AttackerName = attackerPlayer.PlayerNickname;
             KnockbackStrength = knockbackStrength;
             StarsDropped = starDropCount;
-            AttackerRef = attackerMario->PlayerRef;
+            if (f.Unsafe.TryGetPointer<MarioPlayer>(attacker, out var attackerMario)) {
+                var attackerPlayer = f.GetPlayerData(attackerMario->PlayerRef);
+                AttackerRef = attackerMario->PlayerRef;
+                AttackerName = attackerPlayer.PlayerNickname;
+            }
         }
 
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
@@ -440,7 +441,12 @@ namespace NSMB.Replay.Stats {
             foreach (var (Element, _, _) in ComboElements) {
                 if (Element is PointKnockback kb) {
                     int frame = kb.OccurenceFrame - OccurenceFrame;
-                    sb.Append(tm.GetTranslationWithReplacements(translationPrefix + "combo.tooltip.knockback", "attacker", kb.AttackerName, "framenumber", frame.ToString())).AppendLine(" "+kb.StarsDropped+"★");
+                    bool hasAttacker = kb.AffectedPlayerRef != default;
+                    if (hasAttacker) {
+                        sb.Append(tm.GetTranslationWithReplacements(translationPrefix + "combo.tooltip.knockback", "attacker", kb.AttackerName, "framenumber", frame.ToString())).AppendLine(" "+kb.StarsDropped+"★");
+                    } else {
+                        sb.Append(tm.GetTranslationWithReplacements(translationPrefix + "combo.tooltip.knockbacknoattacker", "framenumber", frame.ToString())).AppendLine(" "+kb.StarsDropped+"★");
+                    }
                 } else if (Element is PointDamage dmg) {
                     dmg.SetDescriptionText(tm, sb, displayArg);
                 } else if (Element is PointDeath death) {

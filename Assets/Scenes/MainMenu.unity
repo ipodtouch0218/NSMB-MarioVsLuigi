@@ -7371,8 +7371,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 991404113}
-  - {fileID: 2115760883}
   - {fileID: 579218913}
+  - {fileID: 2115760883}
   - {fileID: 74163550}
   m_Father: {fileID: 633068085}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -29112,6 +29112,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8aad1dcbeec26c40b64249afd074e21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NSMB.UI.MainMenu.Submenus.ReplayStats.StatsToggle
+  statsManager: {fileID: 1837019211}
   label: {fileID: 1936663094}
   toggle: {fileID: 943044363}
 --- !u!1 &586347634
@@ -45631,10 +45632,14 @@ MonoBehaviour:
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
+    m_HighlightedSprite: {fileID: -655794942, guid: 919785a51397c1a44816e9462ed989f9,
+      type: 3}
+    m_PressedSprite: {fileID: 1611290607, guid: 919785a51397c1a44816e9462ed989f9,
+      type: 3}
+    m_SelectedSprite: {fileID: -655794942, guid: 919785a51397c1a44816e9462ed989f9,
+      type: 3}
+    m_DisabledSprite: {fileID: 613028815, guid: 919785a51397c1a44816e9462ed989f9,
+      type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -58735,7 +58740,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 1234 / 5678 (420%)
+  m_text: 1:11 / 2:22 - 1234 / 5678 (420%)
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 38e8769007229044bb229d69f8cbae74, type: 2}
   m_sharedMaterial: {fileID: 3023213983796840565, guid: 38e8769007229044bb229d69f8cbae74,
@@ -97294,6 +97299,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75734fb5f68665a49824f00aab574cfa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NSMB.UI.MainMenu.Submenus.ReplayStats.StatsList
+  statsManager: {fileID: 1837019211}
   label: {fileID: 1193200033}
   dropdown: {fileID: 668837139}
 --- !u!224 &2115760883
@@ -97314,7 +97320,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 15, y: -100.01}
+  m_AnchoredPosition: {x: 15, y: -137.01001}
   m_SizeDelta: {x: 323.37558, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2115760884
@@ -98842,7 +98848,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -22}
+  m_AnchoredPosition: {x: 0, y: -22.00003}
   m_SizeDelta: {x: -40, y: -84}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2144613009

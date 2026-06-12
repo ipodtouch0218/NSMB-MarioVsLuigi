@@ -13,6 +13,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         }
 
         //---serialized
+        [SerializeField] private ReplayStatsManager statsManager;
         [SerializeField] private TMP_Text label;
         [SerializeField] private SpriteChangingToggle toggle;
 
@@ -22,6 +23,10 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         public void Initialize(string translationKey, bool value) {
             this.translationKey = translationKey;
             toggle.SetIsOnWithoutNotify(value);
+
+            if (!statsManager.IsReady) {
+                toggle.interactable = false;
+            }
 
             TranslationManager tm = GlobalController.Instance.translationManager;
             TranslationManager.OnLanguageChanged += UpdateLabel;

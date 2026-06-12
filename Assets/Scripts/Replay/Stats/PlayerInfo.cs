@@ -43,6 +43,9 @@ namespace NSMB.Replay.Stats {
         public const int ComboTimerStart = 15;
         public int ComboEndTimer;
 
+        //---misc
+        public PointKnockback LastKnockbackPointForDeath;
+
         //--methods
         public PlayerInfo(string playerName, PlayerRef playerRef) {
             PlayerName = playerName;

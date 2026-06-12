@@ -19,35 +19,38 @@ namespace NSMB.Replay.Stats
             callbackDispatcher.Subscribe<CallbackSimulateFinished>(this, e => OnSimulationFinished(e.Frame));
         }
 
-        public void HandleEvent(EventBase ev, Frame f) {
-            switch (ev) {
-            // player trackers
-            case EventMarioPlayerCollectedStar starEvent:
-                OnMarioPlayerCollectedStar(starEvent, f);
-                break;
-            case EventMarioPlayerDied diedEvent:
-                OnMarioPlayerDied(diedEvent, f);
-                break;
-            case EventMarioPlayerTookKnockback kbEvent:
-                OnMarioPlayerKnockback(kbEvent, f);
-                break;
-            case EventMarioPlayerTookDamage damageEvent:
-                OnMarioPlayerTookDamage(damageEvent, f);
-                break;
-            case EventMarioPlayerCollectedPowerup powerupEvent:
-                OnMarioPlayerCollectedPowerup(powerupEvent, f);
-                break;
-            case EventMarioPlayerCollectedCoin coinEvent:
-                OnMarioPlayerCollectedCoin(coinEvent, f);
-                break;
-            case EventMarioPlayerTaunted tauntedEvent:
-                OnMarioPlayerTaunted(tauntedEvent, f);
-                break;
+        public void HandleEvents(Frame f) {
+            while (f.Context.Events.Count > 0) {
+                var ev = f.Context.Events.PopHead();
+                switch (ev) {
+                // player trackers
+                case EventMarioPlayerCollectedStar starEvent:
+                    OnMarioPlayerCollectedStar(starEvent, f);
+                    break;
+                case EventMarioPlayerDied diedEvent:
+                    OnMarioPlayerDied(diedEvent, f);
+                    break;
+                case EventMarioPlayerTookKnockback kbEvent:
+                    OnMarioPlayerKnockback(kbEvent, f);
+                    break;
+                case EventMarioPlayerTookDamage damageEvent:
+                    OnMarioPlayerTookDamage(damageEvent, f);
+                    break;
+                case EventMarioPlayerCollectedPowerup powerupEvent:
+                    OnMarioPlayerCollectedPowerup(powerupEvent, f);
+                    break;
+                case EventMarioPlayerCollectedCoin coinEvent:
+                    OnMarioPlayerCollectedCoin(coinEvent, f);
+                    break;
+                case EventMarioPlayerTaunted tauntedEvent:
+                    OnMarioPlayerTaunted(tauntedEvent, f);
+                    break;
 
-            // global trackers
-            case EventBigCollectableAttemptedSpawn bigSpawnEvent:
-                OnBigCollectableAttemptedSpawn(bigSpawnEvent, f);
-                break;
+                // global trackers
+                case EventBigCollectableAttemptedSpawn bigSpawnEvent:
+                    OnBigCollectableAttemptedSpawn(bigSpawnEvent, f);
+                    break;
+                }
             }
         }
 
@@ -129,23 +132,13 @@ namespace NSMB.Replay.Stats
                     deathCause = PointDeath.DeathCause.Pit;
                 }
 
-                // for finding out the killer
-                //! LastAttacker gets cleared...
-                /*if (f.Unsafe.TryGetPointer<MarioPlayer>(mario->LastAttacker, out var attackerMario)) {
-                    attackerName = f.GetPlayerData(attackerMario->PlayerRef).PlayerNickname;
-                    attackerRef = attackerMario->PlayerRef;
-                }*/
-
-
-                startFrameOffset = 60;
-
-                if (playerInfo.CurrComboPoint != null) {
-                    var lastComboElement = playerInfo.CurrComboPoint.ComboElements.Last();
-                    if (lastComboElement.Element is PointKnockback lastKbPoint) {
-                        attackerName = lastKbPoint.AttackerName;
-                        attackerRef = lastKbPoint.AttackerRef;
-                        startFrameOffset = f.Number - lastKbPoint.OccurenceFrame + TimePoint.defaultFrameOffset;
-                    }
+                var lastKbPoint = playerInfo.LastKnockbackPointForDeath;
+                if (lastKbPoint != null) {
+                    attackerName = lastKbPoint.AttackerName;
+                    attackerRef = lastKbPoint.AttackerRef;
+                    startFrameOffset = f.Number - lastKbPoint.OccurenceFrame + TimePoint.defaultFrameOffset;
+                } else {
+                    startFrameOffset = 60;
                 }
             } else {
                 // check if it's a shelled enemy
@@ -190,13 +183,13 @@ namespace NSMB.Replay.Stats
                         deathCause = PointDeath.DeathCause.BlueShell;
                     }
                 } else if (f.Unsafe.TryGetPointer<Enemy>(e.Attacker, out _)) {
-                    startFrameOffset = 40;
-                    if (playerInfo.CurrComboPoint != null) {
-                        var (Element, _, _)= playerInfo.CurrComboPoint.ComboElements.Last();
-                        if (Element is PointKnockback lastKbPoint) {
-                            attackerName = lastKbPoint.AttackerName;
-                            attackerRef = lastKbPoint.AttackerRef;
-                        }
+                    var lastKbPoint = playerInfo.LastKnockbackPointForDeath;
+                    if (lastKbPoint != null) {
+                        attackerName = lastKbPoint.AttackerName;
+                        attackerRef = lastKbPoint.AttackerRef;
+                        startFrameOffset = f.Number - lastKbPoint.OccurenceFrame + TimePoint.defaultFrameOffset;
+                    } else {
+                        startFrameOffset = 60;
                     }
                 }
             }
@@ -224,15 +217,19 @@ namespace NSMB.Replay.Stats
             if (victimMario->PlayerRef == default) {
                 return;
             }
-            var attackerMario = f.Unsafe.GetPointer<MarioPlayer>(e.Attacker);
-            if (attackerMario->PlayerRef == default) {
-                return;
-            }
+
 
             KnockbackStrength strength = e.Strength;
             var victimMarioInfo = StatRecorder.PlayerInfos[victimMario->PlayerRef];
-            var attackerMarioInfo = StatRecorder.PlayerInfos[attackerMario->PlayerRef];
-           
+            PlayerInfo attackerMarioInfo = null;
+
+            if (f.Unsafe.TryGetPointer<MarioPlayer>(e.Attacker, out var attackerMario)) {
+                if (attackerMario->PlayerRef != default) {
+                    attackerMarioInfo = StatRecorder.PlayerInfos[attackerMario->PlayerRef];
+                }
+            }
+
+
             //bool isProjectile = e.ProjectileEffect != ProjectileEffectType.None;
             bool dropStars = e.StarsToDrop != 0;
             int starsToDrop = Math.Min(e.StarsToDrop, e.OldObjectiveCount);
@@ -244,6 +241,7 @@ namespace NSMB.Replay.Stats
             var knockbackPoint = new PointKnockback(StatRecorder, f, victimMario, e.Attacker, starsToDrop, strength);
             victimMarioInfo.KnockbackPoints.Add(knockbackPoint);
             victimMarioInfo.CurrKnockbackPoint = knockbackPoint;
+            victimMarioInfo.LastKnockbackPointForDeath = knockbackPoint;
             StartOrUpdateCombo(StatRecorder, f, victimMario, victimMarioInfo, knockbackPoint, starsToDrop);
         }
 
@@ -428,11 +426,8 @@ namespace NSMB.Replay.Stats
             }
 
             // handle queued events
-            while (f.Context.Events.Count > 0)
-            {
-                var ev = f.Context.Events.PopHead();
-                HandleEvent(ev, f);
-            }
+            // eventDispatcher.Subscribe happens on an UPdate frame
+            HandleEvents(f);
             ActiveReplayManager.Instance.TryCacheReplayFrame(f);
         }
 
@@ -447,6 +442,14 @@ namespace NSMB.Replay.Stats
                 if (playerInfo.CurrKnockbackPoint is PointKnockback currKnockbackPoint) {
                     currKnockbackPoint.EndFrame = f.Number;
                     playerInfo.CurrKnockbackPoint = null;
+                }
+
+                // check if Mario's touching the ground
+                if (playerInfo.LastKnockbackPointForDeath != null) {
+                    var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
+                    if (physicsObject->IsTouchingGround) {
+                        playerInfo.LastKnockbackPointForDeath = null;
+                    }
                 }
             }
 
