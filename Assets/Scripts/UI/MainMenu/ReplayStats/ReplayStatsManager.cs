@@ -118,8 +118,8 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 }
             } else {
                 if (!invincibleOnly) {
-                                int targetState = GetListValOrDefault(0);
-            bool showAllStates = targetState == -1;
+                    int targetState = GetListValOrDefault(0);
+                    bool showAllStates = targetState == -1;
                     foreach (var playerInfo in stats.Values) {
                         foreach (var powerstate in playerInfo.PowerChangePoints) {
                             bool show = true;
@@ -172,7 +172,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         private Dictionary<TimePoint, bool> GetKnockbackDealt() {
             Dictionary<PointKnockback, bool> temp = new();
 
-            var target = GetListValOrDefault(0);
+            var target = statLists.Count == 0 ? -1 : GetListValOrDefault(0);
 
             // loop through all players
             var stats = ReplayStatsRecorder.Instance.PlayerInfos;
@@ -200,7 +200,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         private Dictionary<TimePoint, bool> GetDamageDealt() {
             Dictionary<PointDamage, bool> temp = new();
 
-            var target = GetListValOrDefault(0);
+            var target = statLists.Count == 0 ? -1 : GetListValOrDefault(0);
 
             // loop through all players
             var stats = ReplayStatsRecorder.Instance.PlayerInfos;
@@ -284,7 +284,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         private Dictionary<TimePoint, bool> GetKills() {
             Dictionary<PointDeath, bool> temp = new();
 
-            var target = GetListValOrDefault(0);
+            var target = statLists.Count == 0 ? -1 : GetListValOrDefault(0);
 
             var stats = ReplayStatsRecorder.Instance.PlayerInfos;
             foreach (var playerInfoEntry in stats) {
@@ -458,7 +458,9 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             case StatOptions.Kills:
             case StatOptions.DamageDealt:
             case StatOptions.KnockbackDealt:
-                list.Add((listPrefix+"target", 0, ListType.TargetPlayer));
+                if (ReplayStatsRecorder.Instance.PlayerInfos.Count > 2) {
+                    list.Add((listPrefix+"target", 0, ListType.TargetPlayer));
+                }
                 break;
             case StatOptions.PowerupInfo:
                 if (!GetToggleValOrDefault(0)) {
