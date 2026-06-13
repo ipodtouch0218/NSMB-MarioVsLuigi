@@ -44,6 +44,7 @@ namespace NSMB.Replay.Stats {
         public int ComboEndTimer;
 
         //---misc
+        public PointCombo LastComboPointForDeath;
         public PointKnockback LastKnockbackPointForDeath;
 
         //--methods

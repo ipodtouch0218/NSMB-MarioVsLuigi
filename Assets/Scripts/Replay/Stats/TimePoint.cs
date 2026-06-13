@@ -18,7 +18,7 @@ namespace NSMB.Replay.Stats {
         //---public variables
         public int EndFrame = -1;
         public virtual bool ShowEndTime => HasEndFrame;
-        public virtual bool ShowLength => HasEndFrame;
+        public virtual bool ShowLength => ShowEndTime;
         public abstract int FrameOffset { get; }
 
         //---one-set variables
@@ -150,6 +150,12 @@ namespace NSMB.Replay.Stats {
         }
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append(tm.GetTranslation("ui.replay.stats.entry.coincollected"));
+
+        public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
+            if (CoinItem != null) {
+                stringBuilder.Append(tm.GetTranslation(CoinItem.TranslationKey));
+            }
+        }
 
         public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             if (CoinItem != null) {
@@ -361,7 +367,7 @@ namespace NSMB.Replay.Stats {
         public override int FrameOffset => defaultFrameOffset;
         public readonly List<(TimePoint Element, int StarsLost, int TotalStarsLost)> ComboElements = new();
         public bool GameEnded = false;
-        public override bool ShowEndTime => !GameEnded;
+        public override bool ShowEndTime => base.ShowEndTime && !GameEnded;
 
 
         public Dictionary<PlayerRef, string> GetParticipants() {
@@ -496,7 +502,7 @@ namespace NSMB.Replay.Stats {
         public override int FrameOffset => 10;
         public readonly PowerupState PowerupState;
         public bool GameEnded;
-        public override bool ShowEndTime => !GameEnded;
+        public override bool ShowEndTime => base.ShowEndTime && !GameEnded;
         public PointPowerChange(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario) : base(statsRecorder, f, mario) {
             PowerupState = mario->CurrentPowerupState;
         }
@@ -516,7 +522,7 @@ namespace NSMB.Replay.Stats {
     public unsafe class PointStarmanChange : TimePoint {
         public override int FrameOffset => defaultFrameOffset;
         public bool GameEnded;
-        public override bool ShowEndTime => !GameEnded;
+        public override bool ShowEndTime => base.ShowEndTime && !GameEnded;
         public PointStarmanChange(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) { }
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append(tm.GetTranslation(translationPrefix+"powerup.starman"));
     }
@@ -525,7 +531,7 @@ namespace NSMB.Replay.Stats {
         public override int FrameOffset => defaultFrameOffset;
         public readonly PowerupAsset Powerup;
         public bool GameEnded;
-        public override bool ShowEndTime => !GameEnded;
+        public override bool ShowEndTime => base.ShowEndTime && !GameEnded;
         public PointReserveChange(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) {
             Powerup = f.FindAsset(mario->ReserveItem);
         }
@@ -578,7 +584,7 @@ namespace NSMB.Replay.Stats {
         public string CollectingPlayer; // if a player collected the big star this is their name
 
         public bool GameEnded;
-        public override bool ShowEndTime => !GameEnded;
+        public override bool ShowEndTime => base.ShowEndTime && !GameEnded;
         public PointBigCollectableSpawned(ReplayStatsRecorder stats, Frame f, int usedSpawns, int index, bool blocked, FPVector2 coordinates, ref GlobalInfo globalReplayInfo, VersusStageData stage, List<string> blockers) : base(stats, f) {
             PositionIndex = index;
             UsedSpawns = usedSpawns;
@@ -670,6 +676,12 @@ namespace NSMB.Replay.Stats {
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             string translationKey = translationPrefix+"blockhit." + (WasRandom ? "random" : "normal");
             stringBuilder.Append(tm.GetTranslation(translationKey));
+        }
+
+        public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
+            if (SpawnedItem != null) {
+                stringBuilder.Append(tm.GetTranslation(SpawnedItem.TranslationKey));
+            }
         }
 
         public override string GetTooltip(TranslationManager tm, DisplayArgs displayArg) {

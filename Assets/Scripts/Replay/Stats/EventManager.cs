@@ -120,7 +120,12 @@ namespace NSMB.Replay.Stats
                 if (lastKbPoint != null) {
                     attackerName = lastKbPoint.AttackerName;
                     attackerRef = lastKbPoint.AttackerRef;
-                    startFrameOffset = f.Number - lastKbPoint.OccurenceFrame + TimePoint.defaultFrameOffset;
+                    var lastComboPoint = playerInfo.LastComboPointForDeath;
+                    if (lastComboPoint != null) {
+                        startFrameOffset = f.Number - lastComboPoint.OccurenceFrame + TimePoint.defaultFrameOffset;
+                    } else {
+                        startFrameOffset = f.Number - lastKbPoint.OccurenceFrame + TimePoint.defaultFrameOffset;
+                    }
                 }
             }
 
@@ -222,7 +227,12 @@ namespace NSMB.Replay.Stats
                 if (lastKbPoint != null) {
                     attackerName = lastKbPoint.AttackerName;
                     attackerRef = lastKbPoint.AttackerRef;
-                    startFrameOffset = f.Number - lastKbPoint.OccurenceFrame + TimePoint.defaultFrameOffset;
+                    var lastComboPoint = marioPlayerInfo.LastComboPointForDeath;
+                    if (lastComboPoint != null) {
+                        startFrameOffset = f.Number - lastComboPoint.OccurenceFrame + TimePoint.defaultFrameOffset;
+                    } else {
+                        startFrameOffset = f.Number - lastKbPoint.OccurenceFrame + TimePoint.defaultFrameOffset;
+                    }
                 }
             }
 
@@ -451,6 +461,7 @@ namespace NSMB.Replay.Stats
                     var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
                     if (physicsObject->IsTouchingGround) {
                         playerInfo.LastKnockbackPointForDeath = null;
+                        playerInfo.LastComboPointForDeath = null;
                     }
                 }
             }
@@ -535,6 +546,7 @@ namespace NSMB.Replay.Stats
             if (comb.ComboElements.Count < 2) {
                 playerInfo.ComboReceivedPoints.Remove(comb);
                 playerInfo.CurrComboPoint = null;
+                playerInfo.LastComboPointForDeath = null;
                 return;
             }
 
@@ -550,6 +562,7 @@ namespace NSMB.Replay.Stats
             if (playerInfo.CurrComboPoint == null) {
                 var currCombo = new PointCombo(statsRecorder, f, victimMario, timePoint, starsLost);
                 playerInfo.CurrComboPoint = currCombo;
+                playerInfo.LastComboPointForDeath = currCombo;
                 playerInfo.ComboReceivedPoints.Add(currCombo);
             } else {
                 playerInfo.CurrComboPoint.AddComboElement(timePoint, starsLost);

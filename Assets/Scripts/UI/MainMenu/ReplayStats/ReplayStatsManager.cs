@@ -168,6 +168,24 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             }
         }
 
+        private IEnumerable<TimePoint> GetDeathInfo() {
+            bool targetAll = TargetPlayer < 0;
+            var stats = ReplayStatsRecorder.Instance.PlayerInfos;
+
+            if (!targetAll) {
+                return stats[TargetPlayer].DeathPoints;
+            } else {
+                List<TimePoint> temp = new();
+
+                foreach (var playerInfo in stats.Values) {
+                    temp.AddRange(playerInfo.DeathPoints);
+                }
+
+                temp.Sort();
+                return temp;
+            }
+        }
+
 
         private Dictionary<TimePoint, bool> GetKnockbackDealt() {
             Dictionary<PointKnockback, bool> temp = new();
@@ -355,7 +373,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             var stats = ReplayStatsRecorder.Instance.PlayerInfos;
             return viewingOptions switch {
                 StatOptions.CoinsCollected => stats[TargetPlayer].CoinsCollectedPoints,
-                StatOptions.Death => stats[TargetPlayer].DeathPoints,
+                StatOptions.Death => GetDeathInfo(),
                 StatOptions.KnockbackReceived => stats[TargetPlayer].KnockbackPoints,
                 StatOptions.KnockbackDealt => GetKnockbackDealt(),
                 StatOptions.Damage => stats[TargetPlayer].DamagePoints,
@@ -399,6 +417,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             return viewingOptions switch {
                 StatOptions.PowerupInfo => GetToggleValOrDefault(0),
                 StatOptions.Taunts => true,
+                StatOptions.Death => true,
                 _ => false
             };
         }
@@ -608,7 +627,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 button.UpdateUI(GlobalController.Instance.translationManager);
                 statsButtons.Add(button);
             }
-
             UpdateStatsDropdown(GlobalController.Instance.translationManager);
             if (!IsReady) {
                 targetPlayerDropdown.ClearOptions();
@@ -616,7 +634,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             }
             UpdateInformation(replayListEntry);
 
-            ChangedViewingStats(true);
+            ChangedViewingStats(false);
 
         }
 
@@ -638,11 +656,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 Destroy(button.gameObject);
             }
             statsButtons.Clear();
-
-            foreach (var entry in timePointEnteries) {
-                Destroy(entry.gameObject);
-            }
-            timePointEnteries.Clear();
         }
 
         public void Prepare() {
@@ -1305,9 +1318,15 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 Destroy(list.gameObject);
             }
             statLists.Clear();
+
+            foreach (var entry in timePointEnteries) {
+                Destroy(entry.gameObject);
+            }
+            timePointEnteries.Clear();
         }
 
         public void CloseSubmenu() {
+            PurgeObjects();
             canvas.CloseSubmenu(statsSubmenu);
         }
 
