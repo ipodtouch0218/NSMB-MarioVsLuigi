@@ -38,7 +38,7 @@ namespace NSMB.Replay.Stats {
         //---static
         private static int _index;
         public const string translationPrefix = "ui.replay.stats.entry.";
-        public const int defaultFrameOffset = 15;
+        public const int defaultFrameOffset = 30;
 
         //---enums
         public enum DisplayArgs {
