@@ -559,6 +559,11 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 foreach (var entry in itemSpawnData) {
                     var item = entry.Key;
                     var count = entry.Value;
+
+                    if (count == 0) {
+                        continue;
+                    }
+
                     string itemName = tm.GetTranslation(item.TranslationKey);
 
                     sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix, "powerup", itemName, "spawncount", count.ToString()));
@@ -1080,6 +1085,14 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
         private Dictionary<CoinItemAsset, int> GetItemSpawnCount(List<TimePointEntry> timePointEnteries) {
             Dictionary<CoinItemAsset, int> dictionary = new();
+            BinaryReplayHeader header = replayListEntry.ReplayFile.Header;
+            ref var rules = ref header.Rules;
+            if (QuantumUnityDB.TryGetGlobalAsset(rules.Gamemode, out var gamemode)) {
+                foreach (var item in gamemode.AllCoinItems) {
+                    var coinItem = QuantumUnityDB.GetGlobalAsset(item);
+                    dictionary.Add(coinItem, 0);
+                }
+            }
             foreach (var timePointEntry in timePointEnteries) {
                 var timePoint = timePointEntry.timePoint;
 

@@ -38,7 +38,7 @@ namespace NSMB.Replay.Stats {
         //---static
         private static int _index;
         public const string translationPrefix = "ui.replay.stats.entry.";
-        public const int defaultFrameOffset = 30;
+        public const int defaultFrameOffset = 15;
 
         //---enums
         public enum DisplayArgs {
@@ -241,7 +241,8 @@ namespace NSMB.Replay.Stats {
             Lava,
             Poison,
             Disconnect,
-            Crush
+            Crush,
+            Projectile
         }
 
         public PointDeath(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, DeathCause reason, int ping, string attackerName, PlayerRef attackRef, int frameOffset) : base(statsRecorder, f, mario) {
@@ -681,6 +682,12 @@ namespace NSMB.Replay.Stats {
         public override void SetAdditionalText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             if (SpawnedItem != null) {
                 stringBuilder.Append(tm.GetTranslation(SpawnedItem.TranslationKey));
+            }
+        }
+
+        public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
+            if (SpawnedItem != null) {
+                stringBuilder.Append("<sprite name=room_powerups>");
             }
         }
 
