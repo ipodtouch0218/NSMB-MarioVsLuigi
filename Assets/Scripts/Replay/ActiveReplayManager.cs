@@ -311,7 +311,7 @@ namespace NSMB.Replay {
             }
 
             Frame f = e.Frame;
-            TryCacheReplayFrame(f);
+            TryCacheReplayFrame(f, ReplayStart);
         }
 
         private void OnGameDestroyed(CallbackGameDestroyed e) {
@@ -342,8 +342,8 @@ namespace NSMB.Replay {
             }
         }
 
-        public void TryCacheReplayFrame(Frame f) {
-            if ((f.Number - ReplayStart) % (5 * f.UpdateRate) == 0) {
+        public void TryCacheReplayFrame(Frame f, int replayStart) {
+            if ((f.Number - replayStart) % (5 * f.UpdateRate) == 0) {
                 // Save this frame to the replay cache
                 int index = (f.Number - ReplayStart) / (5 * f.UpdateRate);
                 if (ReplayFrameCache.Count <= index) {

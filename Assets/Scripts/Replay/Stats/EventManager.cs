@@ -437,9 +437,7 @@ namespace NSMB.Replay.Stats
             // handle queued events
             // eventDispatcher.Subscribe happens on an UPdate frame
             HandleEvents(f);
-            if (f.Number - StatRecorder.ReplayStart >= 5 * f.UpdateRate) {
-                ActiveReplayManager.Instance.TryCacheReplayFrame(f);
-            }
+            ActiveReplayManager.Instance.TryCacheReplayFrame(f, StatRecorder.ReplayStart);
         }
 
         private void HandleCombo(Frame f, MarioPlayer* marioPlayer, EntityRef marioEntity, PlayerInfo playerInfo) {
