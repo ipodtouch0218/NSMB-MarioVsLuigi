@@ -2168,18 +2168,14 @@ namespace Quantum {
                 dropStars = ownerMario->GetTeam(f) != mario->GetTeam(f) || rules.TeamAttack == TeamAttackOptions.Full;
             }
 
-            // Mario is "damageable" when he's...
-            // not in knockback, not Mega
-            // regular damageable checks (iframes is 0, not starman invincible)
-            // not in a powerUP transition while mini (specifically)
-            // Mario is in his Blue Shell and projectile doesn't affect blue Shell
-            bool damageable = !mario->IsInKnockback
-                && mario->CurrentPowerupState != PowerupState.MegaMushroom
-                && (mario->IsDamageable(f) || (mario->TryGetCurrentPowerTransition(f, out _) && mario->CurrentPowerupState == PowerupState.MiniMushroom))
-                && !((mario->IsCrouchedInShell || mario->IsInShell) && projectileAsset.DoesntEffectBlueShell);
+            bool standardImmune = mario->IsStarmanOrMega || mario->DamageInvincibilityFrames > 0 || mario->IsInKnockback;
+            bool miniImmune = mario->CurrentPowerupState == PowerupState.MiniMushroom && mario->TryGetCurrentPowerTransition(f, out _);
+            bool shellImmune = (mario->IsCrouchedInShell || mario->IsInShell) && projectileAsset.DoesntEffectBlueShell;
+            bool teamImmune = rules.TeamAttack == TeamAttackOptions.None && !dropStars;
+            bool damageable = !standardImmune && !miniImmune && !shellImmune && !teamImmune;
 
             // allow the projectiles to collide, but do no knockback if no team attack
-            if (damageable && (rules.TeamAttack != TeamAttackOptions.None || dropStars)) {
+            if (damageable) {
                 bool didKnockback = false;
                 switch (projectileAsset.Effect) {
                 case ProjectileEffectType.KillEnemiesAndSoftKnockbackPlayers:
