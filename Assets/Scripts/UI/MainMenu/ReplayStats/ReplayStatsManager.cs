@@ -498,8 +498,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             switch (viewingOptions) {
             case StatOptions.StarCountChange:
                 AddOccurenceCount(tm, sb, true);
-                int highestStarCount = GetMostStarsHad(timePointEnteries);
-                var (mostStarsGet, mostStarsLost)= GetStarGrabLost(timePointEnteries);
+                var (highestStarCount, mostStarsGet, mostStarsLost) = GetStarGrabInfo(timePointEnteries);
                 sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix, "highestStarCount", highestStarCount.ToString(), "starGrabCount", mostStarsGet.ToString(), "starLostCount", mostStarsLost.ToString()));
                 break;
             case StatOptions.ComboRecieved:
@@ -511,9 +510,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                     break;
                 }
 
-                var longestCombo = GetLongestComboEntry(timePointEnteries);
-                var mostComplexCombo = GetMostComplexComboEntry(timePointEnteries);
-                var mostStarsCombo = GetMostStarsComboEntry(timePointEnteries);
+                var (longestCombo, mostComplexCombo, mostStarsCombo) = GetComboEntryInfo(timePointEnteries);
                 sb.AppendLine(tm.GetTranslationWithReplacements(comboPrefix,
                     "longestComboID", longestCombo.EntryInfo, "frameCount", longestCombo.timePoint.Length.ToString(),
                     "mostComplexComboID", mostComplexCombo.EntryInfo, "elements", (mostComplexCombo.timePoint as PointCombo).ComboElements.Count.ToString(),
@@ -1119,136 +1116,89 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             return dictionary;
         } 
 
-        private (int MostStarsGet, int MostStarsLost) GetStarGrabLost(List<TimePointEntry> timePointEntries) {
-            int starsGrabbed = 0, starsLost = 0;
+        private (int highestStarCount, int mostStarsGet, int mostStarsLost) GetStarGrabInfo(List<TimePointEntry> timePointEntries) {
+            int highest = 0, starsGrabbed = 0, starsLost = 0;
 
             for (int i = 0; i < timePointEnteries.Count - 1; i++) {
                 var currEntry = timePointEnteries[i].timePoint as PointStarCountChange;
                 var nextEntry = timePointEnteries[i + 1].timePoint as PointStarCountChange;
 
                 int diff = nextEntry.StarCount - currEntry.StarCount;
-                bool isLoss = diff < 0;
 
-                if (isLoss) {
+                // star counts start at 0, next entry at 0 would be 1
+                int nextStarCount = nextEntry.StarCount;
+
+                if (nextStarCount > highest) {
+                    highest = nextStarCount;
+                }
+
+                if (diff < 0) {
                     starsLost += -diff;
                 } else {
                     starsGrabbed += diff;
                 }
             }
-            return (starsGrabbed, starsLost);
+            return (highest, starsGrabbed, starsLost);
         }
 
-        private int GetMostStarsHad(List<TimePointEntry> timePointEnteries) {
-            int highestStarCount = 0;
+        private (TimePointEntry longest, TimePointEntry mostComplex, TimePointEntry mostStars) GetComboEntryInfo(List<TimePointEntry> timePointEntries) {
+            TimePointEntry longest = null, mostComplex = null, mostStars = null;
+            int maxLen = 0, maxLenElements = 0, maxLenStars = 0;
+            int maxCpxElements = 0, maxCpxStars = 0;
+            int maxStrStars = 0, maxStrElements = 0;
 
-            // loop through all enteries
-            foreach (var timePointEntry in timePointEnteries) {
-                var testPoint = timePointEntry.timePoint as PointStarCountChange;
-                if (testPoint.StarCount > highestStarCount) {
-                    highestStarCount = testPoint.StarCount;
+            for (int i = 0; i < timePointEntries.Count; i++) {
+                var entry = timePointEntries[i];
+                var combo = timePointEntries[i].timePoint as PointCombo;
+
+                int length = combo.Length;
+                int elements = combo.ComboElements.Count;
+                int stars = combo.TotalStarsAfterCombo();
+
+                //--- part one, getting the longest combo
+                if (length > maxLen) {
+                    longest = entry;
+                    maxLen = length;
+                    maxLenElements = elements;
+                    maxLenStars = stars;
+                } else if (length == maxLen) {
+                    // tiebreak case
+                    if (elements < maxLenElements) { /* do nothing */ } else if (stars < maxLenStars) { /* do nothing */ } else {
+                        longest = entry;
+                        maxLen = length;
+                        maxLenElements = elements;
+                        maxLenStars = stars;
+                    }
+                }
+
+                //--- part two, getting the combo with most elements
+                if (elements > maxCpxElements) {
+                    mostComplex = entry;
+                    maxCpxElements = elements;
+                    maxCpxStars = stars;
+                } else if (elements == maxCpxElements) {
+                    if (stars < maxCpxStars) { /* keep the one that lost most stars */ } else {
+                        mostComplex = entry;
+                        maxCpxElements = elements;
+                        maxCpxStars = stars;
+                    }
+                }
+
+                // --- part three, for getting the most stars
+                if (stars > maxStrStars) {
+                    mostStars = entry;
+                    maxStrStars = stars;
+                    maxStrElements = elements;
+                } else if (stars == maxStrStars) {
+                    if (elements < maxStrElements) { /* keep the one the more complex one */ } else {
+                        mostStars = entry;
+                        maxStrStars = stars;
+                        maxStrElements = elements;
+                    }
                 }
             }
 
-            return highestStarCount;
-        }
-
-        private TimePointEntry GetMostStarsComboEntry(List<TimePointEntry> timePointEnteries) {
-            TimePointEntry starsComboEntry = null;
-            int comboMaxElements = 0, comboMostStars = 0;
-
-            // loop through all combos
-            foreach (var timePointEntry in timePointEnteries) {
-                // first check if the combo is more complex
-                var testPoint = timePointEntry.timePoint as PointCombo;
-                if (testPoint.TotalStarsAfterCombo() > comboMostStars) {
-                    starsComboEntry = timePointEntry;
-                    comboMaxElements = testPoint.ComboElements.Count;
-                    comboMostStars = testPoint.TotalStarsAfterCombo();
-                    continue;
-                }
-
-                // the combo matches element count
-                if (testPoint.TotalStarsAfterCombo() == comboMostStars) {
-                    // discard combos that lost less stars
-                    if (testPoint.ComboElements.Count < comboMaxElements) {
-                        continue;
-                    }
-
-                    starsComboEntry = timePointEntry;
-                    comboMaxElements = testPoint.ComboElements.Count;
-                    comboMostStars = testPoint.TotalStarsAfterCombo();
-                }
-            }
-
-            return starsComboEntry;
-        }
-
-        private TimePointEntry GetMostComplexComboEntry(List<TimePointEntry> timePointEnteries) {
-            TimePointEntry complexComboEntry = null;
-            int comboMaxElements = 0, comboMostStars = 0;
-
-            // loop through all combos
-            foreach (var timePointEntry in timePointEnteries) {
-                // first check if the combo is more complex
-                var testPoint = timePointEntry.timePoint as PointCombo;
-                if (testPoint.ComboElements.Count > comboMaxElements) {
-                    complexComboEntry = timePointEntry;
-                    comboMaxElements = testPoint.ComboElements.Count;
-                    comboMostStars = testPoint.TotalStarsAfterCombo();
-                    continue;
-                }
-
-                // the combo matches element count
-                if (testPoint.ComboElements.Count == comboMaxElements) {
-                    // discard combos that lost less stars
-                    if (testPoint.TotalStarsAfterCombo() < comboMostStars) {
-                        continue;
-                    }
-
-                    complexComboEntry = timePointEntry;
-                    comboMaxElements = testPoint.ComboElements.Count;
-                    comboMostStars = testPoint.TotalStarsAfterCombo();
-                }
-            }
-
-            return complexComboEntry;
-        }
-
-        private TimePointEntry GetLongestComboEntry(List<TimePointEntry> timePointEnteries) {
-            TimePointEntry longestComboEntry = null;
-            int comboMaxLength = 0, comboMaxElements = 0, comboMostStars = 0;
-
-            // loop through all combos
-            foreach(var timePointEntry in timePointEnteries) {
-                // first check if the combo is longer
-                var testPoint = timePointEntry.timePoint as PointCombo;
-                if (testPoint.Length > comboMaxLength) {
-                    longestComboEntry = timePointEntry;
-                    comboMaxLength = testPoint.Length;
-                    comboMaxElements = testPoint.ComboElements.Count;
-                    comboMostStars = testPoint.TotalStarsAfterCombo();
-                    continue;
-                }
-
-                // the combo matches length
-                if (testPoint.Length == comboMaxLength) {
-                    // discard combos with a shorter complexity
-                    if (testPoint.ComboElements.Count < comboMaxElements) {
-                        continue;
-                    }
-
-                    if (testPoint.TotalStarsAfterCombo() < comboMostStars) {
-                        continue;
-                    }
-
-                    longestComboEntry = timePointEntry;
-                    comboMaxLength = testPoint.Length;
-                    comboMaxElements = testPoint.ComboElements.Count;
-                    comboMostStars = testPoint.TotalStarsAfterCombo();
-                }
-            }
-
-            return longestComboEntry;
+            return (longest, mostComplex, mostStars);
         }
 
         private bool GetToggleValOrDefault(int index, StatOptions? options = null) {
