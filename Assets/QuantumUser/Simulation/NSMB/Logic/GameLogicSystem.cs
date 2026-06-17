@@ -239,8 +239,8 @@ namespace Quantum {
                 return;
             }
 
-            f.Global->WinningTeam = 67;//winningTeam.GetValueOrDefault();
-            f.Global->HasWinner = true;// winningTeam.HasValue;
+            f.Global->WinningTeam = winningTeam.GetValueOrDefault();
+            f.Global->HasWinner = winningTeam.HasValue;
 
             f.Signals.OnGameEnding(winningTeam.GetValueOrDefault(), winningTeam.HasValue);
             f.Events.GameEnded(endedByHost, winningTeam.GetValueOrDefault(), winningTeam.HasValue);
