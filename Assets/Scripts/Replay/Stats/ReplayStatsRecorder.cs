@@ -102,7 +102,7 @@ namespace NSMB.Replay.Stats {
             }
 
             while ((Runner.Session.FramePredicted == null || Runner.Session.FramePredicted.Number < ReplayEnd) && !cancellationToken.IsCancellationRequested) {
-                Runner.Service(2);
+                Runner.Service(1);
                 statsManager.UpdateProgressBar(Runner.Session.FramePredicted.Number - ReplayStart, ReplayLength, Runner.Session.DeltaTime);
                 await Task.Delay(1);
             }

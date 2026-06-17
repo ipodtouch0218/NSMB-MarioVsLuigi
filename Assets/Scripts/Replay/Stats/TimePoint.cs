@@ -18,7 +18,7 @@ namespace NSMB.Replay.Stats {
         //---public variables
         public int EndFrame = -1;
         public virtual bool ShowEndTime => HasEndFrame;
-        public virtual bool ShowLength => ShowEndTime;
+        public virtual bool ShowLength => HasEndFrame;
         public abstract int FrameOffset { get; }
 
         //---one-set variables
@@ -580,6 +580,7 @@ namespace NSMB.Replay.Stats {
 
         public bool GameEnded;
         public override bool ShowEndTime => base.ShowEndTime && !GameEnded;
+        public override bool ShowLength => base.ShowLength && ShowEndTime;
         public PointBigCollectableSpawned(ReplayStatsRecorder stats, Frame f, int usedSpawns, int index, bool blocked, FPVector2 coordinates, ref GlobalInfo globalReplayInfo, VersusStageData stage, List<string> blockers) : base(stats, f) {
             PositionIndex = index;
             UsedSpawns = usedSpawns;
