@@ -619,16 +619,15 @@ namespace NSMB.Entities.Player {
             // Hit flash
             float remainingDamageInvincibility = mario->DamageInvincibilityFrames / 60f;
 
+            bool modelShouldBeVisible = mario->KnockbackGetupFrames > 0 || mario->MegaMushroomStartFrames > 0;
             bool modelShouldBeInvisible = f.Global->GameState < GameState.Playing
                 || mario->IsRespawning
                 || (mario->IsDead && IsBelowDeathplane)
                 || (remainingDamageInvincibility > 0 && (f.Number * f.DeltaTime.AsFloat) * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f);
 
-            // Exclusions- knockback getup and mega mushroom start (special animations)
-            modelShouldBeInvisible &= mario->KnockbackGetupFrames == 0 && mario->MegaMushroomStartFrames == 0;
-
-            if (modelShouldBeInvisible == modelRoot.activeSelf) {
-                modelRoot.SetActive(!modelShouldBeInvisible);
+            bool modelFinalVisibleState = modelShouldBeVisible || !modelShouldBeInvisible;
+            if (modelFinalVisibleState != modelRoot.activeSelf) {
+                modelRoot.SetActive(modelFinalVisibleState);
             } 
             
             // Z-positioning

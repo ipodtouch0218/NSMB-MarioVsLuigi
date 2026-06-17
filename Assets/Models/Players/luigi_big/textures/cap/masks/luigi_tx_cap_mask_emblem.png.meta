@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 7c71b20179328c44ea14a7bcb75786cc
+guid: 4c3c19df16b30064ab9bf361fb054df2
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3579659087431040942
-    second: luigi_tx_propeller_albedo_0
+      213: 5948898089110963004
+    second: luigi_tx_cap_mask_cap_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -139,13 +139,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: luigi_tx_propeller_albedo_0
+      name: luigi_tx_cap_mask_cap_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 256
-        height: 128
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 2508cac960f725ec0800000000000000
-      internalID: -3579659087431040942
+      spriteID: c33857e1b4bbe8250800000000000000
+      internalID: 5948898089110963004
       vertices: []
       indices: 
       edges: []
@@ -174,7 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      luigi_tx_propeller_albedo_0: -3579659087431040942
+      luigi_tx_cap_mask_cap_0: 5948898089110963004
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

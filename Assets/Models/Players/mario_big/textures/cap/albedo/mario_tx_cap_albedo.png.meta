@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 9e67d523b89addd49a0ccd3ebe2e3acc
+guid: 4e9995b475b3f6946b5201a471a91255
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2552730697619834202
-    second: hammersuit_tx_shell_mask_overalls_0
+      213: -3663278633773390105
+    second: mario_tx_cap_albedo_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,12 +37,12 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
-    wrapU: 1
-    wrapV: 1
-    wrapW: 1
+    wrapU: 2
+    wrapV: 2
+    wrapW: 2
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
@@ -57,7 +57,7 @@ TextureImporter:
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
-  textureType: 8
+  textureType: 0
   textureShape: 1
   singleChannelComponent: 0
   flipbookRows: 1
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -139,13 +139,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: hammersuit_tx_shell_mask_overalls_0
+      name: mario_tx_cap_albedo_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 11
-        width: 22
-        height: 21
+        y: 0
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a558dd66b0f1d6320800000000000000
-      internalID: 2552730697619834202
+      spriteID: 7e6a8a0dd7b692dc0800000000000000
+      internalID: -3663278633773390105
       vertices: []
       indices: 
       edges: []
@@ -174,7 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      hammersuit_tx_shell_mask_overalls_0: 2552730697619834202
+      mario_tx_cap_albedo_0: -3663278633773390105
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

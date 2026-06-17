@@ -2503,17 +2503,17 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct IceBlock : Quantum.IComponent {
-    public const Int32 SIZE = 72;
+    public const Int32 SIZE = 80;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(32)]
+    [FieldOffset(40)]
     public FP SlidingSpeed;
     [FieldOffset(24)]
     [ExcludeFromPrototype()]
     public EntityRef Entity;
-    [FieldOffset(56)]
+    [FieldOffset(64)]
     [ExcludeFromPrototype()]
     public FPVector2 Size;
-    [FieldOffset(40)]
+    [FieldOffset(48)]
     [ExcludeFromPrototype()]
     public FPVector2 ChildOffset;
     [FieldOffset(12)]
@@ -2531,6 +2531,9 @@ namespace Quantum {
     [FieldOffset(4)]
     [ExcludeFromPrototype()]
     public LiquidType InLiquidType;
+    [FieldOffset(32)]
+    [ExcludeFromPrototype()]
+    public FP BonusSpeed;
     public override readonly Int32 GetHashCode() {
       unchecked { 
         var hash = 15017;
@@ -2543,6 +2546,7 @@ namespace Quantum {
         hash = hash * 31 + FacingRight.GetHashCode();
         hash = hash * 31 + AutoBreakFrames.GetHashCode();
         hash = hash * 31 + (byte)InLiquidType;
+        hash = hash * 31 + BonusSpeed.GetHashCode();
         return hash;
       }
     }
@@ -2554,6 +2558,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsFlying, serializer);
         QBoolean.Serialize(&p->IsSliding, serializer);
         EntityRef.Serialize(&p->Entity, serializer);
+        FP.Serialize(&p->BonusSpeed, serializer);
         FP.Serialize(&p->SlidingSpeed, serializer);
         FPVector2.Serialize(&p->ChildOffset, serializer);
         FPVector2.Serialize(&p->Size, serializer);

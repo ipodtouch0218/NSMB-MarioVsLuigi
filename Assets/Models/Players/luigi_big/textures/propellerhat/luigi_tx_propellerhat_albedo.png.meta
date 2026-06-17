@@ -1,15 +1,15 @@
 fileFormatVersion: 2
-guid: 4e9995b475b3f6946b5201a471a91255
+guid: 7c71b20179328c44ea14a7bcb75786cc
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3663278633773390105
-    second: mario_tx_cap_albedo_0
+      213: -3579659087431040942
+    second: luigi_tx_propeller_albedo_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
     mipMapMode: 0
-    enableMipMap: 0
+    enableMipMap: 1
     sRGBTexture: 1
     linearTexture: 0
     fadeOut: 0
@@ -37,12 +37,12 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
-    wrapU: 2
-    wrapV: 2
-    wrapW: 2
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
@@ -139,13 +139,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: mario_tx_cap_albedo_0
+      name: luigi_tx_propeller_albedo_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 32
-        height: 32
+        width: 256
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7e6a8a0dd7b692dc0800000000000000
-      internalID: -3663278633773390105
+      spriteID: 2508cac960f725ec0800000000000000
+      internalID: -3579659087431040942
       vertices: []
       indices: 
       edges: []
@@ -174,7 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      mario_tx_cap_albedo_0: -3663278633773390105
+      luigi_tx_propeller_albedo_0: -3579659087431040942
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

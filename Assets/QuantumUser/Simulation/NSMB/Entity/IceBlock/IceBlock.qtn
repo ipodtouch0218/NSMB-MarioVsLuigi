@@ -11,6 +11,7 @@ component IceBlock {
 	[ExcludeFromPrototype] bool FacingRight;
 	[ExcludeFromPrototype] byte AutoBreakFrames;
 	[ExcludeFromPrototype] LiquidType InLiquidType;
+	[ExcludeFromPrototype] FP BonusSpeed;
 }
 
 signal OnIceBlockBroken(EntityRef brokenIceBlock, IceBlockBreakReason breakReason, EntityRef attacker);

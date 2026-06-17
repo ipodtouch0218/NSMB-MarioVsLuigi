@@ -662,7 +662,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
                 Func<BinaryReplayFile, object> getSortingCriteria = sortIndex switch {
                     1 => (replay) => replay.Header.GetDisplayName(),
-                    2 => (replay) => AssetRepository<Map>.AllAssetRefs.IndexOf(replay.Header.Rules.Stage),
+                    2 => (replay) => AssetRepository<Map>.AllAssetRefs.IndexOf(ar => ar == replay.Header.Rules.Stage),
                     _ => (replay) => replay.Header.UnixTimestamp,
                 };
 

@@ -9,11 +9,22 @@ using UnityEngine;
 namespace NSMB.Utilities {
     public static class Utils {
 
+        public static T IndexIntoOrDefault<T>(IReadOnlyList<T> list, int index, T def) {
+            if (index < 0 || index >= list.Count) {
+                return def;
+            }
+            return list[index];
+        }
+
         public static T IndexIntoOrDefault<T>(IList<T> list, int index, T def) {
             if (index < 0 || index >= list.Count) {
                 return def;
             }
             return list[index];
+        }
+
+        public static T IndexIntoOrDefault<T>(List<T> list, int index, T def) {
+            return IndexIntoOrDefault((IList<T>) list, index, def);
         }
 
         public static bool BitTest(long v, int index) {

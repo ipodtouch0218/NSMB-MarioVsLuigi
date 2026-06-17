@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: e8b5efe82f079254ca940b6f40f9b6eb
+guid: fd6269fff4f6a1943bfabc975eccfcc8
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7749059810755065830
-    second: hammersuithelmet_tx_mask_overalls_0
+      213: 5364068229481852698
+    second: mario_tx_cap_mask_cap_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -139,13 +139,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: hammersuithelmet_tx_mask_overalls_0
+      name: mario_tx_cap_mask_cap_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 10
-        height: 15
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a1840bc882fc57490800000000000000
-      internalID: -7749059810755065830
+      spriteID: a1f693972aff07a40800000000000000
+      internalID: 5364068229481852698
       vertices: []
       indices: 
       edges: []
@@ -174,7 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      hammersuithelmet_tx_mask_overalls_0: -7749059810755065830
+      mario_tx_cap_mask_cap_0: 5364068229481852698
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

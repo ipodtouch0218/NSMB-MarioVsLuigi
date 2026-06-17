@@ -2994,8 +2994,7 @@ namespace Quantum {
             mario->TauntFrames = 0;
 
             if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable)) {
-                mario->HeldEntity = EntityRef.None;
-                holdable->Holder = EntityRef.None;
+                holdable->DropWithoutThrowing(f, mario->HeldEntity);
             }
         }
         #endregion

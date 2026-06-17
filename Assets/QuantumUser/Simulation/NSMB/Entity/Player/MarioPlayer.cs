@@ -1,4 +1,6 @@
 using Photon.Deterministic;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Quantum {
     public unsafe partial struct MarioPlayer {
@@ -472,6 +474,9 @@ namespace Quantum {
 
             physicsObject->IsFrozen = false;
             physicsObject->DisableCollision = false;
+            physicsObject->Velocity = FPVector2.Zero;
+            physicsObject->ParentVelocity = FPVector2.Zero;
+            physicsObject->Parent = EntityRef.None;
 
             f.Events.MarioPlayerRespawned(entity);
 
@@ -523,9 +528,7 @@ namespace Quantum {
                 KnockbackStrength.CollisionBump => new(Constants._2_50, Constants._3_50),
                 KnockbackStrength.Normal or _ => new(Constants._3_75 / 2, Constants._3_50),
             };
-            if (CurrentKnockback == KnockbackStrength.CollisionBump) {
-                knockbackVelocity = FPVector2.Zero;
-            }
+
             knockbackVelocity.X *= fromRight ? -1 : 1;
             if (CurrentPowerupState == PowerupState.MiniMushroom) {
                 var physics = f.FindAsset(PhysicsAsset);
@@ -648,12 +651,10 @@ namespace Quantum {
             f.Events.MarioPlayerEnteredPipe(mario, CurrentPipe, false, horizontalDirection, FPVector2.Zero);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void SetValue(ref BitSet21 bitset, int index, bool value) {
-            if (value) {
-                bitset.Set(index);
-            } else {
-                bitset.Clear(index);
-            }
+            ulong mask = 1ul << index;
+            bitset.Bits[0] = (bitset.Bits[0] & ~mask) | (value ? mask : 0);
         }
     }
 }

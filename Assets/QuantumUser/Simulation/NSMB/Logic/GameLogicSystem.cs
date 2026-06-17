@@ -407,9 +407,9 @@ namespace Quantum {
             // Spawn players
             var config = f.SimulationConfig;
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            int teamCount = 0;
 
-            int playerCount = 0;
+            var activePlayerDatas = stackalloc PlayerData*[f.ComponentCount<PlayerData>()];
+            int activePlayerCount = 0;
             foreach ((_, var data) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
                 if (!data->IsLoaded) {
                     // Force spectator, didn't load in time
@@ -421,6 +421,13 @@ namespace Quantum {
                     continue;
                 }
 
+                activePlayerDatas[activePlayerCount++] = data;
+            }
+            SortByJoinTick(activePlayerDatas, activePlayerCount);
+
+            int teamCount = 0;
+            for (int i = 0; i < activePlayerCount; i++) {
+                var data = activePlayerDatas[i];
                 if (!f.TryFindAsset(data->Character, out var character)) {
                     character = f.Context.GetAllAssets<CharacterAsset>()[0];
                 }
@@ -436,7 +443,7 @@ namespace Quantum {
 
                 // Save runtimeplayer info for late joiners, in case this player DCs
                 RuntimePlayer runtimePlayer = f.GetPlayerData(data->PlayerRef);
-                f.Global->PlayerInfo[playerCount++] = new PlayerInformation {
+                f.Global->PlayerInfo[i] = new PlayerInformation {
                     PlayerRef = data->PlayerRef,
                     Nickname = runtimePlayer.PlayerNickname,
                     NicknameColor = runtimePlayer.NicknameColor,
@@ -496,6 +503,18 @@ namespace Quantum {
 
                 info.Disqualified = true;
                 break;
+            }
+        }
+
+        private static void SortByJoinTick(PlayerData** span, int count) {
+            for (int i = 1; i < count; i++) {
+                var key = span[i];
+                int j = i - 1;
+                while (j >= 0 && span[j]->JoinTick > key->JoinTick) {
+                    span[j + 1] = span[j];
+                    j--;
+                }
+                span[j + 1] = key;
             }
         }
     }

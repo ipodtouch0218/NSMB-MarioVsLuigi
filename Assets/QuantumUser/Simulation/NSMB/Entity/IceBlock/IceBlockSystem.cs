@@ -29,10 +29,17 @@ namespace Quantum {
             }
 
             var transform = filter.Transform;
+            var physicsCollider = filter.PhysicsCollider;
+            if (transform->Position.Y + (physicsCollider->Shape.Box.Extents.Y * 2) < stage.StageWorldMin.Y) {
+                // Below the world
+                Destroy(f, entity, IceBlockBreakReason.Other, EntityRef.None);
+                return;
+            }
+
             var physicsObject = filter.PhysicsObject;
 
             if (!physicsObject->IsFrozen && childFreezable->IsCarryable && (f.Number + entity.Index) % 2 == 0 
-                && PhysicsObjectSystem.BoxInGround(f, transform->Position, filter.PhysicsCollider->Shape, true, stage, entity)) {
+                && PhysicsObjectSystem.BoxInGround(f, transform->Position, physicsCollider->Shape, true, stage, entity)) {
                 Destroy(f, entity, IceBlockBreakReason.HitWall, EntityRef.None);
                 return;
             }
@@ -49,7 +56,7 @@ namespace Quantum {
 
             if (iceBlock->IsSliding) {
                 physicsObject->IsFrozen = false;
-                physicsObject->Velocity.X = iceBlock->SlidingSpeed * (iceBlock->FacingRight ? 1 : -1);
+                physicsObject->Velocity.X = (iceBlock->SlidingSpeed + iceBlock->BonusSpeed) * (iceBlock->FacingRight ? 1 : -1);
 
                 if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
                     Destroy(f, entity, IceBlockBreakReason.HitWall, filter.Holdable->PreviousHolder);
@@ -213,7 +220,7 @@ namespace Quantum {
             if (FPMath.Sign(marioPhysicsObject->Velocity.X) != (mario->FacingRight ? 1 : -1)) {
                 bonusSpeed *= -1;
             }
-            ice->SlidingSpeed += bonusSpeed;
+            ice->BonusSpeed = bonusSpeed;
             physicsObject->Velocity.Y = 0;
             holdable->IgnoreOwnerFrames = 15;
 

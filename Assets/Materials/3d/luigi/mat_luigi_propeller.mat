@@ -38,7 +38,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _CapMask:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: b9da467efb59b014091fc82f9d7e0b7d, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -124,14 +124,16 @@ Material:
     - _DstBlend: 0
     - _EnableBackfaces: 1
     - _EnvironmentReflections: 1
+    - _EyeState: 0
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
+    - _IsEyeTexture: 0
     - _Metallic: 0
     - _MultiPowerupMaterial: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
-    - _QueueControl: 0
+    - _QueueControl: 1
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _Smoothness: 0.5

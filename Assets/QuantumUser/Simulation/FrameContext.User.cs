@@ -10,7 +10,7 @@ namespace Quantum {
         //---Assets
         private readonly Dictionary<Type, object> allAssets = new();
 
-        public List<T> GetAllAssets<T>() where T : AssetObject {
+        public IReadOnlyList<T> GetAllAssets<T>() where T : AssetObject {
             if (!allAssets.ContainsKey(typeof(T))) {
                 var query = ResourceManager.GetAssets(new AssetObjectQuery { Type = typeof(T) }).Cast<T>();
                 if (typeof(IOrderedAsset).IsAssignableFrom(typeof(T))) {

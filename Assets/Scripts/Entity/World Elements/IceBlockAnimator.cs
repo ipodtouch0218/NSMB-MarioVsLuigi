@@ -1,10 +1,11 @@
+using NSMB.Quantum;
 using NSMB.Utilities.Extensions;
 using Quantum;
 using UnityEngine;
 using static NSMB.Utilities.QuantumViewUtils;
 
 namespace NSMB.Entities.World {
-    public unsafe class IceBlockAnimator : QuantumEntityViewComponent {
+    public unsafe class IceBlockAnimator : QuantumEntityViewComponent<StageContext> {
 
         //---Serialized Variables
         [SerializeField] private AudioSource sfx;
@@ -55,7 +56,8 @@ namespace NSMB.Entities.World {
         }
 
         public override void OnDeactivate() {
-            if (!IsReplayFastForwarding) {
+            bool aboveDeathplane = transform.position.y > ViewContext.Stage.StageWorldMin.Y.AsFloat;
+            if (!IsReplayFastForwarding && aboveDeathplane) {
                 Instantiate(breakPrefab, transform.position, Quaternion.identity);
             }
         }

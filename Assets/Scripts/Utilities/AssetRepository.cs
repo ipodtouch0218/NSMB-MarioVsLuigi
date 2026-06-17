@@ -18,7 +18,7 @@ namespace NSMB.Utilities {
         }
 
         private static List<AssetRef<T>> _allAssetRefs;
-        public static List<AssetRef<T>> AllAssetRefs {
+        public static IReadOnlyList<AssetRef<T>> AllAssetRefs {
             get {
                 if (_allAssetRefs == null) {
                     Load();
