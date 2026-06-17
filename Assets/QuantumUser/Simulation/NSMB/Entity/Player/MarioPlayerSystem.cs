@@ -36,6 +36,13 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var player = mario->PlayerRef;
 
+            if (f.Global->GameState == GameState.Ended) {
+                if (f.Global->WinningTeam == mario->GetTeam(f) && mario->IsDead && !mario->IsRespawning) {
+                    HandleDeathAndRespawning(f, ref filter, stage);
+                    return;
+                }
+            }
+
             // Shuffle RNG.
             _ = mario->RNG.Next();
 
@@ -2051,23 +2058,25 @@ namespace Quantum {
 
             // Respawn timers
             // Actually respawning
-            if (mario->IsRespawning) {
-                if (QuantumUtils.Decrement(ref mario->RespawnFrames)) {
-                    mario->Respawn(f, entity);
-                    return false;
+            if (f.Global->GameState != GameState.Ended) {
+                if (mario->IsRespawning) {
+                    if (QuantumUtils.Decrement(ref mario->RespawnFrames)) {
+                        mario->Respawn(f, entity);
+                        return false;
+                    }
+                    return true;
                 }
-                return true;
-            }
 
-            // Waiting to prerespawn
-            if (QuantumUtils.Decrement(ref mario->PreRespawnFrames)) {
-                mario->PreRespawn(f, entity, stage);
-                f.Events.StartCameraFadeIn(entity);
-                return true;
+                // Waiting to prerespawn
+                if (QuantumUtils.Decrement(ref mario->PreRespawnFrames)) {
+                    mario->PreRespawn(f, entity, stage);
+                    f.Events.StartCameraFadeIn(entity);
+                    return true;
 
-            } else if (mario->PreRespawnFrames == 80) {
-                f.Events.StartCameraFadeOut(entity);
-                return true;
+                } else if (mario->PreRespawnFrames == 80 && f.Global->GameState != GameState.Ended) {
+                    f.Events.StartCameraFadeOut(entity);
+                    return true;
+                }
             }
 
             // Death up

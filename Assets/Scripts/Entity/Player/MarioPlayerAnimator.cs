@@ -142,7 +142,7 @@ namespace NSMB.Entities.Player {
         public Animator Animator => animator;
         public GameObject ModelRoot => modelRoot;
         public bool IsBelowDeathplane => transform.position.y <= ViewContext.Stage.StageWorldMin.Y.AsFloat;
-        
+
         //---Private Variables
         private Enums.PlayerEyeState eyeState;
         private Quaternion modelRotationTarget;
@@ -277,8 +277,11 @@ namespace NSMB.Entities.Player {
             }
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(EntityRef);
-
-            if (VerifiedFrame.Global->GameState >= GameState.Ended && !forceUpdate) {
+            
+            // stop animation if the match has ended
+            // and the match has no winner or if it does,
+            // player is winner or the player is not dead
+            if (VerifiedFrame.Global->GameState >= GameState.Ended && !forceUpdate && (!VerifiedFrame.Global->HasWinner || VerifiedFrame.Global->WinningTeam == mario->GetTeam(f) || !mario->IsDead)) {
                 animator.speed = 0;
                 modelRoot.SetActive(!mario->IsRespawning && !(mario->IsDead && IsBelowDeathplane));
                 SetParticleEmission(drillParticle, false);

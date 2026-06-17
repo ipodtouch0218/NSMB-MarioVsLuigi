@@ -24,7 +24,6 @@ namespace Quantum {
                     new MovingPlatformSystem(),
                     new EnemySystem(),
                     new InteractionSystem(),
-                    new PhysicsObjectSystem(),
                     new GoombaSystem(),
                     new KoopaSystem(),
                     new BobombSystem(),
@@ -38,7 +37,6 @@ namespace Quantum {
                     new PowerupSystem(),
                     new BlockBumpSystem(),
                     new BreakableObjectSystem(),
-                    new MarioPlayerSystem(),
                     new CoinSystem(),
                     new GoldBlockSystem(),
                     new WrappingObjectSystem(),
@@ -52,6 +50,12 @@ namespace Quantum {
                     new EnterablePipeSystem(),
                     new InvisibleBlockSystem()
                     // new BetterPhysicsObjectSystem()
+                )
+            );
+            systems.Add(
+                new StartDisabledLaterSystemGroup(
+                    new PhysicsObjectSystem(),
+                    new MarioPlayerSystem()
                 )
             );
             systems.Add(new StageSystem());

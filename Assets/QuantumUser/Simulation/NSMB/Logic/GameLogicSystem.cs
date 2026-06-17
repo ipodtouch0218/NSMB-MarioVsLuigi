@@ -152,6 +152,7 @@ namespace Quantum {
                     // Respawn all players and enable systems
                     f.Global->StartFrame = f.Number;
                     f.SystemEnable<StartDisabledSystemGroup>();
+                    f.SystemEnable<StartDisabledLaterSystemGroup>();
 
                     foreach (var otherGamemode in f.Context.GetAllAssets<GamemodeAsset>()) {
                         otherGamemode.DisableGamemode(f);
@@ -213,6 +214,7 @@ namespace Quantum {
                     f.Global->GameState = GameState.PreGameRoom;
                     f.Events.GameStateChanged(GameState.PreGameRoom);
                     f.SystemDisable<StartDisabledSystemGroup>();
+                    f.SystemDisable<StartDisabledLaterSystemGroup>();
 
                     var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
                     gamemode.DisableGamemode(f);
@@ -237,8 +239,8 @@ namespace Quantum {
                 return;
             }
 
-            f.Global->WinningTeam = winningTeam.GetValueOrDefault();
-            f.Global->HasWinner = winningTeam.HasValue;
+            f.Global->WinningTeam = 67;//winningTeam.GetValueOrDefault();
+            f.Global->HasWinner = true;// winningTeam.HasValue;
 
             f.Signals.OnGameEnding(winningTeam.GetValueOrDefault(), winningTeam.HasValue);
             f.Events.GameEnded(endedByHost, winningTeam.GetValueOrDefault(), winningTeam.HasValue);
@@ -254,6 +256,10 @@ namespace Quantum {
             f.Events.GameStateChanged(GameState.Ended);
             f.Global->GameStartFrames = (ushort) ((endedByHost ? Constants._3_50 : 21) * f.UpdateRate);
             f.SystemDisable<StartDisabledSystemGroup>();
+
+            if (!f.Global->HasWinner) {
+                f.SystemDisable<StartDisabledLaterSystemGroup>();
+            }
 
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             gamemode.DisableGamemode(f);

@@ -133,6 +133,12 @@ namespace Quantum {
                 var transform = filter.Transform;
                 var entity = filter.Entity;
 
+                if (f.Global->GameState == GameState.Ended) {
+                    if (!f.Unsafe.TryGetPointer<MarioPlayer>(entity, out var mario)) { continue; }
+                    if (f.Global->WinningTeam == mario->GetTeam(f)) { continue; }
+                    if (!mario->IsDead || mario->IsRespawning) { continue; }
+                }
+
                 // bool canSnap = wasTouchingGround && physicsObject->Velocity.Y <= physicsObject->PreviousFrameVelocity.Y;
                 physicsObject->PreviousFrameVelocity = physicsObject->Velocity;
                 physicsObject->PreviousData = physicsObject->CurrentData;

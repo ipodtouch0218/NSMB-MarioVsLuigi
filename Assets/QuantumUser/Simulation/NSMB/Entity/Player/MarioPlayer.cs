@@ -413,7 +413,7 @@ namespace Quantum {
 
             RespawnFrames = 78;
 
-            if (!IsValid(f)) {
+            if (!IsValid(f) && f.Global->GameState != GameState.Ended) {
                 f.Destroy(entity);
                 return;
             }
