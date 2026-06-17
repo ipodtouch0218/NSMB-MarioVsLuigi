@@ -93,7 +93,9 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 if (!invincibleOnly) {
                     int targetState = GetListValOrDefault(0);
                     bool showAllStates = targetState == -1;
-                    foreach (var powerstate in stats[TargetPlayer].PowerChangePoints) {
+                    var powerPoints = stats[TargetPlayer].PowerChangePoints;
+                    for (int i = 0; i < powerPoints.Count; i++) {
+                        var powerstate = powerPoints[i];
                         bool show = true;
                         if (!showAllStates && powerstate.PowerupState != (PowerupState)targetState) {
                             show = false;
@@ -103,11 +105,13 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                     }
                 } else {
                     List<TimePoint> tempList = new();
-                    foreach (var starmanPoint in stats[TargetPlayer].StarmanChangePoints) {
-                        tempList.Add(starmanPoint);
+                    var starmanPoints = stats[TargetPlayer].StarmanChangePoints;
+                    var powerPoints = stats[TargetPlayer].PowerChangePoints;
+                    for (int i = 0; i < starmanPoints.Count; i++) {
+                        tempList.Add(starmanPoints[i]);
                     }
-
-                    foreach (var powerPoint in stats[TargetPlayer].PowerChangePoints) {
+                    for (int i = 0; i < powerPoints.Count; i++) {
+                        var powerPoint = powerPoints[i];
                         if (powerPoint.PowerupState == PowerupState.MegaMushroom) {
                             tempList.Add(powerPoint);
                         }
@@ -121,7 +125,9 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                     int targetState = GetListValOrDefault(0);
                     bool showAllStates = targetState == -1;
                     foreach (var playerInfo in stats.Values) {
-                        foreach (var powerstate in playerInfo.PowerChangePoints) {
+                        var powerPoints = playerInfo.PowerChangePoints;
+                        for (int i = 0; i < powerPoints.Count; i++) {
+                            var powerstate = powerPoints[i];
                             bool show = true;
                             if (!showAllStates && powerstate.PowerupState != (PowerupState) targetState) {
                                 show = false;
@@ -133,10 +139,13 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 } else {
                     List<TimePoint> tempList = new();
                     foreach (var playerInfo in stats.Values) {
-                        foreach (var starmanPoint in playerInfo.StarmanChangePoints) {
-                            tempList.Add(starmanPoint);
+                        var starmanPoints = playerInfo.StarmanChangePoints;
+                        var powerPoints = playerInfo.PowerChangePoints;
+                        for (int i = 0; i < starmanPoints.Count; i++) {
+                            tempList.Add(starmanPoints[i]);
                         }
-                        foreach (var powerPoint in playerInfo.PowerChangePoints) {
+                        for (int i = 0; i < powerPoints.Count; i++) {
+                            var powerPoint = powerPoints[i];
                             if (powerPoint.PowerupState == PowerupState.MegaMushroom) {
                                 tempList.Add(powerPoint);
                             }
@@ -200,7 +209,9 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                     continue;
                 }
 
-                foreach (var kbPoint in currPlayer.Value.KnockbackPoints) {
+                var kbPoints = currPlayer.Value.KnockbackPoints;
+                for (int i = 0; i < kbPoints.Count; i++) {
+                    var kbPoint = kbPoints[i];
                     if (kbPoint.AttackerRef != null && kbPoint.AttackerRef == TargetPlayer) {
                         bool show = true;
                         if (target != -1 && currPlayer.Key != target) {
@@ -228,7 +239,9 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                     continue;
                 }
 
-                foreach (var dmgPoint in currPlayer.Value.DamagePoints) {
+                var dmgPoints = currPlayer.Value.DamagePoints;
+                for (int i = 0; i < dmgPoints.Count; i++) {
+                    var dmgPoint = dmgPoints[i];
                     if (dmgPoint.AttackerRef != null && dmgPoint.AttackerRef == TargetPlayer) {
                         bool show = true;
                         if (target != -1 && currPlayer.Key != target) {
@@ -258,13 +271,16 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 }
 
                 // now check the combo points
-                foreach (var comboPoint in playerInfo.Value.ComboReceivedPoints) {
-                    if (comboPoint.GetParticipants().ContainsKey(TargetPlayer)) {
+                var comboReceivedPoints = playerInfo.Value.ComboReceivedPoints;
+                for (int i = 0; i < comboReceivedPoints.Count; i++) {
+                    var comboPoint = comboReceivedPoints[i];
+                    var participants = comboPoint.GetParticipants();
+                    if (participants.ContainsKey(TargetPlayer)) {
                         bool show = true;
-                        if (selfOnly && comboPoint.GetParticipants().Count > 1) {
+                        if (selfOnly && participants.Count > 1) {
                             show = false;
                         }
-                        if (deathOnly && !comboPoint.EndsInDeath()) {
+                        if (deathOnly && !comboPoint.EndsInDeath) {
                             show = false;
                         }
 
@@ -282,8 +298,9 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             bool hideSuccess = GetToggleValOrDefault(0);
             bool hideBlocks = GetToggleValOrDefault(1);
 
-            var attempts = ReplayStatsRecorder.Instance.GlobalInfo;
-            foreach (var spawn in attempts.BigCollectablesSpawned) {
+            var attempts = ReplayStatsRecorder.Instance.GlobalInfo.BigCollectablesSpawned;
+            for (int i = 0; i < attempts.Count; i++) {
+                var spawn = attempts[i];
                 bool show = true;
                 if (hideSuccess && !spawn.WasBlocked) {
                     show = false;
@@ -310,7 +327,9 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                     continue;
                 }
 
-                foreach (var deathPoint in playerInfoEntry.Value.DeathPoints) {
+                var deathPoints = playerInfoEntry.Value.DeathPoints;
+                for (int i = 0; i < deathPoints.Count; i++) {
+                    var deathPoint = deathPoints[i];
                     if (deathPoint.AttackerRef == TargetPlayer) {
                         bool show = true;
                         if (target != -1 && playerInfoEntry.Key != target) {
@@ -331,7 +350,9 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             bool randomOnly = GetToggleValOrDefault(0);
 
             var stats = ReplayStatsRecorder.Instance.PlayerInfos;
-            foreach (var spawnPoint in stats[TargetPlayer].GetAllItemSpawnPoints()) {
+            var spawnPoints = stats[TargetPlayer].GetAllItemSpawnPoints();
+            for (int i = 0; i < spawnPoints.Count; i++) {
+                var spawnPoint = spawnPoints[i];
                 bool show = true;
                 if (spawnPoint is PointBlockHit blockHitPoint) {
                     if (randomOnly && !blockHitPoint.WasRandom) {
@@ -531,10 +552,10 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
 
                     if (powerupFilterAll) {
                         var mostUsedState = GetMostUsedPowerupState(timePointEnteries);
-                        FP timeSpent = GetTotalTimeSpentInPowerup(mostUsedState, timePointEnteries);
-                        if (mostUsedState != PowerupState.NoPowerup) {
+                        if (mostUsedState.Key != PowerupState.NoPowerup) {
+                            var timeSpent = mostUsedState.Value;
                             string secondsInPower = $"{(float) timeSpent:F2}";
-                            string powerupTranslation = tm.GetTranslation("coinitem."+mostUsedState.ToString().ToLower());
+                            string powerupTranslation = tm.GetTranslation("coinitem."+mostUsedState.Key.ToString().ToLower());
                             sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix+".mostused", "powerup", powerupTranslation));
                             sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix+".timespent", "time", secondsInPower));
                         }
@@ -544,25 +565,23 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                         sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix+".timespent", "time", secondsInPower));
                     }
                 } else {
-                    FP timeSpentMega = GetTotalTimeSpentInPowerup(PowerupState.MegaMushroom, timePointEnteries);
-                    FP timeSpentStarman = GetTotalTimeSpentStarman(timePointEnteries);
-                    string megaString = $"{(float) timeSpentMega:F2}";
-                    string starmanString = $"{(float) timeSpentStarman:F2}";
+                    var getInvincibleTimes = GetTotalTimeSpentInvincible(timePointEnteries);
+                    string starmanString = $"{(float) getInvincibleTimes[0]:F2}";
+                    string megaString = $"{(float) getInvincibleTimes[1]:F2}";
                     sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix+".timeinvincible", "megatime", megaString, "starmantime", starmanString));
                 }
                 break;
             case StatOptions.PowerupSpawns:
                 var itemSpawnData = GetItemSpawnCount(timePointEnteries);
                 foreach (var entry in itemSpawnData) {
-                    var item = entry.Key;
                     var count = entry.Value;
 
                     if (count == 0) {
                         continue;
                     }
 
+                    var item = entry.Key;
                     string itemName = tm.GetTranslation(item.TranslationKey);
-
                     sb.AppendLine(tm.GetTranslationWithReplacements(translationPrefix, "powerup", itemName, "spawncount", count.ToString()));
                 }
                 break;
@@ -654,7 +673,8 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             TranslationManager.OnLanguageChanged -= UpdateLists;
             TranslationManager.OnLanguageChanged -= UpdatePlayerDropdown;
 
-            foreach (var button in statsButtons) {
+            for (int i = 0; i < statsButtons.Count; i++) {
+                var button = statsButtons[i];
                 Destroy(button.gameObject);
             }
             statsButtons.Clear();
@@ -766,19 +786,20 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         }
 
         private void UpdateToggles() {
-            foreach (var entry in statToggles) {
+            for (int i = 0; i < statToggles.Count; i++) {
+                var entry = statToggles[i];
                 Destroy(entry.gameObject);
             }
             statToggles.Clear();
 
             var toggleOptions = GetToggleOptions();
 
-            for (int i = 0; i < toggleOptions.Count; i++) {
-                var toggle = toggleOptions.ElementAt(i);
+            int toggleNum = 0;
+            foreach (var toggle in toggleOptions) {
                 var translationKey = toggle.Key;
                 var defaultValue = toggle.Value;
                 var toggleObj = Instantiate(toggleTemplate, toggleTemplate.transform.parent);
-                toggleObj.name = $"Toggle{i}";
+                toggleObj.name = $"Toggle{toggleNum++}";
                 toggleObj.gameObject.SetActive(true);
                 toggleObj.Initialize(translationKey, defaultValue);
                 statToggles.Add(toggleObj);
@@ -786,14 +807,15 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         }
 
         public void UpdateLists(TranslationManager tm) {
-            foreach (var entry in statLists) {
+            for (int i = 0; i < statLists.Count; i++) {
+                var entry = statLists[i];
                 Destroy(entry.gameObject);
             }
             statLists.Clear();
             var listsOptions = GetListOptions();
 
             for (int i = 0; i < listsOptions.Count; i++) {
-                var (translationKey, defaultValue, type) = listsOptions.ElementAt(i);
+                var (translationKey, defaultValue, type) = listsOptions[i];
                 var listObj = Instantiate(listTemplate, listTemplate.transform.parent);
                 listObj.name = $"List{i}";
                 listObj.gameObject.SetActive(true);
@@ -844,7 +866,8 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                     }
 
                     List<PowerupState> powerupStates = new();
-                    foreach (var timePointEntry in timePointEnteries) {
+                    for (int j = 0; j < timePointEnteries.Count; j++) {
+                        var timePointEntry = timePointEnteries[j];
                         var timePoint = timePointEntry.timePoint;
                         if (timePoint is PointPowerChange powerChange) {
                             if (!powerupStates.Contains(powerChange.PowerupState)) {
@@ -886,7 +909,6 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             }
             BinaryReplayHeader header = replayListEntry.ReplayFile.Header;
             for (int i = 0; i < header.PlayerInformation.Length; i++) {
-                ref ReplayPlayerInformation info = ref header.PlayerInformation[i];
                 targetPlayerDropdown.options.Add(new TMP_Dropdown.OptionData { text = ReplayStatsRecorder.Instance.PlayerInfos[i].PlayerName });
             }
             targetPlayerDropdown.SetValueWithoutNotify(index);
@@ -994,26 +1016,34 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             action?.Invoke();
         }
 
-        public FP GetTotalTimeSpentStarman(List<TimePointEntry> timePointEntries) {
-            FP totalTimeSpentFrames = 0;
 
-            // now check all time points
-            foreach (var timePointEntry in timePointEntries) {
-                if (timePointEntry.timePoint is not PointStarmanChange) {
-                    continue;
+        public Span<FP> GetTotalTimeSpentInvincible(List<TimePointEntry> timePointEnteries) {
+            FP[] numbers = { 0, 0 };
+            Span<FP> timeSpent = numbers;
+
+            for (int i = 0; i < timePointEnteries.Count; i++) {
+                var timePointEntry = timePointEnteries[i];
+                var timePoint = timePointEntry.timePoint;
+
+                if (timePoint is PointStarmanChange starmanChange) {
+                    timeSpent[0] += starmanChange.Length * starmanChange.DeltaTime;
+                } else if (timePoint is PointPowerChange powerChange) {
+                    if (powerChange.PowerupState != PowerupState.MegaMushroom) {
+                        continue;
+                    }
+
+                    timeSpent[1] += powerChange.Length * powerChange.DeltaTime;
                 }
-
-                var timePoint = timePointEntry.timePoint as PointStarmanChange;
-                totalTimeSpentFrames += timePoint.Length * timePoint.DeltaTime;
             }
-            return totalTimeSpentFrames;
+            return timeSpent;
         }
 
         public FP GetTotalTimeSpentInPowerup(PowerupState checkingState, List<TimePointEntry> timePointEntries) {
             FP totalTimeSpentFrames = 0;
 
             // now check all time points
-            foreach (var timePointEntry in timePointEntries) {
+            for (int i = 0; i < timePointEnteries.Count; i++) {
+                var timePointEntry = timePointEnteries[i];
                 if (timePointEntry.timePoint is not PointPowerChange) {
                     continue;
                 }
@@ -1026,46 +1056,34 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             return totalTimeSpentFrames;
         }
 
-        public PowerupState GetMostUsedPowerupState(List<TimePointEntry> timePointEntries) {
-            Dictionary<PowerupState, int> stateFrames = new();
+        public KeyValuePair<PowerupState, FP> GetMostUsedPowerupState(List<TimePointEntry> timePointEntries) {
+            KeyValuePair<PowerupState, FP> mostUsedStateInfo = new(PowerupState.NoPowerup, 0);
+            Dictionary<PowerupState, FP> stateFrames = new();
             foreach (PowerupState state in Enum.GetValues(typeof(PowerupState))) {
-                if (state == PowerupState.NoPowerup) {
-                    continue;
-                }
                 stateFrames[state] = 0;
             }
 
             // now check all time points
-            foreach (var timePointEntry in timePointEntries) {
+            FP mostTimeUsed = 0;
+            for (int i = 0; i < timePointEnteries.Count; i++) {
+                var timePointEntry = timePointEnteries[i];
                 if (timePointEntry.timePoint is not PointPowerChange) {
                     continue;
                 }
                 var timePoint = timePointEntry.timePoint as PointPowerChange;
-                if (timePoint.PowerupState == PowerupState.NoPowerup) {
-                    continue;
-                }
-                stateFrames[timePoint.PowerupState] += timePoint.Length;
-            }
+                var timeUsed = stateFrames[timePoint.PowerupState] += timePoint.Length * timePoint.DeltaTime;
 
-            // now compare
-            PowerupState mostUsedState = PowerupState.NoPowerup;
-            int longestPoint = 0;
-            foreach (var kvp in stateFrames) {
-                var state = kvp.Key;
-                var duration = kvp.Value;
-
-                if (duration > longestPoint) {
-                    mostUsedState = state;
-                    longestPoint = duration;
+                if (timeUsed > mostTimeUsed) {
+                    mostUsedStateInfo = new(timePoint.PowerupState, timeUsed);
                 }
             }
-
-            return mostUsedState;
+            return mostUsedStateInfo;
         }
 
         private int GetItemSpawnCountInt(List<TimePointEntry> timePointEnteries) {
             int count = 0;
-            foreach (var timePointEntry in timePointEnteries) {
+            for (int i = 0; i < timePointEnteries.Count; i++) {
+                var timePointEntry = timePointEnteries[i];
                 var timePoint = timePointEntry.timePoint;
 
                 if (timePoint is PointCoinCollected coinCollected) {
@@ -1084,13 +1102,16 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
             Dictionary<CoinItemAsset, int> dictionary = new();
             BinaryReplayHeader header = replayListEntry.ReplayFile.Header;
             ref var rules = ref header.Rules;
+
+            // this is so we have a proper order
             if (QuantumUnityDB.TryGetGlobalAsset(rules.Gamemode, out var gamemode)) {
                 foreach (var item in gamemode.AllCoinItems) {
                     var coinItem = QuantumUnityDB.GetGlobalAsset(item);
                     dictionary.Add(coinItem, 0);
                 }
             }
-            foreach (var timePointEntry in timePointEnteries) {
+            for (int i = 0; i < timePointEnteries.Count; i++) {
+                var timePointEntry = timePointEnteries[i];
                 var timePoint = timePointEntry.timePoint;
 
                 if (timePoint is PointCoinCollected coinCollected) {
@@ -1272,17 +1293,20 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
         }
 
         public void PurgeObjects() {
-            foreach (var toggle in statToggles) {
-                Destroy(toggle.gameObject);
+            for (int i = 0; i < statToggles.Count; i++) {
+                var entry = statToggles[i];
+                Destroy(entry.gameObject);
             }
             statToggles.Clear();
 
-            foreach (var list in statLists) {
-                Destroy(list.gameObject);
+            for (int i = 0; i < statLists.Count; i++) {
+                var entry = statLists[i];
+                Destroy(entry.gameObject);
             }
             statLists.Clear();
 
-            foreach (var entry in timePointEnteries) {
+            for (int i = 0; i < timePointEnteries.Count; i++) {
+                var entry = timePointEnteries[i];
                 Destroy(entry.gameObject);
             }
             timePointEnteries.Clear();

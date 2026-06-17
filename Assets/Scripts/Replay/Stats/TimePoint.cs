@@ -366,7 +366,8 @@ namespace NSMB.Replay.Stats {
 
         // tUPle, first is the elemnt, second is stars lost third is total stars lost
         public override int FrameOffset => defaultFrameOffset;
-        public readonly List<(TimePoint Element, int StarsLost, int TotalStarsLost)> ComboElements = new();
+        public readonly List<(TimePoint element, int starsLost, int totalStarsLost)> ComboElements = new();
+        public bool EndsInDeath = false;
         public bool GameEnded = false;
         public override bool ShowEndTime => base.ShowEndTime && !GameEnded;
 
@@ -374,8 +375,9 @@ namespace NSMB.Replay.Stats {
         public Dictionary<PlayerRef, string> GetParticipants() {
             Dictionary<PlayerRef, string> attackerNames = new();
 
-            foreach (var element in ComboElements) {
-                if (element.Element is PointKnockback kbPoint) {
+            for (int i = 0; i < ComboElements.Count; i++) {
+                var (element, _, _) = ComboElements[i];
+                if (element is PointKnockback kbPoint) {
                     if (!attackerNames.ContainsKey(kbPoint.AttackerRef)) {
                         attackerNames.Add(kbPoint.AttackerRef, kbPoint.AttackerName);
                     }
@@ -385,20 +387,11 @@ namespace NSMB.Replay.Stats {
             return attackerNames;
         }
 
-        public bool EndsInDeath() {
-            foreach (var element in ComboElements) {
-                if (element.Element is PointDeath) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         public int TotalStarsAfterCombo() {
             int totalStars = 0;
-            foreach (var element in ComboElements) {
-                totalStars += element.StarsLost;
+            for (int i = 0; i < ComboElements.Count; i++) {
+                var (_, starsLost, _) = ComboElements[i];
+                totalStars += starsLost;
             }
             return totalStars;
         }
@@ -409,8 +402,9 @@ namespace NSMB.Replay.Stats {
 
         public void AddComboElement(TimePoint timePoint, int starsLost) {
             int totalStarsLost = starsLost;
-            foreach (var element in ComboElements) {
-                totalStarsLost += element.StarsLost;
+            for (int i = 0; i < ComboElements.Count; i++) {
+                var (_, starsLostElm, _) = ComboElements[i];
+                totalStarsLost += starsLostElm;
             }
             ComboElements.Add((timePoint, starsLost, totalStarsLost));
         }
@@ -418,7 +412,7 @@ namespace NSMB.Replay.Stats {
         public override void SetTimeText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             stringBuilder.Append("@ ");
             stringBuilder.Append(string.Join(", ", ComboElements.Select(
-                c => FrameToTime(c.Element.OccurenceFrame, StatsRecorder.ReplayStart, c.Element.DeltaTime))
+                c => FrameToTime(c.element.OccurenceFrame, StatsRecorder.ReplayStart, c.element.DeltaTime))
             ));
             stringBuilder.Append($" ({Length}F)");
         }
@@ -439,7 +433,7 @@ namespace NSMB.Replay.Stats {
 
         public override void SetSymbolsText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             var color = Color.red;
-            if (EndsInDeath()) {
+            if (EndsInDeath) {
                 stringBuilder.Append("<sprite name=\"room_lives\" color=#").Append(Utils.ColorToHex(color, false)).Append('>');
             }
             stringBuilder.Append("<sprite name=\"room_stars\" color=#").Append(Utils.ColorToHex(color, false)).Append('>');

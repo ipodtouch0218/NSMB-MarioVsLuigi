@@ -531,6 +531,7 @@ namespace NSMB.Replay.Stats
             // length is in frames
             comb.EndFrame = f.Number;
             comb.GameEnded = gameEnded;
+            comb.EndsInDeath = timePoint is PointDeath;
             playerInfo.ComboEndTimer = 0;
             playerInfo.CurrComboPoint = null;
         }

@@ -53,9 +53,10 @@ namespace NSMB.Replay.Stats {
             PlayerRef = playerRef;
         }
 
-        public IEnumerable<TimePoint> GetAllItemSpawnPoints() {
+        public List<TimePoint> GetAllItemSpawnPoints() {
             List<TimePoint> itemSpawnPoints = new();
-            foreach (var point in CoinsCollectedPoints) {
+            for (int i = 0; i < CoinsCollectedPoints.Count; i++) {
+                var point = CoinsCollectedPoints[i];
                 // skip no item drops
                 if (point.CoinItem == null) {
                     continue;
@@ -64,7 +65,8 @@ namespace NSMB.Replay.Stats {
                 itemSpawnPoints.Add(point);
             }
 
-            foreach (var point in BlockHitPoints) {
+            for (int i = 0; i < BlockHitPoints.Count; i++) {
+                var point = BlockHitPoints[i];
                 // skip no item drops
                 if (point.SpawnedItem == null) {
                     continue;
