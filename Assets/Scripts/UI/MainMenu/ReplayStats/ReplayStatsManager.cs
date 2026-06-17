@@ -1288,7 +1288,7 @@ namespace NSMB.UI.MainMenu.Submenus.ReplayStats {
                 if (i >= option.Count) {
                     break;
                 }
-                list.Value = option.ElementAt(i).defaultValue;
+                list.Value = option[i].defaultValue;
             }
         }
 
