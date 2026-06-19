@@ -1,5 +1,6 @@
 using NSMB.Addons;
 using NSMB.Networking;
+using NSMB.Replay.Stats;
 using NSMB.UI.MainMenu.Submenus.Replays;
 using NSMB.Utilities;
 using Photon.Deterministic;
@@ -20,6 +21,7 @@ namespace NSMB.Replay {
         public static event Action<ActiveReplayManager> OnReplayFastForwardEnded;
 
         //---Properties
+        public TimePoint SelectedTimePoint { get; private set; }
         public BinaryReplayFile CurrentReplay { get; private set; }
         public bool IsReplay => CurrentReplay != null;
         public int ReplayStart => CurrentReplay?.Header.InitialFrameNumber ?? -1;
@@ -227,13 +229,14 @@ namespace NSMB.Replay {
             }
         }
 
-        public async void StartReplayPlayback(BinaryReplayFile replay, int? startingFrame = null, bool noClearCache = false, object cameraArg = null) {
+        public async void StartReplayPlayback(BinaryReplayFile replay, int? startingFrame = null, bool noClearCache = false, object cameraArg = null, TimePoint timePoint = null) {
             if (replay.LoadAllIfNeeded() != ReplayParseResult.Success) {
                 return;
             }
 
             ReplayStartFrame = startingFrame;
             InitialCameraArg = cameraArg;
+            SelectedTimePoint = timePoint;
 
             GlobalController.Instance.loadingCanvas.dontHideOnGameDestroy = true;
             GlobalController.Instance.loadingCanvas.Initialize(null);

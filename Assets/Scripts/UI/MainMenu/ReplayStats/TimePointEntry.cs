@@ -72,7 +72,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
 
         public void StartReplayAtPart() {
             int targetFrame = timePoint.OccurenceFrame - timePoint.StatsRecorder.ReplayStart - timePoint.FrameOffset;
-            ActiveReplayManager.Instance.StartReplayPlayback(timePoint.StatsRecorder.ReplayFile, Math.Clamp(targetFrame, 0, timePoint.StatsRecorder.ReplayEnd), true, timePoint.GetCameraPos(DisplayArg));
+            ActiveReplayManager.Instance.StartReplayPlayback(timePoint.StatsRecorder.ReplayFile, Math.Clamp(targetFrame, 0, timePoint.StatsRecorder.ReplayEnd), true, timePoint.GetCameraPos(DisplayArg), timePoint);
         }
 
         #endregion

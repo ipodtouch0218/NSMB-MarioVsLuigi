@@ -1,5 +1,6 @@
 ﻿using JimmysUnityUtilities;
 using NSMB.Replay;
+using NSMB.Replay.Stats;
 using NSMB.Sound;
 using NSMB.UI.Pause;
 using NSMB.Utilities;
@@ -8,6 +9,7 @@ using Photon.Deterministic;
 using Quantum;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using TMPro;
@@ -32,7 +34,7 @@ namespace NSMB.UI.Game.Replay {
         [SerializeField] private TMP_Text replayTimecode;
         [SerializeField] private TMP_Text replayPauseButton;
         [SerializeField] private CanvasGroup replayCanvasGroup;
-        [SerializeField] private GameObject defaultSelection;
+        [SerializeField] private GameObject defaultSelection, markerTemplate;
 
         [SerializeField] private GameObject tabBlocker;
 
@@ -49,10 +51,13 @@ namespace NSMB.UI.Game.Replay {
         private StringBuilder builder = new();
         private ReplayUITab activeTab;
         private bool gameEnded;
+        private bool disableTimePointMarkers;
         private Frame resetFrame;
 
         private FieldInfo sessionSimulationField;
         private MethodInfo simulationAdjustTimeMethod;
+        private readonly List<GameObject> markers = new();
+        private readonly List<Image> markerImages = new();
 
         //---Formulas
         private int GetFastForwardTick(int frameNum) => frameNum + ActiveReplayManager.Instance.ReplayStart;
@@ -68,20 +73,22 @@ namespace NSMB.UI.Game.Replay {
         }
 
         public override void OnActivate(Frame f) {
-            replayUI.SetActive(ActiveReplayManager.Instance.IsReplay);
-            if (!ActiveReplayManager.Instance.IsReplay) {
+            var replayManager = ActiveReplayManager.Instance;
+            replayUI.SetActive(replayManager.IsReplay);
+            if (!replayManager.IsReplay) {
                 enabled = false;
                 return;
             }
 
             resetFrame = Game.CreateFrame();
             replayCanvasGroup.interactable = true;
-            replayLength = Utils.SecondsToMinuteSeconds(ActiveReplayManager.Instance.ReplayLength / f.UpdateRate);
+            replayLength = Utils.SecondsToMinuteSeconds(replayManager.ReplayLength / f.UpdateRate);
+            disableTimePointMarkers = replayManager.SelectedTimePoint == null || !replayManager.SelectedTimePoint.HasEndFrame;
             trackArrowText.gameObject.SetActive(false);
             Settings.Controls.UI.Pause.performed += OnPause;
 
-            if (ActiveReplayManager.Instance.ReplayStartFrame != null) {
-                SetToFrame(f, ActiveReplayManager.Instance.ReplayStartFrame.Value);
+            if (replayManager.ReplayStartFrame != null) {
+                SetToFrame(f, replayManager.ReplayStartFrame.Value);
             }
         }
 
@@ -91,6 +98,13 @@ namespace NSMB.UI.Game.Replay {
                 ActiveReplayManager.Instance.IsReplayFastForwarding = false;
             }
             Settings.Controls.UI.Pause.performed -= OnPause;
+
+            // purge lists
+            for (int i = 0; i < markers.Count; i++) {
+                Destroy(markers[i]);
+            }
+            markers.Clear();
+            markerImages.Clear();
         }
 
         public void Update() {
@@ -157,9 +171,11 @@ namespace NSMB.UI.Game.Replay {
                 previousTimestampSeconds = currentSeconds;
             }
 
-            float bufferPercentage = (float) ActiveReplayManager.Instance.ReplayFrameCache.Count * f.UpdateRate * 5 / ActiveReplayManager.Instance.ReplayLength;
-            trackBufferMask.rectTransform.SetAnchorMaxX(Mathf.Clamp01(bufferPercentage));
-            
+            if (disableTimePointMarkers) {
+                float bufferPercentage = (float) ActiveReplayManager.Instance.ReplayFrameCache.Count * f.UpdateRate * 5 / ActiveReplayManager.Instance.ReplayLength;
+                trackBufferMask.rectTransform.SetAnchorMaxX(Mathf.Clamp01(bufferPercentage));
+            }
+
             if (draggingArrow && (playerElements.PauseMenu.IsPaused || !replayCanvasGroup.interactable)) {
                 CancelArrowDrag();
             }
@@ -178,6 +194,38 @@ namespace NSMB.UI.Game.Replay {
             }
 
             trackArrow.localPosition = new Vector3(percentage * (maxTrackX - minTrackX) + minTrackX, 0, 0);
+
+            StatMarker[] statMarkers = ActiveReplayManager.Instance.SelectedTimePoint.ReplayMarkerData(f.Number, TimePoint.DisplayArgs.Normal);
+
+            // UPdate the lighter part of the track if it has an end frame (which can be the end of the replay)
+            if (ActiveReplayManager.Instance.SelectedTimePoint.HasEndFrame) {
+                float anchorStart = (float) (statMarkers[0].frame - ActiveReplayManager.Instance.ReplayStart) / ActiveReplayManager.Instance.ReplayLength;
+                float anchorEnd = statMarkers.Length < 2 ? 1 : (float) (statMarkers[^1].frame - ActiveReplayManager.Instance.ReplayStart) / ActiveReplayManager.Instance.ReplayLength;
+                trackBufferMask.rectTransform.SetAnchorMinX(Mathf.Clamp01(anchorStart - .011f));
+                trackBufferMask.rectTransform.SetAnchorMaxX(Mathf.Clamp01(anchorEnd + .011f));
+            }
+
+            for (int i = 0; i < statMarkers.Length; i++) {
+                var statMarkerInfo = statMarkers[i];
+                float markerNorm = (statMarkerInfo.frame + Game.InterpolationFactor - ActiveReplayManager.Instance.ReplayStart) / ActiveReplayManager.Instance.ReplayLength;
+                GameObject marker;
+                Image markerImage;
+
+                // use cache
+                if (i >= markers.Count) {
+                    marker = Instantiate(markerTemplate, markerTemplate.transform.parent);
+                    marker.SetActive(true);
+                    marker.name = $"Marker{i}";
+                    markerImage = marker.GetComponent<Image>();
+                    markers.Add(marker);
+                    markerImages.Add(markerImage);
+                } else {
+                    marker = markers[i];
+                    markerImage = markerImages[i];
+                }
+                marker.transform.localPosition = new Vector3(markerNorm * (maxTrackX - minTrackX) + minTrackX, 0, 0);
+                markerImage.color = statMarkerInfo.color;
+            }
         }
 
         public void OpenTab(ReplayUITab tab) {

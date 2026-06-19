@@ -9,6 +9,12 @@ using System.Text;
 using UnityEngine;
 
 namespace NSMB.Replay.Stats {
+    public struct StatMarker {
+        public Color color;
+        public int frame;
+        public bool isPassed;
+    }
+
 
     /**
      * Use this class to save information such as when a powerUP is GOtten,
@@ -19,6 +25,9 @@ namespace NSMB.Replay.Stats {
         public int EndFrame = -1;
         public virtual bool ShowEndTime => HasEndFrame;
         public virtual bool ShowLength => HasEndFrame;
+        public virtual Color[] MarkerStartColor => new Color[2] { Color.green, Color.yellow };
+        public virtual Color[] MarkerEndColor => new Color[2] { Color.red, Color.yellow };
+        public virtual Color[] MarkerMiddleColor => new Color[2] { Color.blue, Color.yellow };
         public abstract int FrameOffset { get; }
 
         //---one-set variables
@@ -99,6 +108,30 @@ namespace NSMB.Replay.Stats {
         public virtual object GetCameraPos(DisplayArgs displayArg) => AffectedPlayerRef;
 
         public virtual bool ShowTooltipIcon(TranslationManager tm, DisplayArgs displayArg) => GetTooltip(tm, displayArg) != null;
+        public virtual StatMarker[] ReplayMarkerData(int replayFrameNum, DisplayArgs displayArg) {
+            int numOfMarkers = ShowEndTime ? 2 : 1;
+            var markers = new StatMarker[numOfMarkers];
+
+            static Color GetMarkerColor(int frameNum, int targetFrame, Color[] colors) => frameNum >= targetFrame ? colors[0] : colors[1];
+
+            // start marker
+            markers[0] = new StatMarker() {
+                color = GetMarkerColor(replayFrameNum, OccurenceFrame, MarkerStartColor),
+                frame = OccurenceFrame,
+                isPassed = replayFrameNum > OccurenceFrame,
+            };
+
+            // end marker
+            if (ShowEndTime) {
+                markers[1] = new StatMarker() {
+                    color = GetMarkerColor(replayFrameNum, EndFrame, MarkerEndColor),
+                    frame = EndFrame,
+                    isPassed = replayFrameNum > EndFrame
+                };
+            }
+
+            return markers;
+        }
 
         //---static methods
         public static void ResetIndex() => _index = 0;
@@ -490,6 +523,40 @@ namespace NSMB.Replay.Stats {
             default:
                 return AffectedPlayerRef;
             }
+        }
+
+        public override StatMarker[] ReplayMarkerData(int replayFrameNum, DisplayArgs displayArg) {
+            var markers = new StatMarker[2 + ComboElements.Count];
+
+            static Color GetMarkerColor(int frameNum, int targetFrame, Color[] colors) => frameNum >= targetFrame ? colors[0] : colors[1];
+
+            // everything in between
+            for (int i = 0; i < ComboElements.Count; i++) {
+                var (element, _, _) = ComboElements[i];
+                markers[i] = new StatMarker() {
+                    color = GetMarkerColor(replayFrameNum, element.OccurenceFrame, MarkerMiddleColor),
+                    frame = element.OccurenceFrame,
+                    isPassed = replayFrameNum >= element.OccurenceFrame,
+                };
+            }
+
+            // start marker
+            markers[ComboElements.Count] = new StatMarker() {
+                color = GetMarkerColor(replayFrameNum, OccurenceFrame, MarkerStartColor),
+                frame = OccurenceFrame,
+                isPassed = replayFrameNum > OccurenceFrame,
+            };
+
+            // end marker
+            if (ShowEndTime) {
+                markers[ComboElements.Count+1] = new StatMarker() {
+                    color = GetMarkerColor(replayFrameNum, EndFrame, MarkerEndColor),
+                    frame = EndFrame,
+                    isPassed = replayFrameNum > EndFrame
+                };
+            }
+
+            return markers;
         }
     }
 
