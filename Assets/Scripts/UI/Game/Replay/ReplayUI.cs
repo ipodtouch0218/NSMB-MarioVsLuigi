@@ -37,6 +37,7 @@ namespace NSMB.UI.Game.Replay {
         [SerializeField] private GameObject defaultSelection, markerTemplate;
 
         [SerializeField] private GameObject tabBlocker;
+        [SerializeField] private GameObject restartButton;
 
         //---Properties
         public bool TabOpen => activeTab;
@@ -83,7 +84,10 @@ namespace NSMB.UI.Game.Replay {
             resetFrame = Game.CreateFrame();
             replayCanvasGroup.interactable = true;
             replayLength = Utils.SecondsToMinuteSeconds(replayManager.ReplayLength / f.UpdateRate);
-            disableTimePointMarkers = replayManager.SelectedTimePoint == null || !replayManager.SelectedTimePoint.HasEndFrame;
+            disableTimePointMarkers = replayManager.SelectedTimePoint == null;
+            if (disableTimePointMarkers) {
+                restartButton.SetActive(false);
+            }
             trackArrowText.gameObject.SetActive(false);
             Settings.Controls.UI.Pause.performed += OnPause;
 
@@ -99,12 +103,7 @@ namespace NSMB.UI.Game.Replay {
             }
             Settings.Controls.UI.Pause.performed -= OnPause;
 
-            // purge lists
-            for (int i = 0; i < markers.Count; i++) {
-                Destroy(markers[i]);
-            }
-            markers.Clear();
-            markerImages.Clear();
+            PurgeMarkers();
         }
 
         public void Update() {
@@ -171,8 +170,9 @@ namespace NSMB.UI.Game.Replay {
                 previousTimestampSeconds = currentSeconds;
             }
 
-            if (disableTimePointMarkers) {
+            if (disableTimePointMarkers || !ActiveReplayManager.Instance.SelectedTimePoint.HasEndFrame) {
                 float bufferPercentage = (float) ActiveReplayManager.Instance.ReplayFrameCache.Count * f.UpdateRate * 5 / ActiveReplayManager.Instance.ReplayLength;
+                trackBufferMask.rectTransform.SetAnchorMinX(0);
                 trackBufferMask.rectTransform.SetAnchorMaxX(Mathf.Clamp01(bufferPercentage));
             }
 
@@ -195,36 +195,42 @@ namespace NSMB.UI.Game.Replay {
 
             trackArrow.localPosition = new Vector3(percentage * (maxTrackX - minTrackX) + minTrackX, 0, 0);
 
-            StatMarker[] statMarkers = ActiveReplayManager.Instance.SelectedTimePoint.ReplayMarkerData(f.Number, TimePoint.DisplayArgs.Normal);
+            if (disableTimePointMarkers) {
+                return;
+            }
+
+            StatMarker[] statMarkers = ActiveReplayManager.Instance.SelectedTimePoint?.ReplayMarkerData(f.Number, TimePoint.DisplayArgs.Normal);
 
             // UPdate the lighter part of the track if it has an end frame (which can be the end of the replay)
-            if (ActiveReplayManager.Instance.SelectedTimePoint.HasEndFrame) {
+            if (ActiveReplayManager.Instance.SelectedTimePoint != null && ActiveReplayManager.Instance.SelectedTimePoint.HasEndFrame) {
                 float anchorStart = (float) (statMarkers[0].frame - ActiveReplayManager.Instance.ReplayStart) / ActiveReplayManager.Instance.ReplayLength;
                 float anchorEnd = statMarkers.Length < 2 ? 1 : (float) (statMarkers[^1].frame - ActiveReplayManager.Instance.ReplayStart) / ActiveReplayManager.Instance.ReplayLength;
                 trackBufferMask.rectTransform.SetAnchorMinX(Mathf.Clamp01(anchorStart - .011f));
                 trackBufferMask.rectTransform.SetAnchorMaxX(Mathf.Clamp01(anchorEnd + .011f));
             }
 
-            for (int i = 0; i < statMarkers.Length; i++) {
-                var statMarkerInfo = statMarkers[i];
-                float markerNorm = (statMarkerInfo.frame + Game.InterpolationFactor - ActiveReplayManager.Instance.ReplayStart) / ActiveReplayManager.Instance.ReplayLength;
-                GameObject marker;
-                Image markerImage;
+            if (statMarkers != null) {
+                for (int i = 0; i < statMarkers.Length; i++) {
+                    var statMarkerInfo = statMarkers[i];
+                    float markerNorm = (statMarkerInfo.frame + Game.InterpolationFactor - ActiveReplayManager.Instance.ReplayStart) / ActiveReplayManager.Instance.ReplayLength;
+                    GameObject marker;
+                    Image markerImage;
 
-                // use cache
-                if (i >= markers.Count) {
-                    marker = Instantiate(markerTemplate, markerTemplate.transform.parent);
-                    marker.SetActive(true);
-                    marker.name = $"Marker{i}";
-                    markerImage = marker.GetComponent<Image>();
-                    markers.Add(marker);
-                    markerImages.Add(markerImage);
-                } else {
-                    marker = markers[i];
-                    markerImage = markerImages[i];
+                    // use cache
+                    if (i >= markers.Count) {
+                        marker = Instantiate(markerTemplate, markerTemplate.transform.parent);
+                        marker.SetActive(true);
+                        marker.name = $"Marker{i}";
+                        markerImage = marker.GetComponent<Image>();
+                        markers.Add(marker);
+                        markerImages.Add(markerImage);
+                    } else {
+                        marker = markers[i];
+                        markerImage = markerImages[i];
+                    }
+                    marker.transform.localPosition = new Vector3(markerNorm * (maxTrackX - minTrackX) + minTrackX, 0, 0);
+                    markerImage.color = statMarkerInfo.color;
                 }
-                marker.transform.localPosition = new Vector3(markerNorm * (maxTrackX - minTrackX) + minTrackX, 0, 0);
-                markerImage.color = statMarkerInfo.color;
             }
         }
 
@@ -250,6 +256,14 @@ namespace NSMB.UI.Game.Replay {
             replayUI.SetActive(!replayUI.activeSelf);
             //playerElements.spectationUI.SetActive(replayUI.activeSelf);
             return replayUI.activeSelf;
+        }
+
+        public void RestartAtTimePoint() {
+            if (!ActiveReplayManager.Instance.IsReplay || disableTimePointMarkers) {
+                return;
+            }
+
+            SetToFrame(QuantumRunner.DefaultGame.Frames.Predicted, ActiveReplayManager.Instance.ReplayStartFrame.Value);
         }
 
         public void RewindReplay() {
@@ -378,6 +392,15 @@ namespace NSMB.UI.Game.Replay {
             int cachedFrame = (newFrameCacheIndex * (5 * f.UpdateRate)) + ActiveReplayManager.Instance.ReplayStart;
 
             var session = runner.Session;
+
+            if (!disableTimePointMarkers) {
+                if (newFrame > ActiveReplayManager.Instance.SelectedTimePoint.EndFrame || newFrame < ActiveReplayManager.Instance.SelectedTimePoint.OccurenceFrame) {
+                    PurgeMarkers();
+                    restartButton.SetActive(false);
+                    disableTimePointMarkers = true;
+                }
+            }
+
             if (cachedFrame > f.Number || newFrame < f.Number) {
                 ActiveReplayManager.Instance.IsReplayFastForwarding = true;
                 resetFrame.Deserialize(ActiveReplayManager.Instance.ReplayFrameCache[newFrameCacheIndex]);
@@ -507,6 +530,14 @@ namespace NSMB.UI.Game.Replay {
             if (ActiveReplayManager.Instance.IsReplayFastForwarding) {
                 FinishFastForward();
             }
+        }
+
+        private void PurgeMarkers() {
+            for (int i = 0; i < markers.Count; i++) {
+                Destroy(markers[i]);
+            }
+            markers.Clear();
+            markerImages.Clear();
         }
     }
 }
