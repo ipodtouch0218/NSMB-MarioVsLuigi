@@ -28,12 +28,12 @@ namespace Quantum {
                 return false;
             }
 
-            CoinItemAsset powerupToSpawn = GetItemAsset(f, entity, mario);
-            Bump(f, null, tilePosition, resultTile, direction, entity, allowSelfDamage, powerupToSpawn.Prefab);
+            var (powerupToSpawn, spawnChance, totalSpawnChance) = GetItemAsset(f, entity, mario);
+            Bump(f, null, tilePosition, resultTile, direction, entity, allowSelfDamage, powerupToSpawn.Prefab, spawnChance, totalSpawnChance);
             playBumpSound = false;
             return false;
         }
 
-        public abstract CoinItemAsset GetItemAsset(Frame f, EntityRef marioEntity, MarioPlayer* mario);
+        public abstract (CoinItemAsset, FP, FP) GetItemAsset(Frame f, EntityRef marioEntity, MarioPlayer* mario);
     }
 }

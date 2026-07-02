@@ -1685,23 +1685,23 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct BlockBump : Quantum.IComponent {
-    public const Int32 SIZE = 80;
+    public const Int32 SIZE = 96;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public Byte Lifetime;
     [FieldOffset(24)]
     public AssetRef<StageTile> StartTile;
-    [FieldOffset(64)]
+    [FieldOffset(80)]
     public StageTileInstance ResultTile;
     [FieldOffset(16)]
     public AssetRef<EntityPrototype> Powerup;
     [FieldOffset(12)]
     [ExcludeFromPrototype()]
     public QBoolean IsDownwards;
-    [FieldOffset(48)]
+    [FieldOffset(64)]
     [ExcludeFromPrototype()]
     public FPVector2 Origin;
-    [FieldOffset(40)]
+    [FieldOffset(56)]
     [ExcludeFromPrototype()]
     public IntVector2 Tile;
     [FieldOffset(32)]
@@ -1713,6 +1713,12 @@ namespace Quantum {
     [FieldOffset(8)]
     [ExcludeFromPrototype()]
     public QBoolean HasBumped;
+    [FieldOffset(40)]
+    [ExcludeFromPrototype()]
+    public FP SpawnChanceRaw;
+    [FieldOffset(48)]
+    [ExcludeFromPrototype()]
+    public FP TotalSpawnChance;
     public override readonly Int32 GetHashCode() {
       unchecked { 
         var hash = 21089;
@@ -1726,6 +1732,8 @@ namespace Quantum {
         hash = hash * 31 + Owner.GetHashCode();
         hash = hash * 31 + AllowSelfDamage.GetHashCode();
         hash = hash * 31 + HasBumped.GetHashCode();
+        hash = hash * 31 + SpawnChanceRaw.GetHashCode();
+        hash = hash * 31 + TotalSpawnChance.GetHashCode();
         return hash;
       }
     }
@@ -1738,6 +1746,8 @@ namespace Quantum {
         AssetRef.Serialize(&p->Powerup, serializer);
         AssetRef.Serialize(&p->StartTile, serializer);
         EntityRef.Serialize(&p->Owner, serializer);
+        FP.Serialize(&p->SpawnChanceRaw, serializer);
+        FP.Serialize(&p->TotalSpawnChance, serializer);
         IntVector2.Serialize(&p->Tile, serializer);
         FPVector2.Serialize(&p->Origin, serializer);
         Quantum.StageTileInstance.Serialize(&p->ResultTile, serializer);
@@ -2005,7 +2015,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct CoinItem : Quantum.IComponent {
-    public const Int32 SIZE = 64;
+    public const Int32 SIZE = 80;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(16)]
     public AssetRef<CoinItemAsset> Scriptable;
@@ -2020,10 +2030,10 @@ namespace Quantum {
     [FieldOffset(12)]
     [ExcludeFromPrototype()]
     public QBoolean LaunchSpawn;
-    [FieldOffset(48)]
+    [FieldOffset(64)]
     [ExcludeFromPrototype()]
     public FPVector2 BlockSpawnOrigin;
-    [FieldOffset(32)]
+    [FieldOffset(48)]
     [ExcludeFromPrototype()]
     public FPVector2 BlockSpawnDestination;
     [FieldOffset(0)]
@@ -2038,6 +2048,12 @@ namespace Quantum {
     [FieldOffset(24)]
     [ExcludeFromPrototype()]
     public EntityRef ParentMarioPlayer;
+    [FieldOffset(32)]
+    [ExcludeFromPrototype()]
+    public FP SpawnChanceRaw;
+    [FieldOffset(40)]
+    [ExcludeFromPrototype()]
+    public FP TotalSpawnChance;
     public override readonly Int32 GetHashCode() {
       unchecked { 
         var hash = 13469;
@@ -2052,6 +2068,8 @@ namespace Quantum {
         hash = hash * 31 + SpawnAnimationFrames.GetHashCode();
         hash = hash * 31 + IgnorePlayerFrames.GetHashCode();
         hash = hash * 31 + ParentMarioPlayer.GetHashCode();
+        hash = hash * 31 + SpawnChanceRaw.GetHashCode();
+        hash = hash * 31 + TotalSpawnChance.GetHashCode();
         return hash;
       }
     }
@@ -2066,6 +2084,8 @@ namespace Quantum {
         QBoolean.Serialize(&p->LaunchSpawn, serializer);
         AssetRef.Serialize(&p->Scriptable, serializer);
         EntityRef.Serialize(&p->ParentMarioPlayer, serializer);
+        FP.Serialize(&p->SpawnChanceRaw, serializer);
+        FP.Serialize(&p->TotalSpawnChance, serializer);
         FPVector2.Serialize(&p->BlockSpawnDestination, serializer);
         FPVector2.Serialize(&p->BlockSpawnOrigin, serializer);
     }

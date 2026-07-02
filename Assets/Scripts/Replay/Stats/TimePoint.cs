@@ -108,11 +108,9 @@ namespace NSMB.Replay.Stats {
         public virtual object GetCameraPos(DisplayArgs displayArg) => AffectedPlayerRef;
 
         public virtual bool ShowTooltipIcon(TranslationManager tm, DisplayArgs displayArg) => GetTooltip(tm, displayArg) != null;
-        public virtual StatMarker[] ReplayMarkerData(int replayFrameNum, DisplayArgs displayArg) {
+        public virtual (StatMarker[] markers, int startPoint, int endPoint) ReplayMarkerData(int replayFrameNum, DisplayArgs displayArg) {
             int numOfMarkers = ShowEndTime ? 2 : 1;
             var markers = new StatMarker[numOfMarkers];
-
-            static Color GetMarkerColor(int frameNum, int targetFrame, Color[] colors) => frameNum >= targetFrame ? colors[0] : colors[1];
 
             // start marker
             markers[0] = new StatMarker() {
@@ -130,7 +128,7 @@ namespace NSMB.Replay.Stats {
                 };
             }
 
-            return markers;
+            return (markers, OccurenceFrame, ShowEndTime ? EndFrame : -1);
         }
 
         //---static methods
@@ -150,6 +148,8 @@ namespace NSMB.Replay.Stats {
             return time;
         }
 
+        public static Color GetMarkerColor(int frameNum, int targetFrame, Color[] colors) => frameNum < targetFrame ? colors[0] : colors[1];
+
         // any extra parameters can be GOtten
     }
 
@@ -159,27 +159,22 @@ namespace NSMB.Replay.Stats {
         public readonly FP? SpawnChancePercentage, SpawnChanceRaw;
         public readonly int CoinCount, CoinCountTotal, CurrStarCount, LeaderStars;
         public readonly FP AverageStarCount;
+        public readonly List<PointCoinCollected> CoinCollectedPoints;
 
-        public PointCoinCollected(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, int coinCount, CoinItemAsset coinItemAsset) : base(statsRecorder, f, mario) {
+        public PointCoinCollected(ReplayStatsRecorder statsRecorder, Frame f, MarioPlayer* mario, PlayerInfo playerInfo, int coinCount, CoinItem* coinItem, List<PointCoinCollected> coinCollectedPoints) : base(statsRecorder, f, mario) {
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             CurrStarCount = gamemode.GetTeamObjectiveCount(f, mario->GetTeam(f)) ?? -1;
             LeaderStars = gamemode.GetFirstPlaceObjectiveCount(f);
             AverageStarCount = gamemode.GetAverageObjectiveCount(f);
             CoinCount = coinCount;
             CoinCountTotal = ++playerInfo.Coins;
-            if (coinItemAsset is CoinItemAsset coinItem) {
-                CoinItem = coinItem;
-                SpawnChanceRaw = gamemode.GetItemSpawnWeight(f, coinItem, CurrStarCount);
-                FP sum = 0;
-                foreach (var currCoinItemRef in gamemode.AllCoinItems) {
-                    CoinItemAsset currCoinItemAsset = f.FindAsset(currCoinItemRef);
-                    if (!currCoinItemAsset.CanSpawn(f, false)) {
-                        continue;
-                    }
-                    sum += gamemode.GetItemSpawnWeight(f, currCoinItemAsset, CurrStarCount);
-                }
-                SpawnChancePercentage = SpawnChanceRaw / sum * 100;
+            if (coinItem != null) {
+                CoinItem = f.FindAsset(coinItem->Scriptable);
+                SpawnChanceRaw = coinItem->SpawnChanceRaw;
+                SpawnChancePercentage = SpawnChanceRaw / coinItem->TotalSpawnChance * 100;
             }
+
+            CoinCollectedPoints = coinCollectedPoints;
         }
 
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) => stringBuilder.Append(tm.GetTranslation("ui.replay.stats.entry.coincollected"));
@@ -204,6 +199,33 @@ namespace NSMB.Replay.Stats {
             }
             var itemTranslation = tm.GetTranslation(CoinItem.TranslationKey);
             return tm.GetTranslationWithReplacements(translationPrefix+"tooltip.randomspawn", "item", itemTranslation, "chance", $"{(float) SpawnChancePercentage.GetValueOrDefault():0.00}");
+        }
+
+        public override (StatMarker[], int, int) ReplayMarkerData(int replayFrameNum, DisplayArgs displayArg) {
+            var markers = new StatMarker[CoinCollectedPoints.Count];
+
+            int index = 0;
+            for (int i = 0; i < CoinCollectedPoints.Count - 1; i++) {
+                var currPoint = CoinCollectedPoints[index++];
+                if (currPoint == this) {
+                    continue;
+                }
+
+                markers[i] = new StatMarker() {
+                    color = GetMarkerColor(replayFrameNum, currPoint.OccurenceFrame, MarkerMiddleColor),
+                    frame = currPoint.OccurenceFrame,
+                    isPassed = replayFrameNum >= currPoint.OccurenceFrame,
+                };
+            }
+
+            // draw our point last so it's on top
+            markers[CoinCollectedPoints.Count - 1] = new StatMarker() {
+                color = GetMarkerColor(replayFrameNum, OccurenceFrame, MarkerStartColor),
+                frame = OccurenceFrame,
+                isPassed = replayFrameNum >= OccurenceFrame
+            };
+
+            return (markers, -1, -1);
         }
     }
 
@@ -525,10 +547,8 @@ namespace NSMB.Replay.Stats {
             }
         }
 
-        public override StatMarker[] ReplayMarkerData(int replayFrameNum, DisplayArgs displayArg) {
+        public override (StatMarker[], int, int) ReplayMarkerData(int replayFrameNum, DisplayArgs displayArg) {
             var markers = new StatMarker[2 + ComboElements.Count];
-
-            static Color GetMarkerColor(int frameNum, int targetFrame, Color[] colors) => frameNum >= targetFrame ? colors[0] : colors[1];
 
             // everything in between
             for (int i = 0; i < ComboElements.Count; i++) {
@@ -540,7 +560,7 @@ namespace NSMB.Replay.Stats {
                 };
             }
 
-            // start marker
+            // start marker so it gets drawn on top
             markers[ComboElements.Count] = new StatMarker() {
                 color = GetMarkerColor(replayFrameNum, OccurenceFrame, MarkerStartColor),
                 frame = OccurenceFrame,
@@ -556,7 +576,7 @@ namespace NSMB.Replay.Stats {
                 };
             }
 
-            return markers;
+            return (markers, OccurenceFrame, ShowEndTime ? EndFrame : -1);
         }
     }
 
@@ -715,7 +735,7 @@ namespace NSMB.Replay.Stats {
         public readonly int CurrStarCount, LeaderStars;
         public readonly FP AverageStarCount;
 
-        public PointBlockHit(Frame f, ReplayStatsRecorder stats, MarioPlayer* mario, bool wasRandom, CoinItemAsset spawnedItem) : base(stats, f, mario) {
+        public PointBlockHit(Frame f, ReplayStatsRecorder stats, MarioPlayer* mario, bool wasRandom, CoinItemAsset spawnedItem, FP spawnChanceRaw, FP totalSpawnChance) : base(stats, f, mario) {
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             WasRandom = wasRandom;
             SpawnedItem = spawnedItem;
@@ -723,16 +743,8 @@ namespace NSMB.Replay.Stats {
             LeaderStars = gamemode.GetFirstPlaceObjectiveCount(f);
             AverageStarCount = gamemode.GetAverageObjectiveCount(f);
             if (WasRandom) {
-                SpawnChanceRaw = gamemode.GetItemSpawnWeight(f, spawnedItem, CurrStarCount);
-                FP sum = 0;
-                foreach (var currCoinItemRef in gamemode.AllCoinItems) {
-                    CoinItemAsset currCoinItemAsset = f.FindAsset(currCoinItemRef);
-                    if (!currCoinItemAsset.CanSpawn(f, true)) {
-                        continue;
-                    }
-                    sum += gamemode.GetItemSpawnWeight(f, currCoinItemAsset, CurrStarCount);
-                }
-                SpawnChancePercentage = SpawnChanceRaw / sum * 100;
+                SpawnChanceRaw = spawnChanceRaw;
+                SpawnChancePercentage = SpawnChanceRaw / totalSpawnChance * 100;
             }
         }
 
@@ -765,10 +777,39 @@ namespace NSMB.Replay.Stats {
 
     public unsafe class PointTaunt : TimePoint {
         public override int FrameOffset => defaultFrameOffset;
-        public PointTaunt(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario) : base(stats, f, mario) { }
+        public readonly List<PointTaunt> TauntPoints;
+        public PointTaunt(ReplayStatsRecorder stats, Frame f, MarioPlayer* mario, List<PointTaunt> tauntPoints) : base(stats, f, mario) {
+            TauntPoints = tauntPoints;
+        }
         public override void SetDescriptionText(TranslationManager tm, StringBuilder stringBuilder, DisplayArgs displayArg) {
             string translationKey = translationPrefix+"taunt";
             stringBuilder.Append(tm.GetTranslation(translationKey));
+        }
+
+        public override (StatMarker[], int, int) ReplayMarkerData(int replayFrameNum, DisplayArgs displayArg) {
+            var markers = new StatMarker[TauntPoints.Count];
+            int index = 0;
+            for (int i = 0; i < TauntPoints.Count - 1; i++) {
+                var currPoint = TauntPoints[index++];
+                if (currPoint == this) {
+                    continue;
+                }
+
+                markers[i] = new StatMarker() {
+                    color = GetMarkerColor(replayFrameNum, currPoint.OccurenceFrame, MarkerMiddleColor),
+                    frame = currPoint.OccurenceFrame,
+                    isPassed = replayFrameNum >= currPoint.OccurenceFrame,
+                };
+            }
+
+            // draw our point last so it's on top
+            markers[TauntPoints.Count - 1] = new StatMarker() {
+                color = GetMarkerColor(replayFrameNum, OccurenceFrame, MarkerStartColor),
+                frame = OccurenceFrame,
+                isPassed = replayFrameNum >= OccurenceFrame
+            };
+
+            return (markers, OccurenceFrame, -1);
         }
     }
 

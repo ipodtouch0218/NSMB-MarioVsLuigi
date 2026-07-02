@@ -64,12 +64,11 @@ namespace NSMB.Replay.Stats
 
             var playerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
 
-            CoinItemAsset coinItemAsset = null;
+            CoinItem* coinItemPtr = null;
             if (e.ItemSpawned != EntityRef.None) {
-                var coinItemPtr = f.Unsafe.GetPointer<CoinItem>(e.ItemSpawned);
-                coinItemAsset = f.FindAsset(coinItemPtr->Scriptable);
+                coinItemPtr = f.Unsafe.GetPointer<CoinItem>(e.ItemSpawned);
             }
-            playerInfo.CoinsCollectedPoints.Add(new PointCoinCollected(StatRecorder, f, mario, playerInfo, e.Coins, coinItemAsset));
+            playerInfo.CoinsCollectedPoints.Add(new PointCoinCollected(StatRecorder, f, mario, playerInfo, e.Coins, coinItemPtr, playerInfo.CoinsCollectedPoints));
         }
 
         public void OnMarioPlayerCollectedStar(EventMarioPlayerCollectedStar e, Frame f) {
@@ -322,7 +321,7 @@ namespace NSMB.Replay.Stats
             }
 
             var marioPlayerInfo = StatRecorder.PlayerInfos[mario->PlayerRef];
-            marioPlayerInfo.TauntPoints.Add(new PointTaunt(StatRecorder, f, mario));
+            marioPlayerInfo.TauntPoints.Add(new PointTaunt(StatRecorder, f, mario, marioPlayerInfo.TauntPoints));
         }
 
         // global trackers
@@ -408,7 +407,7 @@ namespace NSMB.Replay.Stats
                                 break;
                             }
                         }
-                        playerInfo.BlockHitPoints.Add(new PointBlockHit(f, StatRecorder, ownerPtr, powerupTile is RouletteTile, coinItemAsset));
+                        playerInfo.BlockHitPoints.Add(new PointBlockHit(f, StatRecorder, ownerPtr, powerupTile is RouletteTile, coinItemAsset, blockBump->SpawnChanceRaw, blockBump->TotalSpawnChance));
                         playerInfo.BlocksBumped.Add(entityRef);
                     }
                 }

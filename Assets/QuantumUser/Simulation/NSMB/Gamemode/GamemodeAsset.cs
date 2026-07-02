@@ -66,7 +66,7 @@ namespace Quantum {
             return false;
         }
 
-        public virtual CoinItemAsset GetRandomItem(Frame f, MarioPlayer* mario, bool fromBlock) {
+        public virtual (CoinItemAsset, FP, FP) GetRandomItem(Frame f, MarioPlayer* mario, bool fromBlock) {
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
             // "Losing" variable based on ln(x+1)
@@ -93,13 +93,13 @@ namespace Quantum {
                 FP chance = GetItemSpawnWeight(f, coinItem, ourObjectiveCount);
 
                 if (rand < chance) {
-                    return coinItem;
+                    return (coinItem, chance, totalChance);
                 }
 
                 rand -= chance;
             }
 
-            return f.FindAsset(FallbackCoinItem);
+            return (f.FindAsset(FallbackCoinItem), 0, 0);
         }
 
         public abstract FP GetItemSpawnWeight(Frame f, CoinItemAsset item, int ourObjectiveCount);

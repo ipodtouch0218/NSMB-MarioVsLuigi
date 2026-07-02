@@ -55,6 +55,8 @@ namespace Quantum {
 
                 if (f.Unsafe.TryGetPointer(newCoinItemEntity, out CoinItem* coinItem)
                     && f.TryFindAsset(coinItem->Scriptable, out CoinItemAsset cia)) {
+                    coinItem->SpawnChanceRaw = blockBump->SpawnChanceRaw;
+                    coinItem->TotalSpawnChance = blockBump->TotalSpawnChance;
 
                     cia.InitializeFromBlockBump(f, newCoinItemEntity, ref filter);
                 }

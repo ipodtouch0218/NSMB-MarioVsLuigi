@@ -78,14 +78,14 @@ namespace Quantum {
             return doBreak;
         }
 
-        public static void Bump(Frame f, VersusStageData stage, IntVector2 tilePosition, StageTileInstance result, InteractionDirection direction, EntityRef owner, bool allowSelfDamage, AssetRef<EntityPrototype> powerup = default) {
+        public static void Bump(Frame f, VersusStageData stage, IntVector2 tilePosition, StageTileInstance result, InteractionDirection direction, EntityRef owner, bool allowSelfDamage, AssetRef<EntityPrototype> powerup = default, FP? powerupSpawnChanceRaw = null, FP? powerupTotalSpawnChance = null) {
             if (stage == null) {
                 stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             }
-            Bump(f, stage, tilePosition, stage.GetTileRelative(f, tilePosition).Tile, result, direction, owner, allowSelfDamage, powerup);
+            Bump(f, stage, tilePosition, stage.GetTileRelative(f, tilePosition).Tile, result, direction, owner, allowSelfDamage, powerup, powerupSpawnChanceRaw, powerupTotalSpawnChance);
         }
 
-        public static void Bump(Frame f, VersusStageData stage, IntVector2 tilePosition, AssetRef<StageTile> tile, StageTileInstance result, InteractionDirection direction, EntityRef owner, bool allowSelfDamage, AssetRef<EntityPrototype> powerup = default) {
+        public static void Bump(Frame f, VersusStageData stage, IntVector2 tilePosition, AssetRef<StageTile> tile, StageTileInstance result, InteractionDirection direction, EntityRef owner, bool allowSelfDamage, AssetRef<EntityPrototype> powerup = default, FP? powerupSpawnChanceRaw = null, FP? powerupTotalSpawnChance = null) {
             if (stage == null) {
                 stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             }
@@ -103,6 +103,8 @@ namespace Quantum {
             blockBump->Owner = owner;
             blockBump->AllowSelfDamage = allowSelfDamage;
             blockBump->HasBumped = direction is InteractionDirection.Left or InteractionDirection.Right;
+            blockBump->SpawnChanceRaw  = powerupSpawnChanceRaw ?? -1;
+            blockBump->TotalSpawnChance  = powerupTotalSpawnChance ?? -1;
 
             stage.SetTileRelative(f, tilePosition, new StageTileInstance {
                 Tile = f.SimulationConfig.InvisibleSolidTile,

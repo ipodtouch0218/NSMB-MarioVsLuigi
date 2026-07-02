@@ -199,12 +199,12 @@ namespace NSMB.UI.Game.Replay {
                 return;
             }
 
-            StatMarker[] statMarkers = ActiveReplayManager.Instance.SelectedTimePoint?.ReplayMarkerData(f.Number, TimePoint.DisplayArgs.Normal);
+            var (statMarkers, startFrame, endFrame) = ActiveReplayManager.Instance.SelectedTimePoint.ReplayMarkerData(f.Number, TimePoint.DisplayArgs.Normal);
 
             // UPdate the lighter part of the track if it has an end frame (which can be the end of the replay)
-            if (ActiveReplayManager.Instance.SelectedTimePoint != null && ActiveReplayManager.Instance.SelectedTimePoint.HasEndFrame) {
-                float anchorStart = (float) (statMarkers[0].frame - ActiveReplayManager.Instance.ReplayStart) / ActiveReplayManager.Instance.ReplayLength;
-                float anchorEnd = statMarkers.Length < 2 ? 1 : (float) (statMarkers[^1].frame - ActiveReplayManager.Instance.ReplayStart) / ActiveReplayManager.Instance.ReplayLength;
+            if (ActiveReplayManager.Instance.SelectedTimePoint != null && endFrame != -1) {
+                float anchorStart = (float) (startFrame - ActiveReplayManager.Instance.ReplayStart) / ActiveReplayManager.Instance.ReplayLength;
+                float anchorEnd = statMarkers.Length < 2 ? 1 : (float) (endFrame - ActiveReplayManager.Instance.ReplayStart) / ActiveReplayManager.Instance.ReplayLength;
                 trackBufferMask.rectTransform.SetAnchorMinX(Mathf.Clamp01(anchorStart - .011f));
                 trackBufferMask.rectTransform.SetAnchorMaxX(Mathf.Clamp01(anchorEnd + .011f));
             }

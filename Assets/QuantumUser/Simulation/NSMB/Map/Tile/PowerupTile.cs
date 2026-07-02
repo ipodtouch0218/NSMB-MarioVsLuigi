@@ -1,10 +1,12 @@
+using Photon.Deterministic;
+
 namespace Quantum {
     public unsafe class PowerupTile : PowerupTileBase {
 
         public AssetRef<CoinItemAsset> smallPowerup, largePowerup;
         public bool bypassCustomSpawnWeightDisables;
 
-        public override CoinItemAsset GetItemAsset(Frame f, EntityRef marioEntity, MarioPlayer* mario) {
+        public override (CoinItemAsset, FP, FP) GetItemAsset(Frame f, EntityRef marioEntity, MarioPlayer* mario) {
             bool isSmall = mario->CurrentPowerupState < PowerupState.Mushroom;
             var powerupToSpawn = isSmall ? smallPowerup : largePowerup;
 
@@ -17,12 +19,12 @@ namespace Quantum {
 
                     if (rules.IsCoinItemDisabled(f, powerupToSpawn)) {
                         // Both are disabled... give up.
-                        return null;
+                        return (null, -1, -1);
                     }
                 }
             }
 
-            return f.FindAsset(powerupToSpawn);
+            return (f.FindAsset(powerupToSpawn), -1, -1);
         }
     }
 }

@@ -11,6 +11,9 @@ component BlockBump {
 	
 	[ExcludeFromPrototype] bool AllowSelfDamage;
 	[ExcludeFromPrototype] bool HasBumped;
+
+	[ExcludeFromPrototype] FP SpawnChanceRaw;
+	[ExcludeFromPrototype] FP TotalSpawnChance;
 }
 
 signal OnEntityBumped(EntityRef entity, FPVector2 tileWorldPosition, EntityRef blockBump, bool fromBelow);

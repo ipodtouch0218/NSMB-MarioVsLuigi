@@ -11,6 +11,9 @@ component CoinItem {
 	[ExcludeFromPrototype] byte SpawnAnimationFrames;
 	[ExcludeFromPrototype] byte IgnorePlayerFrames;
 	[ExcludeFromPrototype] EntityRef ParentMarioPlayer;
+
+	[ExcludeFromPrototype] FP SpawnChanceRaw;
+	[ExcludeFromPrototype] FP TotalSpawnChance;
 }
 
 signal OnCoinItemSpawnEnded(EntityRef entity);

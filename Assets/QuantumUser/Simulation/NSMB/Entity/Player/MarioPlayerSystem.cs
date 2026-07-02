@@ -2099,13 +2099,19 @@ namespace Quantum {
 
         public static EntityRef SpawnItem(Frame f, EntityRef marioEntity, MarioPlayer* mario, AssetRef<EntityPrototype> prefab, bool fromBlock) {
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
+            FP spawnChance = -1, totalChance = -1;
             if (!prefab.IsValid) {
-                prefab = gamemode.GetRandomItem(f, mario, fromBlock).Prefab;
+                var (asset, chance, totalCahance) = gamemode.GetRandomItem(f, mario, fromBlock);
+                prefab = asset.Prefab;
+                spawnChance = chance;
+                totalChance = totalCahance;
             }
 
             EntityRef newEntity = f.Create(prefab);
             if (f.Unsafe.TryGetPointer(newEntity, out CoinItem* coinItem)) {
                 coinItem->InitializePlayerSpawn(f, newEntity, marioEntity);
+                coinItem->SpawnChanceRaw = spawnChance;
+                coinItem->TotalSpawnChance = totalChance;
             }
             return newEntity;
         }
