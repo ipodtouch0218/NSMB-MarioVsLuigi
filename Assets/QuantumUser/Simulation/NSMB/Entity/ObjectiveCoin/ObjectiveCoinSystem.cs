@@ -1,5 +1,4 @@
 using Photon.Deterministic;
-using Quantum.Collections;
 using Quantum.Physics2D;
 
 namespace Quantum {
@@ -39,57 +38,8 @@ namespace Quantum {
         }
 
         private void HandleSpawningNewStarCoin(Frame f, VersusStageData stage) {
-            int spawnpoints = stage.BigStarSpawnpoints.Length;
-            ref BitSet64 usedSpawnpoints = ref f.Global->UsedStarSpawns;
-
-            bool spawnedStarCoin = false;
-            for (int i = 0; i < spawnpoints; i++) {
-                // Find a spot...
-                int setBits = usedSpawnpoints.GetSetCount();
-                if (setBits >= spawnpoints) {
-                    usedSpawnpoints.ClearAll();
-                }
-
-                int count = f.RNG->Next(0, spawnpoints - setBits);
-                int index = 0;
-                for (int j = 0; j < spawnpoints; j++) {
-                    if (!usedSpawnpoints.IsSet(j)) {
-                        if (count-- == 0) {
-                            // This is the index to use
-                            index = j;
-                            break;
-                        }
-                    }
-                }
-                usedSpawnpoints.Set(index);
-
-                // Spawn a coin.
-                FPVector2 position = stage.BigStarSpawnpoints[index];
-                HitCollection hits = f.Physics2D.OverlapShape(position, 0, f.Context.CircleRadiusTwo, f.Context.PlayerOnlyMask);
-
-                if (hits.Count == 0) {
-                    // Hit no players
-                    var gamemode = (CoinRunnersGamemode) f.FindAsset(f.Global->Rules.Gamemode);
-                    EntityRef newEntity = f.Create(gamemode.StarCoinPrototype);
-                    f.Global->MainBigStar = newEntity;
-                    var newStarCoinTransform = f.Unsafe.GetPointer<Transform2D>(newEntity);
-                    newStarCoinTransform->Position = position;
-                    spawnedStarCoin = true;
-                    f.Events.BigCollectableAttemptedSpawn(index, position, usedSpawnpoints.GetSetCount(), true, default);
-                    break;
-                } else {
-                    QListPtr<EntityRef> blockerRefs = f.AllocateList<EntityRef>();
-                    var _blockerRefs = f.ResolveList(blockerRefs);
-                    for (int j = 0; i < hits.Count; i++) {
-                        _blockerRefs.Add(hits[i].Entity);
-                    }
-                    f.Events.BigCollectableAttemptedSpawn(index, position, usedSpawnpoints.GetSetCount(), false, blockerRefs);
-                }
-            }
-
-            if (!spawnedStarCoin) {
-                f.Global->BigStarSpawnTimer = 30;
-            }
+            var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
+            BigStarSystem.TrySpawnObjective(f, ((CoinRunnersGamemode) gamemode).StarCoinPrototype, stage);
         }
 
         public static void SpawnObjectiveCoins(Frame f, FPVector2 origin, int amount, byte exludeTeam, bool selfDamage) {
