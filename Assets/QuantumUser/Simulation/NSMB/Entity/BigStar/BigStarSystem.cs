@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using Quantum.Collections;
 using Quantum.Physics2D;
 
 namespace Quantum {
@@ -178,8 +179,13 @@ namespace Quantum {
 
                 HitCollection hits = f.Physics2D.OverlapShape(position, 0, shape, f.Context.PlayerOnlyMask);
                 if (hits.Count > 0) {
+                    QListPtr<EntityRef> blockerRefs = f.AllocateList<EntityRef>();
+                    var _blockerRefs = f.ResolveList(blockerRefs);
+                    for (int j = 0; j < hits.Count; j++) {
+                        _blockerRefs.Add(hits[j].Entity);
+                    }
                     // Hit something.
-                    f.Events.BigCollectableAttemptedSpawn(index, position, Success: false);
+                    f.Events.BigCollectableAttemptedSpawn(index, position, usedSpawnpoints.GetSetCount(), false, blockerRefs);
                     continue;
                 }
 
@@ -191,8 +197,13 @@ namespace Quantum {
 
                     HitCollection seamHits = f.Physics2D.OverlapShape(seamPosition, 0, shape, f.Context.PlayerOnlyMask);
                     if (seamHits.Count > 0) {
+                        QListPtr<EntityRef> blockerRefs = f.AllocateList<EntityRef>();
+                        var _blockerRefs = f.ResolveList(blockerRefs);
+                        for (int j = 0; j < seamHits.Count; j++) {
+                            _blockerRefs.Add(seamHits[j].Entity);
+                        }
                         // Hit something.
-                        f.Events.BigCollectableAttemptedSpawn(index, position, Success: false);
+                        f.Events.BigCollectableAttemptedSpawn(index, position, usedSpawnpoints.GetSetCount(), false, blockerRefs);
                         continue;
                     }
                 }
@@ -201,7 +212,7 @@ namespace Quantum {
                 EntityRef newEntity = f.Create(prototype);
                 f.Global->MainBigStar = newEntity;
                 f.Unsafe.GetPointer<Transform2D>(newEntity)->Position = position;
-                f.Events.BigCollectableAttemptedSpawn(index, position, Success: true);
+                f.Events.BigCollectableAttemptedSpawn(index, position, usedSpawnpoints.GetSetCount(), true, default);
                 return newEntity;
             }
 
