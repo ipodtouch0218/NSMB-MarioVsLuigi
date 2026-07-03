@@ -18,6 +18,7 @@ namespace NSMB.Replay.Stats
             callbackDispatcher.Subscribe<CallbackSimulateFinished>(this, e => OnSimulationFinished(e.Frame));
         }
 
+        // eventDispatcher.Subscribe is too slow only calling events on every UnityFrame, not simulation frame
         public void HandleEvents(Frame f) {
             while (f.Context.Events.Count > 0) {
                 var ev = f.Context.Events.PopHead();

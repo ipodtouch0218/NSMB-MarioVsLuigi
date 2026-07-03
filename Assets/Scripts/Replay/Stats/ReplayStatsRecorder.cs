@@ -127,7 +127,7 @@ namespace NSMB.Replay.Stats {
 
             var eventDispatcher = new EventDispatcher();
             var callbackDispatcher = new CallbackDispatcher();
-            var eventManager = new EventManager(this, eventDispatcher, callbackDispatcher);
+            new EventManager(this, eventDispatcher, callbackDispatcher);
 
             // Disable checksums- they murder performance.
             deterministicConfig.ChecksumInterval = 0;
