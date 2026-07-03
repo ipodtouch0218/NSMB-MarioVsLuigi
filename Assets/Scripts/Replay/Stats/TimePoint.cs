@@ -173,7 +173,6 @@ namespace NSMB.Replay.Stats {
                 SpawnChanceRaw = coinItem->SpawnChanceRaw;
                 SpawnChancePercentage = SpawnChanceRaw / coinItem->TotalSpawnChance * 100;
             }
-
             CoinCollectedPoints = coinCollectedPoints;
         }
 

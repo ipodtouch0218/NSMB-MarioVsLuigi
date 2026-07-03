@@ -339,6 +339,7 @@ namespace NSMB.UI.Game {
 
         private unsafe void SetCameraToPos(Vector3 pos) {
             CameraAnimator.Mode = CameraAnimator.CameraMode.Freecam;
+            Entity = EntityRef.None;
             CameraAnimator.SetCameraToPos(pos);
             UpdateSpectateUI();
         }

@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using Quantum.Collections;
 using Quantum.Physics2D;
 
 namespace Quantum {
@@ -66,10 +67,15 @@ namespace Quantum {
                     newStar->IsStationary = true;
                     newStarPhysicsObject->DisableCollision = true;
                     spawnedStar = true;
-                    f.Events.BigCollectableAttemptedSpawn(index, position, usedSpawnpoints.GetSetCount(), true);
+                    f.Events.BigCollectableAttemptedSpawn(index, position, usedSpawnpoints.GetSetCount(), true, default);
                     break;
                 } else {
-                    f.Events.BigCollectableAttemptedSpawn(index, position, usedSpawnpoints.GetSetCount(), false);
+                    QListPtr<EntityRef> blockerRefs = f.AllocateList<EntityRef>();
+                    var _blockerRefs = f.ResolveList(blockerRefs);
+                    for (int j = 0; i < hits.Count; i++) {
+                        _blockerRefs.Add(hits[i].Entity);
+                    }
+                    f.Events.BigCollectableAttemptedSpawn(index, position, usedSpawnpoints.GetSetCount(), false, blockerRefs);
                 }
 
                 if (!spawnedStar) {

@@ -1,5 +1,6 @@
 ﻿using Photon.Deterministic;
 using Quantum;
+using Quantum.Collections;
 using Quantum.Physics2D;
 using System;
 using System.Collections.Generic;
@@ -334,14 +335,13 @@ namespace NSMB.Replay.Stats
 
             if (wasBlocked) {
                 blockers = new();
-                HitCollection hits = f.Physics2D.OverlapShape(position, 0, f.Context.CircleRadiusTwo, f.Context.PlayerOnlyMask);;
-                for (int i = 0; i < hits.Count; i++) {
-                    var hit = hits[i];
-                    var mario = f.Unsafe.GetPointer<MarioPlayer>(hit.Entity);
+                var blockersList = f.ResolveList(e.Blockers);
+                for (int i = 0; i < blockersList.Count; i++) {
+                    var entity = blockersList[i];
+                    var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
                     var runtimeData = f.GetPlayerData(mario->PlayerRef);
                     blockers.Add(runtimeData.PlayerNickname);
                 }
-                
             }
 
             var point = new PointBigCollectableSpawned(StatRecorder, f, e.UsedSpawnpoints, e.PositionIndex, wasBlocked, position, ref info, stage, blockers);
