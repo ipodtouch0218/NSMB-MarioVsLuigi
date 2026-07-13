@@ -2401,7 +2401,7 @@ namespace Quantum {
                         // transitions use this bool to make them lose a star
                         bool poweredDown = false;
                         // Hit them, powerdown them
-                        marioB->FacingRight = !fromRight;
+                        marioB->FacingRight = fromRight;
                         // powerdown must come before doknockback or it will not occur
                         if (dropStars) {
                             poweredDown = marioB->Powerdown(f, marioBEntity, false, marioAEntity);
@@ -2417,7 +2417,7 @@ namespace Quantum {
                     if (!marioAAbove) {
                         bool poweredDown = false;
                         // Hit them, powerdown them
-                        marioA->FacingRight = fromRight;
+                        marioA->FacingRight = !fromRight;
                         if (dropStars) {
                             poweredDown = marioA->Powerdown(f, marioAEntity, false, marioBEntity);
                         }
