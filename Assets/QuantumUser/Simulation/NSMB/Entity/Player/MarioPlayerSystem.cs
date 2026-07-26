@@ -2278,8 +2278,8 @@ namespace Quantum {
                         marioB->IsDrilling = false;
                     } else {
                         bool knockbacked = false;
-                        knockbacked |= marioA->DoKnockback(f, marioAEntity, fromRight, 0, KnockbackStrength.CollisionBump, marioBEntity, true, ignoreInvincibleStates: true);
-                        knockbacked |= marioB->DoKnockback(f, marioBEntity, !fromRight, 0, KnockbackStrength.CollisionBump, marioAEntity, true, ignoreInvincibleStates: true);
+                        knockbacked |= marioA->DoKnockback(f, marioAEntity, fromRight, 1, KnockbackStrength.CollisionBump, marioBEntity, true, ignoreInvincibleStates: true);
+                        knockbacked |= marioB->DoKnockback(f, marioBEntity, !fromRight, 1, KnockbackStrength.CollisionBump, marioAEntity, true, ignoreInvincibleStates: true);
 
                         if (knockbacked) {
                             f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, KnockbackStrength.CollisionBump, avgPosition);
