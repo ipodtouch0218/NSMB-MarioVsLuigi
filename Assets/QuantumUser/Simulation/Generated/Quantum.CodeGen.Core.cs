@@ -86,6 +86,7 @@ namespace Quantum {
     None,
     FireballBump,
     CollisionBump,
+    CollsionBumpHard,
     Normal,
     Groundpound,
   }
@@ -3896,6 +3897,14 @@ namespace Quantum {
         return result;
       }
     }
+    /// <summary>2.95</summary>
+    public static FP HardCollisionThreshold {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 193331;
+        return result;
+      }
+    }
     /// <summary>0.05</summary>
     public static FP PhysicsRaycastSkin {
       [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
@@ -4004,6 +4013,8 @@ namespace Quantum {
       public const Int64 _3_75 = 245760;
       /// <summary>0.73</summary>
       public const Int64 _0_73 = 47841;
+      /// <summary>2.95</summary>
+      public const Int64 HardCollisionThreshold = 193331;
       /// <summary>0.05</summary>
       public const Int64 PhysicsRaycastSkin = 3277;
       /// <summary>0.005</summary>

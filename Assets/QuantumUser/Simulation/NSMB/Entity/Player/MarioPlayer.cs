@@ -547,7 +547,7 @@ namespace Quantum {
                 knockbackVelocity = strength switch {
                     KnockbackStrength.Groundpound => new(Constants._8_25 / 2, Constants._3_50),
                     KnockbackStrength.FireballBump => new(Constants._3_75 / 2, 0),
-                    KnockbackStrength.CollisionBump => new(Constants._2_50, Constants._3_50),
+                    KnockbackStrength.CollisionBump or KnockbackStrength.CollsionBumpHard => new(Constants._2_50, Constants._3_50),
                     KnockbackStrength.Normal or _ => new(Constants._3_75 / 2, Constants._3_50),
                 };
             } else {
@@ -600,9 +600,9 @@ namespace Quantum {
 
         private static bool IsImmuneFromKnockbackStrength(KnockbackStrength currentStrength, KnockbackStrength newStrength) {
             return currentStrength == newStrength
-                || (currentStrength == KnockbackStrength.Groundpound && newStrength == KnockbackStrength.Normal)
-                || (currentStrength == KnockbackStrength.Normal && newStrength == KnockbackStrength.Groundpound)
-                || (currentStrength == KnockbackStrength.FireballBump && newStrength == KnockbackStrength.CollisionBump);
+                || (currentStrength is KnockbackStrength.Groundpound or KnockbackStrength.Normal && newStrength is KnockbackStrength.Normal or KnockbackStrength.Groundpound)
+                || (currentStrength == KnockbackStrength.FireballBump && newStrength is KnockbackStrength.CollisionBump or KnockbackStrength.CollsionBumpHard)
+                || (currentStrength is KnockbackStrength.CollisionBump or KnockbackStrength.CollsionBumpHard && newStrength is KnockbackStrength.CollsionBumpHard or KnockbackStrength.CollisionBump);
         }
 
         public void GetupKnockback(Frame f, EntityRef entity) {

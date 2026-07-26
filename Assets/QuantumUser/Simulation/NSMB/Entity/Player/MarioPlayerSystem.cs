@@ -2520,20 +2520,27 @@ namespace Quantum {
                 // if neither of the players are in Blue Shell...
                 if (!marioA->IsInShell && !marioB->IsInShell) {
                     if (FPMath.Abs(velocityDifference) > averageWalkSpeed) {
+                        // the velocity is not static and increases based on speed
+                        FP speedIncrease = FPMath.Max((FPMath.Abs(velocityDifference) - averageWalkSpeed * 2) / 12, 0);
+                        FP xVel = Constants._2_50 + speedIncrease;
+                        FP yVel = Constants._3_50;
+
+                        KnockbackStrength strength = xVel > Constants.HardCollisionThreshold ? KnockbackStrength.CollsionBumpHard : KnockbackStrength.CollisionBump;
+
                         // Bump
                         bool dealtKnockback = false;
                         // since starman and mega mushroom has "normal interactions" when hitting player in powering UP
                         // we want them to not lose any stars when bumping into that player
                         // bool loseStarsA = marioA->CurrentPowerupState != PowerupState.MegaMushroom;
                         if (marioAPhysics->IsTouchingGround && !marioAPhysics->IsUnderwater) {
-                            dealtKnockback = marioA->DoKnockback(f, marioAEntity, fromRight, dropStars /*&& loseStarsA*/ ? 1 : 0, KnockbackStrength.CollisionBump, marioBEntity, bypassDamageInvincibility: true);
+                            dealtKnockback = marioA->DoKnockback(f, marioAEntity, fromRight, dropStars /*&& loseStarsA*/ ? 1 : 0, strength, marioBEntity, velocity: new(xVel, yVel), bypassDamageInvincibility: true);
                         } else {
                             marioAPhysics->Velocity.X = marioAPhysicsInfo.WalkMaxVelocity[marioAPhysicsInfo.RunSpeedStage] * (fromRight ? -1 : 1);
                         }
 
                         //bool loseStarsB = marioA->CurrentPowerupState != PowerupState.MegaMushroom;
                         if (marioBPhysics->IsTouchingGround && !marioAPhysics->IsUnderwater) {
-                            dealtKnockback = marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars /*&& loseStarsB*/ ? 1 : 0, KnockbackStrength.CollisionBump, marioAEntity, bypassDamageInvincibility: true);
+                            dealtKnockback = marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars /*&& loseStarsB*/ ? 1 : 0, strength, marioAEntity, velocity: new(xVel, yVel), bypassDamageInvincibility: true);
                         } else {
                             marioBPhysics->Velocity.X = marioBPhysicsInfo.WalkMaxVelocity[marioBPhysicsInfo.RunSpeedStage] * (fromRight ? 1 : -1);
                         }
