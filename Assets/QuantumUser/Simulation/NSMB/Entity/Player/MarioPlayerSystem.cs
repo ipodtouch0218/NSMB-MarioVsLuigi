@@ -2400,7 +2400,9 @@ namespace Quantum {
                         if (dropStars) {
                             poweredDown = marioB->Powerdown(f, marioBEntity, false, marioAEntity);
                         }
-                        marioB->DoKnockback(f, marioBEntity, !fromRight, poweredDown ? 0 : 1, KnockbackStrength.Normal, marioAEntity, true);
+                        // airborne
+                        f.Unsafe.GetPointer<PhysicsObject>(marioBEntity)->IsTouchingGround = false;
+                        marioB->DoKnockback(f, marioBEntity, !fromRight, poweredDown ? 0 : 1, KnockbackStrength.Normal, marioAEntity, true, velocity: new(Constants._2_50, 6));
                         marioA->FacingRight = !marioA->FacingRight;
                         marioA->ShellSpeedStage = marioAPhysicsInfo.ShellNormalStage;
                         f.Events.PlayBumpSound(marioAEntity);
@@ -2414,7 +2416,8 @@ namespace Quantum {
                         if (dropStars) {
                             poweredDown = marioA->Powerdown(f, marioAEntity, false, marioBEntity);
                         }
-                        marioA->DoKnockback(f, marioAEntity, fromRight, poweredDown ? 0 : 1, KnockbackStrength.Normal, marioBEntity, true);
+                        f.Unsafe.GetPointer<PhysicsObject>(marioAEntity)->IsTouchingGround = false;
+                        marioA->DoKnockback(f, marioAEntity, fromRight, poweredDown ? 0 : 1, KnockbackStrength.Normal, marioBEntity, true, velocity: new(Constants._2_50, 6));
                         marioB->FacingRight = !marioB->FacingRight;
                         marioB->ShellSpeedStage = marioBPhysicsInfo.ShellNormalStage;
                         f.Events.PlayBumpSound(marioBEntity);
