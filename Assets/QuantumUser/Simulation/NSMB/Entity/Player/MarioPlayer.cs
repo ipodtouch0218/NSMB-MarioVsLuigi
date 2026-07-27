@@ -542,17 +542,12 @@ namespace Quantum {
             }
             */
 
-            FPVector2 knockbackVelocity;
-            if (velocity == null) {
-                knockbackVelocity = strength switch {
-                    KnockbackStrength.Groundpound => new(Constants._8_25 / 2, Constants._3_50),
-                    KnockbackStrength.FireballBump => new(Constants._3_75 / 2, 0),
-                    KnockbackStrength.CollisionBump or KnockbackStrength.CollsionBumpHard => new(Constants._2_50, Constants._3_50),
-                    KnockbackStrength.Normal or _ => new(Constants._3_75 / 2, Constants._3_50),
-                };
-            } else {
-                knockbackVelocity = velocity.Value;
-            }
+            FPVector2 knockbackVelocity = velocity ?? strength switch {
+                KnockbackStrength.Groundpound => new(Constants._8_25 / 2, Constants._3_50),
+                KnockbackStrength.FireballBump => new(Constants._3_75 / 2, 0),
+                KnockbackStrength.CollisionBump or KnockbackStrength.CollsionBumpHard => new(Constants._2_50, Constants._3_50),
+                KnockbackStrength.Normal or _ => new(Constants._3_75 / 2, Constants._3_50),
+            };
 
             knockbackVelocity.X *= fromRight ? -1 : 1;
             if (CurrentPowerupState == PowerupState.MiniMushroom) {
