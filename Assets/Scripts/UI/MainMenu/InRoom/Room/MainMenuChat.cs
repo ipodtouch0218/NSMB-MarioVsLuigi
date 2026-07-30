@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
@@ -165,6 +166,11 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
             chatPrompt.text = tm.GetTranslation(key);
             chatPrompt.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
+
+            //foreach (var message in chatMessages) {
+            //    LayoutRebuilder.MarkLayoutForRebuild((RectTransform) message.transform);
+            //}
+            LayoutRebuilder.MarkLayoutForRebuild((RectTransform) chatWindow.transform);
         }
 
         private bool IsLocallyMuted() {

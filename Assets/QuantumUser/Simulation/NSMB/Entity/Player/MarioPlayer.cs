@@ -582,6 +582,8 @@ namespace Quantum {
             IsSliding = false;
             IsDrilling = false;
             WallslideLeft = WallslideRight = false;
+            PreviousJumpState = JumpState.None; 
+            JumpState = JumpState.None;
 
             if (f.Unsafe.TryGetPointer(attacker, out Projectile* projectile)) {
                 attacker = projectile->Owner;

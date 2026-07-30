@@ -1,4 +1,5 @@
 using NSMB.Sound;
+using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
 using Quantum;
 using System;
@@ -14,7 +15,7 @@ namespace NSMB.Entities.World {
         private static Color UncollectableColor = new(1, 1, 1, 0.55f);
 
         //---Serialized Variables
-        [SerializeField] private float pulseAmount = 0.2f, pulseSpeed = 0.2f, rotationSpeed = 30f, blinkingSpeed = 0.5f;
+        [SerializeField] private float pulseAmount = 0.2f, pulseSpeed = 0.2f, rotationSpeed = 30f;
         [SerializeField] private Transform graphicTransform;
         [SerializeField] private ParticleSystem particles;
         [SerializeField] private GameObject starCollectPrefab;
@@ -75,8 +76,7 @@ namespace NSMB.Entities.World {
             } else {
                 graphicTransform.localScale = Vector3.one;
                 graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (star->FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);
-                float timeRemaining = star->Lifetime / 60f;
-                sRenderer.enabled = !(timeRemaining < 5 && timeRemaining * 2 % (blinkingSpeed * 2) < blinkingSpeed);
+                sRenderer.enabled = Utils.Blink((float) star->Lifetime / f.UpdateRate, blinksPerSecond: 4f, blinkStartTime: 5f);
                 sRenderer.color = star->UncollectableFrames > 0 ? uncollectableColor : Color.white;
                 legacyAnimation.Stop();
             }

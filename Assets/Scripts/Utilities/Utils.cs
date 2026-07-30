@@ -344,5 +344,13 @@ namespace NSMB.Utilities {
         public static float Luminance(Color color) {
             return 0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b;
         }
+
+        public static bool Blink(float timer, float blinksPerSecond, float? blinkStartTime = null) {
+            if (!blinkStartTime.HasValue || timer > blinkStartTime.Value) {
+                return true;
+            }
+
+            return timer % (1f / blinksPerSecond) < (0.5f / blinksPerSecond);
+        }
     }
 }
