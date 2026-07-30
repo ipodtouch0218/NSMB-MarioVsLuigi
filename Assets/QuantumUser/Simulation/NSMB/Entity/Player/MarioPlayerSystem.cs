@@ -2883,7 +2883,7 @@ namespace Quantum {
                     yVel = 0;
                 } else {
                     // zero out from hitting a wall, not player
-                    if (breakReason == IceBlockBreakReason.HitWall) {
+                    if (breakReason == IceBlockBreakReason.HitWall && iceBlock->IsSliding) {
                         xVel = 0;
                     }
 
