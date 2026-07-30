@@ -2883,7 +2883,7 @@ namespace Quantum {
                 FPVector2? velocity = null;
                 if (breakReason == IceBlockBreakReason.Other) {
                     yVel = 0;
-                } else {
+                } else if (!hitPlayer) {
                     // zero out from hitting a wall, not player
                     if (breakReason == IceBlockBreakReason.HitWall && iceBlock->IsSliding) {
                         xVel = 0;
@@ -2896,7 +2896,12 @@ namespace Quantum {
                     }
                 }
                 strength = hitPlayer ? KnockbackStrength.FireballBump : KnockbackStrength.CollisionBump;
-                damaged = mario->DoKnockback(f, entity, hitFromRight, 1, strength, attacker, velocity: new(xVel, yVel), lengthOffset: lengthOffset);
+                if (hitPlayer) {
+                    physicsObject->IsTouchingGround = false;
+                } else {
+                    velocity = new(xVel, yVel);
+                }
+                damaged = mario->DoKnockback(f, entity, hitFromRight, 1, strength, attacker, velocity: velocity, lengthOffset: lengthOffset);
                 mario->DamageInvincibilityFrames = Constants.DamageInvincibilityFrames;
                 break;
 
