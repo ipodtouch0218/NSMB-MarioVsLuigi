@@ -2878,7 +2878,7 @@ namespace Quantum {
                 bool hitPlayer = breakReason == IceBlockBreakReason.HitPlayer;
                 int lengthOffset = 0;
 
-                FP xVel = hitPlayer ? Constants._3_75 / 2 : Constants._2_50;
+                FP xVel = Constants._2_50;
                 FP yVel = 0;
                 FPVector2? velocity = null;
                 if (breakReason == IceBlockBreakReason.Other) {
