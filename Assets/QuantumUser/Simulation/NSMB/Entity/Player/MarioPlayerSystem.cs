@@ -2908,7 +2908,6 @@ namespace Quantum {
                 // Hard knockback, i-frames.
                 strength = KnockbackStrength.Groundpound;
                 damaged = mario->DoKnockback(f, entity, hitFromRight, 2, strength, attacker);
-                mario->DamageInvincibilityFrames = Constants.DamageInvincibilityFrames;
                 break;
 
             case IceBlockBreakReason.Shell:
