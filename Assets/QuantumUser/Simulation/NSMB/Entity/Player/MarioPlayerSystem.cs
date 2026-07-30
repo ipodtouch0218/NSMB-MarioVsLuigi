@@ -2875,10 +2875,12 @@ namespace Quantum {
                 // Weak knockback, i-frames.
                 var marioTransform = f.Unsafe.GetPointer<Transform2D>(entity);
                 bool isSliding = iceBlock->IsSliding;
+                bool hitPlayer = breakReason == IceBlockBreakReason.HitPlayer;
                 int lengthOffset = 0;
 
-                FP xVel = Constants._2_50;
+                FP xVel = hitPlayer ? Constants._3_75 / 2 : Constants._2_50;
                 FP yVel = 0;
+                FPVector2? velocity = null;
                 if (breakReason == IceBlockBreakReason.Other) {
                     yVel = 0;
                 } else {
@@ -2893,7 +2895,7 @@ namespace Quantum {
                         lengthOffset = -15;
                     }
                 }
-                strength = breakReason == IceBlockBreakReason.HitPlayer ? KnockbackStrength.Normal : KnockbackStrength.CollisionBump;
+                strength = hitPlayer ? KnockbackStrength.FireballBump : KnockbackStrength.CollisionBump;
                 damaged = mario->DoKnockback(f, entity, hitFromRight, 1, strength, attacker, velocity: new(xVel, yVel), lengthOffset: lengthOffset);
                 mario->DamageInvincibilityFrames = Constants.DamageInvincibilityFrames;
                 break;
