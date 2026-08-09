@@ -108,7 +108,7 @@ namespace Quantum {
             HandleJumping(f, ref filter, physics, wasGroundpoundActive);
             HandleSwimming(f, ref filter, physics);
             HandleBlueShell(f, ref filter, physics, stage);
-            HandleWallslide(f, ref filter, physics);
+            HandleWallslide(f, ref filter, physics, stage);
             HandleGravity(f, ref filter, physics);
             HandleTerminalVelocity(f, ref filter, physics);
             HandleFacingDirection(f, ref filter, physics);
@@ -683,7 +683,7 @@ namespace Quantum {
             physicsObject->TerminalVelocity = terminalVelocity;
         }
 
-        public void HandleWallslide(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics) {
+        public void HandleWallslide(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleWallslide");
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
@@ -741,6 +741,11 @@ namespace Quantum {
                     mario->JumpBufferFrames = 0;
                     mario->FacingRight = faceRight;
                 }
+            }
+
+            // do not wallslide if too close to ground
+            if (!mario->IsWallsliding && PhysicsObjectSystem.Raycast(f, stage, filter.Transform->Position, FPVector2.Down, FP._0_25, out _)) {
+                return;
             }
 
             if (mario->IsWallsliding) {
