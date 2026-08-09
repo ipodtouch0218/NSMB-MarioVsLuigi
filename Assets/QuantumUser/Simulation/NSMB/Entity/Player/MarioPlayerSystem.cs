@@ -723,7 +723,8 @@ namespace Quantum {
                 return;
             }
 
-            if (mario->IsWallsliding || physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
+            bool movingDown = physicsObject->Velocity.Y < -FP._0_10;
+            if (mario->IsWallsliding || (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) && !movingDown) {
                 if (mario->JumpBufferFrames > 0 && mario->WalljumpFrames == 0 /* && !BounceJump */) {
                     bool faceRight = (!mario->FacingRight || mario->WallslideLeft) && !mario->WallslideRight;
                     // Perform walljump
@@ -754,7 +755,7 @@ namespace Quantum {
                 mario->FacingRight = mario->WallslideLeft;
             } else if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
                 // Walljump starting check
-                bool canWallslide = !mario->IsInShell && physicsObject->Velocity.Y < -FP._0_10 && !mario->IsGroundpounding && !physicsObject->IsTouchingGround && !mario->HeldEntity.IsValid && mario->CurrentPowerupState != PowerupState.MegaMushroom && !mario->IsSpinnerFlying && !mario->IsDrilling && !mario->IsCrouching && !mario->IsSliding && !mario->IsInKnockback && mario->PropellerLaunchFrames == 0;
+                bool canWallslide = !mario->IsInShell && movingDown && !mario->IsGroundpounding && !physicsObject->IsTouchingGround && !mario->HeldEntity.IsValid && mario->CurrentPowerupState != PowerupState.MegaMushroom && !mario->IsSpinnerFlying && !mario->IsDrilling && !mario->IsCrouching && !mario->IsSliding && !mario->IsInKnockback && mario->PropellerLaunchFrames == 0;
                 if (!canWallslide) {
                     return;
                 }
