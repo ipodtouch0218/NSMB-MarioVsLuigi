@@ -2586,6 +2586,28 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: question
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 202
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3696f3e416676024885a102a4b56f761
+      internalID: -941819302
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -2665,6 +2687,7 @@ TextureImporter:
       playernumber_7: 445070807
       playernumber_8: 180310867
       playernumber_9: -416960693
+      question: -941819302
       r_button: 907324317
       random: -1497189084
       room_addons: -971827560
