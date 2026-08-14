@@ -126,11 +126,14 @@ namespace NSMB.Entities.World {
             }
             float kconstXDelta = kconstant * delta;
 
+            int totalPointsM1 = totalPoints - 1;
+            int totalPointsP1 = totalPoints + 1;
+
             for (int i = 0; i < totalPoints; i++) {
                 float height = pointHeights[i];
 
-                pointVelocities[i] -= kconstXDelta * (height - pointHeights[(i + totalPoints - 1) % totalPoints]); // Left
-                pointVelocities[i] -= kconstXDelta * (height - pointHeights[(i + totalPoints + 1) % totalPoints]); // Right
+                pointVelocities[i] -= kconstXDelta * (height - pointHeights[(i + totalPointsM1) % totalPoints]); // Left
+                pointVelocities[i] -= kconstXDelta * (height - pointHeights[(i + totalPointsP1) % totalPoints]); // Right
             }
             for (int i = 0; i < totalPoints; i++) {
                 byte newR = (byte) (Mathf.Clamp01((pointHeights[i] / 20f) + 0.5f) * 255f);
