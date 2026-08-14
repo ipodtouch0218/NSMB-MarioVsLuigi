@@ -122,15 +122,15 @@ namespace NSMB.Entities.World {
                 float height = pointHeights[i];
                 pointVelocities[i] += tension * -height;
                 pointVelocities[i] *= damping;
-            }
-            for (int i = 0; i < totalPoints; i++) {
                 pointHeights[i] += pointVelocities[i] * delta;
             }
+            float kconstXDelta = kconstant * delta;
+
             for (int i = 0; i < totalPoints; i++) {
                 float height = pointHeights[i];
 
-                pointVelocities[i] -= kconstant * delta * (height - pointHeights[(i + totalPoints - 1) % totalPoints]); // Left
-                pointVelocities[i] -= kconstant * delta * (height - pointHeights[(i + totalPoints + 1) % totalPoints]); // Right
+                pointVelocities[i] -= kconstXDelta * (height - pointHeights[(i + totalPoints - 1) % totalPoints]); // Left
+                pointVelocities[i] -= kconstXDelta * (height - pointHeights[(i + totalPoints + 1) % totalPoints]); // Right
             }
             for (int i = 0; i < totalPoints; i++) {
                 byte newR = (byte) (Mathf.Clamp01((pointHeights[i] / 20f) + 0.5f) * 255f);
