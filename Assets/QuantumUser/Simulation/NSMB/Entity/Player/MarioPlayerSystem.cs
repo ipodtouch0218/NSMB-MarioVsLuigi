@@ -731,25 +731,30 @@ namespace Quantum {
                 return;
             }
 
-            if (mario->IsWallsliding) {
-                // Walljump check
-                physicsObject->Velocity.X = FPMath.Clamp(physicsObject->Velocity.X, -FP._0_25, FP._0_25);
-                mario->FacingRight = mario->WallslideLeft;
+            if (mario->IsWallsliding || physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
                 if (mario->JumpBufferFrames > 0 && mario->WalljumpFrames == 0 /* && !BounceJump */) {
+                    bool faceRight = (!mario->FacingRight || mario->WallslideLeft) && !mario->WallslideRight;
                     // Perform walljump
-                    physicsObject->Velocity = new(physics.WalljumpHorizontalVelocity * (mario->WallslideLeft ? 1 : -1), mario->CurrentPowerupState == PowerupState.MiniMushroom ? physics.WalljumpMiniVerticalVelocity : physics.WalljumpVerticalVelocity);
+                    physicsObject->Velocity = new(physics.WalljumpHorizontalVelocity * (faceRight ? 1 : -1), mario->CurrentPowerupState == PowerupState.MiniMushroom ? physics.WalljumpMiniVerticalVelocity : physics.WalljumpVerticalVelocity);
                     mario->JumpState = JumpState.SingleJump;
                     physicsObject->IsTouchingGround = false;
                     mario->DoEntityBounce = false;
                     // timeSinceLastBumpSound = 0;
 
-                    f.Events.MarioPlayerWalljumped(filter.Entity, filter.Transform->Position, mario->WallslideRight, filter.PhysicsCollider->Shape.Box.Extents);
+                    f.Events.MarioPlayerWalljumped(filter.Entity, filter.Transform->Position, !faceRight, filter.PhysicsCollider->Shape.Box.Extents);
                     mario->WalljumpFrames = 16;
                     mario->WallslideRight = false;
                     mario->WallslideLeft = false;
                     mario->WallslideEndFrames = 0;
                     mario->JumpBufferFrames = 0;
+                    mario->FacingRight = faceRight;
                 }
+            }
+
+            if (mario->IsWallsliding) {
+                // Walljump check
+                physicsObject->Velocity.X = FPMath.Clamp(physicsObject->Velocity.X, -FP._0_25, FP._0_25);
+                mario->FacingRight = mario->WallslideLeft;
             } else if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
                 // Walljump starting check
                 bool canWallslide = !mario->IsInShell && physicsObject->Velocity.Y < -FP._0_10 && !mario->IsGroundpounding && !physicsObject->IsTouchingGround && !mario->HeldEntity.IsValid && mario->CurrentPowerupState != PowerupState.MegaMushroom && !mario->IsSpinnerFlying && !mario->IsDrilling && !mario->IsCrouching && !mario->IsSliding && !mario->IsInKnockback && mario->PropellerLaunchFrames == 0;
