@@ -16,7 +16,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         [SerializeField] private MainMenuCanvas canvas;
         [SerializeField] private GameObject template, blockerTemplate;
         [SerializeField] public GameObject content;
-        [SerializeField] private Sprite clearSprite, baseSprite;
+        [SerializeField] private Sprite clearSprite, baseSprite, randomSprite;
         [SerializeField] private CharacterAsset defaultCharacter;
         [SerializeField] private GameObject selectOnClose;
 
@@ -43,7 +43,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             int palettesPerRow = Mathf.Max(4, palettes.Count / 7);
             template.transform.parent.GetComponent<GridLayoutGroup>().constraintCount = palettesPerRow;
 
-            for (int i = -1; i < palettes.Count; i++) {
+            for (int i = -2; i < palettes.Count; i++) {
                 PaletteSet palette = (i >= 0) ? palettes[i] : null; // Add one null entry
 
                 GameObject newButton = Instantiate(template, template.transform.parent);
@@ -52,12 +52,25 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                 cb.palette = palette;
 
                 Button b = newButton.GetComponent<Button>();
-                newButton.name = palette ? palette.name : "Reset";
+                
                 if (!palette) {
-                    b.image.sprite = clearSprite;
+                    if (i == -2)
+                    {
+                        b.image.sprite = clearSprite;
+                        newButton.name = "Reset";
+                    }
+                    else
+                    {
+                        b.image.sprite = randomSprite;
+                        newButton.name = "Random";
+                    }
+                }
+                else
+                {
+                    newButton.name = palette.name;
                 }
 
-                newButton.SetActive(true);
+                    newButton.SetActive(true);
             }
 
             for (int i = 0; i < paletteButtons.Count; i++) {
@@ -112,6 +125,11 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                 return;
             }
 
+            if (button.gameObject.name == "Random")
+            {
+                int randomindex = Random.Range(2, paletteButtons.Count);
+                selectedButton = paletteButtons[randomindex];
+            }
             QuantumGame game = QuantumRunner.DefaultGame;
             foreach (var slot in game.GetLocalPlayerSlots()) {
                 game.SendCommand(slot, new CommandChangePlayerData { 
