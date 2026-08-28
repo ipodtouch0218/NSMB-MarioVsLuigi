@@ -30,6 +30,8 @@ public unsafe class PowerupAsset : CoinItemAsset, ISoundOverrideProvider {
     public bool EnterReserveIfOverridden = true;
     public bool Instant = false;
 
+    public AssetRef<ProjectileAsset> ProjectileAsset;
+
     public SoundEffectOverride[] SfxOverrides;
 
     [NonSerialized] private Dictionary<SoundEffect, SoundEffectOverride> overridesDict;
