@@ -2409,7 +2409,7 @@ namespace Quantum {
 
                         // airborne
                         f.Unsafe.GetPointer<PhysicsObject>(marioBEntity)->IsTouchingGround = false;
-                        marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars && !poweredDown ? 1 : 0, KnockbackStrength.Normal, marioAEntity, true, velocity: new(Constants._2_50, 6));
+                        marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars && !poweredDown ? 1 : 0, KnockbackStrength.Normal, marioAEntity, true, yVelOverride: 6);
                         marioA->FacingRight = !marioA->FacingRight;
                         marioA->ShellSpeedStage = marioAPhysicsInfo.ShellNormalStage;
                         f.Events.PlayBumpSound(marioAEntity);
@@ -2425,7 +2425,7 @@ namespace Quantum {
                         }
                         
                         f.Unsafe.GetPointer<PhysicsObject>(marioAEntity)->IsTouchingGround = false;
-                        marioA->DoKnockback(f, marioAEntity, fromRight, dropStars && !poweredDown ? 1 : 0, KnockbackStrength.Normal, marioBEntity, true, velocity: new(Constants._2_50, 6));
+                        marioA->DoKnockback(f, marioAEntity, fromRight, dropStars && !poweredDown ? 1 : 0, KnockbackStrength.Normal, marioBEntity, true, yVelOverride: 6);
                         marioB->FacingRight = !marioB->FacingRight;
                         marioB->ShellSpeedStage = marioBPhysicsInfo.ShellNormalStage;
                         f.Events.PlayBumpSound(marioBEntity);
@@ -2537,7 +2537,7 @@ namespace Quantum {
                         FP xVel = Constants._2_50 + speedIncrease;
                         FP yVel = Constants._3_50;
 
-                        KnockbackStrength strength = xVel > Constants.HardCollisionThreshold ? KnockbackStrength.CollsionBumpHard : KnockbackStrength.CollisionBump;
+                        KnockbackStrength strength = xVel > Constants.HardCollisionThreshold ? KnockbackStrength.CollisionBumpHard : KnockbackStrength.CollisionBump;
 
                         // Bump
                         bool dealtKnockback = false;
@@ -2545,14 +2545,14 @@ namespace Quantum {
                         // we want them to not lose any stars when bumping into that player
                         // bool loseStarsA = marioA->CurrentPowerupState != PowerupState.MegaMushroom;
                         if (marioAPhysics->IsTouchingGround && !marioAPhysics->IsUnderwater) {
-                            dealtKnockback = marioA->DoKnockback(f, marioAEntity, fromRight, dropStars /*&& loseStarsA*/ ? 1 : 0, strength, marioBEntity, velocity: new(xVel, yVel), bypassDamageInvincibility: true);
+                            dealtKnockback = marioA->DoKnockback(f, marioAEntity, fromRight, dropStars /*&& loseStarsA*/ ? 1 : 0, strength, marioBEntity, xVelOverride: xVel, yVelOverride: yVel, bypassDamageInvincibility: true);
                         } else {
                             marioAPhysics->Velocity.X = marioAPhysicsInfo.WalkMaxVelocity[marioAPhysicsInfo.RunSpeedStage] * (fromRight ? -1 : 1);
                         }
 
                         //bool loseStarsB = marioA->CurrentPowerupState != PowerupState.MegaMushroom;
                         if (marioBPhysics->IsTouchingGround && !marioAPhysics->IsUnderwater) {
-                            dealtKnockback = marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars /*&& loseStarsB*/ ? 1 : 0, strength, marioAEntity, velocity: new(xVel, yVel), bypassDamageInvincibility: true);
+                            dealtKnockback = marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars /*&& loseStarsB*/ ? 1 : 0, strength, marioAEntity, xVelOverride: xVel, yVelOverride: yVel, bypassDamageInvincibility: true);
                         } else {
                             marioBPhysics->Velocity.X = marioBPhysicsInfo.WalkMaxVelocity[marioBPhysicsInfo.RunSpeedStage] * (fromRight ? 1 : -1);
                         }
@@ -2894,12 +2894,14 @@ namespace Quantum {
                 bool hitPlayer = breakReason == IceBlockBreakReason.HitPlayer;
                 int lengthOffset = 0;
 
-                FP xVel = Constants._2_50;
+                FP? xVel = null;
                 FP yVel = 0;
-                FPVector2? velocity = null;
-                if (breakReason == IceBlockBreakReason.Other) {
+                strength = hitPlayer ? KnockbackStrength.FireballBump : KnockbackStrength.CollisionBump;
+                if (hitPlayer) {
+                    physicsObject->IsTouchingGround = false;
+                } else if (breakReason == IceBlockBreakReason.Other) {
                     yVel = 0;
-                } else if (!hitPlayer) {
+                } else {
                     // zero out from hitting a wall, not player
                     if (breakReason == IceBlockBreakReason.HitWall && iceBlock->IsSliding) {
                         xVel = 0;
@@ -2911,13 +2913,7 @@ namespace Quantum {
                         lengthOffset = -15;
                     }
                 }
-                strength = hitPlayer ? KnockbackStrength.FireballBump : KnockbackStrength.CollisionBump;
-                if (hitPlayer) {
-                    physicsObject->IsTouchingGround = false;
-                } else {
-                    velocity = new(xVel, yVel);
-                }
-                damaged = mario->DoKnockback(f, entity, hitFromRight, 1, strength, attacker, velocity: velocity, lengthOffset: lengthOffset);
+                damaged = mario->DoKnockback(f, entity, hitFromRight, 1, strength, attacker, xVelOverride: xVel, yVelOverride: yVel, lengthOffset: lengthOffset);
                 mario->DamageInvincibilityFrames = Constants.DamageInvincibilityFrames;
                 break;
 

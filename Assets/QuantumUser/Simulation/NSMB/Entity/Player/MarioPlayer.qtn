@@ -164,7 +164,7 @@ enum KnockbackStrength : Byte {
 	None,
 	FireballBump,
 	CollisionBump,
-	CollsionBumpHard,
+	CollisionBumpHard,
 	Normal,
 	Groundpound,
 }
