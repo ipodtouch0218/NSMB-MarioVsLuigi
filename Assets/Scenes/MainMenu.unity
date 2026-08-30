@@ -4122,8 +4122,8 @@ MonoBehaviour:
   m_LineType: 0
   m_HideMobileInput: 0
   m_HideSoftKeyboard: 0
-  m_CharacterValidation: 0
-  m_RegexValue: '[a-zA-Z]'
+  m_CharacterValidation: 6
+  m_RegexValue: '[^\r\n]'
   m_GlobalPointSize: 14
   m_CharacterLimit: 80
   m_OnEndEdit:
@@ -4157,7 +4157,7 @@ MonoBehaviour:
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
-  m_RichText: 1
+  m_RichText: 0
   m_GlobalFontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_OnFocusSelectAll: 1
   m_ResetOnDeActivation: 1
@@ -13429,9 +13429,9 @@ MonoBehaviour:
   m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 1
   checkPaddingRequired: 0
-  m_isRichText: 1
+  m_isRichText: 0
   m_EmojiFallbackSupport: 1
-  m_parseCtrlCharacters: 1
+  m_parseCtrlCharacters: 0
   m_isOrthographic: 1
   m_isCullingEnabled: 0
   m_horizontalMapping: 0
@@ -35769,7 +35769,7 @@ PrefabInstance:
     - target: {fileID: 6334489993009781916, guid: 14e74ec86b338aa40b231b757683abbc,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 12.001953
+      value: 12.002075
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -36660,7 +36660,7 @@ PrefabInstance:
     - target: {fileID: 6334489993009781916, guid: 14e74ec86b338aa40b231b757683abbc,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 12.001953
+      value: 12.002075
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -47960,7 +47960,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 791989380}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.82605976
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -48160,10 +48160,10 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4294967295
   m_fontSize: 18
-  m_fontSizeBase: 14
+  m_fontSizeBase: 18
   m_fontWeight: 400
-  m_enableAutoSizing: 1
-  m_fontSizeMin: 0
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
   m_fontSizeMax: 18
   m_fontStyle: 0
   m_HorizontalAlignment: 1
@@ -48175,7 +48175,7 @@ MonoBehaviour:
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
-  m_charWidthMaxAdj: 50
+  m_charWidthMaxAdj: 0
   m_TextWrappingMode: 3
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
@@ -48187,7 +48187,7 @@ MonoBehaviour:
   checkPaddingRequired: 0
   m_isRichText: 0
   m_EmojiFallbackSupport: 1
-  m_parseCtrlCharacters: 1
+  m_parseCtrlCharacters: 0
   m_isOrthographic: 1
   m_isCullingEnabled: 0
   m_horizontalMapping: 0
@@ -50821,6 +50821,7 @@ MonoBehaviour:
   minOpacity: {r: 1, g: 1, b: 1, a: 0.2509804}
   maxMovementDistance: 100
   quickSnap: 1
+  eventSystem: {fileID: 566761500}
 --- !u!1 &1212855513
 GameObject:
   m_ObjectHideFlags: 0
@@ -54306,15 +54307,15 @@ MonoBehaviour:
   m_VerticalScrollbarEventHandler: {fileID: 0}
   m_LayoutGroup: {fileID: 0}
   m_ScrollSensitivity: 1
-  m_ContentType: 0
+  m_ContentType: 9
   m_InputType: 0
   m_AsteriskChar: 42
   m_KeyboardType: 0
   m_LineType: 0
   m_HideMobileInput: 0
   m_HideSoftKeyboard: 0
-  m_CharacterValidation: 0
-  m_RegexValue: 
+  m_CharacterValidation: 6
+  m_RegexValue: '[^\r\n]'
   m_GlobalPointSize: 14
   m_CharacterLimit: 0
   m_OnEndEdit:
@@ -56207,7 +56208,7 @@ PrefabInstance:
     - target: {fileID: 6334489993009781916, guid: 14e74ec86b338aa40b231b757683abbc,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 12.001953
+      value: 12.002075
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -62319,7 +62320,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: -24.01}
-  m_SizeDelta: {x: 406.57666, y: 0}
+  m_SizeDelta: {x: 406.26605, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1532295032
 MonoBehaviour:
@@ -63511,7 +63512,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000015258789}
+  m_AnchoredPosition: {x: 0, y: 0.000030517578}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1576260155
@@ -68035,7 +68036,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_RenderShadows: 0
   m_RequiresDepthTextureOption: 2
-  m_RequiresOpaqueTextureOption: 1
+  m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
   m_Cameras: []
   m_RendererIndex: 1
@@ -78163,7 +78164,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: -15.9999695, y: 0}
+  m_AnchoredPosition: {x: -16, y: 0}
   m_SizeDelta: {x: 32, y: 32}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!114 &1931140275
@@ -80129,7 +80130,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 15.9999695, y: 0}
+  m_AnchoredPosition: {x: 16, y: 0}
   m_SizeDelta: {x: 32, y: 32}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &1968440551
@@ -80539,7 +80540,7 @@ PrefabInstance:
     - target: {fileID: 6334489993009781916, guid: 14e74ec86b338aa40b231b757683abbc,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 12.001953
+      value: 12.002075
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -82932,7 +82933,7 @@ PrefabInstance:
     - target: {fileID: 6334489993009781916, guid: 14e74ec86b338aa40b231b757683abbc,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 12.001953
+      value: 12.002075
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -88019,7 +88020,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -22}
+  m_AnchoredPosition: {x: 0, y: -21.999756}
   m_SizeDelta: {x: -40, y: -84}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2144613009
@@ -88380,7 +88381,7 @@ PrefabInstance:
     - target: {fileID: 6334489993009781916, guid: 14e74ec86b338aa40b231b757683abbc,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 12.001953
+      value: 12.002075
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

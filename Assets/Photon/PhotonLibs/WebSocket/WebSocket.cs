@@ -130,7 +130,7 @@ namespace Photon.Client
                                        };
             this.m_Socket.OnError += (sender, e) =>
                                      {
-                                         this.Connected = false;
+                                         //this.Connected = false;      // websocket-sharp calls this for non-fatal errors, too
                                          this.Error = e.Message + (e.Exception == null ? "" : " / " + e.Exception);
                                          this.errorCallback(0, e.Message);
                                      };

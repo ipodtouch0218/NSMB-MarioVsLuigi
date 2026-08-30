@@ -346,7 +346,7 @@ namespace NSMB.Utilities {
         }
 
         public static bool Blink(float timer, float blinksPerSecond, float? blinkStartTime = null) {
-            if (!blinkStartTime.HasValue || timer > blinkStartTime.Value) {
+            if (blinkStartTime.HasValue && timer > blinkStartTime.Value) {
                 return true;
             }
 

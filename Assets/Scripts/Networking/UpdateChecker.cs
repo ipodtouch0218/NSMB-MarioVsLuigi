@@ -14,16 +14,17 @@ namespace NSMB.Networking {
         /// <summary>
         /// Returns if we're up to date, OR newer, compared to the latest GitHub release version number
         /// </summary>
-        public async static void IsUpToDate(UpdateCallback callback) {
+        public async static void CheckIfUpToDate(UpdateCallback callback) {
             // Get http results from the GitHub API
             using UnityWebRequest request = UnityWebRequest.Get(ApiURL);
             request.SetRequestHeader("Accept", "application/json");
             //request.SetRequestHeader("UserAgent", "ipodtouch0218/NSMB-MarioVsLuigi");
 
+            Debug.Log($"[Updater] Checking for updates at {ApiURL}");
             await request.SendWebRequest();
             
-            if (request.responseCode != 200) {
-                Debug.Log($"[Updater] Failed to connect to the GitHub API: {request.responseCode}");
+            if (request.result != UnityWebRequest.Result.Success || request.responseCode != 200) {
+                Debug.Log($"[Updater] Failed to connect to the GitHub API: {request.error} | {request.responseCode} | {request.downloadHandler.text}");
                 return;
             }
 
@@ -41,7 +42,7 @@ namespace NSMB.Networking {
 
                 callback(upToDate, tag);
             } catch (Exception e) {
-                Debug.LogError($"[Updater] Failed to parse API response: {e.Message}");
+                Debug.Log($"[Updater] Failed to parse API response with thrown exception: {e.Message}");
                 Debug.LogError(e);
             }
         }

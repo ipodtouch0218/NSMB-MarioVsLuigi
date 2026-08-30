@@ -44,6 +44,11 @@ namespace Quantum {
     [StaticField(StaticFieldResetMode.None)]
     static Action[] _delegates;
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void Reset() {
+      _delegates = null;
+    }
+
     private void Awake() {
       if (dontDestroyOnLoad) {
         DontDestroyOnLoad(this);

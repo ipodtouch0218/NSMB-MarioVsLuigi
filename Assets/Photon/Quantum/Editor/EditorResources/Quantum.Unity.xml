@@ -2846,6 +2846,11 @@
             Next call to <see cref="P:Quantum.QuantumUnityDB.Global"/> will load the DB again.
             </summary>
         </member>
+        <member name="M:Quantum.QuantumUnityDB.ResetStatics">
+            <summary>
+            Unload global during play mode changes
+            </summary>
+        </member>
         <member name="M:Quantum.QuantumUnityDB.OnUnloadedAsGlobal(System.Boolean)">
             <summary>
             Unloads all the assets that have been loaded by the <see cref="P:Quantum.QuantumUnityDB.Global"/> DB.
@@ -5850,11 +5855,6 @@
         </member>
         <member name="M:Quantum.QuantumUnityNativeUtility.Compare(System.Void*,System.Void*,System.Int32)">
             <inheritdoc />
-        </member>
-        <member name="M:Quantum.QuantumUnityNativeUtility.ResetStatics">
-            <summary>
-            Reset statics. Currently does nothing.
-            </summary>
         </member>
         <member name="T:Quantum.QuantumNavMeshDebugDrawer">
             <summary>
@@ -9126,142 +9126,142 @@
             The default Quantum Gizmo colors.
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.Black">
+        <member name="P:Quantum.QuantumGizmoColors.Black">
             <summary>
             Black Gizmo color. RGBA: (0, 0, 0, 1)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.Yellow">
+        <member name="P:Quantum.QuantumGizmoColors.Yellow">
             <summary>
             Yellow Gizmo color. RGBA: (1, 0.92, 0.016, 1)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.Magenta">
+        <member name="P:Quantum.QuantumGizmoColors.Magenta">
             <summary>
             Magenta Gizmo color. RGBA: (1, 0, 1, 1)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.Blue">
+        <member name="P:Quantum.QuantumGizmoColors.Blue">
             <summary>
             Blue Gizmo color. RGBA: (0, 0, 1, 1)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.Green">
+        <member name="P:Quantum.QuantumGizmoColors.Green">
             <summary>
             Green Gizmo color. RGBA: (0, 1, 0, 1)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.White">
+        <member name="P:Quantum.QuantumGizmoColors.White">
             <summary>
             White Gizmo color. RGBA: (1, 1, 1, 1)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.Red">
+        <member name="P:Quantum.QuantumGizmoColors.Red">
             <summary>
             Red Gizmo color. RGBA: (1, 0, 0, 1)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.Cyan">
+        <member name="P:Quantum.QuantumGizmoColors.Cyan">
             <summary>
             Cyan Gizmo color. RGBA: (0, 1, 1, 1)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.Gray">
+        <member name="P:Quantum.QuantumGizmoColors.Gray">
             <summary>
             Gray Gizmo color. RGBA: (0.5, 0.5, 0.5, 1)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.LightGreen">
+        <member name="P:Quantum.QuantumGizmoColors.LightGreen">
             <summary>
             Light Green Gizmo color. RGBA: (0.4, 1, 0.7, 1)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.LimeGreen">
+        <member name="P:Quantum.QuantumGizmoColors.LimeGreen">
             <summary>
             Lime Green Gizmo color. RGBA: (0.4925605, 0.9176471, 0.5050631, 1)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.LightBlue">
+        <member name="P:Quantum.QuantumGizmoColors.LightBlue">
             <summary>
             Light Blue Gizmo color. RGBA: (0, 0.75, 1, 1)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.SkyBlue">
+        <member name="P:Quantum.QuantumGizmoColors.SkyBlue">
             <summary>
             Sky Blue Gizmo color. RGBA: (0.4705882, 0.7371198, 1, 1)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.Maroon">
+        <member name="P:Quantum.QuantumGizmoColors.Maroon">
             <summary>
             Maroon Gizmo color. RGBA: (1, 0, 0.5, 0.5)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.LightPurple">
+        <member name="P:Quantum.QuantumGizmoColors.LightPurple">
             <summary>
             Light Purple Gizmo color. RGBA: (0.5192922, 0.4622621, 0.6985294, 1)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.TransparentMagenta">
+        <member name="P:Quantum.QuantumGizmoColors.TransparentMagenta">
             <summary>
             Transparent Magenta Gizmo color. RGBA: (1, 0, 1, 0.5)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.TransparentGray">
+        <member name="P:Quantum.QuantumGizmoColors.TransparentGray">
             <summary>
             Transparent Gray Gizmo color. RGBA: (0.5, 0.5, 0.5, 0.5)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.TransparentLightPurple">
+        <member name="P:Quantum.QuantumGizmoColors.TransparentLightPurple">
             <summary>
             Transparent Light Purple Gizmo color. RGBA: (0.5192922, 0.4622621, 0.6985294, 0.5)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.TransparentYellow">
+        <member name="P:Quantum.QuantumGizmoColors.TransparentYellow">
             <summary>
             Transparent Yellow Gizmo color. RGBA: (1, 0.92, 0.016, 0.5)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.TransparentWhite">
+        <member name="P:Quantum.QuantumGizmoColors.TransparentWhite">
             <summary>
             Transparent White Gizmo color. RGBA: (1, 1, 1, 0.5)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.TransparentLimeGreen">
+        <member name="P:Quantum.QuantumGizmoColors.TransparentLimeGreen">
             <summary>
             Transparent Lime Green Gizmo color. RGBA: (0.4925605, 0.9176471, 0.5050631, 0.5)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.TransparentGreen">
+        <member name="P:Quantum.QuantumGizmoColors.TransparentGreen">
             <summary>
             Transparent Green Gizmo color. RGBA: (0, 1, 0, 0.5)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.TransparentSkyBlue">
+        <member name="P:Quantum.QuantumGizmoColors.TransparentSkyBlue">
             <summary>
             Transparent Sky Blue Gizmo color. RGBA: (0.4705882, 0.7371198, 1, 0.5)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.TransparentLightBlue">
+        <member name="P:Quantum.QuantumGizmoColors.TransparentLightBlue">
             <summary>
             Transparent Light Blue Gizmo color. RGBA: (0, 0.75, 1, 0.5)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.TransparentLightGreen">
+        <member name="P:Quantum.QuantumGizmoColors.TransparentLightGreen">
             <summary>
             Transparent Black Gizmo color. RGBA: (0, 0, 0, 0.5)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.TransparentBlue">
+        <member name="P:Quantum.QuantumGizmoColors.TransparentBlue">
             <summary>
             Transparent Blue Gizmo color. RGBA: (0, 0, 1, 0.5)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.TransparentMaroon">
+        <member name="P:Quantum.QuantumGizmoColors.TransparentMaroon">
             <summary>
             Transparent Maroon Gizmo color. RGBA: (1, 0, 0.5, 0.5)
             </summary>
         </member>
-        <member name="F:Quantum.QuantumGizmoColors.TransparentRed">
+        <member name="P:Quantum.QuantumGizmoColors.TransparentRed">
             <summary>
             Transparent Red Gizmo color. RGBA: (1, 0, 0, 0.5)
             </summary>

@@ -1,11 +1,18 @@
 using NSMB.Utilities.Extensions;
 using Quantum;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Input = Quantum.Input;
 
 namespace NSMB.UI.Game {
     public class InputDisplay : QuantumSceneViewComponent {
+
+        private static Dictionary<InputType, Type> CommandTypes = new() {
+            [InputType.ReserveItem] = typeof(CommandSpawnReserveItem),
+            [InputType.Taunt] = typeof(CommandTaunt),
+        };
 
         //---Serialized Variables
         [SerializeField] private PlayerElements playerElements;
@@ -38,7 +45,10 @@ namespace NSMB.UI.Game {
             }
 
             bool isPressed;
-            if (inputType != InputType.ReserveItem) {
+            if (CommandTypes.ContainsKey(inputType)) {
+                int diff = f.Number - commandFrame;
+                isPressed = diff > 0 && diff < f.UpdateRate / 3;
+            } else { 
                 Input input;
                 if (player.IsValid) {
                     input = *f.GetPlayerInput(player);
@@ -46,9 +56,6 @@ namespace NSMB.UI.Game {
                     input = default;
                 }
                 isPressed = GetButton(input, inputType);
-            } else {
-                int diff = f.Number - commandFrame;
-                isPressed = diff > 0 && diff < f.UpdateRate / 3;
             }
             display.color = isPressed ? pressedColor : unpressedColor;
         }
@@ -59,13 +66,9 @@ namespace NSMB.UI.Game {
                 return;
             }
 
-            PlayerRef player = mario->PlayerRef;
-            if (inputType == InputType.ReserveItem) {
-                if (f.GetPlayerCommand(player) is CommandSpawnReserveItem) {
-                    commandFrame = f.Number;
-                }
-            } else if (inputType == InputType.Taunt) {
-                if (f.GetPlayerCommand(player) is CommandTaunt) {
+            if (CommandTypes.TryGetValue(inputType, out Type commandType)) {
+                PlayerRef player = mario->PlayerRef;
+                if (f.GetPlayerCommand(player)?.GetType() == commandType) {
                     commandFrame = f.Number;
                 }
             }

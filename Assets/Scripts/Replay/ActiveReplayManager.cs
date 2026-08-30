@@ -100,8 +100,8 @@ namespace NSMB.Replay {
                 var deletions = ReplayListManager.GetTemporaryReplaysToDelete();
                 foreach (var replayPath in deletions) {
                     Debug.Log($"[Replay] Automatically deleting temporary replay '{replayPath}'.");
-                    File.Delete(replayPath);
                     manager.RemoveReplayByPath(replayPath);
+                    File.Delete(replayPath);
                 }
             }
 

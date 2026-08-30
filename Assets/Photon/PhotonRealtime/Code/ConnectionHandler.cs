@@ -19,6 +19,7 @@ namespace Photon.Realtime
     using System.Text;
     using System.Threading;
     using System.Diagnostics;
+    using System.Collections.Generic;
     using Photon.Client;
 
     #if SUPPORTED_UNITY
@@ -346,7 +347,7 @@ namespace Photon.Realtime
     /// The SystemConnectionSummary (SBS) is useful to analyze low level connection issues in Unity. This requires a ConnectionHandler in the scene.
     /// </summary>
     /// <remarks>
-    /// A LoadBalancingClient automatically creates a SystemConnectionSummary on these disconnect causes:
+    /// A RealtimeClient automatically creates a SystemConnectionSummary on these disconnect causes:
     /// DisconnectCause.ExceptionOnConnect, DisconnectCause.Exception, DisconnectCause.ServerTimeout and DisconnectCause.ClientTimeout.
     ///
     /// The SBS can then be turned into an integer (ToInt()) or string to debug the situation or use in analytics.
@@ -373,10 +374,9 @@ namespace Photon.Realtime
         // ErrorCodeFits (ErrorCode > short.Max would be a problem)
         // WinSock (true) or BSD (false) Socket Error Codes
         //
-        // Time since receive?
-        // Times of send?!
+        // -> 12 of upper 16 bits are used
         //
-        // System/Platform -> should be in other analytic values (not this)
+        // lower 2 bytes are the Socket Error Code (capped to 0xFFFF)
 
 
         /// <summary>Version of the SystemConnectionSummary type.</summary>
@@ -436,13 +436,38 @@ namespace Photon.Realtime
             /// <summary>Error code is of WinSock type bit.</summary>
             internal const int ErrorCodeWinSock = 16;
         }
-
+        
+        /// <summary>Brief error description per Windows socket error code.</summary>
+        static readonly Dictionary<int, string> UdpSocketErrors = new Dictionary<int, string>
+                                                                  {
+                                                                      { 10004,  "WSAEINTR - interrupted (temp)" },
+                                                                      { 10009,  "WSAEBADF - bad file descriptor (fatal)" },
+                                                                      { 10013,  "WSAEACCES - blocked by filter or missing SO_BROADCAST (fatal)" },
+                                                                      { 10014,  "WSAEFAULT - invalid buffer pointer (fatal)" },
+                                                                      { 10022,  "WSAEINVAL - socket not bound or invalid argument (fatal)" },
+                                                                      { 10035,  "WSAEWOULDBLOCK - buffer full or no data yet (temp)" },
+                                                                      { 10036,  "WSAEINPROGRESS - operation in progress (temp)" },
+                                                                      { 10038,  "WSAENOTSOCK - socket handle invalid (fatal)" },
+                                                                      { 10039,  "WSAEDESTADDRREQ - destination address required (fatal)" },
+                                                                      { 10040,  "WSAEMSGSIZE - send: datagram too large / receive: datagram truncated (fatal)" },
+                                                                      { 10049,  "WSAEADDRNOTAVAIL - cannot assign requested address (fatal)" },
+                                                                      { 10050,  "WSAENETDOWN - network subsystem failed (fatal)" },
+                                                                      { 10051,  "WSAENETUNREACH - network unreachable (fatal)" },
+                                                                      { 10054,  "WSAECONNRESET - ICMP port unreachable from remote (fatal)" },
+                                                                      { 10055,  "WSAENOBUFS - buffer exhaustion (temp)" },
+                                                                      { 10057,  "WSAENOTCONN - socket not connected (fatal)" },
+                                                                      { 10058,  "WSAESHUTDOWN - cannot send after socket shutdown (fatal)" },
+                                                                      // server address would be interesting
+                                                                      { 10061,  "WSAECONNREFUSED - connection actively refused (fatal)" },
+                                                                      { 10064,  "WSAEHOSTDOWN - host is down (fatal)" },
+                                                                      { 10065,  "WSAEHOSTUNREACH - host unreachable, no route (fatal)" },
+                                                                  };
 
         /// <summary>
-        /// Creates a SystemConnectionSummary for an incident of a local LoadBalancingClient. This gets used automatically by the LoadBalancingClient!
+        /// Creates a SystemConnectionSummary for an incident of a local RealtimeClient. This gets used automatically by the RealtimeClient!
         /// </summary>
         /// <remarks>
-        /// If the LoadBalancingClient.SystemConnectionSummary is non-null after a connection-loss, you can call .ToInt() and send this to analytics or log it.
+        /// If the RealtimeClient.SystemConnectionSummary is non-null after a connection-loss, you can call .ToInt() and send this to analytics or log it.
         ///
         /// </remarks>
         /// <param name="client"></param>
@@ -463,7 +488,7 @@ namespace Photon.Realtime
             this.AppOutOfFocusRecent = ConnectionHandler.AppOutOfFocusRecent;
             this.NetworkReachable = ConnectionHandler.IsNetworkReachableUnity();
 
-            this.ErrorCodeFits = this.SocketErrorCode <= short.MaxValue; // socket error code <= short.Max (everything else is a problem)
+            this.ErrorCodeFits = this.SocketErrorCode >= 0 && this.SocketErrorCode <= ushort.MaxValue; // socket error code fits in 4 bytes
             this.ErrorCodeWinSock = true;
         }
 
@@ -527,8 +552,12 @@ namespace Photon.Realtime
         {
             StringBuilder sb = new StringBuilder();
             string transportProtocol = ProtocolIdToName[this.UsedProtocol];
+            string annotation = "";
+            UdpSocketErrors.TryGetValue(this.SocketErrorCode, out annotation);
 
-            sb.Append($"SCS v{this.Version} {transportProtocol} SocketErrorCode: {this.SocketErrorCode} ");
+
+            sb.Append($"SCS v{this.Version} {transportProtocol} SocketError: {this.SocketErrorCode} ");
+            if (!string.IsNullOrEmpty(annotation)) sb.Append($"[{annotation}] ");
 
             if (this.AppQuits) sb.Append("AppQuits ");
             if (this.AppPause) sb.Append("AppPause ");
@@ -538,13 +567,26 @@ namespace Photon.Realtime
             if (!this.NetworkReachable) sb.Append("NetworkUnreachable ");
             if (!this.ErrorCodeFits) sb.Append("ErrorCodeRangeExceeded ");
 
-            if (this.ErrorCodeWinSock) sb.Append("WinSock");
-            else sb.Append("BSDSock");
+            if (!this.ErrorCodeWinSock) sb.Append("BSDSock");
 
             string result = sb.ToString();
             return result;
         }
 
+        /// <summary>Extracts the recorded error code from a SystemConnectionSummary binary representation.</summary>
+        /// <param name="summary">Pass the value of SystemConnectionSummary.ToInt().</param>
+        /// <returns>Error code from a SCS summary (int) or -1 if the version can't be read.</returns>
+        public static int GetErrorCode(int summary)
+        {
+            byte version = GetBits(ref summary, SCSBitPos.Version, 0xF);
+            if (version == 0)
+            {
+                // in SCS v0, the error code is put into the last 2 bytes of an int
+                return summary & 0xFFFF;
+            }
+
+            return -1;
+        }
 
         /// <summary>Gets a specific bit out of the value at the given position.</summary>
         internal static bool GetBit(ref int value, int bitpos)

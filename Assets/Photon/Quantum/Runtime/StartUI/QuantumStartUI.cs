@@ -462,7 +462,7 @@ namespace Quantum {
 
             }
             if (UI.FpsGroup != null && UI.FpsGroup.activeSelf) {
-              UI.SignalText.text = $"{Connection.Ping}";
+              UI.SignalText.text = Connection.Ping.ToString();
             }
           }
           break;

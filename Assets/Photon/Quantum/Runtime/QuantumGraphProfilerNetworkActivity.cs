@@ -1,4 +1,5 @@
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   using Photon.Client;
 
   /// <summary>
@@ -26,4 +27,5 @@ namespace Quantum.Profiling {
       Graph.SetThresholds(frameMs * 2.0f, frameMs * 4.0f, frameMs * 8.0f);
     }
   }
+#endif
 }

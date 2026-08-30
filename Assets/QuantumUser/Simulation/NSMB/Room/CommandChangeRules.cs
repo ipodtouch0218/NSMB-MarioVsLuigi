@@ -66,6 +66,7 @@ namespace Quantum {
                 GameRules newRules = default;
                 f.FindAsset(Gamemode).DefaultRules.Materialize(f, ref newRules);
                 newRules.Stage = rules.Stage;
+                newRules.ChooseMode = rules.ChooseMode;
                 newRules.RandomDisabledStages = rules.RandomDisabledStages;
 
                 rules = newRules;

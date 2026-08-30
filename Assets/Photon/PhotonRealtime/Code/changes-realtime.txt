@@ -3,6 +3,21 @@ Photon Realtime C# Client - Changelog
 www.photonengine.com  -  Join our Discord Server: https://dashboard.photonengine.com/account/profile
 
 
+Version 5.1.15 (15. July 2026)
+    Updated: XML reference in various places to remove outdated references and naming. Extended reference in various places.
+    Added: RealtimeClient.CrcEnabled to make it more available/accessible in the client.
+    Updated: Demo Particle for Unity and .Net. Both use the same logic now. 32x32 grid default. Simplest matchmaking. Auto-move uses directions.
+    Added: Example of using Stats is now in the GameLogic, showing Snapshot and Delta.
+    Updated: Logging to avoid boxing and allocations as much as possible. Checked this with Unity's Project Auditor in 6.4. No Major/Critical issues remain.
+    Changed: EventBetter (handling callbacks) is now NonSerialized (as intended).
+
+Version 5.1.14 (1. June 2026 - sha 81dc467)
+    Updated: Static value initialization for Unity using RuntimeInitializeOnLoadMethod in RegionHandler and Log.
+    Updated: AsyncExtensions with annotations for the Unity Analyzer to avoid misleading warnings about static values. See SuppressMessage why each is fine.
+    Updated: SystemConnectionSummary.ToString() to include an annotation of the error codes.
+    Minor: EventCode.CommandEvent from being static to const (consistent with the other codes).
+    Note: Skipping release of v5.1.13 which was used in a few preview builds.
+
 Version 5.1.12 (01. April 2026 - rev8344)
     Updated: EventBetterWorker instance checks for Unity 6.4 and up (using GetEntityId()). This avoids warnings for using obsolete APIs.
 

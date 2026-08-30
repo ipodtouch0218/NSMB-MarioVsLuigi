@@ -3,6 +3,39 @@ Photon C# Client Library - Changelog
 www.photonengine.com  -  Join our Discord Server: https://dashboard.photonengine.com/account/profile
 
 
+Version 5.1.15 (15. July 2026)
+    Updated: Internal locking for critical sections of the de/serialization and message handling. This fixes some rare issues but it was also possible to optimize existing locking.
+    Note: Outgoing ACKs are generated at receive time, so this doesn't delay them. ACK side-effects stay on the send thread, where resends/send-window already lived.
+    Removed: EnetChannel.reliableCommandsInFlight. It was buggy (never decremented on the ACK2) and redundant with the sentReliableCommands scan.
+    Changed: Split incoming ACKs from data commands in EnetPeer. New AckQueue for incoming ACKs is drained in SendOutgoingCommands. CommandQueue executed only on dispatch.
+    Fixed: SendOutgoingCommands() to queue the Disconnect()-call in case of client timeout and to not send in Zombie state (client detected timeout but did not disconnect yet).
+    Note: Timeout teardown now completes on the dispatch thread.
+    Changed: Tcp IncomingList now stores IncomingMessages, which also keep the time of arrival.
+    Changed: Received Ping operations (WS/WSS) will now queue like anything else. The arrival time avoids local lag for the rtt.
+    Changed: Incoming list is now cleared by dequeueing each message and pooling it again (it no longer needs GC).
+    Removed: Shared buffer for TCP ping. This is now lock-free and allocation-free (writes into the pooled buffer it's about to enqueue).
+    Changed: outgoingStream: List<StreamBuffer> to Queue<StreamBuffer>. The blocking send no longer holds outgoingStream, so an enqueueing thread on another thread is never stalled by a slow/back-pressured send.
+    Changed: Enet command pooling. On disconnect, commands are also all returned to pools. This automatically returns and pooled payload buffers to their pool as well.
+    Changed: TCP handling of late arriving messages and network simulation. 
+    Fixed: WebSocket case where full send buffers (on the socket) could cause more memory allocations, as internal buffers were not released to the pool.
+    Added: TPeer.pendingSendBuffer to temporarily store a buffer until the next send happens. Released when sending becomes possible again.
+    Fixed: DatagramEncryptedConnection bool could flip mid-datagram-assembly (causing a single "0" command to be sent).
+    Changed: Remaining size will now be checked when writing ACK2s. If there are a lot of channels (and loss) there might be more ACK2s than remaining space in a package. This keeps the remaining ACK2s for next package.
+    Fixed: (Obsolete) SentReliableCommandsCount, which was accessing Stats.UdpReliableCommandsInFlight. You want to use the Stats directly but this was simply wrong.
+
+Version 5.1.14 (29. Mai 2026 - sha 81dc467)
+    Updated: SocketUdp ignores most non-fatal UDP Socket errors.
+    Updated: SocketUdp sets it's photonSocket.SocketErrorCode for sending and receiving errors (if available).
+    Updated: SocketWebTcp handling of errors for WebSocket-sharp (non JavaScript / WebGL builds). While connected, all fatal errors are followed by OnClose. Errors while connecting are still treated as fatal (as there is no OnClose callback then).
+    Changed: PhotonClientWebSocket Send() and Disconnect() now switch SynchronizationContext when using ClientWebSocket (and return to the context after async calls).
+    Note: PhotonClientWebSocket SocketErrorCode is set to either the ws.CloseStatus or ws.State. For UDP sockets, it is the SocketException.SocketErrorCode.
+    Changed: CountDiscarded now counts reliable sequenced commands if the incoming one is older than dispatched. This is only a counter for such cases for debugging / analytics.
+    Fixed: Closing of sockets that could not be connected to (in case a host name resolves to more than one IP in SocketUdp).
+    Fixed: Potential NullReference Exception in SocketUdp.Send(), if the socket closes (so it was not a relevant error case).
+    Updated: SocketUdpAsync to avoid allocations and to also ignore socket error codes which point out temporary issues. This class is now closer to what the SocketUdp class does (which is used by default).
+    Fixed: SocketUdpAsync was shutting down the connection if a message was too large. This is not simply skipped (analog to SocketUdp).
+    Note: Skipping release of v5.1.13 which was used in preview builds.
+
 Version 5.1.12 (01. April 2026 - rev8344)
     Fixed: Potential divide by zero exception in TrafficStatsDelta.ToString().
 
@@ -21,7 +54,7 @@ Version 5.1.10 (24. February 2026 - rev8290)
     Changed: EnetPeer.peerConnectionState is now a property which uses Interlocked methods for atomic updates and checks. See peerConnectionState and TryUpdateConnectionState.
     Added: ConnectionStateValue.ConnectingHandleVerifyConnect to have a short-lived state which is used while the init request is being written and queued (avoids surplus init requests).
     Updated: Comments for CT_VERIFYCONNECT in ExecuteCommand().
-    Fixed: EnetPeer.CreateAndEnqueueCommand() now locks the channel if a range of fragments needs to be sent. This should prevent other commands from being written to the channel concurrently (which in turn would mess with the sequence numbering), fixing a problem where the first fragment's sequence number was not matching the "first fragment" value. 
+    Fixed: EnetPeer.CreateAndEnqueueCommand() now locks the channel if a range of fragments needs to be sent. This should prevent other commands from being written to the channel concurrently (which in turn would mess with the sequence numbering), fixing a problem where the first fragment's sequence number was not matching the "first fragment" value.
     Changed: PhotonPeer.EstablishEncryption() now passes the enqueueLock object for locking. This is the correct lock-object, as opposed to the sendOutgoingLockObject (which is for send calls done by the game logic/realtime).
     Added: Check for payload size when initializing an NCommand from a byte-buffer coming from the network.
     Changed: PhotonPeer.UseAck2. If ACK2 isn't compiled into the library, it can not be set and is always false. If it's compiled in, it can be set to true.

@@ -1,3 +1,54 @@
+# 3.0.13
+
+## Stable
+
+### Build 2170 (Aug 05, 2026)
+
+**Changes**
+
+- Improved the deserialization performance of `QuantumJsonSerializer`
+
+**Bug Fixes**
+
+- Fixed: An issue that left `ComponentCount<T>()` one below the correct count after a component was removed and re-added on the same frame
+- Fixed: A regression that made the `sharedResourceManager` on server simulation to be accidentally discarded with rooms
+- Fixed: An issue where the standalone .NET runner logged a kernel32.dll DllNotFoundException on macOS, despite correctly falling back to the Marshal allocator
+- Fixed: An issue in 2D Physics when removing a `PhysicsCallbacks2D` component from an entity during collision callbacks, which could cause such entity to use the wrong callback flags on that frame
+
+# 3.0.12
+
+## Stable
+
+### Build 2122 (Jun 30, 2026)
+
+**What's New**
+
+- Added the scripting define `QUANTUM_DISABLE_GRAPHPROFILER` to optionally remove all Quantum GraphProfiler code from builds
+
+**Changes**
+
+- Upgraded Photon Realtime to version `5.1.15`
+- Implemented critical Unity Auditor feedback and fixed domain reload warnings
+
+**Removed**
+
+- Removed partial `EnterPlayModeOptionsHandler.IsEnabledUser()` method
+
+**Bug Fixes**
+
+- Fixed: An issue when baking static mesh colliders with `N` degenerate triangles causing the last `N` triangles to be dropped from the baked mesh
+- Fixed: An issue that caused the imported Asteroids sample to have broken materials for Unity 6.5+
+- Fixed: An issue with 2D and 3D Physics callbacks that could cause desyncs due to `OnEnter` callbacks being called for late-joiners
+- Fixed: An issue with 3D capsule-triangle collision detection that was causing false negatives in certain conditions
+- Fixed: An issue that could cause a DivisionByZero exception in `FPQuaternion.RotateTowards` when quaternions are almost identical or non-normalized AND `maxDegreesDelta` is negative
+- Fixed: An issue that caused stepping the editor in paused play mode to not play back exactly one Quantum tick
+- Fixed: An issue that caused exceptions (e.g. from gizmo rendering) on invalid or broken asset refs in `Map.NavMeshLinks`
+- Fixed: An issue that caused scene view components to be stale after reusing the `QuantumEntityViewUpdater`; now `Activate()` is called on them when starting the new game
+- Fixed: An issue where code-generated union structs could theoretically cause a desync in `GetHashCode()`
+- Fixed: An issue that caused the Unity navmesh data to be saved on the Unity scene instead of on a separate asset during map baking
+- Fixed: An issue in the 2D navmesh agent internal steering that caused right and left steering to use a slightly different rotation speed
+- Fixed: An issue where navmesh agents that failed their search can influence other agent waypoint detection
+
 # 3.0.11
 
 ## Stable
@@ -12,7 +63,7 @@
 
 - Fixed: Deprecated warnings in Unity `6000.4`
 - Fixed: An issue where `frame.DestroyPending(entity)` was giving incorrect results (again). When `frame.Destroy(entity)` is called, `frame.DestroyPending(entity)` is expected return `true` during `Destroy` (remove callbacks) and afterward until the destroy is committed. Before 3.0.10 build 1991, `DestroyPending` did return `true` during `Destroy` but `false` afterward. In 3.0.10 build 1991, it returned `true` after `Destroy` but `false` during. With this fix, `DestroyPending` returns the correct result in both scenarios
-- Fixed: FIxed: An issue that caused an Unity TMP error to be logged when using the StartUI
+- FIxed: An issue that caused an Unity TMP error to be logged when using the StartUI
 - Fixed: A possible `NullReferenceException` in `AssetRefDrawer` when used with Odin drawers
 
 # 3.0.10

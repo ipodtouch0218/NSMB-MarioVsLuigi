@@ -20,6 +20,8 @@ namespace Quantum {
 
         public abstract void DisableGamemode(Frame f);
 
+        public abstract void OnReturnToRoom(Frame f);
+
         public abstract void CheckForGameEnd(Frame f);
 
         public virtual int GetObjectiveCount(Frame f, PlayerRef player) {

@@ -1,5 +1,3 @@
-#if UNITY_WEBGL || WEBSOCKET || WEBSOCKET_PROXYCONFIG
-
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SocketWebTcp.cs" company="Exit Games GmbH">
 //   Copyright (c) Exit Games GmbH.  All rights reserved.
@@ -9,6 +7,15 @@
 // </summary>
 // <author>developer@exitgames.com</author>
 // --------------------------------------------------------------------------------------------------------------------
+
+
+#if UNITY_WEBGL || WEBSOCKET || WEBSOCKET_PROXYCONFIG
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+#define PHOTON_WEBSOCKET_JS
+#else
+#define PHOTON_WEBSOCKET_CS
+#endif
 
 
 namespace Photon.Client
@@ -133,8 +140,21 @@ namespace Photon.Client
             // passing-on errors only if this socket is still used / expected to be connected
             if (this.State != PhotonSocketState.Disconnecting && this.State != PhotonSocketState.Disconnected)
             {
-                this.Listener.DebugReturn(LogLevel.Error, "SocketWebTcp.ErrorCallback(). Going to disconnect. Server: " + this.ServerAddress + " Error: " + code + " Message: " + message);
-                this.HandleException(this.State != PhotonSocketState.Connected ? StatusCode.ExceptionOnConnect : StatusCode.ExceptionOnReceive); // sets state to Disconnecting
+                this.Listener.DebugReturn(LogLevel.Error, "SocketWebTcp.ErrorCallback(). Server: " + this.ServerAddress + " Error: " + code + " Message: " + message);
+
+                #if PHOTON_WEBSOCKET_CS
+                // websocket-sharp: only act during Connect — covers connect failures that don't produce an OnClose
+                // after Connected, OnError is non-fatal
+                if (this.State == PhotonSocketState.Connecting)
+                {
+                    this.HandleException(StatusCode.ExceptionOnConnect);
+                }
+                #else
+                // JS: errors are always terminal in the browser
+                this.HandleException(this.State != PhotonSocketState.Connected
+                    ? StatusCode.ExceptionOnConnect
+                    : StatusCode.ExceptionOnReceive);
+                #endif
             }
         }
 
@@ -154,7 +174,7 @@ namespace Photon.Client
         /// Extended proxy support is available to Industries Circle members. Where available, proxy addresses may be defined as 'auto:', 'pac:' or 'system:'.
         /// In all other cases, the proxy address is used as is and fails to read configs (if one of the listed schemes is used).
         ///
-        /// Requires file ProxyAutoConfig.cs and compile define: WEBSOCKET_PROXYCONFIG_SUPPORT.
+        /// Requires file ProxyAutoConfig.cs and compile define: WEBSOCKET_PROXYCONFIG
         /// </remarks>
         /// <param name="proxyAddress">Proxy address from the server configuration.</param>
         /// <param name="url">Url to connect to (one of the Photon servers).</param>
@@ -298,10 +318,14 @@ namespace Photon.Client
                     data = trimmedData;
                 }
 
-                if (this.sock != null)
+                if (this.sock == null)
                 {
-                    this.sock.Send(data);
+                    // a Disconnect() may null the socket while a send is in progress: report Skipped instead of
+                    // silently returning Success for a message that was never sent
+                    return PhotonSocketError.Skipped;
                 }
+
+                this.sock.Send(data);
             }
             catch (Exception e)
             {
@@ -331,7 +355,10 @@ namespace Photon.Client
 
             try
             {
-                this.HandleReceivedDatagram(buf, len, false);
+                // willBeReused must be true: the JsLib implementation re-uses its receiveBuffer across messages
+                // (WebSocket.RecvCallbackInstance), so the DEBUG network-sim path has to copy before deferring.
+                // websocket-sharp delivers a fresh array per message but can use the same (safe) flag.
+                this.HandleReceivedDatagram(buf, len, true);
             }
             catch (Exception e)
             {

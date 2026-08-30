@@ -163,6 +163,14 @@ namespace Quantum {
         foreach (var view in _activeViews) {
           view.Value.GameChanged(_observedGame);
         }
+      } else {
+        // For new games reusing the EVU will Activate the scene components again
+        for (int i = _viewComponents.Count - 1; i >= 0; i--) {
+          if (_viewComponents[i].IsActive == false) {
+            _viewComponentsToAdd.Enqueue(_viewComponents[i]);
+            _viewComponents.RemoveAt(i);
+          }
+        }
       }
     }
 

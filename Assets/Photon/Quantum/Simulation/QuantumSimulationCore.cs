@@ -1059,7 +1059,7 @@ namespace Quantum {
             var bytes = this.Context.AssetSerializer.AssetToByteArray(asset);
             fixed (byte* p = bytes) {
               var hash = CRC64.Calculate(0, p, bytes.Length);
-              printer.AddLine($"{asset.Identifier}: {hash}");
+              printer.AddLine($"{asset.Identifier.ToString()}: {hash}");
             }
           }
           printer.ScopeEnd();
@@ -1074,7 +1074,7 @@ namespace Quantum {
 
           var assetSerializer = Context.AssetSerializer;
           if ((dumpFlags & DumpFlag_ReadableDynamicDB) == DumpFlag_ReadableDynamicDB) {
-            printer.AddLine($"NextGuid: {DynamicAssetDB.NextGuid}");
+            printer.AddLine($"NextGuid: {DynamicAssetDB.NextGuid.ToString()}");
             foreach (var asset in DynamicAssetDB.Assets) {
               printer.AddLine($"{asset.GetType().FullName}:");
               printer.ScopeBegin();
@@ -2767,7 +2767,7 @@ namespace Quantum {
     }
     
     private static Type FindStaticType(string name) {
-      foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()) {
+      foreach (var assembly in QuantumPlatform.GetLoadedAssemblies()) {
         Type[] types;
         try {
           types = assembly.GetTypes();
@@ -4455,7 +4455,7 @@ namespace Quantum {
       if (InstantReplayConfig.LengthSeconds <= 0 || InstantReplayConfig.SnapshotsPerSecond <= 0) {
         Assert.Check(_instantReplaySnapshotBuffer == null);
         Assert.Check(_commonSnapshotInterval <= 0);
-        Log.Error($"Can't start recording replay snapshots with these settings: {InstantReplayConfig}");
+        Log.Error($"Can't start recording replay snapshots with these settings: {InstantReplayConfig.ToString()}");
         return;
       }
 
@@ -5064,7 +5064,7 @@ namespace Quantum {
               sb.AppendLine();
               sb.AppendLine("# RECEIVED ASSETDB CHECKSUMS");
               foreach (var entry in Context.AssetDBChecksums) {
-                sb.Append(entry.Item0).Append(": ").Append(entry.Item1).AppendLine();
+                sb.Append(entry.Item0).Append(": ").Append(entry.Item1.ToString()).AppendLine();
               }
 
               _frameDump = QTuple.Create(true, sb.ToString());
@@ -5772,10 +5772,12 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Legacy/SessionContainer.cs
 
 namespace Quantum {
-  using System;
   using Photon.Deterministic;
+  using System;
+  using System.Diagnostics.CodeAnalysis;
   [Obsolete("Has been replaced by SessionRunner class.")]
   public class SessionContainer {
+    [SuppressMessage("Domain reload", "UDR0001", Justification = "Legacy code")]
     public static Boolean _loadedAllStatics = false;
     public static readonly Object _lock = new Object();
 
@@ -7268,9 +7270,10 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Runner/DotNetRunnerFactory.cs
 
 namespace Quantum {
-  using System;
-  using System.Threading.Tasks;
   using Photon.Deterministic;
+  using System;
+  using System.Diagnostics.CodeAnalysis;
+  using System.Threading.Tasks;
 
   /// <summary>
   /// Platform dependent information and factory methods for the <see cref="SessionRunner"/>.
@@ -7278,6 +7281,7 @@ namespace Quantum {
   /// standalone Quantum applications and on the Quantum server plugin.
   /// </summary>
   public class DotNetRunnerFactory : IRunnerFactory {
+    [SuppressMessage("Domain reload", "UDR0001", Justification = "Not used in Unity")]
     static Boolean _isInitialized = false;
     static readonly Object _lock = new Object();
 
@@ -7382,9 +7386,10 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Runner/DotNetSessionContext.cs
 
 namespace Quantum {
-  using System;
-  using System.IO;
   using Photon.Deterministic;
+  using System;
+  using System.Diagnostics.CodeAnalysis;
+  using System.IO;
 
   /// <summary>
   /// This class implements the <see cref="IDeterministicSessionContext"/> interface inside the simulation project.
@@ -7392,8 +7397,9 @@ namespace Quantum {
   /// A static resource manager is created during Init() that is shared between multiple server simulation instances.
   /// </summary>
   public class DotNetSessionContext : IDeterministicSessionContext {
+    [SuppressMessage("Domain reload", "UDR0001", Justification = "Not used in Unity")]
     static ResourceManagerStatic _sharedResourceManager;
-    static Object _lock = new Object();
+    static readonly Object _lock = new Object();
     DeterministicCommandSerializer _commandSerializer;
 
     /// <summary>
@@ -7481,7 +7487,6 @@ namespace Quantum {
     public void Shutdown() {
       _commandSerializer = null;
     }
-
 
     /// <summary>
     /// Implements the start of the Quantum online session. Instantiates a Quantum runner.
@@ -8071,14 +8076,6 @@ namespace Quantum {
     /// </summary>
     /// <param name="deltaTime">If null the internal stopwatch is used to update, otherwise pass in the desired delta time to progress the simulation.</param>
     public void Service(double? deltaTime = null) {
-#if UNITY_EDITOR
-      //Guarantees that only one frame will be step during pause mode 
-      if (UnityEditor.EditorApplication.isPaused && !UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
-      {
-        deltaTime = (double)1 / Session.SimulationRate;
-      }
-#endif
-      
       if (Session != null && State == SessionState.Starting) {
         // Waiting for a snapshot 
         if (Session.IsRunning && Session.IsPaused == false) {
@@ -8091,6 +8088,16 @@ namespace Quantum {
           State = SessionState.Running;
         }
       }
+      
+#if UNITY_EDITOR
+      if (Session != null && State == SessionState.Running) {
+        // Guarantees that only one frame will be step during pause mode 
+        if (UnityEditor.EditorApplication.isPaused) {
+          deltaTime = 1d / Session.SimulationRate;
+        }
+      }
+#endif
+
 
       if (Session != null) {
         _inSessionUpdate = true;
@@ -9399,8 +9406,9 @@ namespace Quantum.Core {
 #region Assets/Photon/Quantum/Simulation/Systems/Core/DebugSystem.cs
 
 namespace Quantum.Core {
-  using System;
   using Photon.Deterministic;
+  using System;
+  using System.Diagnostics.CodeAnalysis;
 #if !DEBUG
   using Quantum.Task;
 #endif
@@ -9453,9 +9461,12 @@ namespace Quantum.Core {
     public static event Action<Payload, Exception> CommandExecuted
 #if DEBUG && !QUANTUM_DEBUG_COMMAND_DISABLED
     {
+      [SuppressMessage("Domain reload", "UDR0004:Domain Reload Analyzer")]
       add => _commandExecuted += value;
       remove => _commandExecuted -= value;
     }
+
+    [SuppressMessage("Domain reload", "UDR0001:Domain Reload Analyzer", Justification = "Is reset QuantumStateInspector.Init()")]
     private static Action<Payload, Exception> _commandExecuted;
 #else
     { add { } remove { } }

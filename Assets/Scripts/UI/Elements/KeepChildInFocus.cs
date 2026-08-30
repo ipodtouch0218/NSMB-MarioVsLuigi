@@ -18,9 +18,14 @@ namespace NSMB.UI.Elements {
         private float scrollPos = 0;
         private GameObject previousObject;
         private bool scrolled;
+        private EventSystem eventSystem;
 
         public void Awake() {
             this.SetIfNull(ref rect);
+        }
+
+        public void OnEnable() {
+            eventSystem = EventSystem.current;
         }
 
         public void Update() {
@@ -30,7 +35,7 @@ namespace NSMB.UI.Elements {
 
             rect.verticalNormalizedPosition = Mathf.Lerp(rect.verticalNormalizedPosition, scrollPos, scrollAmount * Time.deltaTime);
 
-            GameObject obj = EventSystem.current.currentSelectedGameObject;
+            GameObject obj = eventSystem.currentSelectedGameObject;
             if (obj != previousObject) {
                 scrolled = false;
                 previousObject = obj;
@@ -49,7 +54,7 @@ namespace NSMB.UI.Elements {
 
         private bool IsFirstParent(Transform target) {
             do {
-                if (target.GetComponent<IFocusIgnore>() != null) {
+                if (target.TryGetComponent(out IFocusIgnore _)) {
                     return false;
                 }
 

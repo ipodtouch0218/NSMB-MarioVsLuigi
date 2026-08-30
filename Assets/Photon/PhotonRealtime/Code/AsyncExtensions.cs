@@ -6,7 +6,6 @@
 // <author>developer@photonengine.com</author>
 // -----------------------------------------------------------------------------
 
-
 #if UNITY_2017_4_OR_NEWER
 #define SUPPORTED_UNITY
 #endif
@@ -15,6 +14,8 @@
 namespace Photon.Realtime
 {
     using System.Threading;
+    using System.Diagnostics.CodeAnalysis;
+
     #if SUPPORTED_UNITY
     using UnityEngine;
     #if UNITY_EDITOR
@@ -28,6 +29,7 @@ namespace Photon.Realtime
         /// <summary>
         /// A cancellation token that is used for all tasks related to the Realtime connection.
         /// </summary>
+        [SuppressMessage("Domain reload", "UDR0002:Domain Reload Analyzer", Justification = "Is reset during Startup()")]
         #if UNITY_2022_3_OR_NEWER
         [System.Obsolete("Replaced by Application.exitCancellationToken")]
         #endif
@@ -321,7 +323,7 @@ namespace Photon.Realtime
                 // everything else
                 else
                 {
-                    return Task.FromException<RegionHandler>(new OperationStartException($"Client state ({client.State}) unuseable for name server connection."));
+                    return Task.FromException<RegionHandler>(new OperationStartException($"Client state ({client.State.ToString()}) unuseable for name server connection."));
                 }
 
                 if (client.RegionHandler?.EnabledRegions == null || client.RegionHandler?.EnabledRegions.Count <= 0)
@@ -783,7 +785,6 @@ namespace Photon.Realtime
         /// <param name="config">Optional AsyncConfig, otherwise AsyncConfig.Global is used.</param>
         public static void CreateServiceTask(this RealtimeClient client, CancellationToken token, TaskCompletionSource<short> completionSource = null, IDisposable disposable = null, AsyncConfig config = null)
         {
-            var startTime = DateTime.Now;
             config.Resolve().TaskFactory.StartNew(async () =>
             {
                 // use combined tokens to support cancel all tasks (Unity)
@@ -1010,6 +1011,7 @@ namespace Photon.Realtime
 
 namespace Photon.Realtime
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -1021,6 +1023,7 @@ namespace Photon.Realtime
         /// <summary>
         /// The global async config used by all async calls if no explicit config is passed.
         /// </summary>
+        [SuppressMessage("Domain reload", "UDR0001:Domain Reload Analyzer", Justification = "Is reset during Startup() -> AsyncConfig.InitForUnity()")]
         public static AsyncConfig Global = new AsyncConfig();
 
         /// <summary>

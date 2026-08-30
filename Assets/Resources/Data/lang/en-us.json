@@ -159,6 +159,7 @@
   "ui.options.controls.player.sprint": "Sprint",
   "ui.options.controls.player.powerupaction": "Powerup action",
   "ui.options.controls.player.reserveitem": "Reserve item",
+  "ui.options.controls.player.taunt": "Taunt",
   "ui.options.controls.player.sprintfireball": "Use Fire/Ice Flower when starting to sprint",
   "ui.options.controls.player.propellerjump": "Use Propeller Mushroom when jumping in mid-air",
   "ui.options.controls.player.autosprint": "Sprint by default",

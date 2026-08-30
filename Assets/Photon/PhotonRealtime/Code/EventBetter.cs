@@ -333,7 +333,8 @@ namespace Photon.Realtime
         private sealed class EventBetterWorker : MonoBehaviour
         {
             private EntityId instanceId;
-
+            
+            [NonSerialized]
             public EventBetter EventBetterInstance;
 
             void Awake()
@@ -351,7 +352,8 @@ namespace Photon.Realtime
         private sealed class EventBetterWorker : MonoBehaviour
         {
             private int instanceId;
-
+            
+            [NonSerialized]
             public EventBetter EventBetterInstance;
 
             void Awake()

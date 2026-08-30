@@ -36,11 +36,14 @@ namespace NSMB.Entities.World {
             QuantumEvent.Subscribe<EventCoinChangedType>(this, OnCoinChangedType, onlyIfEntityViewBound: true);
             QuantumEvent.Subscribe<EventCoinChangeCollected>(this, OnCoinChangedCollected, onlyIfEntityViewBound: true);
             QuantumEvent.Subscribe<EventCoinBounced>(this, OnCoinBounced, FilterOutReplayFastForward, onlyIfEntityViewBound: true);
+            QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced, onlyIfEntityViewBound: true);
             RenderPipelineManager.beginCameraRendering += URPOnPreRender;
         }
 
         public override void OnActivate(Frame f) {
-            var coin = f.Unsafe.GetPointer<Coin>(EntityRef);
+            if (!f.Unsafe.TryGetPointer(EntityRef, out Coin* coin)) {
+                return;
+            }
 
             bool dotted = coin->IsCurrentlyDotted;
             defaultCoinAnimate.isDisplaying = !dotted;
@@ -167,6 +170,10 @@ namespace NSMB.Entities.World {
             if (!dotted && !IsReplayFastForwarding) {
                 sfx.PlayOneShot(SoundEffect.World_Coin_Dotted_Spawn);
             }
+        }
+
+        private void OnGameResynced(CallbackGameResynced e) {
+            OnActivate(e.Game.Frames.Verified);
         }
     }
 }

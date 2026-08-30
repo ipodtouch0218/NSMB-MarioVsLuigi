@@ -12,8 +12,11 @@ namespace Quantum {
             var enemy = f.Unsafe.GetPointer<Enemy>(booEntity);
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(booEntity);
 
-            // Fall off screen
             var booTransform = f.Unsafe.GetPointer<Transform2D>(booEntity);
+            var booCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(booEntity);
+            FPVector2 center = booTransform->Position + booCollider->Shape.Centroid;
+
+            // Fall off screen
             var killerTransform = f.Unsafe.GetPointer<Transform2D>(killerEntity);
 
             QuantumUtils.UnwrapWorldLocations(f, booTransform->Position, killerTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
@@ -25,20 +28,19 @@ namespace Quantum {
             );
             physicsObject->Gravity = new FPVector2(0, -Constants._14_75);
 
-            // Play combo sound
-            byte combo;
-            if (f.Unsafe.TryGetPointer(killerEntity, out ComboKeeper* comboKeeper)) {
-                combo = comboKeeper->Combo++;
-            } else {
-                combo = 0;
+            if (reason.ShouldSpawnCoin()) {
+                // Spawn coin
+                var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
+                gamemode.SpawnLooseCoin(f, center);
             }
+
+            // Play combo sound
+            byte combo = ComboKeeper.IncrementOrDefault(f, killerEntity);
             f.Events.PlayComboSound(booEntity, combo);
 
             enemy->IsDead = true;
-            enemy->SetDelayedRespawn(sparklesTime: 2 * f.UpdateRate);
+            enemy->SetDelayedRespawn();
 
-            var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(booEntity);
-            FPVector2 center = booTransform->Position + collider->Shape.Centroid;
             f.Events.EnemyKilled(booEntity, killerEntity, reason, center);
         }
     }

@@ -26,7 +26,7 @@ namespace NSMB.UI.Game.Replay {
 
         [SerializeField] private GameObject replayUI, simulatingCanvas;
         [SerializeField] private Transform trackArrow, simulationTargetTrackArrow;
-        [SerializeField] private RectMask2D trackBufferMask;
+        [SerializeField] private RectTransform trackFill;
         [SerializeField] private TMP_Text trackArrowText;
         [SerializeField] private float minTrackX = -180, maxTrackX = 180;
         [SerializeField] private TMP_Text replayTimecode;
@@ -151,7 +151,7 @@ namespace NSMB.UI.Game.Replay {
             }
 
             float bufferPercentage = (float) ActiveReplayManager.Instance.ReplayFrameCache.Count * f.UpdateRate * 5 / ActiveReplayManager.Instance.ReplayLength;
-            trackBufferMask.rectTransform.SetAnchorMaxX(Mathf.Clamp01(bufferPercentage));
+            trackFill.SetAnchorMaxX(Mathf.Clamp01(bufferPercentage));
             
             if (draggingArrow && (playerElements.PauseMenu.IsPaused || !replayCanvasGroup.interactable)) {
                 CancelArrowDrag();
@@ -406,6 +406,7 @@ namespace NSMB.UI.Game.Replay {
 
         private void OnPause(InputAction.CallbackContext context) {
             if (ActiveReplayManager.Instance.IsReplayFastForwarding) {
+                PauseMenuManager.UnpauseTime = Time.unscaledTime; // Prevent pausing
                 FinishFastForward();
             }
         }

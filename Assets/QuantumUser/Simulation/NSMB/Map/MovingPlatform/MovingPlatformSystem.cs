@@ -15,7 +15,6 @@ namespace Quantum {
         private ComponentGetter<PhysicsObjectSystem.Filter> PhysicsObjectSystemFilterGetter;
 
         public override void OnInit(Frame f) {
-            f.Context.ExcludeEntityAndPlayerMask = ~f.Layers.GetLayerMask("Entity", "Player");
             PhysicsObjectSystemFilterGetter = f.Unsafe.ComponentGetter<PhysicsObjectSystem.Filter>();
         }
 
@@ -29,6 +28,10 @@ namespace Quantum {
 
         private void TryMove(Frame f, ref Filter filter, VersusStageData stage) {
             var queries = f.ResolveList(filter.Platform->Queries);
+            if (queries.Count <= 0) {
+                // Probably was just added this frame.
+                return;
+            }
             TryMoveShape(f, ref filter, stage, queries, &filter.Collider->Shape, 0);
 
             var platform = filter.Platform;
@@ -125,6 +128,10 @@ namespace Quantum {
             if (platform->CanCrushEntities && (tempHit1 || tempHit2) && shape->Type != Shape2DType.Edge) {
                 // Crushed
                 physicsObject->IsBeingCrushed = true;
+
+                if (!physicsObject->WasBeingCrushed) {
+                    f.Signals.OnEntityCrushed(hit.Entity);
+                }
             }
         }
     }

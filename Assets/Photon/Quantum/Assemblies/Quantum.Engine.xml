@@ -24226,6 +24226,11 @@
             <param name="conditionMember"></param>
             <param name="message"></param>
         </member>
+        <member name="T:Quantum.QuantumPlatform">
+            <summary>
+            Current platform information. 
+            </summary>
+        </member>
         <member name="T:Quantum.FieldsMask">
             <summary>
             Base class for <see cref="T:Quantum.FieldsMask`1"/>.

@@ -29,7 +29,7 @@ namespace Photon.Realtime
         /// <summary>A region's code as string (e.g. US, EU).</summary>
         public string Code { get; private set; }
 
-        /// <summary>Unlike the CloudRegionCode, this may contain cluster information.</summary>
+        /// <summary>Unlike the region <see cref="Code"/>, this may contain cluster information.</summary>
         public string Cluster { get; private set; }
 
         /// <summary>The address of this region.</summary>
@@ -86,11 +86,11 @@ namespace Photon.Realtime
 
             if (compact)
             {
-                return string.Format("{0}:{1}", regionCluster, this.Ping);
+                return string.Format("{0}:{1}", regionCluster, this.Ping.ToString());
             }
             else
             {
-                return string.Format("{0}[{2}]: {1}ms", regionCluster, this.Ping, this.HostAndPort);
+                return string.Format("{0}[{2}]: {1}ms", regionCluster, this.Ping.ToString(), this.HostAndPort);
             }
         }
     }

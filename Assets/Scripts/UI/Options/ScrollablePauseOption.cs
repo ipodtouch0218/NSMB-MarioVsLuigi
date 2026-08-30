@@ -52,7 +52,7 @@ namespace NSMB.UI.Options {
                     loader.OnValueChanged(this, value);
                 }
 
-                Settings.Instance.SaveSettings();
+                StartCoroutine(WaitOneFrame(Settings.Instance.SaveSettings));
             }
 
             UpdateLabel();

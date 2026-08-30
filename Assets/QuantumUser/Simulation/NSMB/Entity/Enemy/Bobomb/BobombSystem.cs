@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using Quantum.Physics2D;
 
 namespace Quantum {
     public unsafe class BobombSystem : SystemMainThreadEntityFilter<Bobomb, BobombSystem.Filter>, ISignalOnEntityBumped, ISignalOnEnemyRespawned, ISignalOnThrowHoldable, 
@@ -71,6 +72,7 @@ namespace Quantum {
 
             bobomb->CurrentDetonationFrames = bobomb->DetonationFrames;
             f.Unsafe.GetPointer<PhysicsObject>(entity)->Velocity.X = 0;
+            f.Unsafe.GetPointer<Enemy>(entity)->IgnoreOffscreen = true;
 
             f.Events.BobombLit(entity, stomp);
         }
@@ -81,22 +83,30 @@ namespace Quantum {
             var transform = filter.Transform;
             var holdable = filter.Holdable;
             var physicsObject = filter.PhysicsObject;
+            var entity = filter.Entity;
 
             // Hit players
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             Shape2D shape = Shape2D.CreateCircle(bobomb->ExplosionRadius);
             var hits = f.Physics2D.OverlapShape(*transform, shape);
-            for (int i = 0; i < hits.Count; i++) {
-                var hit = hits[i];
-                if (hit.Entity == filter.Entity) {
-                    continue;
-                }
+            ProcessHits(hits);
 
-                f.Signals.OnBobombExplodeEntity(filter.Entity, hit.Entity);
+            if (transform->Position.X - bobomb->ExplosionRadius * 2 <= stage.StageWorldMin.X) {
+                // Overlap left seam
+                var transformCopy = *transform;
+                transformCopy.Position.X += stage.TileDimensions.X / 2;
+                var seamHits = f.Physics2D.OverlapShape(transformCopy, shape);
+                ProcessHits(seamHits);
+            } else if (transform->Position.X + bobomb->ExplosionRadius * 2 >= stage.StageWorldMin.X) {
+                // Overlap right seam 
+                var transformCopy = *transform;
+                transformCopy.Position.X -= stage.TileDimensions.X / 2;
+                var seamHits = f.Physics2D.OverlapShape(transformCopy, shape);
+                ProcessHits(seamHits);
             }
 
             // Destroy tiles
             int sizeTiles = FPMath.FloorToInt(bobomb->ExplosionRadius * 2);
-            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             IntVector2 origin = QuantumUtils.WorldToRelativeTile(stage, transform->Position + filter.Collider->Shape.Centroid);
             for (int x = -sizeTiles; x <= sizeTiles; x++) {
                 for (int y = -sizeTiles; y <= sizeTiles; y++) {
@@ -126,6 +136,17 @@ namespace Quantum {
             physicsObject->Velocity = FPVector2.Zero;
             physicsObject->IsFrozen = true;
             f.Events.BobombExploded(filter.Entity);
+
+            void ProcessHits(HitCollection hitCollection) {
+                for (int i = 0; i < hitCollection.Count; i++) {
+                    var hit = hitCollection[i];
+                    if (hit.Entity == entity) {
+                        continue;
+                    }
+
+                    f.Signals.OnBobombExplodeEntity(entity, hit.Entity);
+                }
+            }
         }
 
         #region Interactions

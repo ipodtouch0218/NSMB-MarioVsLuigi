@@ -205,13 +205,13 @@ TextureImporter:
       name: track_2
       rect:
         serializedVersion: 2
-        x: 4
+        x: 8
         y: 0
-        width: 16
+        width: 4
         height: 8
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 4, y: 0, z: 4, w: 0}
+      border: {x: 0, y: 0, z: 0, w: 1}
       customData: 
       outline: []
       physicsShape: []
@@ -245,6 +245,28 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: track_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 9
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 43c4bb6799a7e8340be19259ea30786e
+      internalID: 1392736827
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -263,6 +285,7 @@ TextureImporter:
       track_1: -1914542346467782983
       track_2: -7589307040187653254
       track_3: 1576883564
+      track_4: 1392736827
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

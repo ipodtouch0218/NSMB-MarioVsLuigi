@@ -44,6 +44,7 @@ namespace Quantum {
                 }
                 if (f.Unsafe.TryGetPointer(newEntity, out Enemy* enemy)) {
                     enemy->DisableRespawning = true;
+                    enemy->IgnoreOffscreen = true;
                     enemy->FacingRight = mario->FacingRight;
                     enemy->IsActive = true;
                     enemy->IsDead = false;

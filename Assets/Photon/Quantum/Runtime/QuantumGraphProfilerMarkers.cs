@@ -1,4 +1,5 @@
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   using System.Collections.Generic;
   using Photon.Deterministic;
   using UnityEngine;
@@ -118,4 +119,5 @@ namespace Quantum.Profiling {
       }
     }
   }
+#endif
 }

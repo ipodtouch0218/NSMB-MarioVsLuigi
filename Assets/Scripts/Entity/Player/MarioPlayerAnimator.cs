@@ -227,6 +227,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerLandedWithAnimation>(this, OnMarioPlayerLandedWithAnimation, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventEnemyKicked>(this, OnEnemyKicked, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerTaunted>(this, OnMarioPlayerTaunted, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerTauntCancelled>(this, OnMarioPlayerTauntCancelled, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerUpdatePowerupQueue>(this, OnMarioPlayerUpdatePowerupQueue, FilterOutReplayFastForward);
         }
 
@@ -321,23 +322,13 @@ namespace NSMB.Entities.Player {
             using var profilerScope = HostProfiler.Start("MarioPlayerAnimator.HandleAnimations");
             // Particles
             bool disableParticles = mario->IsDead || freezable->IsFrozen(f) || f.Global->GameState == GameState.Ended;
-
-            bool onWater = false;
-            if (physicsObject->IsTouchingGround && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
-                var contacts = f.ResolveList(physicsObject->Contacts);
-                foreach (var contact in contacts) {
-                    if (f.Has<Liquid>(contact.Entity)) {
-                        onWater = true;
-                        break;
-                    }
-                }
-            }
-
+            bool walkingOnWater = mario->IsWalkingOnWater(f, EntityRef);
+            
             SetParticleEmission(drillParticle, !disableParticles && mario->IsDrilling);
             SetParticleEmission(sparkles, !disableParticles && mario->IsStarmanInvincible);
             SetParticleEmission(iceSkiddingParticle, !disableParticles && physicsObject->IsOnSlipperyGround && ((mario->IsSkidding && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f) || mario->FastTurnaroundFrames > 0));
-            SetParticleEmission(waterSkiddingParticle, !disableParticles && onWater && ((mario->IsSkidding && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f) || mario->FastTurnaroundFrames > 0));
-            SetParticleEmission(waterRunningParticle, !disableParticles && !waterSkiddingParticle.isPlaying && onWater && FPMath.Abs(physicsObject->Velocity.X) > FP._0_10);
+            SetParticleEmission(waterSkiddingParticle, !disableParticles && walkingOnWater && ((mario->IsSkidding && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f) || mario->FastTurnaroundFrames > 0));
+            SetParticleEmission(waterRunningParticle, !disableParticles && !waterSkiddingParticle.isPlaying && walkingOnWater && FPMath.Abs(physicsObject->Velocity.X) > FP._0_10);
             SetParticleEmission(dust, !disableParticles && !iceSkiddingParticle.isPlaying && !waterSkiddingParticle.isPlaying && (mario->IsWallsliding || (physicsObject->IsTouchingGround && ((mario->IsSkidding || (mario->IsCrouching && !physicsObject->IsOnSlipperyGround)) && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f)) || mario->FastTurnaroundFrames > 0 || (((mario->IsSliding && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f) || mario->IsInShell) && physicsObject->IsTouchingGround)) && !f.Exists(mario->CurrentPipe));
             SetParticleEmission(giantParticle, !disableParticles && mario->CurrentPowerupState == PowerupState.MegaMushroom && mario->MegaMushroomStartFrames == 0);
             SetParticleEmission(fireParticle, mario->IsDead && !mario->IsRespawning && mario->FireDeath && !physicsObject->IsFrozen);
@@ -624,7 +615,7 @@ namespace NSMB.Entities.Player {
             bool modelShouldBeInvisible = f.Global->GameState < GameState.Playing
                 || mario->IsRespawning
                 || (mario->IsDead && IsBelowDeathplane)
-                || (!mario->IsDead && remainingDamageInvincibility > 0 && (f.Number * f.DeltaTime.AsFloat) * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f);
+                || (remainingDamageInvincibility > 0 && (f.Number * f.DeltaTime.AsFloat) * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f);
 
             bool modelFinalVisibleState = modelShouldBeVisible || !modelShouldBeInvisible;
             if (modelFinalVisibleState != modelRoot.activeSelf) {
@@ -869,7 +860,9 @@ namespace NSMB.Entities.Player {
             }
 
             KnockbackStrength strength = e.Strength;
-            PlaySound((strength is KnockbackStrength.FireballBump or KnockbackStrength.CollisionBump) ? SoundEffect.Player_Sound_Collision_Fireball : SoundEffect.Player_Sound_Collision);
+            if (e.PlayKnockbackSound) {
+                PlaySound((strength is KnockbackStrength.FireballBump or KnockbackStrength.CollisionBump) ? SoundEffect.Player_Sound_Collision_Fireball : SoundEffect.Player_Sound_Collision);
+            }
 
             if (IsMarioLocal(e.Entity)) {
                 float rumbleStrength = strength switch {
@@ -1353,6 +1346,13 @@ namespace NSMB.Entities.Player {
             PlaySound(SoundEffect.Player_Voice_Taunt);
         }
 
+        private void OnMarioPlayerTauntCancelled(EventMarioPlayerTauntCancelled e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
+
+            sfx.Stop();
+        }
         private void OnMarioPlayerUpdatePowerupQueue(EventMarioPlayerUpdatePowerupQueue e) {
             if (e.Entity != EntityRef) {
                 return;

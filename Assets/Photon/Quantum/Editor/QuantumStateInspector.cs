@@ -77,6 +77,11 @@ namespace Quantum.Editor {
 
     #region Unity Messages
 
+    [RuntimeInitializeOnLoadMethod]
+    static void Init() {
+      DebugCommand.Reset();
+    }
+
     private void OnDisable() {
       EditorApplication.hierarchyChanged -= DeferredSyncWithSelection;
       Selection.selectionChanged         -= DeferredSyncWithSelection;

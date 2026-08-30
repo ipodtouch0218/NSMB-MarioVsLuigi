@@ -11,6 +11,7 @@
 #define _8_25 8.25
 #define _3_75 3.75
 #define _0_73 0.73
+#define _2_75 2.75
 
 #define DamageInvincibilityFrames 120
 
@@ -317,6 +318,7 @@ event PlayKnockbackEffect {
 	EntityRef Attacker;
 	KnockbackStrength Strength;
 	nothashed FPVector2? AttackerPosition;
+	bool PlayKnockbackSound;
 }
 
 event MarioPlayerBlueShellStomped {
@@ -324,6 +326,10 @@ event MarioPlayerBlueShellStomped {
 }
 
 event MarioPlayerTaunted {
+	EntityRef Entity;
+}
+
+event MarioPlayerTauntCancelled {
 	EntityRef Entity;
 }
 

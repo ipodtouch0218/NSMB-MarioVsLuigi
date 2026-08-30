@@ -33,15 +33,15 @@ namespace Quantum {
 
             // face left by default
             var shouldFaceRight = false;
-            var closestMario = QuantumUtils.FindClosestAliveMario(f, Spawnpoint, out _);
 
             // use closest player and face them
-            if (f.Unsafe.TryGetPointer(closestMario, out Transform2D* marioTransform)) {
-                QuantumUtils.WrappedDistance(f, Spawnpoint, marioTransform->Position, out FP xDiff);
+            if (QuantumUtils.FindClosestAliveMario(f, Spawnpoint, out FPVector2 closestMarioPosition) != EntityRef.None) {
+                QuantumUtils.WrappedDistance(f, Spawnpoint, closestMarioPosition, out FP xDiff);
                 shouldFaceRight = xDiff < 0;
             }
 
             FacingRight = shouldFaceRight;
+            f.Signals.OnEnemyRespawned(entity);
         }
 
         public void ChangeFacingRight(Frame f, EntityRef entity, bool newFacingRight) {

@@ -16,6 +16,12 @@ namespace Quantum {
             f.SystemDisable<GoldBlockSystem>();
        }
 
+        public override void OnReturnToRoom(Frame f) {
+            f.Global->MainBigStar = EntityRef.None;
+            f.Global->BigStarSpawnTimer = 0;
+            f.Global->UsedStarSpawns.ClearAll();
+        }
+
         public override void CheckForGameEnd(Frame f) {
             // End Condition: only one team alive
             Span<int> objectiveCounts = stackalloc int[Constants.MaxPlayers];

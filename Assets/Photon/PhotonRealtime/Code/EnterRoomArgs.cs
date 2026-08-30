@@ -19,7 +19,7 @@ namespace Photon.Realtime
         public string RoomName;
         /// <summary>The RoomOptions define the optional behaviour of rooms.</summary>
         public RoomOptions RoomOptions;
-        /// <summary>A lobby to attach the new room to. If set, this overrides a joined lobby (if any).</summary>
+        /// <summary>A lobby to attach the new room to. If set, this overrides a joined lobby (if any). Only used when this client creates the room (OpCreateRoom / OpJoinOrCreateRoom); ignored on pure join.</summary>
         public TypedLobby Lobby;
         /// <summary>A list of users who are expected to join the room along with this client. Reserves slots for rooms with MaxPlayers value.</summary>
         public string[] ExpectedUsers;
@@ -70,7 +70,7 @@ namespace Photon.Realtime
 
 
 
-    /// <summary>Renamed to FindFriendsArgs.</summary>
+    /// <summary>Renamed to EnterRoomArgs.</summary>
     [Obsolete("Use EnterRoomArgs")]
     public class EnterRoomParams : EnterRoomArgs
     {

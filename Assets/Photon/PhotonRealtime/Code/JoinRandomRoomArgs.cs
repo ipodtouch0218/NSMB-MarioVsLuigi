@@ -26,9 +26,9 @@ namespace Photon.Realtime
         public int ExpectedMaxPlayers;
         /// <summary>The MatchmakingMode affects how rooms get filled. By default, the server fills rooms.</summary>
         public MatchmakingMode MatchingType;
-        /// <summary>The lobby in which to match. The type affects how filters are applied.</summary>
+        /// <summary>The lobby in which to match. The type affects how filters are applied. If null and the client is already in a non-default lobby, that lobby is used; otherwise TypedLobby.Default.</summary>
         public TypedLobby Lobby;
-        /// <summary>SQL query to filter room matches. For default-typed lobbies, use ExpectedCustomRoomProperties instead.</summary>
+        /// <summary>SQL query to filter room matches. Only honored when the target lobby's LobbyType is SqlLobby; ignored for default-typed lobbies. For default-typed lobbies, use ExpectedCustomRoomProperties instead.</summary>
         public string SqlLobbyFilter;
         /// <summary>The expected users list blocks player slots for your friends or team mates to join the room, too.</summary>
         /// <remarks>See: https://doc.photonengine.com/en-us/pun/v2/lobby-and-matchmaking/matchmaking-and-lobby#matchmaking_slot_reservation </remarks>

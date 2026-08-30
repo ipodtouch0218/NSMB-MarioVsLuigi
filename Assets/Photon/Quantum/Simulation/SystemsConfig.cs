@@ -48,6 +48,7 @@ namespace Quantum {
     /// To prevent indefinite recursion in Unity serialization system hierarchies are limited to 3 levels.
     /// </summary>
     /// <typeparam name="T">Type of the children</typeparam>
+    [Serializable]
     public abstract class SystemEntryBase<T> : SystemEntryBase where T : SystemEntryBase, new() {
       /// <summary>
       /// Child systems.

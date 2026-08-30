@@ -13,13 +13,12 @@ namespace NSMB.Entities.Player {
 
         public override void OnUpdateView() {
             Frame f = PredictedFrame;
-            Freezable* freezable = f.Unsafe.GetPointer<Freezable>(EntityRef);
-
-            if (freezable->IsFrozen(f)) {
+            if (!f.Unsafe.TryGetPointer(EntityRef, out Freezable* freezable)
+                || freezable->IsFrozen(f)
+                || !f.Unsafe.TryGetPointer(EntityRef, out MarioPlayer* mario)) {
                 return;
             }
 
-            MarioPlayer* mario = PredictedFrame.Unsafe.GetPointer<MarioPlayer>(EntityRef);
             if (mario->UsedPropellerThisJump) {
                 currentRotationSpeed = fastRotationSpeed;
             } else {

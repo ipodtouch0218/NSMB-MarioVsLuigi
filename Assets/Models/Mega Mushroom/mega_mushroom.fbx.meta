@@ -27,7 +27,7 @@ ModelImporter:
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
     importConstraints: 0
-    animationCompression: 0
+    animationCompression: 1
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5
@@ -36,11 +36,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: obj_big_kinoko|idle_obj_big_kinoko
-      takeName: obj_big_kinoko|idle_obj_big_kinoko
+      name: idle_obj_big_kinoko
+      takeName: obj_big_kinoko.001|idle_obj_big_kinoko
       internalID: 8731382233595936370
       firstFrame: 0
-      lastFrame: 16
+      lastFrame: 33
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -65,11 +65,11 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: obj_big_kinoko|start_obj_big_kinoko
-      takeName: obj_big_kinoko|start_obj_big_kinoko
+      name: start_obj_big_kinoko
+      takeName: obj_big_kinoko.001|start_obj_big_kinoko
       internalID: -6616384887039555463
       firstFrame: 0
-      lastFrame: 32
+      lastFrame: 66
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -155,7 +155,7 @@ ModelImporter:
     legStretch: 0.05
     feetSpacing: 0
     globalScale: 1
-    rootMotionBoneName: big_kinoko
+    rootMotionBoneName: I_bigKinoko
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1

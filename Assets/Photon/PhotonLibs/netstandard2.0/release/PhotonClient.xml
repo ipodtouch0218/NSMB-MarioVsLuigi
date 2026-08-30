@@ -188,12 +188,31 @@
         </member>
         <member name="T:Photon.Client.Encryption.IPhotonEncryptor">
             <summary>Interface for DatagramEncryptor implementations.</summary>
+            <remarks>
+            Threading contract (see EnetPeer): after Init, Encrypt2 is called on the sending thread (under
+            PhotonPeer's send lock) while Decrypt2 runs CONCURRENTLY on the socket-receive thread - the
+            library does not serialize the two directions against each other. Implementations must therefore
+            keep the encrypt and decrypt sides free of shared mutable state (separate cipher contexts, IVs and
+            work buffers per direction). One call per direction at a time is guaranteed; concurrent calls of the
+            same method do not happen.
+            </remarks>
         </member>
         <member name="P:Photon.Client.Encryption.IPhotonEncryptor.LogLevel">
             <summary>Get/set the logging level. OFF = 0, ERRORS = 1, WARNINGS = 2, INFO = 3, ALL = 4, </summary>
         </member>
         <member name="M:Photon.Client.Encryption.IPhotonEncryptor.Init(System.Byte[],System.Byte[],System.Byte[],System.Boolean,System.Int32)">
-            <summary>Initialize the encryptor.</summary>
+            <summary>Initialize the encryptor. Called once, before any Encrypt2/Decrypt2 (no concurrency).</summary>
+        </member>
+        <member name="M:Photon.Client.Encryption.IPhotonEncryptor.Encrypt2(System.Byte[],System.Int32,System.Byte[],System.Byte[],System.Int32,System.Int32@)">
+            <summary>Encrypts one outgoing datagram. Called on the sending thread only - but possibly while
+            Decrypt2 runs on the receive thread, so it must not touch any state the decrypt side uses
+            (including the buffer returned by Decrypt2).</summary>
+        </member>
+        <member name="M:Photon.Client.Encryption.IPhotonEncryptor.Decrypt2(System.Byte[],System.Int32,System.Int32,System.Byte[],System.Int32@)">
+            <summary>Decrypts one incoming datagram. Called on the socket-receive thread only - but possibly
+            while Encrypt2 runs on the sending thread (see interface remarks). The returned buffer may be an
+            internal one re-used by the NEXT Decrypt2 call: the caller parses (and copies payloads out of) it
+            synchronously before the next receive, but the encrypt side must never write to it.</summary>
         </member>
         <member name="T:Photon.Client.Encryption.ICryptoProvider">
             <summary>Interface for Photon's DiffieHellman/Payload Encryption.</summary>
@@ -236,9 +255,6 @@
         <member name="F:Photon.Client.EnetChannel.highestReceivedAck">
             <summary>To store the highest acknowledged sequence number (and get some impression what the server already received and stored).</summary>
         </member>
-        <member name="F:Photon.Client.EnetChannel.reliableCommandsInFlight">
-            <summary>Count of reliable commands sent and not yet acknowledged.</summary>
-        </member>
         <member name="F:Photon.Client.EnetChannel.lowestUnacknowledgedSequenceNumber">
             <summary>The lowest sequence number sent but not acknowledged yet. This defines the sequence delta "window" for sending subsequent reliable commands.</summary>
         </member>
@@ -253,11 +269,22 @@
         <member name="F:Photon.Client.EnetPeer.sentReliableCommands">
             <summary>One list for all channels keeps sent commands (for re-sending).</summary>
         </member>
-        <member name="P:Photon.Client.EnetPeer.SendWindowUpdateRequired">
-            <summary>When ACKs are executed they set this. Signals changes within sentReliableCommands. Thread safe.</summary>
+        <member name="F:Photon.Client.EnetPeer.SendWindowUpdateRequired">
+            <summary>When ACKs are executed they set this. Signals changes within sentReliableCommands.</summary>
+            <remarks>Set and consumed only on the send thread: the setters live in ExecuteCommand's ACK cases,
+            reached only via DispatchAckQueue (called from SendOutgoingCommands); the read and clear are in the
+            send pump too. No cross-thread access, so a plain field is sufficient (no Interlocked needed).</remarks>
         </member>
         <member name="F:Photon.Client.EnetPeer.outgoingAcknowledgementsPool">
             <summary>One pool of ACK byte arrays ( 20 bytes each)  for all channels to keep acknowledgements.</summary>
+        </member>
+        <member name="F:Photon.Client.EnetPeer.udpBufferEncryptedLayout">
+            <summary>Layout of the datagram currently being assembled (encrypted: commands at offset 5; plain: commands at offset 12, 16 with CRC).</summary>
+            <remarks>Snapshot of DatagramEncryptedConnection taken once
+            per datagram in SendOutgoingCommands, so a mid-assembly flip of the live flag (set on the
+            receive thread when the server's first encrypted datagram arrives) cannot produce a datagram
+            assembled with one layout but framed/sent with the other. Guarded by datagramAccessLockObject
+            (only read by CalculateInitialOffset/CalculatePacketSize/SendData, all called under that lock).</remarks>
         </member>
         <member name="F:Photon.Client.EnetPeer.serverSentTime">
             <summary>Timestamp sent by the server in last udp package (enet header).</summary>
@@ -273,14 +300,25 @@
             <summary>Initial PeerId to enable Photon Tracing, as used in Connect command. See: EnableServerTracing.</summary>
         </member>
         <member name="F:Photon.Client.EnetPeer.CommandQueue">
-            <summary>Queue of received commands. ReceiveIncomingCommands will queue commands.</summary>
+            <summary>Queue of received data and control commands (everything except ACKs). Drained by DispatchIncomingCommands only.</summary>
+        </member>
+        <member name="F:Photon.Client.EnetPeer.AckQueue">
+            <summary>Queue of received ACK commands (transport-level). Drained by SendOutgoingCommands only.</summary>
+            <remarks>
+            ACKs are separated from data/control commands (see ReceiveIncomingCommands) so the send path can apply their
+            side-effects - cleaning up sentReliableCommands (which prevents surplus resends), updating RTT and the send
+            window - on the sending thread, while DispatchIncomingCommands independently executes incoming commands.
+            This avoids running ExecuteCommand concurrently on both threads (which raced on the per-channel incoming lists).
+            </remarks>
+        </member>
+        <member name="M:Photon.Client.EnetPeer.IsAckCommand(System.Byte)">
+            <summary>True for the ACK command types that are routed to the AckQueue (and processed by the send path).</summary>
         </member>
         <member name="M:Photon.Client.EnetPeer.DispatchCommandQueue">
-            <summary>Handles the incoming commands which are not executed yet in the CommandQueue.</summary>
-            <remarks>
-            Must be called in DispatchIncomingCommands and SendOutgoingCommands as that queue contains ACKs (which prevent re-sends).
-            ACKs may set SendWindowUpdateRequired.
-            </remarks>
+            <summary>Executes the queued incoming data and control commands. Called from DispatchIncomingCommands.</summary>
+        </member>
+        <member name="M:Photon.Client.EnetPeer.DispatchAckQueue">
+            <summary>Executes the queued incoming ACK commands. Called from SendOutgoingCommands, so ACK side-effects are applied before resends and send-window updates, on the sending thread.</summary>
         </member>
         <member name="M:Photon.Client.EnetPeer.DispatchIncomingCommands">
             <summary>
@@ -308,7 +346,7 @@
             <param name="sendAcksOnly">Skips sending "new" commands and does not time out, when true. Default: false.</param>
             <returns>True if there are commands not sent within the current datagram.</returns>
         </member>
-        <member name="F:Photon.Client.EnetPeer.channelsToUpdateLowestSent">
+        <member name="F:Photon.Client.EnetPeer.lowestSentSequenceNumber">
             <summary>Used to store temporary values in UpdateSendWindow().</summary>
         </member>
         <member name="M:Photon.Client.EnetPeer.EnqueuePhotonMessage(Photon.Client.StreamBuffer,Photon.Client.SendOptions)">
@@ -328,6 +366,18 @@
         <member name="M:Photon.Client.EnetPeer.QueueIncomingCommand(Photon.Client.NCommand)">
             <summary>Queues incoming commands in the correct order as either unreliable, reliable or unsequenced.</summary>
             <returns>If queued or not.</returns>
+            <remarks>
+            Threading: the per-channel INCOMING collections (incomingReliableCommandsList, incomingUnreliableCommandsList,
+            incomingUnsequencedCommandsList, incomingUnsequencedFragments) and the incoming sequence counters are
+            structurally modified only by the dispatch thread - here (via DispatchCommandQueue -> ExecuteCommand), in the
+            fragment reassembly of ExecuteCommand, and in the DispatchIncomingCommands dispatch loop - plus clearAll/Reset,
+            which run under PhotonPeer.dispatchLockObject just like DispatchIncomingCommands. The socket-receive and netSim
+            threads only feed ReceiveIncomingCommands (which enqueues to CommandQueue/AckQueue and writes ACK tracking), and
+            the send thread only touches the OUTGOING lists. So no per-channel lock is needed for the incoming collections.
+            (The channel lock is still required for the outgoing lists, which the send thread does race - see SerializeToBuffer/clearAll.)
+            The only off-thread access is QueuedIncomingCommandsCount reading .Count for diagnostics; that is an atomic int-field
+            read that tolerates an approximate value (the count is inherently approximate for a live queue), so it needs no lock.
+            </remarks>
         </member>
         <member name="M:Photon.Client.EnetPeer.RemoveSentReliableCommand(System.Int32,System.Int32,System.Boolean)">
             <summary>removes commands which are acknowledged</summary>
@@ -1166,7 +1216,7 @@
             This is the (low level) state of the connection to the server of a PhotonPeer. Managed internally and read-only.
             </summary>
             <remarks>
-            Don't mix this up with the StatusCode provided in IPhotonListener.OnStatusChanged().
+            Don't mix this up with the StatusCode provided in IPhotonPeerListener.OnStatusChanged().
             Applications should use the StatusCode of OnStatusChanged() to track their state, as
             it also covers the higher level initialization between a client and Photon.
             </remarks>
@@ -1214,8 +1264,8 @@
         </member>
         <member name="P:Photon.Client.PhotonPeer.WrapIncomingStructs">
             <summary>
-            Incoming struct types are wrapped in a pooled IWrapperStruct, rather than being cast to object. This eliminated allocations and garbage collection from boxing,
-            however object that are wrapped structs will need to be cast to WrapperStruct&lt;T&gt; and their values extracted with (obj as WrapperStruct&lt;T&gt;).Value.
+            Incoming struct types are wrapped in a pooled StructWrapper&lt;T&gt;, rather than being cast to object. This eliminated allocations and garbage collection from boxing,
+            however objects that are wrapped structs will need their values extracted via obj.Get&lt;T&gt;() or obj.Unwrap&lt;T&gt;() (or the StructWrapper&lt;T&gt;.value field).
             </summary>
         </member>
         <member name="P:Photon.Client.PhotonPeer.ByteArraySlicePool">
@@ -1403,7 +1453,7 @@
         </member>
         <member name="P:Photon.Client.PhotonPeer.IsEncryptionAvailable">
             <summary>
-            This property is set internally, when OpExchangeKeysForEncryption successfully finished.
+            This property is set internally, when EstablishEncryption() successfully finished.
             While it's true, encryption can be used for operations.
             </summary>
         </member>
@@ -1545,8 +1595,8 @@
              Get this value immediately after calling an operation.
              Example:
             
-             this.client.OpJoinRoom("myroom");
-             int opJoinByteCount = this.client.ByteCountLastOperation;
+             this.peer.SendOperation(operationCode, operationParameters, sendOptions);
+             int opByteCount = this.peer.ByteCountLastOperation;
              </remarks>
         </member>
         <member name="F:Photon.Client.PhotonPeer.PingUsedAsInit">
@@ -1615,7 +1665,7 @@
             <summary>Count of reliable commands "in flight". They are sent but not yet acknowledged by the receiving peer / server.</summary>
         </member>
         <member name="P:Photon.Client.PhotonPeer.SentReliableCommandsCount">
-            <summary>Count of reliable commands "in flight". They are sent but not yet acknowledged by the receiving peer / server.</summary>
+            <summary>Count of reliable commands sent so far (total on all channels). Does not include resends.</summary>
         </member>
         <member name="P:Photon.Client.PhotonPeer.Stats">
             <summary>Provides stats of incoming and outgoing traffic for the current connection. Replaced with new instance when connecting.</summary>
@@ -1729,7 +1779,7 @@
              Check for StatusCode EncryptionEstablished and EncryptionFailedToEstablish.
             
              Calling this method sets IsEncryptionAvailable to false.
-             This method must be called before the "encrypt" parameter of OpCustom can be used.
+             This method must be called before the SendOptions.Encrypt option of SendOperation can be used.
              </remarks>
              <returns>If operation could be enqueued for sending</returns>
         </member>
@@ -1886,6 +1936,9 @@
         </member>
         <member name="F:Photon.Client.PhotonSocket.Protocol">
             <summary>The protocol for this socket, defined in constructor.</summary>
+        </member>
+        <member name="P:Photon.Client.PhotonSocket.State">
+            <summary>Connection state of this socket. volatile: written on the connect/receive thread, read on the app/pump thread (see Connected).</summary>
         </member>
         <member name="P:Photon.Client.PhotonSocket.SocketErrorCode">
             <summary>Socket implementations should store the SocketErrorCode here, if anything happens.</summary>
@@ -2481,6 +2534,9 @@
         <member name="T:Photon.Client.SocketUdp">
             <summary>Encapsulates the network i/o functionality for the realtime library.</summary>
         </member>
+        <member name="M:Photon.Client.SocketUdp.CloseSocketSafely">
+            <summary>Closes and clears the current socket, swallowing any exception. Used to avoid leaking a socket that failed to connect.</summary>
+        </member>
         <member name="M:Photon.Client.SocketUdp.Send(System.Byte[],System.Int32)">
             <summary>used by PhotonPeer*</summary>
         </member>
@@ -2490,8 +2546,20 @@
         <member name="T:Photon.Client.SocketUdpAsync">
             <summary>Internal class to encapsulate the network i/o functionality for the realtime libary.</summary>
         </member>
+        <member name="M:Photon.Client.SocketUdpAsync.CloseSocketSafely">
+            <summary>Closes and clears the current socket, swallowing any exception. Used to avoid leaking a socket that failed to connect.</summary>
+        </member>
         <member name="M:Photon.Client.SocketUdpAsync.Send(System.Byte[],System.Int32)">
             <summary>used by PhotonPeer*</summary>
+        </member>
+        <member name="M:Photon.Client.SocketUdpAsync.ReceiveAsyncLoop">
+            <summary>
+            Issues receives in a loop so that synchronously-completing receives are drained iteratively instead of recursing on the stack.
+            When a receive goes pending, the loop returns and the Completed event resumes it on a thread-pool thread.
+            </summary>
+        </member>
+        <member name="M:Photon.Client.SocketUdpAsync.ProcessReceive(System.Net.Sockets.SocketAsyncEventArgs)">
+            <summary>Handles one completed receive. Returns true if receiving should continue.</summary>
         </member>
         <member name="M:Photon.Client.StreamBuffer.ToArray">
             <summary>
@@ -2578,6 +2646,19 @@
             </summary>
             <typeparam name="T">Type of the items to pool.</typeparam>
         </member>
+        <member name="T:Photon.Client.PoolReleaseExtensions">
+            <summary>Extensions to release all pooled items of a collection and empty it.</summary>
+            <remarks>
+            There is no common interface across the collections used for pooled items (ConcurrentQueue must be
+            drained via TryDequeue, List/Queue are enumerated and cleared, NonAllocDictionary.Values is an
+            allocation-free struct iterator without IEnumerable), so this is one overload per collection shape.
+            Callers must hold the lock that guards the collection - these methods do not lock.
+            </remarks>
+        </member>
+        <member name="M:Photon.Client.PoolReleaseExtensions.ReleaseAndClear``1(System.Collections.Concurrent.ConcurrentQueue{``0},Photon.Client.Pool{``0})">
+            <remarks>Drains via TryDequeue (netstandard2.0's ConcurrentQueue has no Clear). Safe alongside
+            concurrent enqueues: only items actually dequeued are released.</remarks>
+        </member>
         <member name="T:Photon.Client.PreserveAttribute">
             <summary>
             An Attribute named "Preserve" tells Unity to not strip the code.
@@ -2592,18 +2673,32 @@
         <member name="F:Photon.Client.TPeer.ALL_HEADER_BYTES">
             <summary>TCP header combined: 9 bytes</summary>
         </member>
+        <member name="T:Photon.Client.TPeer.IncomingMessage">
+            <summary>Pairs a queued incoming payload with its receive-thread arrival time, so RTT can be measured without dispatch-scheduling lag.</summary>
+        </member>
+        <member name="F:Photon.Client.TPeer.pendingSendBuffer">
+            <summary>Buffer of the last SendData that returned PendingSend (the async socket still references it).
+            Released on the next send attempt that confirms the async send completed (see SendBuffer). Guarded by
+            sendOutgoingLockObject: the pump, SendAcksOnly and the disconnect teardown all hold S.</summary>
+        </member>
+        <member name="F:Photon.Client.TPeer.dispatchArrivalTime">
+            <summary>Arrival time of the message currently being dispatched. Used by ReadPingResult to avoid dispatch-scheduling lag. Only accessed on the dispatch thread.</summary>
+        </member>
         <member name="F:Photon.Client.TPeer.lastPingActivity">
             <summary>Timestamp of last ping activity (updated when sending to avoid sending again immediately).</summary>
         </member>
-        <member name="F:Photon.Client.TPeer.pingRequest">
-            <summary>Re-used binary message used in the TCP protocol (WSS uses a Ping Operation due to lack of framing).</summary>
-        </member>
         <member name="F:Photon.Client.TPeer.pingParamDict">
-            <summary>Re-used ping-Operation parameter-dict used in the WS/WSS protocol (TCP uses pingRequest).</summary>
+            <summary>Re-used ping-Operation parameter-dict used in the WS/WSS protocol (raw TCP builds its ping bytes inline).</summary>
         </member>
         <member name="F:Photon.Client.TPeer.DoFraming">
             <summary>Defines if the (TCP) socket implementation needs to do "framing".</summary>
             <remarks>The WebSocket protocol (e.g.) includes framing, so when that is used, we set DoFraming to false.</remarks>
+        </member>
+        <member name="M:Photon.Client.TPeer.ClearIncomingList">
+            <summary>Releases all queued incoming payloads back to the pool and empties the queue.</summary>
+        </member>
+        <member name="M:Photon.Client.TPeer.ClearOutgoingList">
+            <summary>Releases all queued outgoing payloads back to the pool and empties the queue.</summary>
         </member>
         <member name="M:Photon.Client.TPeer.DispatchIncomingCommands">
             <summary>
@@ -2626,6 +2721,17 @@
         <member name="M:Photon.Client.TPeer.SendPing(System.Boolean)">
             <summary>Queues a ping (operation or "message") and updates this.lastPingActivity to avoid another ping for a while.</summary>
             <param name="sendImmediately">Set to true to immediately send a Ping (not queueing it first). This is useful for SendAcksOnly() to keep the connection up.</param>
+        </member>
+        <member name="M:Photon.Client.TPeer.SendBuffer(Photon.Client.StreamBuffer)">
+            <summary>SendData wrapper that tracks ownership of the async in-flight buffer (WS PendingSend).
+            Must be called under sendOutgoingLockObject.</summary>
+            <remarks>
+            Only the WS socket returns Busy/PendingSend (the other sockets send synchronously). It allows a single
+            outstanding send and waits for the previous sendTask before starting a new SendAsync. So Success or
+            PendingSend prove the previous async send completed and its buffer can be pooled again, while Busy means
+            it is still in flight (and msg was not touched). On Skipped/Exception we stay conservative and let the
+            teardown (ClearOutgoingList) drop the reference instead of pooling a buffer the socket might still read.
+            </remarks>
         </member>
         <member name="M:Photon.Client.TPeer.ReceiveIncomingCommands(System.Byte[],System.Int32)">
             <summary>reads incoming tcp-packages to create and queue incoming commands*</summary>
@@ -2713,7 +2819,7 @@
             <remarks>Comparing the very last roundtrip time of any two snapshots likely has limited usefulness.</remarks>
         </member>
         <member name="F:Photon.Client.TrafficStatsDelta.DeltaTime">
-            <summary>Timespan / delta time between the two snapshots.</summary>
+            <summary>Elapsed time in milliseconds between the two snapshots.</summary>
         </member>
         <member name="P:Photon.Client.TrafficStatsDelta.ReferenceRoundtripTime">
             <summary>RoundtripTime of the reference (earlier) snapshot.</summary>

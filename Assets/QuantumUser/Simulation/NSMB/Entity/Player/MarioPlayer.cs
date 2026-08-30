@@ -114,6 +114,21 @@ namespace Quantum {
             return true;
         }
 
+        public readonly bool IsWalkingOnWater(Frame f, EntityRef entity) {
+            if (CurrentPowerupState == PowerupState.MiniMushroom 
+                && f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
+                && physicsObject->IsTouchingGround) {
+
+                var contacts = f.ResolveList(physicsObject->Contacts);
+                foreach (var contact in contacts) {
+                    if (f.Has<Liquid>(contact.Entity)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         public readonly byte? GetTeam(Frame f) {
             var data = QuantumUtils.GetPlayerData(f, PlayerRef);
             if (data == null) {
@@ -344,7 +359,8 @@ namespace Quantum {
             ForceJumpTimer = 0;
             LastAttacker = EntityRef.None;
             TauntFrames = 0;
-            
+            DamageInvincibilityFrames = 0;
+
             if (f.Unsafe.TryGetPointer(HeldEntity, out Holdable* holdable)) {
                 holdable->DropWithoutThrowing(f, HeldEntity);
             }
@@ -440,7 +456,7 @@ namespace Quantum {
             }
 
             FPVector2 spawnpoint = stage.GetWorldSpawnpointForPlayer(SpawnpointIndex, f.Global->TotalMarios);
-            transform->Position = spawnpoint;
+            transform->Teleport(f, spawnpoint);
             f.Unsafe.GetPointer<CameraController>(entity)->Recenter(stage, spawnpoint);
             
             IsDead = true;

@@ -14,6 +14,10 @@ namespace Quantum {
                 return;
             }
 
+            if (sendEvent && f.Global->Host != PlayerRef.None) {
+                f.Events.PlayerDataChanged(f.Global->Host);
+            }
+
             f.Global->Host = PlayerRef;
             
             // These should not be true while hosting
@@ -22,6 +26,7 @@ namespace Quantum {
             
             if (sendEvent) {
                 f.Events.HostChanged(PlayerRef);
+                f.Events.PlayerDataChanged(PlayerRef);
             }
         }
     }

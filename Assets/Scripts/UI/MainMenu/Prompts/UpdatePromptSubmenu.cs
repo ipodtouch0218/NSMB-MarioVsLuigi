@@ -14,7 +14,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
         public override void Initialize() {
             base.Initialize();
-            UpdateChecker.IsUpToDate((isUpToDate, newVersion) => {
+            UpdateChecker.CheckIfUpToDate((isUpToDate, newVersion) => {
                 remoteVersion = newVersion;
                 upToDate = isUpToDate;
             });

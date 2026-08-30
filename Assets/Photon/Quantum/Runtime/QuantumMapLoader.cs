@@ -53,6 +53,7 @@ namespace Quantum {
     /// Reset global statics.
     /// </summary>
     [StaticFieldResetMethod]
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     public static void ResetStatics() {
       _instance              = null;
       _isApplicationQuitting = false;

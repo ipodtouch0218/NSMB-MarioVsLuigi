@@ -96,7 +96,7 @@ namespace NSMB.UI.Game.Scoreboard {
             background.color = backgroundColor;
             
             nameLayoutElement.flexibleWidth = Settings.Instance.GeneralCondensedScoreboard ? 0 : 1;
-            nameLayoutElement.gameObject.SetActive(!Settings.Instance.GeneralCondensedScoreboard || !Settings.Instance.GraphicsColorblind);
+            //nameLayoutElement.gameObject.SetActive(!Settings.Instance.GeneralCondensedScoreboard || !Settings.Instance.GraphicsColorblind);
 
             if (Settings.Instance.GraphicsColorblind) {
                 if (f.Global->Rules.TeamsEnabled) {

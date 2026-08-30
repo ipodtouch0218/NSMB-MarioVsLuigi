@@ -5,8 +5,8 @@ namespace NSMB.UI.Elements {
     [ExecuteAlways, RequireComponent(typeof(RectTransform))]
     public class ScaleWithParent : MonoBehaviour {
 
-        //---Serialized Variables
-        [SerializeField] private float targetWidth = 1000, aspectRatio = (16f/9f);
+        //---Public Variables
+        public float targetWidth = 1000, aspectRatio = (16f/9f);
 
         //---Private Variables
         private DrivenRectTransformTracker tracker;

@@ -33,6 +33,7 @@ namespace NSMB.Entities.Enemies {
             QuantumEvent.Subscribe<EventBobombLit>(this, OnBobombLit, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
+            QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
         }
 
         public override void OnUpdateView() {
@@ -123,6 +124,10 @@ namespace NSMB.Entities.Enemies {
             }
 
             sfx.Play(SoundEffect.Enemy_Bobomb_Fuse);
+        }
+
+        private void OnGameResynced(CallbackGameResynced e) {
+            sfx.Stop();
         }
     }
 }

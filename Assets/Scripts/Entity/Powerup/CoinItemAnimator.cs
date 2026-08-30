@@ -110,7 +110,7 @@ namespace NSMB.Entities.CoinItems {
             HandleSpawningAnimation(f, coinItem);
             HandleDespawningBlinking(f, coinItem);
         }
-
+        
         private void HandleSpawningAnimation(Frame f, CoinItem* coinItem) {
             if (f.Exists(coinItem->ParentMarioPlayer) && coinItem->SpawnAnimationFrames > 0) {
                 // Following player

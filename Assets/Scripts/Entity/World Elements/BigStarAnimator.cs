@@ -75,7 +75,7 @@ namespace NSMB.Entities.World {
                 sRenderer.enabled = true;
             } else {
                 graphicTransform.localScale = Vector3.one;
-                graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (star->FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);
+                graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (star->FacingRight ? -1 : 1) * (f.Unsafe.GetPointer<PhysicsObject>(EntityRef)->IsUnderwater ? 0.5f : 1f) * Time.deltaTime), Space.Self);
                 sRenderer.enabled = Utils.Blink((float) star->Lifetime / f.UpdateRate, blinksPerSecond: 4f, blinkStartTime: 5f);
                 sRenderer.color = star->UncollectableFrames > 0 ? uncollectableColor : Color.white;
                 legacyAnimation.Stop();

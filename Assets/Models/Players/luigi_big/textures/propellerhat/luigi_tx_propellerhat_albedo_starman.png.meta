@@ -1,15 +1,15 @@
 fileFormatVersion: 2
-guid: 568069a3f62027b4e988881bd766d065
+guid: 74d77c8976bc3804ca5b93e1d21f4c96
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -852573300463052752
-    second: hammersuit_tx_helmet_starman_albedo_0
+      213: 3366595507730827997
+    second: luigi_tx_propellerhat_albedo_starman_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
     mipMapMode: 0
-    enableMipMap: 1
+    enableMipMap: 0
     sRGBTexture: 1
     linearTexture: 0
     fadeOut: 0
@@ -96,17 +96,56 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: hammersuit_tx_helmet_starman_albedo_0
+      name: luigi_tx_propellerhat_albedo_starman_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 25
-        height: 16
+        width: 256
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 038dae0b91d0b24f0800000000000000
-      internalID: -852573300463052752
+      spriteID: ddac8bcf6cc88be20800000000000000
+      internalID: 3366595507730827997
       vertices: []
       indices: 
       edges: []
@@ -135,7 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      hammersuit_tx_helmet_starman_albedo_0: -852573300463052752
+      luigi_tx_propellerhat_albedo_starman_0: 3366595507730827997
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

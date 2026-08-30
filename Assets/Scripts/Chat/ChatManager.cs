@@ -22,6 +22,7 @@ namespace NSMB.Chat {
         public readonly HashSet<string> mutedPlayers = new();
 
         //---Private Variables
+        private StageChooseMode currentMapChooseMode;
         private AssetRef<Map> currentMap;
         private AssetRef<GamemodeAsset> currentGamemode;
         private ChatMessageData changeMapMessage, changeGamemodeMessage, assignTeamMessage, randomizeTeamMessage;
@@ -68,17 +69,24 @@ namespace NSMB.Chat {
                 changeGamemodeMessage = AddSystemMessage("ui.inroom.chat.server.gamemode", Red, "gamemode", gamemodeName);
                 currentGamemode = rules.Gamemode;
             }
-            if (rules.Stage != currentMap) {
+            if (rules.Stage != currentMap || rules.ChooseMode != currentMapChooseMode) {
                 RemoveChatMessage(changeMapMessage);
+
                 string stageName;
-                if (f.TryFindAsset(rules.Stage, out Map map)
-                    && f.TryFindAsset(map.UserAsset, out VersusStageData stageData)) {
-                    stageName = tm.GetTranslation(stageData.TranslationKey);
+                if (rules.ChooseMode == StageChooseMode.Random) {
+                    stageName = tm.GetTranslation("ui.inroom.settings.game.mapchoosemode.random");
                 } else {
-                    stageName = "???";
+                    if (f.TryFindAsset(rules.Stage, out Map map)
+                        && f.TryFindAsset(map.UserAsset, out VersusStageData stageData)) {
+                        stageName = tm.GetTranslation(stageData.TranslationKey);
+                    } else {
+                        stageName = "???";
+                    }
                 }
+
                 changeMapMessage = AddSystemMessage("ui.inroom.chat.server.map", Red, "map", stageName);
                 currentMap = rules.Stage;
+                currentMapChooseMode = rules.ChooseMode;
             }
         }
 

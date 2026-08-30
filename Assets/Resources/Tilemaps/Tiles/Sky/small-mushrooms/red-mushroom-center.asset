@@ -31,7 +31,7 @@ MonoBehaviour:
           RawValue: 32768
   IsSlipperyGround: 0
   IsSlideableGround: 0
-  IsPolygon: 0
+  IsPolygon: 1
   FootstepSound: 31
   FootstepParticle: 0
 --- !u!114 &11400000

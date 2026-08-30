@@ -1,6 +1,8 @@
 using NSMB.UI.Options.Loaders;
 using NSMB.UI.Translation;
 using NSMB.Utilities.Extensions;
+using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -82,6 +84,11 @@ namespace NSMB.UI.Options {
 
         private void OnLanguageChanged(TranslationManager tm) {
             UpdateLabel();
+        }
+
+        protected IEnumerator WaitOneFrame(Action action) {
+            yield return null;
+            action?.Invoke();
         }
     }
 }

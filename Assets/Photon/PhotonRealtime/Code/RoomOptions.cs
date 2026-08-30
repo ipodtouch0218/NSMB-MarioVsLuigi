@@ -40,9 +40,14 @@ namespace Photon.Realtime
         public int MaxPlayers;
 
         /// <summary>Time To Live (TTL) for an 'actor' in a room. If a client disconnects, this actor is inactive first and removed after this timeout. In milliseconds.</summary>
+        /// <remarks>
+        /// A non-zero value is required to enable rejoin: a positive value keeps the actor inactive for that many
+        /// milliseconds, after which they are removed; -1 keeps the actor in the room for the lifetime of the room.
+        /// 0 (default) removes a disconnected actor immediately and no rejoin is possible.
+        /// </remarks>
         public int PlayerTtl;
 
-        /// <summary>Time To Live (TTL) for a room when the last player leaves. Keeps room in memory for case a player re-joins soon. In milliseconds.</summary>
+        /// <summary>Time To Live (TTL) for a room when the last player leaves. Keeps room in memory for case a player re-joins soon. Useful together with PlayerTtl &gt; 0 so inactive players can rejoin an otherwise empty room. In milliseconds.</summary>
         public int EmptyRoomTtl;
 
         /// <summary>Removes a user's events and properties from the room when a user leaves.</summary>
@@ -87,10 +92,18 @@ namespace Photon.Realtime
         /// Using this makes the client unaware of the other players in a room.
         /// That can save some traffic if you have some server logic that updates players
         /// but it can also limit the client's usability.
+        ///
+        /// Not fully supported in v5. Do not enable in production without consulting Photon support.
         /// </remarks>
         public bool SuppressRoomEvents { get; set; }
 
         /// <summary>Disables events join and leave from the server as well as property broadcasts in a room (to minimize traffic)</summary>
+        /// <remarks>
+        /// Stricter than SuppressRoomEvents: also suppresses player property updates and the player list itself,
+        /// so the client does not learn about other players at all.
+        ///
+        /// Not fully supported in v5. Do not enable in production without consulting Photon support.
+        /// </remarks>
         public bool SuppressPlayerInfo { get; set; }
 
         /// <summary>

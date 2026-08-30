@@ -187,6 +187,7 @@ namespace NSMB.Cameras {
                 return;
             }
 
+            zoomSfx.enabled = true;
             bool ignoreKeyboard = playerElements.ReplayUi.IsOpen;
 
             // Movement
