@@ -93,10 +93,21 @@ namespace Quantum {
             var projectileAssetB = f.FindAsset(projectileB->Asset);
 
             if ((projectileAssetA.Effect == ProjectileEffectType.Fire && projectileAssetB.Effect == ProjectileEffectType.Freeze)
-                || (projectileAssetB.Effect == ProjectileEffectType.Fire && projectileAssetA.Effect == ProjectileEffectType.Freeze)) {
-                // Fireball collided with Iceball. Destroy both.
+                || (projectileAssetB.Effect == ProjectileEffectType.Fire && projectileAssetA.Effect == ProjectileEffectType.Freeze)
+                || (projectileA.Effect == ProjectileEffectType.Hammer && projectileAssetB.Effect == ProjectileEffectType.Boomerang)
+                || (projectileB.Effect == ProjectileEffectType.Hammer && projectileAssetA.Effect == ProjectileEffectType.Boomerang)) {
+                // Fireball collided with Iceball, or Hammer collided with Boomerang. Destroy both.
                 Destroy(f, projectileEntityA, projectileAssetA.DestroyParticleEffect);
                 Destroy(f, projectileEntityB, projectileAssetB.DestroyParticleEffect);
+            }
+        }
+
+        private void OnProjectileCoinInteraction(Frame f, EntityRef coinEntity, EntityRef projectileEntity) {
+            var projectile = f.Unsafe.GetPointer<Projectile>(projectileEntity);
+            var projectileAsset = f.FindAsset(projectile->Asset);
+
+            if (projectileAsset.CollectCoins) {
+                CoinSystem.TryCollectCoin(f, coinEntity, projectile->Owner);
             }
         }
 
@@ -112,15 +123,19 @@ namespace Quantum {
 
             if (projectileAsset.DestroyOnHit) {
                 Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
-            } else if (projectileAsset.Bounce) {
-                var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(projectileEntity);
-                projectile->Speed *= Constants._0_85;
-                physicsObject->Gravity *= Constants._0_85;
-                physicsObject->Velocity.Y = projectile->Speed;
+            } else {
+                if (projectileAsset.Bounce) {
+                    var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(projectileEntity);
+                    projectile->Speed *= Constants._0_85;
+                    physicsObject->Gravity *= Constants._0_85;
+                    physicsObject->Velocity.Y = projectile->Speed;
 
-                f.Events.EnemyKicked(hitEntity, false);
-                if (projectile->Speed < 1) {
-                    Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
+                    f.Events.EnemyKicked(hitEntity, false);
+                    if (projectile->Speed < 1) {
+                        Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
+                    }
+                } else {
+                    f.Events.EnemyPierced(hitEntity, false);
                 }
             }
         }
