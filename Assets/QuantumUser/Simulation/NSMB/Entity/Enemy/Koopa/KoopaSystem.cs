@@ -413,13 +413,17 @@ namespace Quantum {
             var projectileAsset = f.FindAsset(f.Unsafe.GetPointer<Projectile>(projectileEntity)->Asset);
 
             switch (projectileAsset.Effect) {
-            case ProjectileEffectType.KillEnemiesAndSoftKnockbackPlayers:
+            case ProjectileEffectType.Hammer:
             case ProjectileEffectType.Fire: {
                 f.Unsafe.GetPointer<Koopa>(koopaEntity)->Kill(f, koopaEntity, projectileEntity, EnemyKillReason.Special);
                 break;
             }
             case ProjectileEffectType.Freeze: {
                 IceBlockSystem.Freeze(f, koopaEntity);
+                break;
+            }
+            case ProjectileEffectType.Boomerang: {
+                KoopaSystem.OnEntityBumped();
                 break;
             }
             }

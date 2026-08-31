@@ -253,6 +253,7 @@ namespace Quantum {
                 f.Unsafe.GetPointer<Bobomb>(bobombEntity)->Kill(f, bobombEntity, projectileEntity, EnemyKillReason.Special);
                 break;
             }
+            case projectileEffectType.Boomerang:
             case ProjectileEffectType.Fire: {
                 if (bobomb->CurrentDetonationFrames > 0) {
                     bobomb->Kick(f, bobombEntity, projectileEntity, 0);
