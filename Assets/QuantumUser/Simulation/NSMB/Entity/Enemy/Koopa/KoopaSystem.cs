@@ -410,12 +410,13 @@ namespace Quantum {
         }
 
         public static void OnKoopaProjectileInteraction(Frame f, EntityRef koopaEntity, EntityRef projectileEntity) {
+            var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
             var projectileAsset = f.FindAsset(f.Unsafe.GetPointer<Projectile>(projectileEntity)->Asset);
 
             switch (projectileAsset.Effect) {
             case ProjectileEffectType.Hammer:
             case ProjectileEffectType.Fire: {
-                f.Unsafe.GetPointer<Koopa>(koopaEntity)->Kill(f, koopaEntity, projectileEntity, EnemyKillReason.Special);
+                koopa->Kill(f, koopaEntity, projectileEntity, EnemyKillReason.Special);
                 break;
             }
             case ProjectileEffectType.Freeze: {
@@ -423,7 +424,18 @@ namespace Quantum {
                 break;
             }
             case ProjectileEffectType.Boomerang: {
-                KoopaSystem.OnEntityBumped();
+                // Bump effect (from OnEntityBumped void)
+                var transform = f.Unsafe.GetPointer<Transform2D>(koopaEntity);
+                var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(koopaEntity);
+
+                koopa->IsInShell = true;
+                koopa->EnterShell(f, koopaEntity, projectileEntity, true, false);
+                f.Events.PlayComboSound(koopaEntity, 0);
+
+                var projectileTransform = f.Unsafe.GetPointer<Transform2D>(projectileEntity);
+                QuantumUtils.UnwrapWorldLocations(f, transform->Position, projectileTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
+                physicsObject->Velocity = new FPVector2(ourPos.X > theirPos.X ? 1 : -1, Constants._5_50);
+                physicsObject->IsTouchingGround = false;
                 break;
             }
             }

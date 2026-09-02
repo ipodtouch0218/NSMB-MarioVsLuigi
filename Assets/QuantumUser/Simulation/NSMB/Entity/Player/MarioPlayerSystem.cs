@@ -1616,7 +1616,7 @@ namespace Quantum {
             EntityRef newEntity = f.Create(f.SimulationConfig.BoomerangPrototype);
 
             var projectile = f.Unsafe.GetPointer<Projectile>(newEntity);
-            projectile->InitializeBoomerang(f, newEntity, filter.Entity, spawnPos, mario->FacingRight);
+            projectile->InitializeBoomerang(f, newEntity, filter.Entity, spawnPos);
             return projectile;
         }
 
@@ -2176,6 +2176,7 @@ namespace Quantum {
             }
 
             var projectile = f.Unsafe.GetPointer<Projectile>(projectileEntity);
+            var projectilePhysics = f.Unsafe.GetPointer<PhysicsObject>(projectileEntity);
             if (projectile->Owner == marioEntity) {
                 return;
             }
@@ -2216,7 +2217,7 @@ namespace Quantum {
                     if (dropStars && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
                         mario->Powerdown(f, marioEntity, false, projectileEntity);
                     } else {
-                        didKnockback = mario->DoKnockback(f, marioEntity, projectile->Velocity.X < 0, dropStars ? 1 : 0, KnockbackStrength.FireballBump, projectile->Owner);
+                        didKnockback = mario->DoKnockback(f, marioEntity, projectilePhysics->Velocity.X < 0, dropStars ? 1 : 0, KnockbackStrength.FireballBump, projectile->Owner);
                     }
                     break;
                 case ProjectileEffectType.Freeze:

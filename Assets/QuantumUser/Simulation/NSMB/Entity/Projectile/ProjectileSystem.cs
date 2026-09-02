@@ -94,8 +94,8 @@ namespace Quantum {
 
             if ((projectileAssetA.Effect == ProjectileEffectType.Fire && projectileAssetB.Effect == ProjectileEffectType.Freeze)
                 || (projectileAssetB.Effect == ProjectileEffectType.Fire && projectileAssetA.Effect == ProjectileEffectType.Freeze)
-                || (projectileA.Effect == ProjectileEffectType.Hammer && projectileAssetB.Effect == ProjectileEffectType.Boomerang)
-                || (projectileB.Effect == ProjectileEffectType.Hammer && projectileAssetA.Effect == ProjectileEffectType.Boomerang)) {
+                || (projectileAssetA.Effect == ProjectileEffectType.Hammer && projectileAssetB.Effect == ProjectileEffectType.Boomerang)
+                || (projectileAssetB.Effect == ProjectileEffectType.Hammer && projectileAssetA.Effect == ProjectileEffectType.Boomerang)) {
                 // Fireball collided with Iceball, or Hammer collided with Boomerang. Destroy both.
                 Destroy(f, projectileEntityA, projectileAssetA.DestroyParticleEffect);
                 Destroy(f, projectileEntityB, projectileAssetB.DestroyParticleEffect);
@@ -135,7 +135,7 @@ namespace Quantum {
                         Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
                     }
                 } else {
-                    f.Events.EnemyPierced(hitEntity, false);
+                    f.Events.EnemyPierced(hitEntity);
                 }
             }
         }

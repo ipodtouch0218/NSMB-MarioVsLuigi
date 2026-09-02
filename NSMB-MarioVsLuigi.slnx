@@ -1,0 +1,12 @@
+﻿<Solution>
+  <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="Photon.Realtime.csproj" />
+  <Project Path="Quantum.Simulation.csproj" />
+  <Project Path="Quantum.Unity.Editor.csproj" />
+  <Project Path="Quantum.Unity.csproj" />
+  <Project Path="Assembly-CSharp-firstpass.csproj" />
+  <Project Path="Tayx.Graphy.Editor.csproj" />
+  <Project Path="Tayx.Graphy.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
+  <Project Path="Quantum.Unity.Editor.CodeGen.csproj" />
+</Solution>
