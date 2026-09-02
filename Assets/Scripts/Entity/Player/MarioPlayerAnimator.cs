@@ -1343,7 +1343,7 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            PlaySound(soundEffect.Powerup_BoomerangFlower_Pierce);
+            PlaySound(SoundEffect.Powerup_BoomerangFlower_Pierce);
         }
 
         private void OnMarioPlayerTaunted(EventMarioPlayerTaunted e) {
