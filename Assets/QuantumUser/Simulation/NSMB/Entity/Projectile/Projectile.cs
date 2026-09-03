@@ -51,7 +51,7 @@ namespace Quantum {
             physicsObject->Gravity = FPVector2.Up * (playerHoldingUp ? FP.FromString("-37.512") : FP.FromString("-28.125"));
         }
 
-        public void InitializeBoomerang(Frame f, EntityRef thisEntity, EntityRef owner, FPVector2 spawnpoint) {
+        public void InitializeBoomerang(Frame f, EntityRef thisEntity, EntityRef owner, FPVector2 spawnpoint, bool right) {
             // WIP: Boomerang's mechanics.
             var asset = f.FindAsset(Asset);
             var transform = f.Unsafe.GetPointer<Transform2D>(thisEntity);
@@ -59,9 +59,11 @@ namespace Quantum {
 
             // Vars
             Owner = owner;
+            FacingRight = right;
 
             // Speed
             Speed = asset.Speed;
+            physicsObject->Gravity = asset.Gravity;
             if (asset.InheritShooterVelocity
                 && f.Unsafe.TryGetPointer(owner, out PhysicsObject* ownerPhysicsObject)
                 // Moving in same direction
@@ -69,6 +71,14 @@ namespace Quantum {
 
                 Speed += FPMath.Abs(ownerPhysicsObject->Velocity.X / 3);
             }
+
+            if (asset.LockTo45Degrees) {
+                physicsObject->TerminalVelocity = -Speed;
+            }
+
+            // Physics
+            transform->Position = spawnpoint;
+            physicsObject->Velocity = new(Speed * (FacingRight ? 1 : -1), -Speed);
         }
     }
 }
