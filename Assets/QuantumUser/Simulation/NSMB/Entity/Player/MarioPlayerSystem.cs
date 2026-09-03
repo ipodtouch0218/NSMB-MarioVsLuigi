@@ -1612,7 +1612,7 @@ namespace Quantum {
             EntityRef newEntity = f.Create(f.SimulationConfig.BoomerangPrototype);
 
             var projectile = f.Unsafe.GetPointer<Projectile>(newEntity);
-            projectile->InitializeBoomerang(f, newEntity, filter.Entity, spawnPos);
+            projectile->InitializeBoomerang(f, newEntity, filter.Entity, spawnPos, mario->FacingRight);
             return projectile;
         }
 
