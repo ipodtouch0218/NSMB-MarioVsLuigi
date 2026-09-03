@@ -13,11 +13,11 @@ enum PowerupState : Byte {
     Mushroom,
     FireFlower,
     IceFlower,
+    BoomerangFlower,
     PropellerMushroom,
     BlueShell,
 	HammerSuit,
-    MegaMushroom,
-    BoomerangFlower,
+    MegaMushroom
 }
 
 enum PowerupSpawnReason : Byte {

@@ -214,6 +214,9 @@ MonoBehaviour:
   HammerPrototype:
     Id:
       Value: 1406353302584805307
+  BoomerangPrototype:
+    Id:
+      Value: 1350609883368378676
   BlockBumpPrototype:
     Id:
       Value: 1308320651839637093

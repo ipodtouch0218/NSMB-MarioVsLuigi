@@ -106,11 +106,11 @@ namespace Quantum {
     Mushroom,
     FireFlower,
     IceFlower,
+    BoomerangFlower,
     PropellerMushroom,
     BlueShell,
     HammerSuit,
     MegaMushroom,
-    BoomerangFlower,
   }
   public enum StageChooseMode : byte {
     Choose,

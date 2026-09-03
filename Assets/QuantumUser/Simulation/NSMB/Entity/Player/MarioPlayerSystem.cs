@@ -1489,6 +1489,7 @@ namespace Quantum {
             switch (mario->CurrentPowerupState) {
             case PowerupState.IceFlower:
             case PowerupState.FireFlower:
+            case PowerupState.BoomerangFlower:
             case PowerupState.HammerSuit: {
 
                 if (mario->ProjectileDelayFrames > 0 || mario->IsWallsliding || (mario->JumpState == JumpState.TripleJump && !physicsObject->IsTouchingGround)
