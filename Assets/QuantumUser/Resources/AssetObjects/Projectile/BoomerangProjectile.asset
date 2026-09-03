@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63caed69988a51547838713bab6e20ed, type: 3}
+  m_Name: BoomerangProjectile
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/AssetObjects/Projectile/BoomerangProjectile
+    Guid:
+      Value: 317398270294624352
+  Effect: 3
+  Bounce: 0
+  Speed:
+    RawValue: 0
+  BounceStrength:
+    RawValue: 0
+  Gravity:
+    X:
+      RawValue: 0
+    Y:
+      RawValue: 0
+  DestroyOnSecondBounce: 0
+  DestroyOnHit: 0
+  LockTo45Degrees: 0
+  InheritShooterVelocity: 0
+  HasCollision: 1
+  DoesntEffectBlueShell: 1
+  BreakBreakableTiles: 1
+  CollectCoins: 1
+  DestroyParticleEffect: 8
+  ShootSound: 121
+  SfxOverrides: []
