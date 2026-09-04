@@ -90,9 +90,9 @@ MonoBehaviour:
         RawValue: 0
       BoxExtents:
         X:
-          RawValue: 19661
+          RawValue: 16384
         Y:
-          RawValue: 6963
+          RawValue: 6554
       PositionOffset:
         X:
           RawValue: 1966
@@ -331,7 +331,7 @@ MonoBehaviour:
     IsFrozen:
       Value: 0
     DisableCollision:
-      Value: 1
+      Value: 0
     SlowInLiquids:
       Value: 0
     IsWaterSolid:
@@ -630,17 +630,17 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: c7d71db7f4e39b24ea73d52b5fcdfd08,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.06
+      value: 0.04
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c7d71db7f4e39b24ea73d52b5fcdfd08,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.06
+      value: 0.04
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c7d71db7f4e39b24ea73d52b5fcdfd08,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.06
+      value: 0.04
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c7d71db7f4e39b24ea73d52b5fcdfd08,
         type: 3}

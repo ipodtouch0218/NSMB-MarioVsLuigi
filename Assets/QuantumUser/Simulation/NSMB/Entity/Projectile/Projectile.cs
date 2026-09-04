@@ -66,9 +66,8 @@ namespace Quantum {
             if (asset.InheritShooterVelocity
                 && f.Unsafe.TryGetPointer(owner, out PhysicsObject* ownerPhysicsObject)
                 // Moving in same direction
-                && FPMath.Sign(ownerPhysicsObject->Velocity.X) == 1 == FacingRight) { 
-
-                Speed += FPMath.Abs(ownerPhysicsObject->Velocity.X / 3);
+                && FPMath.Sign(ownerPhysicsObject->Velocity.X) == 1 == FacingRight) {
+                Speed += FPMath.Abs(ownerPhysicsObject->Velocity.X * 3);
             }
 
             if (asset.LockTo45Degrees) {
@@ -79,7 +78,7 @@ namespace Quantum {
             BoomerangPhase = 0;
             BoomerangFrame = 0;
             transform->Position = spawnpoint;
-            physicsObject->Velocity = new(Speed * (FacingRight ? 1 : -1), -Speed);
+            physicsObject->Velocity = new(Speed * (FacingRight ? 1 : -1), 0);
         }
 
         public void UpdateBoomerang(Frame f, EntityRef thisEntity, PhysicsObject* physicsObject, VersusStageData stage) {
@@ -108,7 +107,7 @@ namespace Quantum {
                     QuantumUtils.UnwrapWorldLocations(stage, transform->Position, ownerCenter, out _, out FPVector2 closestOwner);
                     FPVector2 toOwner = closestOwner - transform->Position;
 
-                    if (toOwner.SqrMagnitude < 1) {
+                    if (toOwner.SqrMagnitude < FP._0_25 * FP._0_25) {
                         ProjectileSystem.Destroy(f, thisEntity, asset.DestroyParticleEffect);
                         return;
                     }
