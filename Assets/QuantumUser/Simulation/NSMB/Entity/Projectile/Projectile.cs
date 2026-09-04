@@ -52,7 +52,6 @@ namespace Quantum {
         }
 
         public void InitializeBoomerang(Frame f, EntityRef thisEntity, EntityRef owner, FPVector2 spawnpoint, bool right) {
-            // WIP: Boomerang's mechanics.
             var asset = f.FindAsset(Asset);
             var transform = f.Unsafe.GetPointer<Transform2D>(thisEntity);
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(thisEntity);
@@ -77,8 +76,49 @@ namespace Quantum {
             }
 
             // Physics
+            BoomerangPhase = 0;
+            BoomerangFrame = 0;
             transform->Position = spawnpoint;
             physicsObject->Velocity = new(Speed * (FacingRight ? 1 : -1), -Speed);
+        }
+
+        public void UpdateBoomerang(Frame f, EntityRef thisEntity, PhysicsObject* physicsObject, VersusStageData stage) {
+            BoomerangFrame++;
+            var asset = f.FindAsset(Asset);
+
+            if (BoomerangPhase == 0) {
+                if (BoomerangFrame >= 15) {
+                    BoomerangPhase = 1;
+                    BoomerangFrame = 0;
+                }
+            } else if (BoomerangPhase == 1) {
+                Speed = asset.Speed * (15 - BoomerangFrame) / 15;
+                if (BoomerangFrame >= 15) {
+                    BoomerangPhase = 2;
+                    BoomerangFrame = 0;
+                    Speed = 0;
+                }
+            } else if (BoomerangPhase == 2) {
+                Speed = BoomerangFrame >= 15 ? asset.Speed : asset.Speed * BoomerangFrame / 15;
+
+                var transform = f.Unsafe.GetPointer<Transform2D>(thisEntity);
+                if (f.Unsafe.TryGetPointer(Owner, out Transform2D* ownerTransform)
+                    && f.Unsafe.TryGetPointer(Owner, out PhysicsCollider2D* ownerCollider)) {
+                    FPVector2 ownerCenter = ownerTransform->Position + ownerCollider->Shape.Centroid + new FPVector2(0, ownerCollider->Shape.Box.Extents.Y / 2);
+                    QuantumUtils.UnwrapWorldLocations(stage, transform->Position, ownerCenter, out _, out FPVector2 closestOwner);
+                    FPVector2 toOwner = closestOwner - transform->Position;
+
+                    if (toOwner.SqrMagnitude < 1) {
+                        ProjectileSystem.Destroy(f, thisEntity, asset.DestroyParticleEffect);
+                        return;
+                    }
+
+                    FPVector2 direction = toOwner.Normalized;
+                    physicsObject->Velocity = direction * Speed;
+                }
+
+                physicsObject->Gravity = FPVector2.Zero;
+            }
         }
     }
 }
