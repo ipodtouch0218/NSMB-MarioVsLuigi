@@ -49,6 +49,10 @@ namespace Quantum {
             if (asset.LockTo45Degrees) {
                 physicsObject->TerminalVelocity = -projectile->Speed;
             }
+
+            if (asset.Effect == ProjectileEffectType.Boomerang) {
+                projectile->UpdateBoomerang(f, filter.Entity, physicsObject, stage);
+            }
         }
 
         public void HandleTileCollision(Frame f, ref Filter filter, ProjectileAsset asset) {
