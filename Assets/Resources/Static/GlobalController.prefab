@@ -20299,6 +20299,7 @@ GameObject:
   - component: {fileID: 6114239374411719935}
   - component: {fileID: 405963795238578845}
   - component: {fileID: 5858149666679547523}
+  - component: {fileID: 4257129773049029738}
   m_Layer: 0
   m_Name: GlobalController
   m_TagString: Untagged
@@ -20417,6 +20418,7 @@ MonoBehaviour:
   controlsAutoSprint: 0
   controlsPropellerJump: 0
   controlsAllowGroundpoundWithLeftRight: 0
+  lightBarManager: {fileID: 4257129773049029738}
   miscFilterFullRooms: 0
   miscFilterInProgressRooms: 0
   miscFilterAddons: 0
@@ -20677,6 +20679,18 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4938254683282774592}
   m_Enabled: 1
+--- !u!114 &4257129773049029738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4938254683282774592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec44790a9e2cfd74b9003936c0e1c8fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PSLightbarManager
 --- !u!1 &4947824015881995125
 GameObject:
   m_ObjectHideFlags: 0

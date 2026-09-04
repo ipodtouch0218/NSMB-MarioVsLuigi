@@ -103,6 +103,13 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             ChangeCharacterButton(selectedCharacter);
 
             Settings.Instance.generalCharacter = selectedCharacter;
+
+            if(QuantumUnityDB.TryGetGlobalAsset(selectedCharacter, out var character))
+            {
+                Settings.Instance.lightBarColorIndex = character.Order;
+                Settings.Instance.lightBarManager.SetLightbarColor(character.Order);
+            }
+
             Settings.Instance.SaveSettings();
             canvas.PlayConfirmSound();
 

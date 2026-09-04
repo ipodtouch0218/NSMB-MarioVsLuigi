@@ -239,6 +239,9 @@ namespace NSMB {
         public RumbleManager.RumbleSetting controlsRumble;
         public bool controlsFireballSprint, controlsAutoSprint, controlsPropellerJump, controlsAllowGroundpoundWithLeftRight;
 
+        public PSLightbarManager lightBarManager;
+        public int lightBarColorIndex;
+
         public bool miscFilterFullRooms, miscFilterInProgressRooms, miscFilterAddons;
 
         //---Private Variables
@@ -310,6 +313,9 @@ namespace NSMB {
             PlayerPrefs.SetInt("Controls_Rumble", (int) controlsRumble);
             PlayerPrefs.SetInt("Controls_AllowGroundpoundWithLeftRight", controlsAllowGroundpoundWithLeftRight ? 1 : 0);
             PlayerPrefs.SetString("Controls_Bindings", ControlsBindings);
+
+            //Lightbar
+            PlayerPrefs.SetInt("LightBarColorIndex", lightBarColorIndex);
 
             // Misc
             PlayerPrefs.SetInt("Misc_FilterFullRooms", miscFilterFullRooms ? 1 : 0);
@@ -469,6 +475,9 @@ namespace NSMB {
             // Generic
             TryGetSetting("General_Character", ref generalCharacter);
             TryGetSetting("General_Palette", ref generalPalette);
+
+            //Lightbar
+            TryGetSetting("LightBarColorIndex", ref lightBarColorIndex);
         }
 
         private bool TryGetSetting<T>(string key, string propertyName) {
