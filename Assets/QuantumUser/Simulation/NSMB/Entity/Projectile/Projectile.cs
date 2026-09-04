@@ -62,17 +62,13 @@ namespace Quantum {
 
             // Speed
             Speed = asset.Speed;
-            physicsObject->Gravity = asset.Gravity;
+            /*
             if (asset.InheritShooterVelocity
                 && f.Unsafe.TryGetPointer(owner, out PhysicsObject* ownerPhysicsObject)
-                // Moving in same direction
                 && FPMath.Sign(ownerPhysicsObject->Velocity.X) == 1 == FacingRight) {
                 Speed += FPMath.Abs(ownerPhysicsObject->Velocity.X * 3);
             }
-
-            if (asset.LockTo45Degrees) {
-                physicsObject->TerminalVelocity = -Speed;
-            }
+            */
 
             // Physics
             BoomerangPhase = 0;
