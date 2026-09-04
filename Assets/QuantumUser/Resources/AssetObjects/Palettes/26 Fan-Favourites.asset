@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce8b0cb6c1d54e5428273c6662ede73f, type: 3}
+  m_Name: 26 Fan-Favourites
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/AssetObjects/Palettes/26 Fan-Favourites
+    Guid:
+      Value: 482082418739994755
+  Colors:
+  - Character:
+      Id:
+        Value: 532063855470386108
+    ShirtColor:
+      R: 15
+      G: 0
+      B: 255
+      A: 255
+    OverallsColor:
+      R: 255
+      G: 221
+      B: 0
+      A: 255
+    HatUsesOverallsColor: 0
+  - Character:
+      Id:
+        Value: 485289843648077326
+    ShirtColor:
+      R: 234
+      G: 0
+      B: 108
+      A: 255
+    OverallsColor:
+      R: 137
+      G: 0
+      B: 202
+      A: 255
+    HatUsesOverallsColor: 0
+  TranslationKey: skin.fanfavourites
+  Order: 2400
+  IsLegacy: 1
