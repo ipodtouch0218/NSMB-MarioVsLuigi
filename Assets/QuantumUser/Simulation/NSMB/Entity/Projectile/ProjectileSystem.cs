@@ -12,6 +12,7 @@ namespace Quantum {
 
         public override void OnInit(Frame f) {
             f.Context.Interactions.Register<Projectile, Projectile>(f, OnProjectileProjectileInteraction);
+            f.Context.Interactions.Register<Projectile, Coin>(f, OnProjectileCoinInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -106,7 +107,7 @@ namespace Quantum {
             }
         }
 
-        private void OnProjectileCoinInteraction(Frame f, EntityRef coinEntity, EntityRef projectileEntity) {
+        private void OnProjectileCoinInteraction(Frame f, EntityRef projectileEntity, EntityRef coinEntity) {
             var projectile = f.Unsafe.GetPointer<Projectile>(projectileEntity);
             var projectileAsset = f.FindAsset(projectile->Asset);
 
