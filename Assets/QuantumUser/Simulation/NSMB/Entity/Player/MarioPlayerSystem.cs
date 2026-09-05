@@ -2188,11 +2188,13 @@ namespace Quantum {
             // regular damageable checks (iframes is 0, not starman invincible)
             // not in a powerUP transition while mini (specifically)
             // Mario is in his Blue Shell and projectile doesn't affect blue Shell
+            // Mario is crouched and grounded with Hammer Suit and projectile isn't a boomerang
             // Team attack allows him to get hit
             bool damageable = !mario->IsInKnockback
                 && mario->CurrentPowerupState != PowerupState.MegaMushroom
                 && (mario->IsDamageable(f) || (mario->TryGetCurrentPowerTransition(f, out _) && mario->CurrentPowerupState == PowerupState.MiniMushroom))
                 && !((mario->IsCrouchedInShell || mario->IsInShell) && projectileAsset.DoesntEffectBlueShell)
+                && !(mario->IsCrouching && marioPhysics->IsTouchingGround && mario->CurrentPowerupState == PowerupState.HammerSuit && projectileAsset.Effect != ProjectileEffectType.Boomerang)
                 && mario->CheckTeamAttack(f, projectile->Owner, out dropStars);
 
             if (damageable) {
@@ -2241,6 +2243,14 @@ namespace Quantum {
 
                     FPVector2 avgPosition = (marioPos + projectilePos) / 2;
                     f.Events.PlayKnockbackEffect(marioEntity, projectileEntity, KnockbackStrength.FireballBump, avgPosition, true);
+                }
+            } else {
+                if (mario->IsCrouching && marioPhysics->IsTouchingGround && mario->CurrentPowerupState == PowerupState.HammerSuit && projectileAsset.Effect == ProjectileEffectType.Boomerang) {
+                    // Reflect it.
+                    var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(projectileEntity);
+                    projectile->Speed *= Constants._0_85;
+                    physicsObject->Gravity *= Constants._0_85;
+                    physicsObject->Velocity.Y = projectile->Speed;
                 }
             }
 

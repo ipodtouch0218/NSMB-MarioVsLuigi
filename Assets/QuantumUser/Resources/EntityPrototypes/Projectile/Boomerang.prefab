@@ -417,7 +417,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sRenderer: {fileID: 0}
-  animator: {fileID: 0}
+  animator: {fileID: 1928416519840096064}
   legacySpriteAnimator: {fileID: 0}
   sameTeamColor: {r: 1, g: 1, b: 1, a: 1}
   differentTeamColor: {r: 1, g: 1, b: 1, a: 1}
@@ -573,7 +573,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6102423714800591244}
-  - component: {fileID: 4462215008397996180}
+  - component: {fileID: 1928416519840096064}
   m_Layer: 19
   m_Name: Graphics
   m_TagString: Untagged
@@ -597,23 +597,28 @@ Transform:
   - {fileID: 7772443187923817931}
   m_Father: {fileID: 6226578532214227705}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &4462215008397996180
-Animation:
+--- !u!95 &1928416519840096064
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6817442949190414024}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: fb38d2032f1cab849aa3937096473ad0, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: fb38d2032f1cab849aa3937096473ad0, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: db3ecb56e508f094eacdc7bc49e12881, type: 2}
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_CullingType: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &7806984023966216736
 PrefabInstance:
   m_ObjectHideFlags: 0
