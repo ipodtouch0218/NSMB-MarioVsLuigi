@@ -81,7 +81,7 @@ namespace Quantum {
         public override FP GetItemSpawnWeight(Frame f, CoinItemAsset item, int ourCoins) {
             FP averageCoins = GetAverageObjectiveCount(f);
             FP avgDiff = ourCoins - averageCoins;
-            FP percentageTimeRemaining = f.Global->Timer / (f.Global->Rules.TimerMinutes * 60);
+            FP percentageTimeRemaining = f.Global->Rules.IsTimerEnabled ? (f.Global->Timer / (f.Global->Rules.TimerMinutes * 60)) : 1;
             FP whichBonus = avgDiff > 0 ? item.AboveAverageBonus : item.BelowAverageBonus;
             FP bonus = whichBonus * FPMath.Log((FPMath.Abs(avgDiff) / 40) + 1, FP.E) * 1 - (percentageTimeRemaining * percentageTimeRemaining);
 
