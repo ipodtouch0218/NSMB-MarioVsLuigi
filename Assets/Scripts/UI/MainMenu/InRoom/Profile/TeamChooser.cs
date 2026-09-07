@@ -178,7 +178,17 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             if (f.Global->Rules.TeamsEnabled) {
                 var teams = f.Context.GetAllAssets<TeamAsset>();
                 TeamAsset team = teams[selected % teams.Count];
+                if (Settings.Instance.lightBarColorSettingIndex == (int) PSLightbarManager.ColorSettings.Slot_TeamColor) {
+                    Settings.Instance.lightBarManager.SetLightbarColor(team.color);
+                }
                 flag.sprite = Settings.Instance.GraphicsColorblind ? team.spriteColorblind : team.spriteNormal;
+            } else
+            {
+                if (Settings.Instance.lightBarColorSettingIndex == (int) PSLightbarManager.ColorSettings.Slot_TeamColor) {
+                    var localSlots = QuantumRunner.DefaultGame.GetLocalPlayerSlots();
+                    int slot = localSlots[0];
+                    Settings.Instance.lightBarManager.SetLightbarColor(GlobalController.Instance.playerSlots[0].Color);
+                }
             }
         }
     }

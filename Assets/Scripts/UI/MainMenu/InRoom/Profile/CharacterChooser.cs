@@ -104,10 +104,12 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
             Settings.Instance.generalCharacter = selectedCharacter;
 
-            if(QuantumUnityDB.TryGetGlobalAsset(selectedCharacter, out var character))
-            {
-                Settings.Instance.lightBarColorIndex = character.Order;
-                Settings.Instance.lightBarManager.SetLightbarColor(character.Order);
+            //Sets the bar color to the player
+            if (Settings.Instance.lightBarColorSettingIndex > 0 && Settings.Instance.lightBarColorSettingIndex != (int) PSLightbarManager.ColorSettings.Slot_TeamColor) {
+                if (QuantumUnityDB.TryGetGlobalAsset(selectedCharacter, out var character)) {
+                    Settings.Instance.lightBarManager.SetLightbarColor(character.lightBarColors[0]);
+                    Debug.Log("Called this function");
+                }
             }
 
             Settings.Instance.SaveSettings();

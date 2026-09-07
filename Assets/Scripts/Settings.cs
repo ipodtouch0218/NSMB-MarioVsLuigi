@@ -240,7 +240,7 @@ namespace NSMB {
         public bool controlsFireballSprint, controlsAutoSprint, controlsPropellerJump, controlsAllowGroundpoundWithLeftRight;
 
         public PSLightbarManager lightBarManager;
-        public int lightBarColorIndex;
+        public int lightBarColorSettingIndex;
 
         public bool miscFilterFullRooms, miscFilterInProgressRooms, miscFilterAddons;
 
@@ -315,7 +315,16 @@ namespace NSMB {
             PlayerPrefs.SetString("Controls_Bindings", ControlsBindings);
 
             //Lightbar
-            PlayerPrefs.SetInt("LightBarColorIndex", lightBarColorIndex);
+            PlayerPrefs.SetInt("LightBarColorSettingIndex", lightBarColorSettingIndex);
+
+            //This ensures the lightbar actually updates when changing the option in the Settings menu
+            if (lightBarColorSettingIndex == 0) {
+                lightBarManager.ClearLightbarColor();
+            } else if (lightBarColorSettingIndex != (int) PSLightbarManager.ColorSettings.Slot_TeamColor){
+                QuantumUnityDB.TryGetGlobalAsset(Instance.generalCharacter, out var character);
+
+                lightBarManager.SetLightbarColor(character.lightBarColors[0]);
+              }
 
             // Misc
             PlayerPrefs.SetInt("Misc_FilterFullRooms", miscFilterFullRooms ? 1 : 0);
@@ -477,7 +486,7 @@ namespace NSMB {
             TryGetSetting("General_Palette", ref generalPalette);
 
             //Lightbar
-            TryGetSetting("LightBarColorIndex", ref lightBarColorIndex);
+            TryGetSetting("LightBarColorSettingIndex", ref lightBarColorSettingIndex);
         }
 
         private bool TryGetSetting<T>(string key, string propertyName) {

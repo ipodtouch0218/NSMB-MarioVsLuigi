@@ -30,9 +30,16 @@ MonoBehaviour:
   SilhouetteSprite: {fileID: 21300000, guid: e52d82a4d5d0ae845bb4726a3600bc62, type: 3}
   SelectionSprite: {fileID: -1589787217, guid: 66a50f8ce62e8954a977cf86df786637, type: 3}
   SelectionColor: {r: 0.8867924, g: 0.23843002, b: 0.23843002, a: 1}
-  SelectionOrder: -2000
-  SmallOverrides: {fileID: 22100000, guid: 347b7f77a47c4db4b85584fbfdecf63b, type: 2}
-  LargeOverrides: {fileID: 9100000, guid: fa2b2fc953f5f444291d26193e0ac7fb, type: 2}
+  lightBarColors:
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 0.23529412, g: 0.78431374, b: 1, a: 1}
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 1, g: 0.39215687, b: 0, a: 1}
+  - {r: 0, g: 0.5882353, b: 1, a: 1}
+  - {r: 0.32941177, g: 0.12941177, b: 0, a: 1}
+  - {r: 0, g: 0, b: 1, a: 1}
+  - {r: 0.09803922, g: 0.09803922, b: 0.09803922, a: 1}
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 1, g: 1, b: 0, a: 1}
   Order: 0
-  IsLegacy: 1
   SfxOverrides: []
