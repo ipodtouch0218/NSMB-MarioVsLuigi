@@ -12,6 +12,7 @@ using Quantum.Profiling;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Scripting;
@@ -709,6 +710,23 @@ namespace NSMB.Entities.Player {
                 teammateStompTimer -= Time.deltaTime;
             }
             modelRoot.transform.SetLossyScale(targetScale);
+
+            //Converts whatever the powerup state is to the appropriate lightbar color
+            if (Settings.Instance.lightBarColorSettingIndex > 0) {
+                //Checks if the character we're using is a local player
+                bool isLocal = PlayerElements.AllPlayerElements.Any(pe => pe.Player == mario->PlayerRef);
+                if (isLocal) {
+                    if (Settings.Instance.lightBarColorSettingIndex == (int) PSLightbarManager.ColorSettings.BrotherColor) {
+                        Settings.Instance.lightBarManager.SetLightbarColor(character.lightBarColors[0]);
+                    } else if (Settings.Instance.lightBarColorSettingIndex == (int) PSLightbarManager.ColorSettings.PowerupColorSimple) {
+                        Settings.Instance.lightBarManager.SetLightbarColor(mario->IsStarmanInvincible ? character.lightBarColors[9] : character.lightBarColors[(int) mario->CurrentPowerupState]);
+                    } else if (Settings.Instance.lightBarColorSettingIndex == (int) PSLightbarManager.ColorSettings.PowerupColorBlink) {
+                        Settings.Instance.lightBarManager.SetLightbarColor(mario->IsStarmanInvincible ? character.lightBarColors[9] : character.lightBarColors[(int) DisplayPowerupState(mario, f)]);
+                    } else if (Settings.Instance.lightBarColorSettingIndex == (int) PSLightbarManager.ColorSettings.Slot_TeamColor) {
+                        Settings.Instance.lightBarManager.SetLightbarColor(Utils.GetPlayerSlotInfo(f, mario->PlayerRef).Color);
+                    }
+                }
+            }
         }
 
         private PowerupVisuals FindPowerupVisuals(PowerupState state) {
@@ -1371,6 +1389,7 @@ namespace NSMB.Entities.Player {
                 var powerup = f.FindAsset(anim.Scriptable);
                 PlaySound(powerup.SoundEffect, new[] { powerup });
             }
+            
         }
     }
 }

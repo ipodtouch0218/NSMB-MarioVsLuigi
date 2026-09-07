@@ -1,5 +1,6 @@
 using NSMB.Networking;
 using NSMB.Replay;
+using NSMB.UI.Game;
 using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
 using Photon.Client;
@@ -403,6 +404,12 @@ namespace NSMB.Networking {
             }
 
             Debug.Log($"[Network] AddPlayer confirmed on Frame {e.Frame.Number}, {e.Player} with slot {e.PlayerSlot}");
+
+            //If our settings are set to use the lightBarSetting
+            if (Settings.Instance.lightBarColorSettingIndex == (int) PSLightbarManager.ColorSettings.Slot_TeamColor)
+            {
+                Settings.Instance.lightBarManager.SetLightbarColor(GlobalController.Instance.playerSlots[e.PlayerSlot].Color);
+            }
         }
 
         private void OnLocalPlayerAddFailed(CallbackLocalPlayerAddFailed e) {

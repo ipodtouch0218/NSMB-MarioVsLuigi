@@ -239,6 +239,9 @@ namespace NSMB {
         public RumbleManager.RumbleSetting controlsRumble;
         public bool controlsFireballSprint, controlsAutoSprint, controlsPropellerJump, controlsAllowGroundpoundWithLeftRight;
 
+        public PSLightbarManager lightBarManager;
+        public int lightBarColorSettingIndex;
+
         public bool miscFilterFullRooms, miscFilterInProgressRooms, miscFilterAddons;
 
         //---Private Variables
@@ -310,6 +313,18 @@ namespace NSMB {
             PlayerPrefs.SetInt("Controls_Rumble", (int) controlsRumble);
             PlayerPrefs.SetInt("Controls_AllowGroundpoundWithLeftRight", controlsAllowGroundpoundWithLeftRight ? 1 : 0);
             PlayerPrefs.SetString("Controls_Bindings", ControlsBindings);
+
+            //Lightbar
+            PlayerPrefs.SetInt("LightBarColorSettingIndex", lightBarColorSettingIndex);
+
+            //This ensures the lightbar actually updates when changing the option in the Settings menu
+            if (lightBarColorSettingIndex == 0) {
+                lightBarManager.ClearLightbarColor();
+            } else if (lightBarColorSettingIndex != (int) PSLightbarManager.ColorSettings.Slot_TeamColor){
+                QuantumUnityDB.TryGetGlobalAsset(Instance.generalCharacter, out var character);
+
+                lightBarManager.SetLightbarColor(character.lightBarColors[0]);
+              }
 
             // Misc
             PlayerPrefs.SetInt("Misc_FilterFullRooms", miscFilterFullRooms ? 1 : 0);
@@ -469,6 +484,9 @@ namespace NSMB {
             // Generic
             TryGetSetting("General_Character", ref generalCharacter);
             TryGetSetting("General_Palette", ref generalPalette);
+
+            //Lightbar
+            TryGetSetting("LightBarColorSettingIndex", ref lightBarColorSettingIndex);
         }
 
         private bool TryGetSetting<T>(string key, string propertyName) {

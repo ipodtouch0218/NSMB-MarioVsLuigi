@@ -34,6 +34,8 @@ namespace NSMB.UI.MainMenu.Submenus {
             }
 
             float duration = playedSounds.Max(ac => ac.length);
+            //Set Lightbar to Clear so the player color doesn't stay after application closes
+            Settings.Instance.lightBarManager.ClearLightbarColor();
             yield return new WaitForSecondsRealtime(duration);
 
 #if UNITY_EDITOR

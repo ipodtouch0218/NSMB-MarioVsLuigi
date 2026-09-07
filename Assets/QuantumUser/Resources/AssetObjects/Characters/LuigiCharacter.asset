@@ -30,9 +30,17 @@ MonoBehaviour:
   SilhouetteSprite: {fileID: 21300000, guid: 69ebf16f7ccd5c34fb0733a2b65e900f, type: 3}
   SelectionSprite: {fileID: 1263302900, guid: 66a50f8ce62e8954a977cf86df786637, type: 3}
   SelectionColor: {r: 0.401459, g: 0.9716981, b: 0.3254272, a: 1}
-  SelectionOrder: -1000
-  SmallOverrides: {fileID: 22100000, guid: a1854453357bb034e89ec419b0f57906, type: 2}
-  LargeOverrides: {fileID: 22100000, guid: 671e2adc5dbd26a45abdf5c18398a86e, type: 2}
+  lightBarColors:
+  - {r: 0, g: 1, b: 0, a: 1}
+  - {r: 0.23529412, g: 0.78431374, b: 1, a: 1}
+  - {r: 0, g: 1, b: 0, a: 1}
+  - {r: 1, g: 0.39215687, b: 0, a: 1}
+  - {r: 0, g: 0.5882353, b: 1, a: 1}
+  - {r: 0.32941177, g: 0.12941177, b: 0, a: 1}
+  - {r: 0, g: 0, b: 1, a: 1}
+  - {r: 0.09803922, g: 0.09803922, b: 0.09803922, a: 1}
+  - {r: 0, g: 1, b: 0, a: 1}
+  - {r: 1, g: 1, b: 0, a: 1}
   Order: 1
   SfxOverrides:
   - SoundEffect: 33

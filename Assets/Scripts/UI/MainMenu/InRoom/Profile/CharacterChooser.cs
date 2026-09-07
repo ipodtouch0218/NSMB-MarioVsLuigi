@@ -103,6 +103,15 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             ChangeCharacterButton(selectedCharacter);
 
             Settings.Instance.generalCharacter = selectedCharacter;
+
+            //Sets the bar color to the player
+            if (Settings.Instance.lightBarColorSettingIndex > 0 && Settings.Instance.lightBarColorSettingIndex != (int) PSLightbarManager.ColorSettings.Slot_TeamColor) {
+                if (QuantumUnityDB.TryGetGlobalAsset(selectedCharacter, out var character)) {
+                    Settings.Instance.lightBarManager.SetLightbarColor(character.lightBarColors[0]);
+                    Debug.Log("Called this function");
+                }
+            }
+
             Settings.Instance.SaveSettings();
             canvas.PlayConfirmSound();
 

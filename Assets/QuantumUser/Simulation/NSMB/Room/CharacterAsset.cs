@@ -21,6 +21,7 @@ public class CharacterAsset : AssetObject, ISoundOverrideProvider, IOrderedAsset
 
     public Sprite SelectionSprite;
     public Color SelectionColor = Color.white;
+    public Color[] lightBarColors = new Color[10];
 #endif
 
     public int Order;
