@@ -871,7 +871,6 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.PlayerData))]
   public unsafe partial class PlayerDataPrototype : ComponentPrototype<Quantum.PlayerData> {
     public PlayerRef PlayerRef;
-    public QBoolean IsRoomHost;
     public QBoolean IsLoaded;
     public AssetRef<CharacterAsset> Character;
     public AssetRef<PaletteSet> Palette;
@@ -895,7 +894,6 @@ namespace Quantum.Prototypes {
     }
     public void Materialize(Frame frame, ref Quantum.PlayerData result, in PrototypeMaterializationContext context = default) {
         result.PlayerRef = this.PlayerRef;
-        result.IsRoomHost = this.IsRoomHost;
         result.IsLoaded = this.IsLoaded;
         result.Character = this.Character;
         result.Palette = this.Palette;

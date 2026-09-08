@@ -11,7 +11,7 @@ namespace Quantum {
 
         public void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
             if (f.Global->GameState != GameState.PreGameRoom
-                || !playerData->IsRoomHost) {
+                || !playerData->IsRoomHost(f)) {
                 // Can't let you do that, Star Fox
                 return;
             }

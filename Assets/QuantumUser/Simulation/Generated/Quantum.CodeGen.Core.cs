@@ -1572,8 +1572,12 @@ namespace Quantum {
       unchecked { 
         var hash = 11299;
         hash = hash * 31 + _field_used_.GetHashCode();
-        hash = hash * 31 + _StarChasers.GetHashCode();
-        hash = hash * 31 + _CoinRunners.GetHashCode();
+        if (_field_used_ == STARCHASERS) {
+          hash = hash * 31 + _StarChasers.GetHashCode();
+        }
+        if (_field_used_ == COINRUNNERS) {
+          hash = hash * 31 + _CoinRunners.GetHashCode();
+        }
         return hash;
       }
     }
@@ -3348,8 +3352,6 @@ namespace Quantum {
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(20)]
     public PlayerRef PlayerRef;
-    [FieldOffset(36)]
-    public QBoolean IsRoomHost;
     [FieldOffset(28)]
     public QBoolean IsLoaded;
     [FieldOffset(56)]
@@ -3358,13 +3360,13 @@ namespace Quantum {
     public AssetRef<PaletteSet> Palette;
     [FieldOffset(1)]
     public Byte RequestedTeam;
-    [FieldOffset(40)]
+    [FieldOffset(36)]
     public QBoolean IsSpectator;
-    [FieldOffset(48)]
-    public QBoolean ManualSpectator;
-    [FieldOffset(52)]
-    public QBoolean VotedToContinue;
     [FieldOffset(44)]
+    public QBoolean ManualSpectator;
+    [FieldOffset(48)]
+    public QBoolean VotedToContinue;
+    [FieldOffset(40)]
     public QBoolean IsTeamLocked;
     [FieldOffset(16)]
     public Int32 Wins;
@@ -3384,7 +3386,6 @@ namespace Quantum {
       unchecked { 
         var hash = 10271;
         hash = hash * 31 + PlayerRef.GetHashCode();
-        hash = hash * 31 + IsRoomHost.GetHashCode();
         hash = hash * 31 + IsLoaded.GetHashCode();
         hash = hash * 31 + Character.GetHashCode();
         hash = hash * 31 + Palette.GetHashCode();
@@ -3415,7 +3416,6 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsInSettings, serializer);
         QBoolean.Serialize(&p->IsLoaded, serializer);
         QBoolean.Serialize(&p->IsReady, serializer);
-        QBoolean.Serialize(&p->IsRoomHost, serializer);
         QBoolean.Serialize(&p->IsSpectator, serializer);
         QBoolean.Serialize(&p->IsTeamLocked, serializer);
         QBoolean.Serialize(&p->ManualSpectator, serializer);
@@ -3900,6 +3900,14 @@ namespace Quantum {
         return result;
       }
     }
+    /// <summary>2.75</summary>
+    public static FP _2_75 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 180224;
+        return result;
+      }
+    }
     /// <summary>0.05</summary>
     public static FP PhysicsRaycastSkin {
       [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
@@ -4008,6 +4016,8 @@ namespace Quantum {
       public const Int64 _3_75 = 245760;
       /// <summary>0.73</summary>
       public const Int64 _0_73 = 47841;
+      /// <summary>2.75</summary>
+      public const Int64 _2_75 = 180224;
       /// <summary>0.05</summary>
       public const Int64 PhysicsRaycastSkin = 3277;
       /// <summary>0.005</summary>

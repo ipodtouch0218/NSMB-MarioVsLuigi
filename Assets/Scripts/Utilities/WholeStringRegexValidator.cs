@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 namespace NSMB.Utilities {
     [CreateAssetMenu(fileName = "WholeStringRegexValidator", menuName = "ScriptableObjects/Input Validators/WholeStringRegexValidator")]

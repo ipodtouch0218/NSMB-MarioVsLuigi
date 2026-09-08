@@ -49,7 +49,8 @@ namespace Quantum {
         }
 
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
-            if (f.Global->GameState != GameState.PreGameRoom || !playerData->IsRoomHost) {
+            if (f.Global->GameState != GameState.PreGameRoom
+                || !playerData->IsRoomHost(f)) {
                 // Only the host can change rules.
                 return;
             }
@@ -65,6 +66,7 @@ namespace Quantum {
                 GameRules newRules = default;
                 f.FindAsset(Gamemode).DefaultRules.Materialize(f, ref newRules);
                 newRules.Stage = rules.Stage;
+                newRules.ChooseMode = rules.ChooseMode;
                 newRules.RandomDisabledStages = rules.RandomDisabledStages;
 
                 rules = newRules;

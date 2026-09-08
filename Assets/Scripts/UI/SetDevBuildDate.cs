@@ -1,5 +1,5 @@
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 namespace NSMB.UI {
     public class SetDevBuildDate : MonoBehaviour {

@@ -59,12 +59,10 @@ namespace NSMB.UI.Game.Scoreboard {
 
         public void OnEnable() {
             Settings.OnColorblindModeChanged += OnColorblindModeChanged;
-            Settings.OnCondensedScoreboardChanged += OnCondensedScoreboardChanged;
         }
 
         public void OnDisable() {
             Settings.OnColorblindModeChanged -= OnColorblindModeChanged;
-            Settings.OnCondensedScoreboardChanged -= OnCondensedScoreboardChanged;
         }
 
         public void Update() {
@@ -95,9 +93,6 @@ namespace NSMB.UI.Game.Scoreboard {
             backgroundColor.a = 0.6f;
             background.color = backgroundColor;
             
-            nameLayoutElement.flexibleWidth = Settings.Instance.GeneralCondensedScoreboard ? 0 : 1;
-            nameLayoutElement.gameObject.SetActive(!Settings.Instance.GeneralCondensedScoreboard || !Settings.Instance.GraphicsColorblind);
-
             if (Settings.Instance.GraphicsColorblind) {
                 if (f.Global->Rules.TeamsEnabled) {
                     var teams = f.Context.GetAllAssets<TeamAsset>();
@@ -209,10 +204,6 @@ namespace NSMB.UI.Game.Scoreboard {
         }
 
         private void OnColorblindModeChanged() {
-            UpdateEntry(QuantumRunner.DefaultGame.Frames.Predicted);
-        }
-        
-        private void OnCondensedScoreboardChanged() {
             UpdateEntry(QuantumRunner.DefaultGame.Frames.Predicted);
         }
     }

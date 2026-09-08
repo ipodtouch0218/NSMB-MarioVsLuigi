@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Photon.Deterministic;
+﻿using Photon.Deterministic;
+using System.Collections.Generic;
 
 namespace Quantum {
     public static partial class DeterministicCommandSetup {

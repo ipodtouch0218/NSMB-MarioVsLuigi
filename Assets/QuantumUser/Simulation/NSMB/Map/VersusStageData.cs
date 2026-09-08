@@ -94,7 +94,10 @@ public unsafe class VersusStageData : AssetObject, ISoundOverrideProvider {
     }
     
     public StageTileInstance GetTileRelative(Frame f, IntVector2 tile) {
-        tile.X = QuantumUtils.Modulo(tile.X, TileDimensions.X);
+        if (IsWrappingLevel) {
+            tile.X = QuantumUtils.Modulo(tile.X, TileDimensions.X);
+        }
+
         if (tile.Y < 0 || tile.Y >= TileDimensions.Y) {
             return default;
         }

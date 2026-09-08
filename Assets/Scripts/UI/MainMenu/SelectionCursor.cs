@@ -16,6 +16,7 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private Color minOpacity;
         [SerializeField] private float maxMovementDistance = 100;
         [SerializeField] private bool quickSnap = true;
+        [SerializeField] private EventSystem eventSystem;
 
         //---Private Variables
         private GameObject old;
@@ -23,14 +24,19 @@ namespace NSMB.UI.MainMenu {
         private Vector2 sizeVelocity;
         private Vector3 positionVelocity;
         private float fadeValue;
+        private LayerMask disabledLayers;
 
         public void OnValidate() {
             this.SetIfNull(ref rectTransform);
             this.SetIfNull(ref image);
         }
 
+        public void Start() {
+            disabledLayers = LayerMask.GetMask("UINoCursor", "Default");
+        }
+
         public void Update() {
-            GameObject current = EventSystem.current.currentSelectedGameObject;
+            GameObject current = eventSystem.currentSelectedGameObject;
             bool newObject = false;
             if (current != old) {
                 fadeValue = 2f;
@@ -49,8 +55,7 @@ namespace NSMB.UI.MainMenu {
 
             if (!current
                 || !current.activeInHierarchy
-                || current.layer == LayerMask.NameToLayer("UINoCursor")
-                || current.layer == LayerMask.NameToLayer("Default")
+                || ((1 << current.layer) & disabledLayers) != 0
                 || (current.TryGetComponent(out Image currentImage) && currentImage.color.r == 0 && currentImage.color.a == 0)) {
                 image.enabled = false;
                 hidden = true;

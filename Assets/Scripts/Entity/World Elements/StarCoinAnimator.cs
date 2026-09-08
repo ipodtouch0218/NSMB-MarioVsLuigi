@@ -17,7 +17,7 @@ namespace NSMB.Entities.World {
         [SerializeField] private Animator animator;
         [SerializeField] private AudioSource sfx;
         [SerializeField] private MeshRenderer mRenderer;
-        [SerializeField] private ParticleSystem particles;
+        [SerializeField] private GameObject starCoinCollectPrefab;
         [SerializeField] private Material solidMaterial, transparentMaterial;
 
         //---Private Variables
@@ -86,7 +86,7 @@ namespace NSMB.Entities.World {
             }
 
             animator.SetTrigger("collected");
-            particles.Play();
+            Instantiate(starCoinCollectPrefab, transform.position, Quaternion.identity);
             if (!IsReplayFastForwarding) {
                 sfx.Play();
                 if (!IsMarioLocal(e.Entity)) {

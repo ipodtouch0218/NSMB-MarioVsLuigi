@@ -1,5 +1,5 @@
-using NSMB.Utilities.Extensions;
 using NSMB.Tiles;
+using NSMB.Utilities.Extensions;
 using Quantum;
 using UnityEngine;
 using UnityEngine.Tilemaps;

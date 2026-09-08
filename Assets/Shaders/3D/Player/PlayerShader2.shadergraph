@@ -32,6 +32,9 @@
         },
         {
             "m_Id": "2ddff030f303497a8b18307dd9a14a39"
+        },
+        {
+            "m_Id": "2ab7c4e031a4403090170a8f3d523a2a"
         }
     ],
     "m_Keywords": [],
@@ -777,7 +780,7 @@
     "m_ObjectId": "17751287c29f4fa9980522129d3328a8",
     "m_Title": "Overalls",
     "m_Position": {
-        "x": -1244.0,
+        "x": -1243.9998779296875,
         "y": -2145.0
     }
 }
@@ -947,6 +950,34 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Internal.BooleanShaderProperty",
+    "m_ObjectId": "2ab7c4e031a4403090170a8f3d523a2a",
+    "m_Guid": {
+        "m_GuidSerialized": "46329116-2ae6-4c77-8bf6-ddc7ef616311"
+    },
+    "promotedFromAssetID": "",
+    "promotedFromCategoryName": "",
+    "promotedOrdering": -1,
+    "m_Name": "StarmanUsesWhiteCustomColors",
+    "m_DefaultRefNameVersion": 1,
+    "m_RefNameGeneratedByDisplayName": "StarmanUsesWhiteCustomColors",
+    "m_DefaultReferenceName": "_StarmanUsesWhiteCustomColors",
+    "m_OverrideReferenceName": "",
+    "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
+    "m_DismissedVersion": 0,
+    "m_Precision": 0,
+    "overrideHLSLDeclaration": false,
+    "hlslDeclarationOverride": 0,
+    "m_Hidden": false,
+    "m_PerRendererData": false,
+    "m_customAttributes": [],
+    "m_Value": true
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Vector4MaterialSlot",
     "m_ObjectId": "2ad8240b44744046a8ec10594209075a",
     "m_Id": 1,
@@ -1006,6 +1037,9 @@
         },
         {
             "m_Id": "2ddff030f303497a8b18307dd9a14a39"
+        },
+        {
+            "m_Id": "2ab7c4e031a4403090170a8f3d523a2a"
         },
         {
             "m_Id": "696e891cb32e4fc88cb187900a0cf59e"
@@ -3115,7 +3149,7 @@
     "m_ObjectId": "a58929416252421d867488bb228ed99e",
     "m_Title": "Cap",
     "m_Position": {
-        "x": -367.99993896484377,
+        "x": -368.0000305175781,
         "y": -2145.0
     }
 }
@@ -3194,7 +3228,7 @@
     "m_ObjectId": "ab2eed6b8c52469196bbfccd3239e277",
     "m_Title": "Base",
     "m_Position": {
-        "x": -1647.0,
+        "x": -1646.9998779296875,
         "y": -2145.0
     }
 }

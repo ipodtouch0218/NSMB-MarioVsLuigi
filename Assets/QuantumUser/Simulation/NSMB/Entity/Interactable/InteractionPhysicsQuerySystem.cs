@@ -45,23 +45,20 @@ namespace Quantum {
             var shape = filter.Collider->Shape;
 
             Transform2D transformCopy = *filter.Transform;
-            /*
-            if (f.Unsafe.TryGetPointer(filter.Entity, out PhysicsObject* physicsObject)) {
-                transformCopy.Position += physicsObject->Velocity * f.DeltaTime;
-            }
-            */
             
             // Normal query
             interactable->OverlapQueryRef = f.Physics2D.AddOverlapShapeQuery(transformCopy, shape);
 
             // Wrapping queries
+            FP tolerance = 1;
+
             if (stage.IsWrappingLevel) {
                 FP center = transformCopy.Position.X + shape.Centroid.X;
-                if (center - shape.Box.Extents.X <= stage.StageWorldMin.X) {
+                if (center - shape.Box.Extents.X - tolerance <= stage.StageWorldMin.X) {
                     // Left edge
                     transformCopy.Position.X += stage.TileDimensions.X * FP._0_50;
                     interactable->OverlapLevelSeamQueryRef = f.Physics2D.AddOverlapShapeQuery(transformCopy, shape);
-                } else if (center + shape.Box.Extents.X >= stage.StageWorldMax.X) {
+                } else if (center + shape.Box.Extents.X + tolerance >= stage.StageWorldMax.X) {
                     // Right edge
                     transformCopy.Position.X -= stage.TileDimensions.X * FP._0_50;
                     interactable->OverlapLevelSeamQueryRef = f.Physics2D.AddOverlapShapeQuery(transformCopy, shape);

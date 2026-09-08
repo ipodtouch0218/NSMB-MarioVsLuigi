@@ -1,4 +1,3 @@
-using NSMB.Networking;
 using NSMB.Utilities.Extensions;
 using Quantum;
 using System;

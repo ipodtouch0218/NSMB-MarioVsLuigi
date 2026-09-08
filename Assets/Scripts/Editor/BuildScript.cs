@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEngine;
 using UnityEditor;
-using UnityEditor.Build.Reporting;
 using UnityEditor.Build;
+using UnityEditor.Build.Reporting;
+using UnityEngine;
 
 public class BuildScript : EditorWindow {
     private const string path = "Builds";

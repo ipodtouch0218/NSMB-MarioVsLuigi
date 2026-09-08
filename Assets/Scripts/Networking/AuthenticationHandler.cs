@@ -1,11 +1,11 @@
+using Newtonsoft.Json;
 using NSMB.Utilities;
 using Photon.Realtime;
-using UnityEngine;
-using UnityEngine.Networking;
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using UnityEngine;
+using UnityEngine.Networking;
 
 namespace NSMB.Networking {
     public class AuthenticationHandler {
@@ -42,6 +42,8 @@ namespace NSMB.Networking {
             webRequest.disposeUploadHandlerOnDispose = true;
             webRequest.timeout = 10;
 
+            string redactedUrl = string.IsNullOrEmpty(token) ? requestUrl : requestUrl.Replace(token, "[REDACTED]");
+            Debug.Log($"[Authentication] Sending authentication init request to {redactedUrl}");
             await webRequest.SendWebRequest();
 
             string result = webRequest.downloadHandler.text.Trim();
@@ -52,12 +54,15 @@ namespace NSMB.Networking {
                 result = result[..^1];
             }
 
-            if (webRequest.responseCode >= 500) {
+            if (webRequest.result != UnityWebRequest.Result.Success || webRequest.responseCode >= 500) {
                 // Auth server down?
+                Debug.LogError($"[Authentication] Authentication init request failed with error: {webRequest.error} | response code: {webRequest.responseCode} | response: {result}");
                 NetworkHandler.ThrowError("ui.error.authentication", false);
                 IsAuthenticating = false;
                 return null;
             }
+
+            Debug.Log($"[Authentication] Received authentication init response with code {webRequest.responseCode} and body: {webRequest.downloadHandler.text}");
 
             if (webRequest.responseCode >= 300) {
                 try {

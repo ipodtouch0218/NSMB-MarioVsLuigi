@@ -1,6 +1,6 @@
-using UnityEngine;
-using TMPro;
 using Quantum;
+using TMPro;
+using UnityEngine;
 
 namespace NSMB.UI.Loading {
 

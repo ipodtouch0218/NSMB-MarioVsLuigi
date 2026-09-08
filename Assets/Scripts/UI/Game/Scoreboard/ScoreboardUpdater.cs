@@ -7,6 +7,7 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace NSMB.UI.Game.Scoreboard {
     public class ScoreboardUpdater : MonoBehaviour {
@@ -19,6 +20,7 @@ namespace NSMB.UI.Game.Scoreboard {
         [SerializeField] private PlayerElements playerElements;
         [SerializeField] private ScoreboardEntry entryTemplate;
         [SerializeField] private GameObject teamHeader;
+        [SerializeField] private LayoutElement repositioner;
         [SerializeField] private TMP_Text spectatorText, teamHeaderText;
         [SerializeField] private Animator animator;
 
@@ -38,11 +40,14 @@ namespace NSMB.UI.Game.Scoreboard {
         public void OnEnable() {
             Settings.Controls.UI.Scoreboard.performed += OnToggleScoreboard;
             Settings.OnColorblindModeChanged += OnColorblindModeChanged;
+            Settings.OnCondensedScoreboardChanged += OnCondensedScoreboardChanged;
+            OnCondensedScoreboardChanged();
         }
 
         public void OnDisable() {
             Settings.Controls.UI.Scoreboard.performed -= OnToggleScoreboard;
             Settings.OnColorblindModeChanged -= OnColorblindModeChanged;
+            Settings.OnCondensedScoreboardChanged -= OnCondensedScoreboardChanged;
         }
 
         public unsafe void Start() {
@@ -160,13 +165,21 @@ namespace NSMB.UI.Game.Scoreboard {
                     continue;
                 }
 
-                int objectiveCount = teamObjectiveCounts[i];
-                if (objectiveCount < 0) {
-                    objectiveCount = 0;
-                }
+                int objectiveCount = Mathf.Max(0, teamObjectiveCounts[i]);
+                
                 TeamAsset team = teams[i];
-                stringBuilder.Append(Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal);
-                stringBuilder.Append(Utils.GetSymbolString("x" + objectiveCount));
+                if (Settings.Instance.GeneralCondensedScoreboard) {
+                    stringBuilder.Append("<color=#").Append(Utils.ColorToHex(team.color)).Append(">");
+                    if (Settings.Instance.GraphicsColorblind) {
+                        stringBuilder.Append(team.textSpriteColorblind);
+                    }
+                } else {
+                    stringBuilder.Append(Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal).Append("<sprite name=hudnumber_x>");
+                }
+                stringBuilder.Append(Utils.GetSymbolString(objectiveCount.ToString()));
+                if (Settings.Instance.GeneralCondensedScoreboard) {
+                    stringBuilder.Append(" ");
+                }
             }
 
             teamHeaderText.SetText(stringBuilder);
@@ -273,6 +286,11 @@ namespace NSMB.UI.Game.Scoreboard {
         }
 
         private void OnColorblindModeChanged() {
+            UpdateTeamHeader(QuantumRunner.DefaultGame.Frames.Predicted);
+        }
+
+        private void OnCondensedScoreboardChanged() {
+            repositioner.preferredWidth = Settings.Instance.GeneralCondensedScoreboard ? 130 : 238;
             UpdateTeamHeader(QuantumRunner.DefaultGame.Frames.Predicted);
         }
 

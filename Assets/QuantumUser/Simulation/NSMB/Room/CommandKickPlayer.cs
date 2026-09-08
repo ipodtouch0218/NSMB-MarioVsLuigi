@@ -11,7 +11,7 @@ namespace Quantum {
 
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
             if (f.Global->GameState != GameState.PreGameRoom
-                || !playerData->IsRoomHost
+                || !playerData->IsRoomHost(f)
                 || sender == Target
                 || !f.PlayerIsConnected(Target)) {
                 // Can't kick

@@ -1,8 +1,8 @@
+using Quantum;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using TMPro;
-using Quantum;
 using Button = UnityEngine.UI.Button;
 
 namespace NSMB.UI.MainMenu.Submenus.InRoom {

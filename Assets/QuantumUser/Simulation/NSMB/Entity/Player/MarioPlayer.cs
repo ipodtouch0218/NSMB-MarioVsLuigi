@@ -1,5 +1,4 @@
 using Photon.Deterministic;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Quantum {
@@ -115,6 +114,21 @@ namespace Quantum {
             return true;
         }
 
+        public readonly bool IsWalkingOnWater(Frame f, EntityRef entity) {
+            if (CurrentPowerupState == PowerupState.MiniMushroom 
+                && f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
+                && physicsObject->IsTouchingGround) {
+
+                var contacts = f.ResolveList(physicsObject->Contacts);
+                foreach (var contact in contacts) {
+                    if (f.Has<Liquid>(contact.Entity)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         public readonly byte? GetTeam(Frame f) {
             var data = QuantumUtils.GetPlayerData(f, PlayerRef);
             if (data == null) {
@@ -122,6 +136,28 @@ namespace Quantum {
             } else {
                 return (byte) (data->RealTeam % Constants.MaxPlayers);
             }
+        }
+
+        public readonly bool CheckTeamAttack(Frame f, EntityRef attacker, out bool dropObjectives) {
+            dropObjectives = true;
+
+            // Always, if team attack == Full
+            if (f.Global->Rules.TeamAttack == TeamAttackOptions.Full) {
+                return true;
+            }
+
+            // True if attacker Mario is on different team
+            if (f.Unsafe.TryGetPointer(attacker, out MarioPlayer* attackerMario)
+                && GetTeam(f) == attackerMario->GetTeam(f)) {
+                // Same team
+                dropObjectives = false;
+
+                // Allow hit if team attack is KnockbackOnly
+                return f.Global->Rules.TeamAttack == TeamAttackOptions.KnockbackOnly;
+            }
+
+            // Fallback to true
+            return true;
         }
 
         public readonly FPVector2 GetHeldItemOffset(Frame f, EntityRef marioEntity) {
@@ -323,7 +359,8 @@ namespace Quantum {
             ForceJumpTimer = 0;
             LastAttacker = EntityRef.None;
             TauntFrames = 0;
-            
+            DamageInvincibilityFrames = 0;
+
             if (f.Unsafe.TryGetPointer(HeldEntity, out Holdable* holdable)) {
                 holdable->DropWithoutThrowing(f, HeldEntity);
             }
@@ -419,7 +456,7 @@ namespace Quantum {
             }
 
             FPVector2 spawnpoint = stage.GetWorldSpawnpointForPlayer(SpawnpointIndex, f.Global->TotalMarios);
-            transform->Position = spawnpoint;
+            transform->Teleport(f, spawnpoint);
             f.Unsafe.GetPointer<CameraController>(entity)->Recenter(stage, spawnpoint);
             
             IsDead = true;
@@ -560,6 +597,7 @@ namespace Quantum {
             KnockForwards = FacingRight != fromRight;
             IsInShell = false;
             IsGroundpounding = false;
+            GroundpoundStartFrames = 0;
             IsSpinnerFlying = false;
             IsPropellerFlying = false;
             PropellerLaunchFrames = 0;
@@ -567,6 +605,8 @@ namespace Quantum {
             IsSliding = false;
             IsDrilling = false;
             WallslideLeft = WallslideRight = false;
+            PreviousJumpState = JumpState.None; 
+            JumpState = JumpState.None;
 
             if (f.Unsafe.TryGetPointer(attacker, out Projectile* projectile)) {
                 attacker = projectile->Owner;

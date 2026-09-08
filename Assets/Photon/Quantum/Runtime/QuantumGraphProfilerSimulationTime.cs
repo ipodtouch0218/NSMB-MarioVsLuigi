@@ -1,4 +1,5 @@
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   /// <summary>
   /// A Quantum graph profiler that shows the simulation time.
   /// </summary>
@@ -34,4 +35,5 @@ namespace Quantum.Profiling {
       Graph.SetThresholds(frameMs * 0.25f, frameMs * 0.375f, frameMs * 0.5f);
     }
   }
+#endif
 }

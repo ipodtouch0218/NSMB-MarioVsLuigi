@@ -1213,7 +1213,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: animated-blocks_0
+      name: animation_44
       rect:
         serializedVersion: 2
         x: 0
@@ -1221,7 +1221,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -1235,7 +1235,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: animated-blocks_1
+      name: animation_45
       rect:
         serializedVersion: 2
         x: 16
@@ -1243,7 +1243,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -1257,7 +1257,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: animated-blocks_2
+      name: animation_46
       rect:
         serializedVersion: 2
         x: 32
@@ -1265,7 +1265,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -1279,7 +1279,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: animated-blocks_3
+      name: animation-47
       rect:
         serializedVersion: 2
         x: 48
@@ -1287,7 +1287,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -1314,10 +1314,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      animated-blocks_0: -290171741
-      animated-blocks_1: -110508365
-      animated-blocks_2: -1287987863
-      animated-blocks_3: -1739663378
+      animation-47: -1739663378
       animation_0: -8917260427315313510
       animation_1: -8151411539534625427
       animation_10: -2074995507315294404
@@ -1357,6 +1354,9 @@ TextureImporter:
       animation_41: 579779561
       animation_42: -667571031
       animation_43: -1028925186
+      animation_44: -290171741
+      animation_45: -110508365
+      animation_46: -1287987863
       animation_5: 3442106473843032738
       animation_6: -6030831360514867012
       animation_7: 3684821612489964542

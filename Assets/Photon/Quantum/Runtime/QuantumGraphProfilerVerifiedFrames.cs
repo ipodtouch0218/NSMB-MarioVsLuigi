@@ -1,4 +1,5 @@
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   /// <summary>
   /// A Quantum graph profiler that shows how many verified frames have been simulated during the last update.
   /// </summary>
@@ -21,4 +22,5 @@ namespace Quantum.Profiling {
       AddValue(verifiedFramesSimulated);
     }
   }
+#endif
 }

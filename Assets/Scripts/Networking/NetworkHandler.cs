@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -25,11 +26,12 @@ namespace NSMB.Networking {
         public static event Action<ClientState, ClientState> StateChanged;
         public static event Action<string, bool> OnError;
 
-        //---Constants
+        //---Static Variables
         public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
         public static readonly int RoomIdLength = 4;
+        private static Dictionary<short, string> RealtimeErrorCodeNames;
 
-        //---Static Variables
+        //---Static Properties
         public static RealtimeClient Client => Instance ? Instance.realtimeClient : null;
         public static long? Ping => Client?.RealtimePeer.Stats.RoundtripTime;
         public static QuantumRunner Runner { get; set; }
@@ -46,6 +48,10 @@ namespace NSMB.Networking {
         private Coroutine pingUpdateCoroutine;
 
         public void Awake() {
+            RealtimeErrorCodeNames ??= typeof(ErrorCode).GetFields(BindingFlags.Public | BindingFlags.Static)
+                .Where(f => f.IsLiteral && !f.IsInitOnly && f.FieldType == typeof(int))
+                .ToDictionary(f => (short) (int) f.GetRawConstantValue(), f => f.Name);
+
             Set(this);
             StateChanged += OnClientStateChanged;
 
@@ -59,6 +65,7 @@ namespace NSMB.Networking {
             QuantumCallback.Subscribe<CallbackPluginDisconnect>(this, OnPluginDisconnect);
             QuantumCallback.Subscribe<CallbackChecksumError>(this, OnChecksumError);
             QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
+            QuantumCallback.Subscribe<CallbackLocalPlayerAddFailed>(this, OnLocalPlayerAddFailed);
             QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
@@ -117,6 +124,7 @@ namespace NSMB.Networking {
 
         public static async Task<bool> ConnectToRegion(string region) {
             if (Client == null) {
+                Debug.LogWarning("[Network] RealtimeClient is null, bailing");
                 return false;
             }
             if (Runner != null && Runner.IsRunning) {
@@ -129,10 +137,12 @@ namespace NSMB.Networking {
             Client.AuthValues = await AuthenticationHandler.Authenticate();
 
             if (Client == null) {
+                Debug.LogWarning("[Network] Client was null after authentication (race condition?), bailing");
                 return false;
             }
 
             if (Client.AuthValues == null) {
+                Debug.LogWarning("[Network] Authentication failed, bailing");
                 StateChanged?.Invoke(ClientState.ConnectingToMasterServer, ClientState.Disconnected);
                 return false;
             }
@@ -144,7 +154,7 @@ namespace NSMB.Networking {
             if (region == null) {
                 Debug.Log("[Network] Connecting to the best available region");
             } else {
-                Debug.Log($"[Network] Connecting to region {region}");
+                Debug.Log($"[Network] Connecting to region '{region}'");
             }
 
             try {
@@ -160,22 +170,34 @@ namespace NSMB.Networking {
                     AuthMode = AuthModeOption.Auth,
                     FixedRegion = region,
                 });
-                await Client.JoinLobbyAsync(TypedLobby.Default);
-                Instance.lastRegion = Client.CurrentRegion;
+                short response = await Client.JoinLobbyAsync(TypedLobby.Default);
+                if (response == 0) {
+                    Debug.Log($"[Network] Successfully connected to region '{Client.CurrentRegion}'");
+                    Instance.lastRegion = Client.CurrentRegion;
+                } else {
+                    string responseAsString = RealtimeErrorCodeNames.GetValueOrDefault(response, "Unknown Error");
+                    Debug.LogError($"[Network] Failed to join lobby in region '{region ?? "best"}' with error code {response} ({responseAsString})");
+                    return false;
+                }
+
                 return true;
-            } catch {
+            } catch (Exception e) {
+                Debug.Log($"[Network] Failed to connect with thrown exception: {e.Message}");
+                Debug.LogError(e);
                 return false;
             }
         }
 
-        public static async Task ConnectToRoomsRegion(string roomId) {
+        public static async Task<bool> ConnectToRoomsRegion(string roomId) {
             int regionIndex = RoomIdValidChars.IndexOf(roomId.ToUpper()[0]);
             string targetRegion = Regions.ElementAt(regionIndex).Code;
 
-            if (Client.CurrentRegion != targetRegion) {
-                // await Client.DisconnectAsync();
-                await ConnectToRegion(targetRegion);
+            if (Client.State is ClientState.ConnectedToMasterServer or ClientState.JoinedLobby
+                && Client.CurrentRegion.Equals(targetRegion, StringComparison.InvariantCultureIgnoreCase)) {
+                return true;
             }
+
+            return await ConnectToRegion(targetRegion);
         }
 
         public static async Task<short> CreateRoom(EnterRoomArgs args) {
@@ -200,7 +222,15 @@ namespace NSMB.Networking {
             args.RoomOptions.CustomRoomPropertiesForLobby = DefaultRoomProperties.Keys.ToArray();
 
             Debug.Log($"[Network] Creating a game in {Region} with the ID {idBuilder}");
-            return await Client.CreateAndJoinRoomAsync(args, false);
+            short response = await Client.CreateAndJoinRoomAsync(args, false);
+
+            if (response == 0) {
+                Debug.Log($"[Network] Successfully created a game with ID {idBuilder}");
+            } else {
+                string responseAsString = RealtimeErrorCodeNames.GetValueOrDefault(response, "Unknown Error");
+                Debug.LogWarning($"[Network] Failed to create a game with ID {idBuilder} with error code {response} ({responseAsString})");
+            }
+            return response;
         }
 
         public static bool IsValidRoomId(string id, out int regionIndex) {
@@ -215,10 +245,13 @@ namespace NSMB.Networking {
 
         public static async Task<short> JoinRoom(EnterRoomArgs args) {
             // Change to region if we need to
-            args.RoomName = args.RoomName.ToUpper();
-            await ConnectToRoomsRegion(args.RoomName);
-
             Debug.Log($"[Network] Attempting to join a game with the ID {args.RoomName}");
+
+            args.RoomName = args.RoomName.ToUpper();
+            if (!await ConnectToRoomsRegion(args.RoomName)) {
+                Debug.Log($"[Network] Failed to change regions- abandoning joining game with ID {args.RoomName}");
+            }
+
             return await Client.JoinRoomAsync(args, false);
         }
 
@@ -248,17 +281,29 @@ namespace NSMB.Networking {
                 AddonsEnabled = GlobalController.Instance.addonManager.LoadedAddons.Count > 0
             };
 
+            string stageGuid;
+            if (f.Global->GameState == GameState.PreGameRoom) {
+                if (f.Global->Rules.ChooseMode == StageChooseMode.Random) {
+                    stageGuid = "random";
+                } else {
+                    stageGuid = f.Global->Rules.Stage.Id.ToString();
+                }
+            } else {
+                stageGuid = f.MapAssetRef.Id.ToString();
+            }
+
             RuntimePlayer hostData = f.GetPlayerData(host);
             Client.CurrentRoom.SetCustomProperties(new PhotonHashtable {
                 [Enums.NetRoomProperties.IntProperties] = (int) intProperties,
                 [Enums.NetRoomProperties.BoolProperties] = (int) boolProperties,
                 [Enums.NetRoomProperties.HostName] = hostData?.PlayerNickname ?? "noname",
-                [Enums.NetRoomProperties.StageGuid] = rules.Stage.Id.ToString(),
+                [Enums.NetRoomProperties.StageGuid] = stageGuid,
                 [Enums.NetRoomProperties.GamemodeGuid] = rules.Gamemode.Id.ToString(),
             });
         }
 
         public async Task StartQuantum() {
+            Debug.Log("[Network] Starting Quantum Runner");
             var sessionRunnerArguments = new SessionRunner.Arguments {
                 GameParameters = QuantumRunnerUnityFactory.CreateGameParameters,
                 ClientId = Client.UserId,
@@ -276,6 +321,7 @@ namespace NSMB.Networking {
 
             try {
                 Runner = await QuantumRunner.StartGameAsync(sessionRunnerArguments);
+                Debug.Log("[Network] Quantum Runner started successfully, sending AddPlayer request.");
                 Runner.Game.AddPlayer(new RuntimePlayer {
                     PlayerNickname = Settings.Instance.generalNickname ?? "noname",
                     UserId = Client.UserId,
@@ -283,7 +329,9 @@ namespace NSMB.Networking {
                     Character = Settings.Instance.generalCharacter,
                     Palette = Settings.Instance.generalPalette,
                 });
-            } catch {
+            } catch (Exception e) {
+                Debug.Log($"[Network] Failed to start Quantum Runner with thrown exception: {e.Message}. Qutiting game.");
+                Debug.LogError(e);
                 ThrowError("ui.error.corrupt", false);
             }
         }
@@ -348,11 +396,17 @@ namespace NSMB.Networking {
             foreach (var ban in bans) {
                 if (ban.MatchesPlayer(player)) {
                     // We're banned...
-                    QuantumRunner.Default.Shutdown(ShutdownCause.NetworkError);
+                    QuantumRunner.Default.Shutdown(ShutdownCause.Ok);
                     ThrowError("ui.error.join.banned", true);
                     return;
                 }
             }
+
+            Debug.Log($"[Network] AddPlayer confirmed on Frame {e.Frame.Number}, {e.Player} with slot {e.PlayerSlot}");
+        }
+
+        private void OnLocalPlayerAddFailed(CallbackLocalPlayerAddFailed e) {
+            Debug.LogWarning($"[Network] AddPlayer failed for slot {e.PlayerSlot}, error: {e.Message}");
         }
 
         private void OnChecksumError(CallbackChecksumError e) {
@@ -461,6 +515,9 @@ namespace NSMB.Networking {
 
             if (Runner) {
                 Runner.Shutdown(ShutdownCause.NetworkError);
+            }
+            if (RealtimeDisconnectCauses.TryGetValue(cause, out string key)) {
+                ThrowError(key, true);
             }
         }
 

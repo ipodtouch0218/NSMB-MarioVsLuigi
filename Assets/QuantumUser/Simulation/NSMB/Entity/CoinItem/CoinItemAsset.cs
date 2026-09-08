@@ -1,6 +1,6 @@
-using System;
 using Photon.Deterministic;
 using Quantum;
+using System;
 
 public unsafe class CoinItemAsset : AssetObject {
 

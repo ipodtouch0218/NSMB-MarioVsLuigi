@@ -204,7 +204,7 @@ namespace Photon.Realtime
         /// </summary>
         /// <remarks>
         /// This callback has two preconditions:
-        /// EnableLobbyStatistics must be set to true, before this client connects.
+        /// AppSettings.EnableLobbyStatistics must be set to true, before this client connects.
         /// And the client has to be connected to the Master Server, which is providing the info about lobbies.
         /// </remarks>
         void OnLobbyStatisticsUpdate(List<TypedLobbyInfo> lobbyStatistics);

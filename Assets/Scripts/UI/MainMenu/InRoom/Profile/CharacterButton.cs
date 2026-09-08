@@ -1,7 +1,7 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using TMPro;
 
 namespace NSMB.UI.MainMenu.Submenus.InRoom {
     public class CharacterButton : MonoBehaviour, ISelectHandler {

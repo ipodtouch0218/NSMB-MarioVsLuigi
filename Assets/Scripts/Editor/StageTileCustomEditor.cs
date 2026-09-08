@@ -1,7 +1,3 @@
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.Tilemaps;
-
 /*
 [CustomEditor(typeof(StageTile), editorForChildClasses: true)]
 public class StageTileCustomEditor : Editor {

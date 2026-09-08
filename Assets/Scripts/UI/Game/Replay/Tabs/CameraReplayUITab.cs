@@ -1,6 +1,5 @@
 using NSMB.Cameras;
 using NSMB.UI.MainMenu.Submenus.Prompts;
-using NSMB.Utilities.Extensions;
 using Quantum;
 using TMPro;
 using UnityEngine;

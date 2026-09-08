@@ -1,7 +1,7 @@
 using NSMB.Chat;
-using NSMB.Utilities.Extensions;
 using NSMB.UI.Translation;
 using NSMB.Utilities;
+using NSMB.Utilities.Extensions;
 using Quantum;
 using System;
 using TMPro;
@@ -59,8 +59,16 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
 
         private void OnLanguageChanged(TranslationManager tm) {
+#if UNITY_EDITOR
+            // I hate that we have to do this.
+            if (!this) {
+                return;
+            }
+#endif
             chatText.text = tm.GetTranslationWithReplacements(data.message, data.replacements);
             chatText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
+            chatText.ForceMeshUpdate();
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) transform);
         }
     }
 }

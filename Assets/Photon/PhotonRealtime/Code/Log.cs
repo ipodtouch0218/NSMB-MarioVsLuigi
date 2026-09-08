@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------------
-// <copyright file="SupportLogger.cs" company="Exit Games GmbH">
+// <copyright file="Log.cs" company="Exit Games GmbH">
 // Photon Realtime API - Copyright (C) 2022 Exit Games GmbH
 // </copyright>
 // <summary>
@@ -19,6 +19,8 @@ namespace Photon.Realtime
     using System.Text;
     using Stopwatch = System.Diagnostics.Stopwatch;
     using Conditional = System.Diagnostics.ConditionalAttribute;
+    using System.Diagnostics.CodeAnalysis;
+
     using Photon.Client;
 
     #if SUPPORTED_UNITY
@@ -67,21 +69,43 @@ namespace Photon.Realtime
         private static Stopwatch sw;
 
 
+        #if SUPPORTED_UNITY
+        /// <summary>Initialize the logging also without Domain Reload.</summary>
+        [RuntimeInitializeOnLoadMethod]
+        private static void Init()
+        {
+            LogPrefix = PrefixOptions.None;
+
+            sw = new Stopwatch();
+            sw.Restart();
+
+            onError = UnityEngine.Debug.LogError;
+            onWarn = UnityEngine.Debug.LogWarning;
+            onInfo = UnityEngine.Debug.Log;
+            onDebug = UnityEngine.Debug.Log;
+            onException = null;
+        }
+        #else
         /// <summary>Static constructor will initialize the logging actions.</summary>
         static Log()
         {
             Init(LogOutputOption.Auto);
         }
+        #endif
 
+        
         /// <summary>Initializes the logging to selected output stream.</summary>
         /// <remarks>Auto becomes UnityDebug if this is a Unity build. Defaults to: Console.</remarks>
         /// <param name="logOutput"></param>
         public static void Init(LogOutputOption logOutput)
         {
+            LogPrefix = PrefixOptions.None;
+
             onError = null;
             onWarn = null;
             onInfo = null;
             onDebug = null;
+            onException = null;
             
             sw = new Stopwatch();
             sw.Restart();
@@ -142,41 +166,52 @@ namespace Photon.Realtime
         }
 
 
+        [SuppressMessage("Domain reload", "UDR0001:Domain Reload Analyzer", Justification = "Exists to be re-used. Domain reload not needed.")]
         private static readonly StringBuilder prefixesBuilder = new StringBuilder();
 
+
         /// <summary>Prefixes the message with timestamp, log level and prefix.</summary>
-        static string ApplyPrefixes(string msg, LogLevel lvl = LogLevel.Error, string prefix = null)
+        private static string ApplyPrefixes(string msg, LogLevel lvl = LogLevel.Error, string prefix = null)
         {
             lock (prefixesBuilder)
             {
                 prefixesBuilder.Clear();
                 if (LogPrefix == PrefixOptions.Time || LogPrefix == PrefixOptions.TimeAndLevel)
                 {
-                    //sb.Append($"[{GetFormattedTimestamp()}]");
                     TimeSpan span = sw.Elapsed;
                     if (span.Minutes > 0)
                     {
-                        prefixesBuilder.Append($"[{span.Minutes}:{span.Seconds:D2}.{span.Milliseconds:D3}]");
+                        prefixesBuilder.Append('[')
+                                       .Append(span.Minutes)
+                                       .Append(':')
+                                       .Append(span.Seconds.ToString("D2"))
+                                       .Append('.')
+                                       .Append(span.Milliseconds.ToString("D3"))
+                                       .Append(']');
                     }
                     else
-                        prefixesBuilder.Append($"[{span.Seconds:D2}.{span.Milliseconds:D3}]");
-
+                    {
+                        prefixesBuilder.Append('[')
+                                       .Append(span.Seconds.ToString("D2"))
+                                       .Append('.')
+                                       .Append(span.Milliseconds.ToString("D3"))
+                                       .Append(']');
+                    }
                 }
-
                 if (LogPrefix == PrefixOptions.Level || LogPrefix == PrefixOptions.TimeAndLevel)
                 {
-                    prefixesBuilder.Append($"[{lvl}]");
+                    prefixesBuilder.Append('[')
+                                   .Append(lvl.ToString())
+                                   .Append(']');
                 }
-
                 if (!string.IsNullOrEmpty(prefix))
                 {
-                    prefixesBuilder.Append($"{prefix}: ");
+                    prefixesBuilder.Append(prefix).Append(": ");
                 }
                 else if (prefixesBuilder.Length > 0)
                 {
-                    prefixesBuilder.Append(" ");
+                    prefixesBuilder.Append(' ');
                 }
-
                 prefixesBuilder.Append(msg);
                 return prefixesBuilder.ToString();
             }

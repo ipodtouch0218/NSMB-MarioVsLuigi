@@ -2,6 +2,7 @@ using NSMB.Cameras;
 using NSMB.Particles;
 using NSMB.Quantum;
 using NSMB.Sound;
+using NSMB.UI;
 using NSMB.UI.Game;
 using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
@@ -11,7 +12,6 @@ using Quantum.Profiling;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using NSMB.UI;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Scripting;
@@ -112,6 +112,7 @@ namespace NSMB.Entities.Player {
         [Header("Sound")]
         [SerializeField] private AudioSource sfx;
         [SerializeField] private AudioSource coinSfx;
+        [SerializeField] private AudioSource tauntSfx;
         [SerializeField] private AudioClip normalDrill, propellerDrill;
         [SerializeField] private LoopingSoundPlayer dustPlayer, drillPlayer;
         [SerializeField] private LoopingSoundData wallSlideData, shellSlideData, spinnerDrillData, propellerDrillData;
@@ -227,6 +228,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerLandedWithAnimation>(this, OnMarioPlayerLandedWithAnimation, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventEnemyKicked>(this, OnEnemyKicked, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerTaunted>(this, OnMarioPlayerTaunted, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerTauntCancelled>(this, OnMarioPlayerTauntCancelled, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerUpdatePowerupQueue>(this, OnMarioPlayerUpdatePowerupQueue, FilterOutReplayFastForward);
         }
 
@@ -321,23 +323,13 @@ namespace NSMB.Entities.Player {
             using var profilerScope = HostProfiler.Start("MarioPlayerAnimator.HandleAnimations");
             // Particles
             bool disableParticles = mario->IsDead || freezable->IsFrozen(f) || f.Global->GameState == GameState.Ended;
-
-            bool onWater = false;
-            if (physicsObject->IsTouchingGround && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
-                var contacts = f.ResolveList(physicsObject->Contacts);
-                foreach (var contact in contacts) {
-                    if (f.Has<Liquid>(contact.Entity)) {
-                        onWater = true;
-                        break;
-                    }
-                }
-            }
-
+            bool walkingOnWater = mario->IsWalkingOnWater(f, EntityRef);
+            
             SetParticleEmission(drillParticle, !disableParticles && mario->IsDrilling);
             SetParticleEmission(sparkles, !disableParticles && mario->IsStarmanInvincible);
             SetParticleEmission(iceSkiddingParticle, !disableParticles && physicsObject->IsOnSlipperyGround && ((mario->IsSkidding && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f) || mario->FastTurnaroundFrames > 0));
-            SetParticleEmission(waterSkiddingParticle, !disableParticles && onWater && ((mario->IsSkidding && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f) || mario->FastTurnaroundFrames > 0));
-            SetParticleEmission(waterRunningParticle, !disableParticles && !waterSkiddingParticle.isPlaying && onWater && FPMath.Abs(physicsObject->Velocity.X) > FP._0_10);
+            SetParticleEmission(waterSkiddingParticle, !disableParticles && walkingOnWater && ((mario->IsSkidding && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f) || mario->FastTurnaroundFrames > 0));
+            SetParticleEmission(waterRunningParticle, !disableParticles && !waterSkiddingParticle.isPlaying && walkingOnWater && FPMath.Abs(physicsObject->Velocity.X) > FP._0_10);
             SetParticleEmission(dust, !disableParticles && !iceSkiddingParticle.isPlaying && !waterSkiddingParticle.isPlaying && (mario->IsWallsliding || (physicsObject->IsTouchingGround && ((mario->IsSkidding || (mario->IsCrouching && !physicsObject->IsOnSlipperyGround)) && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f)) || mario->FastTurnaroundFrames > 0 || (((mario->IsSliding && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f) || mario->IsInShell) && physicsObject->IsTouchingGround)) && !f.Exists(mario->CurrentPipe));
             SetParticleEmission(giantParticle, !disableParticles && mario->CurrentPowerupState == PowerupState.MegaMushroom && mario->MegaMushroomStartFrames == 0);
             SetParticleEmission(fireParticle, mario->IsDead && !mario->IsRespawning && mario->FireDeath && !physicsObject->IsFrozen);
@@ -619,7 +611,8 @@ namespace NSMB.Entities.Player {
             // Hit flash
             float remainingDamageInvincibility = mario->DamageInvincibilityFrames / 60f;
 
-            bool modelShouldBeVisible = mario->KnockbackGetupFrames > 0 || mario->MegaMushroomStartFrames > 0;
+            bool modelShouldBeVisible = mario->KnockbackGetupFrames > 0
+                || mario->MegaMushroomStartFrames > 0;
             bool modelShouldBeInvisible = f.Global->GameState < GameState.Playing
                 || mario->IsRespawning
                 || (mario->IsDead && IsBelowDeathplane)
@@ -744,12 +737,15 @@ namespace NSMB.Entities.Player {
             return false;
         }
 
-        public void PlaySound(SoundEffect soundEffect, IList<ISoundOverrideProvider> extraProviders = null, int? variant = null, float volume = 1) {
+        public void PlaySound(SoundEffect soundEffect, IList<ISoundOverrideProvider> extraProviders = null, int? variant = null, float volume = 1, AudioSource src = null) {
             List<ISoundOverrideProvider> providers = new() { character };
             if (extraProviders != null) {
                 providers.AddRange(extraProviders);
             }
-            sfx.PlayOneShot(soundEffect, providers, variant, volume);
+            if (!src) {
+                src = sfx;
+            }
+            src.PlayOneShot(soundEffect, providers, variant, volume);
         }
 
         public GameObject SpawnParticle(GameObject particle, Vector3 worldPos, Quaternion? rot = null) {
@@ -762,7 +758,7 @@ namespace NSMB.Entities.Player {
         [Preserve]
         public void Footstep() {
             Frame f = PredictedFrame;
-            if (IsReplayFastForwarding || !f.Exists(EntityRef)) {
+            if (IsReplayFastForwarding || !f.Exists(EntityRef) || Game.Session.IsDestroyed) {
                 return;
             }
 
@@ -868,7 +864,9 @@ namespace NSMB.Entities.Player {
             }
 
             KnockbackStrength strength = e.Strength;
-            PlaySound((strength is KnockbackStrength.FireballBump or KnockbackStrength.CollisionBump) ? SoundEffect.Player_Sound_Collision_Fireball : SoundEffect.Player_Sound_Collision);
+            if (e.PlayKnockbackSound) {
+                PlaySound((strength is KnockbackStrength.FireballBump or KnockbackStrength.CollisionBump) ? SoundEffect.Player_Sound_Collision_Fireball : SoundEffect.Player_Sound_Collision);
+            }
 
             if (IsMarioLocal(e.Entity)) {
                 float rumbleStrength = strength switch {
@@ -1318,6 +1316,7 @@ namespace NSMB.Entities.Player {
             }
 
             previousPowerupVisuals = null;
+            GlowColor = Utils.GetPlayerColor(f, mario->PlayerRef);
         }
 
         private void OnMarioPlayerLandedWithAnimation(EventMarioPlayerLandedWithAnimation e) {
@@ -1348,7 +1347,15 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            PlaySound(SoundEffect.Player_Voice_Taunt);
+            PlaySound(SoundEffect.Player_Voice_Taunt, src: tauntSfx);
+        }
+
+        private void OnMarioPlayerTauntCancelled(EventMarioPlayerTauntCancelled e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
+
+            tauntSfx.Stop();
         }
 
         private void OnMarioPlayerUpdatePowerupQueue(EventMarioPlayerUpdatePowerupQueue e) {

@@ -22,7 +22,7 @@ namespace NSMB.UI {
         [SerializeField] private Canvas canvas;
 
         public bool FadeBehindUi {
-            set => canvas.sortingOrder = value ? 0 : 31000;
+            set => canvas.sortingOrder = value ? 1 : 31000;
         }
 
         //---Private Variables

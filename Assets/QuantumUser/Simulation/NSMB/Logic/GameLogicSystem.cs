@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using Quantum.Profiling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,6 +40,7 @@ namespace Quantum {
                 }
 #else
                 if (f.GetPlayerCommand(player) is ILobbyCommand lobbyCommand) {
+                    using var profiler = HostProfiler.Start("ILobbyCommand.Execute");
                     var playerData = QuantumUtils.GetPlayerData(f, player, playerDataDictionary);
                     if (playerData == null) {
                         break;
@@ -76,8 +78,8 @@ namespace Quantum {
                                 }
 
                                 // Remove the previous map (if possible)
-                                if (allMaps.Count > 1) {
-                                    allMaps.RemoveAll(map => map == f.Global->PreviousStage);
+                                if (allMaps.Count > 1 && f.TryFindAsset(f.Global->PreviousStage, out Map previousStageMap)) {
+                                    allMaps.Remove(previousStageMap);
                                 }
 
                                 nextStage = allMaps[f.RNG->Next(0, allMaps.Count)];
@@ -100,6 +102,7 @@ namespace Quantum {
                     }
                 }
                 break;
+
             case GameState.WaitingForPlayers:
                 int validPlayers = 0;
                 int loadedPlayers = 0;
@@ -134,6 +137,7 @@ namespace Quantum {
                     f.Events.GameStateChanged(GameState.Starting);
                 }
                 break;
+
             case GameState.Starting:
                 if (QuantumUtils.Decrement(ref f.Global->GameStartFrames)) {
                     // Now playing
@@ -164,7 +168,7 @@ namespace Quantum {
                     f.Events.GameStarted();
                 }
                 break;
-
+            
             case GameState.Playing:
                 if (f.Global->Rules.TimerMinutes > 0 && f.Global->Timer > 0) {
                     if ((f.Global->Timer -= f.DeltaTime) <= 0) {
@@ -213,9 +217,6 @@ namespace Quantum {
                     f.Global->GameState = GameState.PreGameRoom;
                     f.Events.GameStateChanged(GameState.PreGameRoom);
                     f.SystemDisable<StartDisabledSystemGroup>();
-
-                    var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
-                    gamemode.DisableGamemode(f);
                 }
                 break;
             }
@@ -309,11 +310,7 @@ namespace Quantum {
 
             if (playerDatas.Count == 0) {
                 // First player is host
-                newData->IsRoomHost = true;
-                newData->IsReady = false;
-                newData->IsTeamLocked = false;
-                f.Global->Host = player;
-                f.Events.HostChanged(player);
+                newData->SetAsHost(f, true);
             }
 
             foreach ((_, EntityRef otherEntity) in playerDatas) {
@@ -342,7 +339,7 @@ namespace Quantum {
             if (playerDatas.TryGetValue(player, out EntityRef entity)
                 && f.Unsafe.TryGetPointer(entity, out PlayerData* deletedPlayerData)) {
 
-                if (deletedPlayerData->IsRoomHost) {
+                if (deletedPlayerData->IsRoomHost(f)) {
                     // Give the host to the youngest player.
                     PlayerData* youngestPlayer = null;
                     foreach ((_, EntityRef otherEntity) in playerDatas) {
@@ -357,11 +354,7 @@ namespace Quantum {
                     }
 
                     if (youngestPlayer != null) {
-                        youngestPlayer->IsRoomHost = true;
-                        youngestPlayer->IsReady = false;
-                        youngestPlayer->IsTeamLocked = false;
-                        f.Global->Host = youngestPlayer->PlayerRef;
-                        f.Events.HostChanged(youngestPlayer->PlayerRef);
+                        youngestPlayer->SetAsHost(f, true);
                     }
 
                     hostChanged = true;
@@ -447,7 +440,7 @@ namespace Quantum {
                     PlayerRef = data->PlayerRef,
                     Nickname = runtimePlayer.PlayerNickname,
                     NicknameColor = runtimePlayer.NicknameColor,
-                    Character = runtimePlayer.Character,
+                    Character = data->Character,
                     Team = data->RealTeam,
                 };
             }
@@ -483,7 +476,6 @@ namespace Quantum {
             for (int i = 0; i < f.Global->PlayerInfo.Length; i++) {
                 f.Global->PlayerInfo[i] = default;
             }
-            f.Global->UsedStarSpawns.ClearAll();
 
             foreach ((_, var data) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
                 data->IsLoaded = false;
@@ -492,6 +484,8 @@ namespace Quantum {
                 data->VotedToContinue = false;
                 data->RealTeam = 255;
             }
+
+            f.FindAsset(f.Global->Rules.Gamemode).OnReturnToRoom(f);
         }
 
         public void OnRemoved(Frame f, EntityRef entity, MarioPlayer* component) {

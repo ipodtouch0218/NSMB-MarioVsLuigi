@@ -137,6 +137,10 @@ namespace Quantum {
 
             if (projectileAsset.DestroyOnHit) {
                 ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
+            } else {
+                var boo = f.Unsafe.GetPointer<Boo>(booEntity);
+                boo->Kill(f, booEntity, projectileEntity, EnemyKillReason.Special);
+                f.Signals.OnProjectileHitEntity(projectileEntity, booEntity);
             }
         }
 

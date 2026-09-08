@@ -5,11 +5,10 @@ using Quantum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using UnityEditor;
 using AssetObjectQuery = Quantum.AssetObjectQuery;
-using System.Reflection;
 
 [assembly: QuantumMapBakeAssembly]
 namespace NSMB.Quantum { 

@@ -166,7 +166,14 @@ namespace Photon.Realtime
         /// <summary>
         /// Joins the lobby on the Master Server, where you get a list of RoomInfos of currently open rooms. This is an async request triggers an OnOperationResponse() call and the callback OnJoinedLobby().
         /// </summary>
-        /// <param name="lobby">The lobby join to.</param>
+        /// <remarks>
+        /// Joining a lobby is not required for random matchmaking — OpJoinRandomRoom and OpJoinRandomOrCreateRoom
+        /// work without an active lobby. Use this only when you actually need the room list (e.g. for a custom
+        /// server browser).
+        ///
+        /// The room list the server sends is capped, so on busy titles clients will not see every open room.
+        /// </remarks>
+        /// <param name="lobby">The lobby to join. If null, TypedLobby.Default is used.</param>
         /// <returns>If the operation could be sent (has to be connected).</returns>
         public virtual bool OpJoinLobby(TypedLobby lobby = null)
         {
@@ -1049,6 +1056,9 @@ namespace Photon.Realtime
         /// you will have to provide a fitting ticket. Ticket have an internal expiry date time, so they
         /// may become unusable for a rejoin.
         /// </remarks>
+        /// <param name="roomName">Name of the room to rejoin. The same name must have been used when this client originally entered the room.</param>
+        /// <param name="ticket">Optional matchmaking ticket. Required if the original join used a ticket or the server enforces tickets; otherwise leave null.</param>
+        /// <returns>True if the rejoin op was queued. The actual rejoin result arrives via OnJoinedRoom or OnJoinRoomFailed.</returns>
         public bool OpRejoinRoom(string roomName, object ticket = null)
         {
             if (!this.CheckIfOpCanBeSent(OperationCode.JoinGame, this.Server, "RejoinRoom"))

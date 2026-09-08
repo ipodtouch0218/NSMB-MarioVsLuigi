@@ -209,24 +209,24 @@ namespace Quantum {
 
     static string FormatFrame(int frame, bool isStalling) {
       if (isStalling) {
-        return $"<b><color=#FF9794>{frame}</color></b>";
+        return $"<b><color=#FF9794>{frame.ToString()}</color></b>";
       }
-      return $"<b>{frame}</b>";
+      return $"<b>{frame.ToString()}</b>";
     }
 
     static string FormatPing(int ping) {
       if (ping <= 50) {
-        return $"<b><color=#B6FFD3>{ping}</color></b>";
+        return $"<b><color=#B6FFD3>{ping.ToString()}</color></b>";
       } else if (ping <= 100) {
-        return $"<b><color=#F9FFB6>{ping}</color></b>";
+        return $"<b><color=#F9FFB6>{ping.ToString()}</color></b>";
       } else if (ping <= 150) {
-        return $"<b><color=#FFDAB6>{ping}</color></b>";
+        return $"<b><color=#FFDAB6>{ping.ToString()}</color></b>";
       }
 
-      return $"<b><color=#FF9794>{ping}</color></b>";
+      return $"<b><color=#FF9794>{ping.ToString()}</color></b>";
     }
 
-    static string[] BytesPerSecondUnits = { "B/s", "KB/s", "MB/s", "GB/s" };
+    static readonly string[] BytesPerSecondUnits = { "B/s", "KB/s", "MB/s", "GB/s" };
 
     static string FormatBandwidth(double byteCount) {
       if (byteCount <= 0) {
@@ -237,7 +237,7 @@ namespace Quantum {
       var place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
       var num = Math.Round(bytes / Math.Pow(1024, place), 1);
 
-      return $"{(Math.Sign(byteCount) * num):0.0} {BytesPerSecondUnits[Math.Min(place, BytesPerSecondUnits.Length - 1)]}";
+      return $"{(Math.Sign(byteCount) * num).ToString("0.0")} {BytesPerSecondUnits[Math.Min(place, BytesPerSecondUnits.Length - 1)]}";
     }
   }
 }

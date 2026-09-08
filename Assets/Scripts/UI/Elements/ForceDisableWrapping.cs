@@ -1,5 +1,5 @@
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 namespace NSMB.UI.Elements {
     [RequireComponent(typeof(TMP_Text))]

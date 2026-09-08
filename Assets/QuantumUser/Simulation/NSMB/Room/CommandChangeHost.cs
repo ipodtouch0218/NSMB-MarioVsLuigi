@@ -10,7 +10,8 @@ namespace Quantum {
         }
 
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
-            if (f.Global->GameState != GameState.PreGameRoom || !playerData->IsRoomHost) {
+            if (f.Global->GameState != GameState.PreGameRoom
+                || !playerData->IsRoomHost(f)) {
                 // Only the host can give it to another player.
                 return;
             }
@@ -19,11 +20,7 @@ namespace Quantum {
             if (newHostPlayerData == null) {
                 return;
             }
-
-            playerData->IsRoomHost = false;
-            newHostPlayerData->IsRoomHost = true;
-            f.Global->Host = Target;
-            f.Events.HostChanged(Target);
+            newHostPlayerData->SetAsHost(f, true);
         }
     }
 }

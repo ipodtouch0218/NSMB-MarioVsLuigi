@@ -741,6 +741,7 @@ GameObject:
   - component: {fileID: 2254935152879088866}
   - component: {fileID: 5377451828833222271}
   - component: {fileID: 3452636116809643534}
+  - component: {fileID: 5558916644815594025}
   - component: {fileID: 2776696542251080495}
   - component: {fileID: 8682297443920381521}
   - component: {fileID: -2541758970786198444}
@@ -1038,6 +1039,7 @@ MonoBehaviour:
     type: 3}
   sfx: {fileID: 5377451828833222271}
   coinSfx: {fileID: 3452636116809643534}
+  tauntSfx: {fileID: 5558916644815594025}
   normalDrill: {fileID: 8300000, guid: 80e6fe6f66166f04e8beccc08fe56422, type: 3}
   propellerDrill: {fileID: 8300000, guid: c8ae9349c885145468011889cafc470b, type: 3}
   dustPlayer: {fileID: 8224161238141519067}
@@ -1079,9 +1081,8 @@ MonoBehaviour:
     - Material: {fileID: 2100000, guid: bfe0a50f3d6f5b64386c7392202ba06a, type: 2}
       AlbedoTexture: {fileID: 2800000, guid: dc09a3bb7c94a4545915912c9f3e7152, type: 3}
       OverallsMaskTexture: {fileID: 0}
-      ShirtMaskTexture: {fileID: 2800000, guid: f640f42b881bd644d9fae4f284c815f4,
-        type: 3}
-      CapMaskTexture: {fileID: 2800000, guid: 4c3c19df16b30064ab9bf361fb054df2, type: 3}
+      ShirtMaskTexture: {fileID: 0}
+      CapMaskTexture: {fileID: 2800000, guid: f640f42b881bd644d9fae4f284c815f4, type: 3}
       StarmanAlbedoTexture: {fileID: 0}
     AnimationAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
     AnimatorOverrides: {fileID: 22100000, guid: 671e2adc5dbd26a45abdf5c18398a86e,
@@ -1127,7 +1128,7 @@ MonoBehaviour:
     - Material: {fileID: 2100000, guid: 44b589e71dec4564d8b250647f07fb0a, type: 2}
       AlbedoTexture: {fileID: 2800000, guid: 426f7261dde484c43b572d0addce9ddf, type: 3}
       OverallsMaskTexture: {fileID: 0}
-      ShirtMaskTexture: {fileID: 2800000, guid: b17d63742da247248a1024b007e091f3,
+      ShirtMaskTexture: {fileID: 2800000, guid: 85b7f195f6199d247ae2b85b00cc28de,
         type: 3}
       CapMaskTexture: {fileID: 0}
       StarmanAlbedoTexture: {fileID: 2800000, guid: 290f358be6599584db28453134e4d6a0,
@@ -1152,7 +1153,7 @@ MonoBehaviour:
     - Material: {fileID: 2100000, guid: 44b589e71dec4564d8b250647f07fb0a, type: 2}
       AlbedoTexture: {fileID: 2800000, guid: 0e1bcddcd216a084888b28fb6dfe4516, type: 3}
       OverallsMaskTexture: {fileID: 0}
-      ShirtMaskTexture: {fileID: 2800000, guid: b17d63742da247248a1024b007e091f3,
+      ShirtMaskTexture: {fileID: 2800000, guid: 85b7f195f6199d247ae2b85b00cc28de,
         type: 3}
       CapMaskTexture: {fileID: 0}
       StarmanAlbedoTexture: {fileID: 2800000, guid: 290f358be6599584db28453134e4d6a0,
@@ -1182,7 +1183,14 @@ MonoBehaviour:
       ShirtMaskTexture: {fileID: 2800000, guid: 4d5b4f3445f52c849b160d7dfc336bac,
         type: 3}
       CapMaskTexture: {fileID: 0}
-      StarmanAlbedoTexture: {fileID: 2800000, guid: f62b16c760bc38249bb951979802cc47,
+      StarmanAlbedoTexture: {fileID: 0}
+    - Material: {fileID: 2100000, guid: 8df212614361f5240aa9a8917bd9a40e, type: 2}
+      AlbedoTexture: {fileID: 2800000, guid: 7c71b20179328c44ea14a7bcb75786cc, type: 3}
+      OverallsMaskTexture: {fileID: 0}
+      ShirtMaskTexture: {fileID: 2800000, guid: 6c61d229abdc26e4abc06ef0f77e0d58,
+        type: 3}
+      CapMaskTexture: {fileID: 2800000, guid: b9da467efb59b014091fc82f9d7e0b7d, type: 3}
+      StarmanAlbedoTexture: {fileID: 2800000, guid: 74d77c8976bc3804ca5b93e1d21f4c96,
         type: 3}
     AnimationAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
     AnimatorOverrides: {fileID: 22100000, guid: 671e2adc5dbd26a45abdf5c18398a86e,
@@ -1194,7 +1202,15 @@ MonoBehaviour:
     BaseModel: {fileID: 2209300530651413591}
     ModelScale: {x: 1, y: 1, z: 1}
     ModelHeightInBlocks: 1
-    TextureReplacements: []
+    TextureReplacements:
+    - Material: {fileID: 2100000, guid: aa0ae4b7edaf62842ad504eb5d367de6, type: 2}
+      AlbedoTexture: {fileID: 2800000, guid: 8301373c08169994b86469eaa260c7db, type: 3}
+      OverallsMaskTexture: {fileID: 2800000, guid: 0cf743dadec2dde40b894fd9202c3b51,
+        type: 3}
+      ShirtMaskTexture: {fileID: 0}
+      CapMaskTexture: {fileID: 0}
+      StarmanAlbedoTexture: {fileID: 2800000, guid: 5d5f9ad4948945b4c83685ca4f0933b0,
+        type: 3}
     AnimationAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
     AnimatorOverrides: {fileID: 22100000, guid: 671e2adc5dbd26a45abdf5c18398a86e,
       type: 2}
@@ -1221,14 +1237,14 @@ MonoBehaviour:
       OverallsMaskTexture: {fileID: 0}
       ShirtMaskTexture: {fileID: 0}
       CapMaskTexture: {fileID: 0}
-      StarmanAlbedoTexture: {fileID: 2800000, guid: 62f7e72e406fb3e43a59282395d69818,
+      StarmanAlbedoTexture: {fileID: 2800000, guid: 5d5f9ad4948945b4c83685ca4f0933b0,
         type: 3}
     - Material: {fileID: 2100000, guid: 694a4aa9ac5a7af46816e537c779a20b, type: 2}
       AlbedoTexture: {fileID: 2800000, guid: b39be608bd2f798428156770977420f4, type: 3}
       OverallsMaskTexture: {fileID: 0}
       ShirtMaskTexture: {fileID: 0}
       CapMaskTexture: {fileID: 0}
-      StarmanAlbedoTexture: {fileID: 2800000, guid: 568069a3f62027b4e988881bd766d065,
+      StarmanAlbedoTexture: {fileID: 2800000, guid: 5d5f9ad4948945b4c83685ca4f0933b0,
         type: 3}
     AnimationAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
     AnimatorOverrides: {fileID: 22100000, guid: 671e2adc5dbd26a45abdf5c18398a86e,
@@ -1510,6 +1526,113 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!82 &5558916644815594025
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4824223341387914446}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
+    type: 2}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 0
+  DopplerLevel: 0
+  MinDistance: 1
+  MaxDistance: 7.5
+  Pan2D: 0
+  rolloffMode: 2
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.6143979
+      value: 0.5498109
+      inSlope: -1.4761623
+      outSlope: -1.4761623
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0.022363096
+      outSlope: 0.022363096
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.5594825
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &2776696542251080495
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1586,6 +1709,7 @@ MonoBehaviour:
   audioSources:
   - {fileID: 3452636116809643534}
   - {fileID: 5377451828833222271}
+  - {fileID: 5558916644815594025}
   soundOrigin: {fileID: 4824223341387914440}
   soundRange: 12
   maxPanning: 0.8
@@ -8614,100 +8738,6 @@ ParticleSystem:
     type: 3}
   m_PrefabInstance: {fileID: 3487713464487444891}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &5441785162183575166
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 4865570266982932041}
-    m_Modifications:
-    - target: {fileID: 3094612392314655968, guid: d758aa65baab42b43ba031de88063bb7,
-        type: 3}
-      propertyPath: playOnAwake
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3094612392314655968, guid: d758aa65baab42b43ba031de88063bb7,
-        type: 3}
-      propertyPath: moveWithTransform
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3094612392314655968, guid: d758aa65baab42b43ba031de88063bb7,
-        type: 3}
-      propertyPath: EmissionModule.rateOverTime.scalar
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 4113588847912301876, guid: d758aa65baab42b43ba031de88063bb7,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4113588847912301876, guid: d758aa65baab42b43ba031de88063bb7,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4113588847912301876, guid: d758aa65baab42b43ba031de88063bb7,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4113588847912301876, guid: d758aa65baab42b43ba031de88063bb7,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4113588847912301876, guid: d758aa65baab42b43ba031de88063bb7,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4113588847912301876, guid: d758aa65baab42b43ba031de88063bb7,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4113588847912301876, guid: d758aa65baab42b43ba031de88063bb7,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4113588847912301876, guid: d758aa65baab42b43ba031de88063bb7,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4113588847912301876, guid: d758aa65baab42b43ba031de88063bb7,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4113588847912301876, guid: d758aa65baab42b43ba031de88063bb7,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4895065583142849143, guid: d758aa65baab42b43ba031de88063bb7,
-        type: 3}
-      propertyPath: m_Name
-      value: InvincibleSparkles (1)
-      objectReference: {fileID: 0}
-    - target: {fileID: 4895065583142849143, guid: d758aa65baab42b43ba031de88063bb7,
-        type: 3}
-      propertyPath: m_Layer
-      value: 17
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: d758aa65baab42b43ba031de88063bb7, type: 3}
---- !u!4 &8256080559602905930 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4113588847912301876, guid: d758aa65baab42b43ba031de88063bb7,
-    type: 3}
-  m_PrefabInstance: {fileID: 5441785162183575166}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5754340209509000517
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10468,11 +10498,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 4113588847912301876, guid: d758aa65baab42b43ba031de88063bb7,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8256080559602905930}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d758aa65baab42b43ba031de88063bb7, type: 3}
 --- !u!4 &4865570266982932041 stripped

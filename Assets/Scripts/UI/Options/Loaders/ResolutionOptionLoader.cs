@@ -12,29 +12,22 @@ namespace NSMB.UI.Options.Loaders {
                 return;
             }
 
-            spo.options.Clear();
-
             resolutions = Screen.resolutions.Distinct(new ResolutionComparer()).ToList();
 
-            spo.options.AddRange(
-                resolutions.Select(res => {
-                    int width = res.width;
-                    int height = res.height;
+            spo.options.Clear();
+            spo.options.AddRange(resolutions.Select(res => $"{res.width}x{res.height} ({GetClosestAspectRatio(res.width, res.height)})"));
 
-                    return res.width + "x" + res.height + " (" + GetClosestAspectRatio(width, height) + ")";
-                }));
-
-            int index = Screen.resolutions.Length;
-            for (int i = 0; i < Screen.resolutions.Length; i++) {
-                var res = Screen.resolutions[i];
+            int index = -1;
+            for (int i = 0; i < resolutions.Count; i++) {
+                var res = resolutions[i];
                 if (Screen.currentResolution.width == res.width && Screen.currentResolution.height == res.height) {
                     index = i;
                     break;
                 }
             }
 
+            index = Mathf.Clamp(index, 0, resolutions.Count - 1);
             spo.SetValue(index, false);
-            return;
         }
 
         public override void OnValueChanged(PauseOption option, object newValue) {

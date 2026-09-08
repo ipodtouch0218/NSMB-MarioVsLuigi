@@ -34,7 +34,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: obj_big_kinoko|idle_obj_big_kinoko 0
-  m_Speed: 1
+  m_Speed: 2
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -5785212697239477205}
@@ -115,7 +115,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: obj_big_kinoko|start_obj_big_kinoko
-  m_Speed: 0.85
+  m_Speed: 1.15
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -7707591976997538825}

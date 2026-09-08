@@ -1,5 +1,5 @@
-using UnityEngine;
 using Quantum;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 public class TeamAsset : AssetObject, IOrderedAsset {

@@ -1,7 +1,6 @@
 using Photon.Deterministic;
 
-namespace Quantum
-{
+namespace Quantum {
     public unsafe class BulletBillSystem : SystemMainThreadEntityFilter<BulletBill, BulletBillSystem.Filter>, ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken {
         public struct Filter {
             public EntityRef Entity;
@@ -74,9 +73,10 @@ namespace Quantum
             bool attackedFromAbove = FPVector2.Dot(damageDirection, FPVector2.Up) > 0;
             bool groundpounded = attackedFromAbove && mario->IsGroundpoundActive && mario->CurrentPowerupState != PowerupState.MiniMushroom;
 
-            if (mario->InstakillsEnemies(marioPhysicsObject, true) || groundpounded) {
+            bool instakills = mario->InstakillsEnemies(marioPhysicsObject, true);
+            if (instakills || groundpounded) {
                 bulletBill->Kill(f, bulletBillEntity, marioEntity, groundpounded ? EnemyKillReason.Groundpounded : EnemyKillReason.Special);
-                mario->DoEntityBounce |= mario->IsDrilling;
+                mario->DoEntityBounce |= !instakills && mario->IsDrilling;
                 return;
             }
 

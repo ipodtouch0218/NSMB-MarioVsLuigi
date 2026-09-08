@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 
 // https://stackoverflow.com/a/74052588/19635374
 public class UnorderedTupleEqualityComparer<T> : IEqualityComparer<(T, T)> {

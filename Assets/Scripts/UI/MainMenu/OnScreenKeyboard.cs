@@ -50,19 +50,16 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void Update() {
-            if (IsOpen) {
-                if (!inputField.isFocused) {
-                    inputField.ActivateInputField();
-                }
-                //eventSystem.SetSelectedGameObject(inputField.gameObject);
-            }
-            GameObject selection = eventSystem.currentSelectedGameObject;
-            OnScreenKeyboardTrigger trigger = null;
-            if (selection) {
-                trigger = selection.GetComponent<OnScreenKeyboardTrigger>();
+            if (!IsOpen) {
+                return;
             }
 
-            if (IsOpen && !trigger) {
+            if (!inputField.isFocused) {
+                inputField.ActivateInputField();
+            }
+
+            GameObject selection = eventSystem.currentSelectedGameObject;
+            if (selection && !selection.TryGetComponent(out OnScreenKeyboardTrigger _)) {
                 Close();
             }
         }

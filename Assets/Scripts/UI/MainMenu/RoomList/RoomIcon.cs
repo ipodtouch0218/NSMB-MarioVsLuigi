@@ -100,7 +100,10 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
 
             stringBuilder.Append(" - ");
 
-            if (stageAssetGuid != null
+            if (stageAssetGuid == "random") {
+                stringBuilder.Append(tm.GetTranslation("ui.inroom.settings.game.mapchoosemode.random"));
+
+            } else if (stageAssetGuid != null
                 && AssetGuid.TryParse(stageAssetGuid, out guid, true)
                 && QuantumUnityDB.TryGetGlobalAsset(new AssetRef<Map>(guid), out Map map)
                 && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {

@@ -1,6 +1,6 @@
 {
   "name": "com.photonengine.quantum",
-  "version": "3.0.11",
+  "version": "3.0.13",
   "displayName": "Photon Quantum",
   "description": "Photon Quantum - Deterministic Multiplayer Engine",
   "unity": "2021.3",

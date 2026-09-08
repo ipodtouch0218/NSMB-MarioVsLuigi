@@ -15,7 +15,8 @@ namespace Quantum {
 
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* senderData) {
             // GOtta stop those filthy cheaters :/
-            if (!senderData->IsRoomHost) {
+            if (f.Global->GameState != GameState.PreGameRoom
+                || !senderData->IsRoomHost(f)) {
                 return;
             }
 

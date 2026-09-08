@@ -15,7 +15,6 @@ namespace Quantum {
         private ComponentGetter<PhysicsObjectSystem.Filter> PhysicsObjectSystemFilterGetter;
 
         public override void OnInit(Frame f) {
-            f.Context.ExcludeEntityAndPlayerMask = ~f.Layers.GetLayerMask("Entity", "Player");
             PhysicsObjectSystemFilterGetter = f.Unsafe.ComponentGetter<PhysicsObjectSystem.Filter>();
         }
 
@@ -29,6 +28,10 @@ namespace Quantum {
 
         private void TryMove(Frame f, ref Filter filter, VersusStageData stage) {
             var queries = f.ResolveList(filter.Platform->Queries);
+            if (queries.Count <= 0) {
+                // Probably was just added this frame.
+                return;
+            }
             TryMoveShape(f, ref filter, stage, queries, &filter.Collider->Shape, 0);
 
             var platform = filter.Platform;
@@ -67,7 +70,7 @@ namespace Quantum {
         private void ProcessHit(Frame f, ref Filter filter, Shape2D* shape, Hit hit, VersusStageData stage) {
             var platform = filter.Platform;
             var entity = filter.Entity;
-            FPVector2 velocity = platform->Velocity * f.DeltaTime;
+            FPVector2 platformVelocity = platform->Velocity * f.DeltaTime;
 
             if (hit.Entity == entity) {
                 return;
@@ -80,22 +83,21 @@ namespace Quantum {
                 return;
             }
 
-            bool movingAway = FPVector2.Dot(physicsObject->Velocity.Normalized, velocity.Normalized) >= 0;
+            bool movingAway = FPVector2.Dot(physicsObject->Velocity, platformVelocity) > platformVelocity.Magnitude;
             if (shape->Type == Shape2DType.Edge) {
                 // Semisolid logic
                 FP lowerEdge = physicsSystemFilter.Transform->Position.Y + physicsSystemFilter.Collider->Shape.Centroid.Y - physicsSystemFilter.Collider->Shape.Box.Extents.Y;
-                bool below = lowerEdge < (hit.Point.Y - (platform->Velocity.Y * 2 * f.DeltaTime));
+                bool below = lowerEdge < (hit.Point.Y - (platform->Velocity.Y * 3 * f.DeltaTime));
+
                 if (movingAway || below) {
                     return;
-                } else {
-                    movingAway = !movingAway;
                 }
             }
 
             PhysicsContact newContact = new PhysicsContact {
                 Position = hit.Point,
                 Normal = -hit.Normal,
-                Distance = velocity.Magnitude * hit.CastDistanceNormalized,
+                Distance = platformVelocity.Magnitude * hit.CastDistanceNormalized,
                 Entity = entity,
                 Frame = f.Number,
                 Tile = new(-1, -1)
@@ -125,6 +127,10 @@ namespace Quantum {
             if (platform->CanCrushEntities && (tempHit1 || tempHit2) && shape->Type != Shape2DType.Edge) {
                 // Crushed
                 physicsObject->IsBeingCrushed = true;
+
+                if (!physicsObject->WasBeingCrushed) {
+                    f.Signals.OnEntityCrushed(hit.Entity);
+                }
             }
         }
     }

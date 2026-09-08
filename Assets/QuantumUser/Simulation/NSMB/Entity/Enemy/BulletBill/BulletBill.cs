@@ -16,31 +16,24 @@ namespace Quantum {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(bulletBillEntity);
 
             bool playSound;
-            if (reason != EnemyKillReason.Normal) {
-                // Spawn 
-                enemy->IsActive = false;
-                physicsObject->IsFrozen = true;
-                playSound = true;
-            } else {
-                // Fall off screen
+            if (reason == EnemyKillReason.Normal) {
+                // Stomped, fall off screen
                 physicsObject->DisableCollision = true;
                 physicsObject->Velocity = new FPVector2(
                     2 * (enemy->FacingRight ? 1 : -1),
                     0
                 );
                 physicsObject->Gravity = new FPVector2(0, -Constants._14_75);
-
-
                 playSound = f.Has<Holdable>(killerEntity);
+            } else {
+                // Special kill, disappear.
+                enemy->IsActive = false;
+                physicsObject->IsFrozen = true;
+                playSound = true;
             }
 
             if (playSound) {
-                byte combo;
-                if (f.Unsafe.TryGetPointer(killerEntity, out ComboKeeper* comboKeeper)) {
-                    combo = comboKeeper->Combo++;
-                } else {
-                    combo = 0;
-                }
+                byte combo = ComboKeeper.IncrementOrDefault(f, killerEntity);
                 f.Events.PlayComboSound(bulletBillEntity, combo);
             }
 

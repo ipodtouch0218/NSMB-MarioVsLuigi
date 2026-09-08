@@ -19,7 +19,7 @@ namespace NSMB.UI.Game.Track {
         public override void OnUpdateView() {
             base.OnUpdateView();
 
-            if (PredictedFrame.Unsafe.TryGetPointer(targetEntity, out BigStar* star)) {
+            if (VerifiedFrame.Unsafe.TryGetPointer(targetEntity, out BigStar* star)) {
                 if (star->IsStationary) {
                     animator.enabled = true;
                     transform.localScale = Vector3.zero;

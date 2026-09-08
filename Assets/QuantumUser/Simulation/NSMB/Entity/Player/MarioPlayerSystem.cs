@@ -84,6 +84,8 @@ namespace Quantum {
             }
 
             if (HandleTaunting(f, ref filter, command is CommandTaunt)) {
+                filter.Inputs = default;
+                HandleWalkingRunning(f, ref filter, physics);
                 HandlePowerups(f, ref filter, physics, stage);
                 HandleKnockback(f, ref filter);
                 HandleHitbox(f, ref filter, physics);
@@ -124,23 +126,35 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            if (!physicsObject->IsTouchingGround || FPMath.Abs(physicsObject->Velocity.X) > 2 || physicsObject->IsUnderwater
+            if (!physicsObject->IsTouchingGround || (FPMath.Abs(physicsObject->Velocity.X) > 3 && !physicsObject->IsOnSlipperyGround) /*|| physicsObject->IsUnderwater*/
                 || mario->IsWallsliding || mario->IsGroundpounding || f.Exists(mario->CurrentPipe) || mario->IsInKnockback
                 || mario->IsPropellerFlying || mario->IsSpinnerFlying || mario->IsSkidding || mario->IsSliding || mario->IsCrouching
-                || mario->IsInShell || mario->IsTurnaround || mario->IsStuckInBlock || f.Exists(mario->HeldEntity) || mario->DoEntityBounce) {
+                || mario->IsInShell || mario->IsTurnaround || mario->IsStuckInBlock || f.Exists(mario->HeldEntity) || mario->DoEntityBounce
+                || mario->IsWalkingOnWater(f, filter.Entity)) {
                 // Disgusting.
 
+                if (mario->TauntFrames > 0) {
+                    f.Events.MarioPlayerTauntCancelled(filter.Entity);
+                }
                 mario->TauntFrames = 0;
                 return false;
             }
-
+            
             QuantumUtils.Decrement(ref mario->TauntFrames);
 
             if (start && mario->TauntFrames == 0) {
                 mario->TauntFrames = 125;
                 mario->JumpBufferFrames = 0;
-                physicsObject->Velocity.X = 0;
+                if (!physicsObject->IsOnSlipperyGround) {
+                    physicsObject->Velocity.X = 0;
+                }
                 f.Events.MarioPlayerTaunted(filter.Entity);
+            }
+
+            // Cancel up to 13 frames early
+            if (mario->TauntFrames <= 13 && (filter.Inputs.Left.IsDown || filter.Inputs.Right.IsDown || filter.Inputs.Jump.IsDown)) {
+                mario->TauntFrames = 0;
+                return false;
             }
 
             return mario->TauntFrames > 0;
@@ -174,13 +188,6 @@ namespace Quantum {
             if (!physicsObject->IsTouchingGround || swimming) {
                 mario->IsSkidding = false;
             }
-
-            /*
-            if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable) && holdable->HoldAboveHead && f.Number - mario->HoldStartFrame < physics.IceBlockPickupFreezeFrames) {
-                physicsObject->Velocity.X = 0;
-                return;
-            }
-            */
 
             ref var inputs = ref filter.Inputs;
             bool mega = mario->CurrentPowerupState == PowerupState.MegaMushroom;
@@ -459,11 +466,12 @@ namespace Quantum {
             }
 
             if (!mario->DoEntityBounce
-                && f.Unsafe.TryGetPointer(mario->CurrentSpinner, out Spinner* Spinner) && mario->ProjectileDelayFrames == 0
+                && f.Unsafe.TryGetPointer(mario->CurrentSpinner, out Spinner* spinner)
+                && mario->ProjectileDelayFrames == 0
                 && !f.Exists(mario->HeldEntity) && !mario->IsInShell) {
-                // Jump of spinner
+                // Jump off spinner
                 physicsObject->Velocity.Y = physics.SpinnerLaunchVelocity;
-                Spinner->PlatformWaitFrames = 6;
+                spinner->PlatformWaitFrames = 6;
 
                 mario->IsSkidding = false;
                 mario->IsTurnaround = false;
@@ -475,24 +483,13 @@ namespace Quantum {
                 mario->IsSpinnerFlying = true;
                 mario->IsPropellerFlying = false;
                 mario->JumpBufferFrames = 0;
+                mario->CoyoteTimeFrames = 0;
                 physicsObject->WasTouchingGround = false;
                 physicsObject->IsTouchingGround = false;
 
-                /*
-                var contacts = f.ResolveList(physicsObject->Contacts);
-                for (int i = contacts.Count - 1; i >= 0; i--) {
-                    if (contacts[i].Entity == mario->CurrentSpinner) {
-                        contacts.RemoveAtUnordered(i);
-                    }
-                }
-                */
-
-                // Disable koyote time
-                mario->CoyoteTimeFrames = 0;
-
                 f.Events.MarioPlayerUsedSpinner(filter.Entity, mario->CurrentSpinner);
-
                 mario->CurrentSpinner = EntityRef.None;
+
                 return;
             }
 
@@ -717,6 +714,7 @@ namespace Quantum {
             }
 
             if (mario->WallslideEndFrames > 0 && QuantumUtils.Decrement(ref mario->WallslideEndFrames)) {
+                mario->FacingRight = mario->WallslideRight;
                 mario->WallslideRight = false;
                 mario->WallslideLeft = false;
                 return;
@@ -830,14 +828,16 @@ namespace Quantum {
             ref var inputs = ref filter.Inputs;
             bool rightOrLeft = (inputs.Right.IsDown ^ inputs.Left.IsDown);
 
-            if (!mario->IsInShell && !mario->IsSliding && !mario->IsSkidding && !mario->IsInKnockback && !mario->IsTurnaround) {
+            if (!mario->IsInShell && !mario->IsSliding && !mario->IsSkidding && !mario->IsTurnaround) {
                 if (rightOrLeft) {
                     mario->FacingRight = inputs.Right.IsDown;
+                } else if (!physicsObject->IsTouchingGround && (mario->IsPropellerFlying || mario->IsSpinnerFlying) && FPMath.Abs(physicsObject->Velocity.X) > FP._0_05) {
+                    mario->FacingRight = physicsObject->Velocity.X > 0;
                 }
             } else if (mario->MegaMushroomStartFrames == 0 && mario->MegaMushroomEndFrames == 0 && !mario->IsSkidding && !mario->IsTurnaround) {
                 if (!mario->IsInShell && ((FPMath.Abs(physicsObject->Velocity.X) < FP._0_50 && mario->IsCrouching) || physicsObject->IsOnSlipperyGround) && rightOrLeft) {
                     mario->FacingRight = inputs.Right.IsDown;
-                } else if (mario->IsInKnockback || (physicsObject->IsTouchingGround && mario->CurrentPowerupState != PowerupState.MegaMushroom && FPMath.Abs(physicsObject->Velocity.X) > FP._0_05 && !mario->IsCrouching)) {
+                } else if ((physicsObject->IsTouchingGround && mario->CurrentPowerupState != PowerupState.MegaMushroom && FPMath.Abs(physicsObject->Velocity.X) > FP._0_05 && !mario->IsCrouching)) {
                     mario->FacingRight = physicsObject->Velocity.X > 0;
                 } else if ((!mario->IsInShell || mario->MegaMushroomStartFrames > 0) && rightOrLeft) {
                     mario->FacingRight = inputs.Right.IsDown;
@@ -915,7 +915,7 @@ namespace Quantum {
             QuantumUtils.Decrement(ref mario->GroundpoundCooldownFrames);
             QuantumUtils.Decrement(ref mario->PropellerDrillCooldown);
 
-            if (inputs.Down.IsDown && allowGroundpoundStart) {
+            if (inputs.Down.IsDown && allowGroundpoundStart && f.IsPlayerVerifiedOrLocal(mario->PlayerRef)) {
                 TryStartGroundpound(f, ref filter, physics, stage);
             }
 
@@ -1177,7 +1177,11 @@ namespace Quantum {
                 return;
             }
 
-            if (mario->IsInShell && (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall)) {
+            // Can cause wrong sliding sounds on ice
+            mario->IsTurnaround = false;
+            mario->IsSkidding = false;
+
+            if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
                 QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
                 FPVector2? maxVector = null;
                 foreach (var contact in contacts) {
@@ -2161,25 +2165,21 @@ namespace Quantum {
             var marioPhysics = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
             var projectileAsset = f.FindAsset(projectile->Asset);
 
-            var rules = f.Global->Rules;
-
-            bool dropStars = true;
-            if (f.Unsafe.TryGetPointer(projectile->Owner, out MarioPlayer* ownerMario)) {
-                dropStars = ownerMario->GetTeam(f) != mario->GetTeam(f) || rules.TeamAttack == TeamAttackOptions.Full;
-            }
+            bool dropStars = false;
 
             // Mario is "damageable" when he's...
             // not in knockback, not Mega
             // regular damageable checks (iframes is 0, not starman invincible)
             // not in a powerUP transition while mini (specifically)
             // Mario is in his Blue Shell and projectile doesn't affect blue Shell
+            // Team attack allows him to get hit
             bool damageable = !mario->IsInKnockback
                 && mario->CurrentPowerupState != PowerupState.MegaMushroom
                 && (mario->IsDamageable(f) || (mario->TryGetCurrentPowerTransition(f, out _) && mario->CurrentPowerupState == PowerupState.MiniMushroom))
-                && !((mario->IsCrouchedInShell || mario->IsInShell) && projectileAsset.DoesntEffectBlueShell);
+                && !((mario->IsCrouchedInShell || mario->IsInShell) && projectileAsset.DoesntEffectBlueShell)
+                && mario->CheckTeamAttack(f, projectile->Owner, out dropStars);
 
-            // allow the projectiles to collide, but do no knockback if no team attack
-            if (damageable && (rules.TeamAttack != TeamAttackOptions.None || dropStars)) {
+            if (damageable) {
                 bool didKnockback = false;
                 switch (projectileAsset.Effect) {
                 case ProjectileEffectType.KillEnemiesAndSoftKnockbackPlayers:
@@ -2210,8 +2210,13 @@ namespace Quantum {
                 }
 
                 if (didKnockback) {
-                    FPVector2 particlePos = (f.Unsafe.GetPointer<Transform2D>(marioEntity)->Position + f.Unsafe.GetPointer<Transform2D>(projectileEntity)->Position) / 2;
-                    f.Events.PlayKnockbackEffect(marioEntity, projectileEntity, KnockbackStrength.FireballBump, particlePos);
+                    QuantumUtils.UnwrapWorldLocations(f.FindAsset<VersusStageData>(f.Map.UserAsset), 
+                        f.Unsafe.GetPointer<Transform2D>(marioEntity)->Position, 
+                        f.Unsafe.GetPointer<Transform2D>(projectileEntity)->Position, 
+                        out FPVector2 marioPos, out FPVector2 projectilePos);
+
+                    FPVector2 avgPosition = (marioPos + projectilePos) / 2;
+                    f.Events.PlayKnockbackEffect(marioEntity, projectileEntity, KnockbackStrength.FireballBump, avgPosition, true);
                 }
             }
 
@@ -2235,16 +2240,12 @@ namespace Quantum {
             }
 
             // Or if a player just got damaged
-            if ((f.Number - marioA->KnockbackTick) < 12 || (f.Number - marioB->KnockbackTick) < 12) {
+            if ((f.Number - marioA->KnockbackTick) < 8 || (f.Number - marioB->KnockbackTick) < 8) {
                 return;
             }
 
-            // check game rules
-            var rules = f.Global->Rules;
-            bool dropStars = marioA->GetTeam(f) != marioB->GetTeam(f) || rules.TeamAttack == TeamAttackOptions.Full;
-
-            // using drop stars as a team check
-            if (rules.TeamAttack == TeamAttackOptions.None && !dropStars) {
+            // Check if hit should be prevented due to team attack rules
+            if (!marioA->CheckTeamAttack(f, marioBEntity, out bool dropStars)) {
                 return;
             }
 
@@ -2260,8 +2261,8 @@ namespace Quantum {
 
             bool eitherDamageInvincible = marioA->DamageInvincibilityFrames > 0 || marioB->DamageInvincibilityFrames > 0;
 
-            FPVector2 previousMarioAPosition = marioAPosition - (marioAPhysics->Velocity * f.DeltaTime);
-            FPVector2 previousMarioBPosition = marioBPosition - (marioBPhysics->Velocity * f.DeltaTime);
+            FPVector2 previousMarioAPosition = marioAPosition - (marioAPhysics->PreviousFrameVelocity * f.DeltaTime);
+            FPVector2 previousMarioBPosition = marioBPosition - (marioBPhysics->PreviousFrameVelocity * f.DeltaTime);
             FP dot = FPVector2.Dot((previousMarioAPosition - previousMarioBPosition).Normalized, FPVector2.Up);
             FP yDiff = previousMarioAPosition.Y - previousMarioBPosition.Y;
             bool marioAAbove = dot > Constants._0_66 && FPMath.Abs(yDiff) >= FP._0_10;
@@ -2287,14 +2288,14 @@ namespace Quantum {
                         knockbacked |= marioB->DoKnockback(f, marioBEntity, !fromRight, 0, KnockbackStrength.CollisionBump, marioAEntity, true, ignoreInvincibleStates: true);
 
                         if (knockbacked) {
-                            f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, KnockbackStrength.CollisionBump, avgPosition);
+                            f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, KnockbackStrength.CollisionBump, avgPosition, true);
                         }
                     }
                 } else if (marioAMega) {
                     bool knockbacked;
                     if (marioB->TryGetCurrentPowerTransition(f, out _) && !marioB->IsStarmanInvincible) {
                         // recalculate
-                        marioBAbove = dot < -Constants._0_66 && FPMath.Abs(yDiff) > Constants._0_73 * (Constants._3_50 + FP._0_25);
+                        marioBAbove = dot < -Constants._0_66 && FPMath.Abs(yDiff) > Constants._2_75;
                         goto NormalInteractions;
                     }
                     if (dropStars) {
@@ -2310,12 +2311,12 @@ namespace Quantum {
                         knockbacked = marioB->DoKnockback(f, marioBEntity, !fromRight, 0, KnockbackStrength.CollisionBump, marioAEntity, true, ignoreInvincibleStates: true);
                     }
                     if (knockbacked) {
-                        f.Events.PlayKnockbackEffect(marioBEntity, marioAEntity, KnockbackStrength.CollisionBump, avgPosition);
+                        f.Events.PlayKnockbackEffect(marioBEntity, marioAEntity, KnockbackStrength.CollisionBump, avgPosition, true);
                     }
                     return;
                 } else if (marioBMega) {
                     if (marioA->TryGetCurrentPowerTransition(f, out _) && !marioA->IsStarmanInvincible) {
-                        marioAAbove = dot > Constants._0_66 && FPMath.Abs(yDiff) > Constants._0_73 * (Constants._3_50 + FP._0_25);
+                        marioAAbove = dot > Constants._0_66 && FPMath.Abs(yDiff) > Constants._2_75;
                         goto NormalInteractions;
                     }
                     bool knockbacked;
@@ -2330,7 +2331,7 @@ namespace Quantum {
                         knockbacked = marioA->DoKnockback(f, marioAEntity, fromRight, 0, KnockbackStrength.CollisionBump, marioBEntity, true, ignoreInvincibleStates: true);
                     }
                     if (knockbacked) {
-                        f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, KnockbackStrength.CollisionBump, avgPosition);
+                        f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, KnockbackStrength.CollisionBump, avgPosition, true);
                     }
                 }
             }
@@ -2351,20 +2352,20 @@ namespace Quantum {
                     knockbacked |= marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars ? 1 : 0, KnockbackStrength.CollisionBump, marioAEntity, ignoreInvincibleStates: true);
 
                     if (knockbacked) {
-                        f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, KnockbackStrength.CollisionBump, avgPosition);
+                        f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, KnockbackStrength.CollisionBump, avgPosition, true);
                     }
                     return;
                 } else if (marioAStarman) {
                     if (marioB->TryGetCurrentPowerTransition(f, out _) && !marioB->IsStarmanInvincible) {
                         goto NormalInteractions;
                     }
-                    MarioMarioAttackStarman(f, marioAEntity, marioBEntity, fromRight, dropStars);
+                    MarioMarioAttackStarman(f, marioAEntity, marioBEntity, fromRight, dropStars, avgPosition);
                     return;
                 } else if (marioBStarman) {
                     if (marioA->TryGetCurrentPowerTransition(f, out _) && !marioA->IsStarmanInvincible) {
                         goto NormalInteractions;
                     }
-                    MarioMarioAttackStarman(f, marioBEntity, marioAEntity, !fromRight, dropStars);
+                    MarioMarioAttackStarman(f, marioBEntity, marioAEntity, !fromRight, dropStars, avgPosition);
                     return;
                 }
             }
@@ -2391,7 +2392,7 @@ namespace Quantum {
                     knockbacked |= marioA->DoKnockback(f, marioAEntity, fromRight, dropStars ? 1 : 0, KnockbackStrength.CollisionBump, marioBEntity);
                     knockbacked |= marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars ? 1 : 0, KnockbackStrength.CollisionBump, marioAEntity);
                     if (knockbacked) {
-                        f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, KnockbackStrength.CollisionBump, avgPosition);
+                        f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, KnockbackStrength.CollisionBump, avgPosition, true);
                     }
                     return;
                 } else if (marioAShell && marioB->CurrentPowerupState != PowerupState.MegaMushroom) {
@@ -2401,12 +2402,11 @@ namespace Quantum {
                         // transitions use this bool to make them lose a star
                         bool poweredDown = false;
                         // Hit them, powerdown them
-                        marioB->FacingRight = !fromRight;
                         // powerdown must come before doknockback or it will not occur
                         if (dropStars) {
                             poweredDown = marioB->Powerdown(f, marioBEntity, false, marioAEntity);
                         }
-                        marioB->DoKnockback(f, marioBEntity, !fromRight, poweredDown ? 0 : 1, KnockbackStrength.Normal, marioAEntity, bypassDamageInvincibility: true, wasBlueShell: true);
+                        marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars && !poweredDown ? 1 : 0, KnockbackStrength.Normal, marioAEntity, bypassDamageInvincibility: true, wasBlueShell: true);
                         marioA->FacingRight = !marioA->FacingRight;
                         marioA->ShellSpeedStage = marioAPhysicsInfo.ShellNormalStage;
                         f.Events.PlayBumpSound(marioAEntity);
@@ -2417,11 +2417,10 @@ namespace Quantum {
                     if (!marioAAbove) {
                         bool poweredDown = false;
                         // Hit them, powerdown them
-                        marioA->FacingRight = fromRight;
                         if (dropStars) {
                             poweredDown = marioA->Powerdown(f, marioAEntity, false, marioBEntity);
                         }
-                        marioA->DoKnockback(f, marioAEntity, fromRight, poweredDown ? 0 : 1, KnockbackStrength.Normal, marioBEntity, bypassDamageInvincibility: true, wasBlueShell: true);
+                        marioA->DoKnockback(f, marioAEntity, fromRight, dropStars && !poweredDown ? 1 : 0, KnockbackStrength.Normal, marioBEntity, bypassDamageInvincibility: true, wasBlueShell: true);
                         marioB->FacingRight = !marioB->FacingRight;
                         marioB->ShellSpeedStage = marioBPhysicsInfo.ShellNormalStage;
                         f.Events.PlayBumpSound(marioBEntity);
@@ -2430,10 +2429,10 @@ namespace Quantum {
                 }
 
                 // Crouched in shell stomps
-                if (marioA->IsCrouchedInShell && marioBAbove && !marioB->IsGroundpoundActive && !marioB->IsDrilling && marioB->CurrentPowerupState != PowerupState.MegaMushroom) {
+                if (marioA->IsCrouchedInShell && marioB->LastAttacker != marioAEntity && marioBAbove && !marioB->IsGroundpoundActive && !marioB->IsDrilling && marioB->CurrentPowerupState != PowerupState.MegaMushroom) {
                     MarioMarioBlueShellStomp(f, stage, marioBEntity, marioAEntity, fromRight);
                     return;
-                } else if (marioB->IsCrouchedInShell && marioAAbove && !marioA->IsGroundpoundActive && !marioA->IsDrilling && marioA->CurrentPowerupState != PowerupState.MegaMushroom) {
+                } else if (marioB->IsCrouchedInShell && marioA->LastAttacker != marioBEntity && marioAAbove && !marioA->IsGroundpoundActive && !marioA->IsDrilling && marioA->CurrentPowerupState != PowerupState.MegaMushroom) {
                     MarioMarioBlueShellStomp(f, stage, marioAEntity, marioBEntity, fromRight);
                     return;
                 }
@@ -2452,7 +2451,8 @@ namespace Quantum {
                 }
 
                 // crouched in shell interactions
-                if (marioA->IsCrouchedInShell && marioB->CurrentPowerupState != PowerupState.MegaMushroom || marioB->IsCrouchedInShell && marioA->CurrentPowerupState != PowerupState.MegaMushroom) {
+                if ((marioA->IsCrouchedInShell && marioB->CurrentPowerupState != PowerupState.MegaMushroom)
+                    || (marioB->IsCrouchedInShell && marioA->CurrentPowerupState != PowerupState.MegaMushroom)) {
                     // push the other Mario back only if grounded otherwise do knockback
                     if (marioA->IsCrouchedInShell && marioB->IsCrouchedInShell) {
                         // Bump
@@ -2476,7 +2476,7 @@ namespace Quantum {
                             ) {
                             bool didKnockback = marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars ? 1 : 0, KnockbackStrength.Normal, marioAEntity);
                             if (didKnockback) {
-                                f.Events.PlayKnockbackEffect(marioBEntity, marioAEntity, KnockbackStrength.Normal, avgPosition);
+                                f.Events.PlayKnockbackEffect(marioBEntity, marioAEntity, KnockbackStrength.Normal, avgPosition, true);
                             }
                         }
                     } else if (marioB->IsCrouchedInShell) {
@@ -2493,7 +2493,7 @@ namespace Quantum {
                             ) {
                             bool didKnockback = marioA->DoKnockback(f, marioAEntity, fromRight, dropStars ? 1 : 0, KnockbackStrength.Normal, marioBEntity);
                             if (didKnockback) {
-                                f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, KnockbackStrength.Normal, avgPosition);
+                                f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, KnockbackStrength.Normal, avgPosition, true);
                             }
                         }
                     }
@@ -2506,13 +2506,13 @@ namespace Quantum {
                         // Minis
                         bool dealtKnockback = false;
                         if (marioAMini) {
-                            dealtKnockback = marioA->DoKnockback(f, marioAEntity, fromRight, dropStars ? 1 : 0, KnockbackStrength.Normal, marioBEntity);
+                            dealtKnockback |= marioA->DoKnockback(f, marioAEntity, fromRight, dropStars ? 1 : 0, KnockbackStrength.Normal, marioBEntity);
                         }
                         if (marioBMini) {
-                            dealtKnockback = marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars ? 1 : 0, KnockbackStrength.Normal, marioAEntity);
+                            dealtKnockback |= marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars ? 1 : 0, KnockbackStrength.Normal, marioAEntity);
                         }
                         if (dealtKnockback) {
-                            f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, KnockbackStrength.Normal, avgPosition);
+                            f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, KnockbackStrength.Normal, avgPosition, true);
                         }
                         return;
                     }
@@ -2546,7 +2546,7 @@ namespace Quantum {
                         }
 
                         if (dealtKnockback) {
-                            f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, KnockbackStrength.CollisionBump, avgPosition);
+                            f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, KnockbackStrength.CollisionBump, avgPosition, true);
                         }
                         return;
                     }
@@ -2554,7 +2554,8 @@ namespace Quantum {
             }
 
             // handle pushing
-            if (!eitherDamageInvincible && !marioA->IsInKnockback && !marioB->IsInKnockback && marioA->CurrentPowerupState != PowerupState.MegaMushroom && marioB->CurrentPowerupState != PowerupState.MegaMushroom) {
+            if (!eitherDamageInvincible && !marioA->IsInKnockback && !marioB->IsInKnockback
+                && marioA->CurrentPowerupState != PowerupState.MegaMushroom && marioB->CurrentPowerupState != PowerupState.MegaMushroom) {
                 // Collide
                 int directionToOtherPlayer = fromRight ? -1 : 1;
                 var marioACollider = f.Unsafe.GetPointer<PhysicsCollider2D>(marioAEntity);
@@ -2585,7 +2586,7 @@ namespace Quantum {
             }
         }
 
-        private static void MarioMarioAttackStarman(Frame f, EntityRef attacker, EntityRef defender, bool fromRight, bool dropStars) {
+        private static void MarioMarioAttackStarman(Frame f, EntityRef attacker, EntityRef defender, bool fromRight, bool dropStars, FPVector2 avgPosition) {
             var attackerMario = f.Unsafe.GetPointer<MarioPlayer>(attacker);
             var defenderMario = f.Unsafe.GetPointer<MarioPlayer>(defender);
 
@@ -2605,8 +2606,7 @@ namespace Quantum {
             }
 
             if (dealtKnockback) {
-                FPVector2 avgPosition = (f.Unsafe.GetPointer<Transform2D>(attacker)->Position + f.Unsafe.GetPointer<Transform2D>(defender)->Position) / 2;
-                f.Events.PlayKnockbackEffect(attacker, defender, KnockbackStrength.CollisionBump, avgPosition);
+                f.Events.PlayKnockbackEffect(attacker, defender, KnockbackStrength.CollisionBump, avgPosition, true);
             }
         }
 
@@ -2634,11 +2634,11 @@ namespace Quantum {
             defenderPhysicsObject->Velocity.Y = FPMath.Min(0, attackerPhysicsObject->Velocity.Y, defenderPhysicsObject->Velocity.Y);
 
             // avoid overlap issues when stomping
-                var attackerTransform = f.Unsafe.GetPointer<Transform2D>(attacker);
-                var defenderCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(defender);
+            var attackerTransform = f.Unsafe.GetPointer<Transform2D>(attacker);
+            var defenderCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(defender);
 
-                // move the attacker above the defender so they don't interact
-                attackerTransform->Position.Y += defenderCollider->Shape.Box.Extents.Y;
+            // move the attacker above the defender so they don't interact
+            attackerTransform->Position.Y += defenderCollider->Shape.Box.Extents.Y;
 
             var attackerMario = f.Unsafe.GetPointer<MarioPlayer>(attacker);
             attackerMario->DoEntityBounce = true;
@@ -2660,9 +2660,7 @@ namespace Quantum {
                 // Attacker is mini, they arent. special rules.
                 if (groundpounded) {
                     bool dealtKnockback = defenderMario->DoKnockback(f, defender, !fromRight, dropStars ? 3 : 0, KnockbackStrength.Groundpound, attacker);
-                    if (dealtKnockback) {
-                        f.Events.PlayKnockbackEffect(defender, attacker, KnockbackStrength.Groundpound, avgPosition);
-                    }
+                    f.Events.PlayKnockbackEffect(defender, attacker, KnockbackStrength.Groundpound, avgPosition, dealtKnockback);
                     attackerMario->IsGroundpounding = false;
                     attackerMario->DoEntityBounce = true;
                     if (!attackerMario->IsSpinnerFlying && !attackerMario->IsPropellerFlying) {
@@ -2685,8 +2683,10 @@ namespace Quantum {
                 KnockbackStrength strength = dropStars ? KnockbackStrength.Groundpound : KnockbackStrength.Normal;
                 bool didKnockback = defenderMario->DoKnockback(f, defender, !fromRight, dropStars ? 1 : 0, strength, attacker);
                 attackerMario->DoEntityBounce = false; // no bounce
+
+                // don't play the particles
                 if (didKnockback) {
-                    f.Events.PlayKnockbackEffect(defender, attacker, strength, avgPosition);
+                    f.Events.PlayKnockbackEffect(defender, attacker, strength, avgPosition, didKnockback);
                 }
             } else if (defenderMario->CurrentPowerupState == PowerupState.HammerSuit && defenderPhysicsObject->IsTouchingGround && defenderMario->IsCrouching && !groundpounded) {
                 // Bounce
@@ -2696,6 +2696,10 @@ namespace Quantum {
                 }
                 attackerPhysicsObject->Velocity.Y = 4;
                 attackerMario->DoEntityBounce = false;
+                if (attackerMario->IsInKnockback) {
+                    // Prevents softlocks
+                    attackerMario->ResetKnockback(f, attacker);
+                }
                 f.Events.EnemyKicked(defender, false);
             } else {
                 // Normal knockbacks
@@ -2712,13 +2716,13 @@ namespace Quantum {
                     }
                     KnockbackStrength strength = groundpounded ? KnockbackStrength.Groundpound : KnockbackStrength.Normal;
                     bool dealtKnockback = defenderMario->DoKnockback(f, defender, !fromRight, dropStars ? (groundpounded ? 3 : 1) : 0, strength, attacker);
-                    if (dealtKnockback) {
-                        f.Events.PlayKnockbackEffect(defender, attacker, strength, avgPosition);
+                    if (dealtKnockback || !groundpounded) {
+                        f.Events.PlayKnockbackEffect(defender, attacker, strength, avgPosition, dealtKnockback);
                     }
                 }
             }
         }
-#endregion
+        #endregion
 
         #region Signals
         public void OnRemoved(Frame f, EntityRef entity, Projectile* component) {
@@ -2736,7 +2740,7 @@ namespace Quantum {
         }
 
         public void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity) {
-            if (f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
+            if (f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario) && !mario->IsDead) {
                 mario->Powerdown(f, entity, false, bobomb);
             }
         }
@@ -2778,6 +2782,11 @@ namespace Quantum {
                 return;
             }
 
+            // Check if hit should be prevented due to team attack rules
+            if (!mario->CheckTeamAttack(f, bumper, out bool dropStars)) {
+                return;
+            }
+
             FPVector2 bumperPosition;
             if (f.Unsafe.TryGetPointer(bumper, out Transform2D* bumperTransform)) {
                 bumperPosition = bumperTransform->Position;
@@ -2788,19 +2797,9 @@ namespace Quantum {
             QuantumUtils.UnwrapWorldLocations(f, marioTransform->Position, bumperPosition, out FPVector2 ourPos, out FPVector2 theirPos);
             bool onRight = ourPos.X > theirPos.X;
 
-            var rules = f.Global->Rules;
-            bool dropStars = true;
-            if (f.Unsafe.TryGetPointer(bumper, out MarioPlayer* bumperMario)) {
-                bool teamMatch = bumperMario->GetTeam(f) == mario->GetTeam(f);
-                if (rules.TeamAttack == TeamAttackOptions.None && teamMatch) {
-                    return;
-                }
-                dropStars = !teamMatch || rules.TeamAttack == TeamAttackOptions.Full;
-            }
-
             bool damaged = mario->DoKnockback(f, entity, !onRight, dropStars ? 1 : 0, KnockbackStrength.Normal, bumper, bypassDamageInvincibility: true, ignoreInvincibleStates: true);
             if (damaged) {
-                f.Events.PlayKnockbackEffect(entity, bumper, KnockbackStrength.Normal, tileWorldPosition);
+                f.Events.PlayKnockbackEffect(entity, bumper, KnockbackStrength.Normal, tileWorldPosition, true);
             }
         }
 
@@ -2826,6 +2825,9 @@ namespace Quantum {
                 mario->PlayerRef = PlayerRef.None;
                 mario->Death(f, entity, false, true, entity);
             }
+
+            // In the case they were already dead...
+            GameLogicSystem.CheckForGameEnd(f);
         }
 
         public void OnIceBlockBroken(Frame f, EntityRef brokenIceBlock, IceBlockBreakReason breakReason, EntityRef attacker) {
@@ -2859,36 +2861,36 @@ namespace Quantum {
                 } else if (iceBlockPhysicsObject->IsTouchingRightWall) {
                     mario->FacingRight = false;
                 }
-            } else {
-                if (f.Unsafe.TryGetPointer(attacker, out Transform2D* attackerTransform)) {
-                    var marioTransform = f.Unsafe.GetPointer<Transform2D>(entity);
-                    QuantumUtils.UnwrapWorldLocations(f, marioTransform->Position, attackerTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
-                    mario->FacingRight = ourPos.X < theirPos.X;
-                }
             }
 
+            bool hitFromRight = mario->FacingRight;
+            if (f.Unsafe.TryGetPointer(attacker, out Transform2D* attackerTransform)) {
+                var marioTransform = f.Unsafe.GetPointer<Transform2D>(entity);
+                QuantumUtils.UnwrapWorldLocations(f, marioTransform->Position, attackerTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
+                hitFromRight = ourPos.X < theirPos.X;
+            }
+            
             bool damaged = false;
             KnockbackStrength strength = KnockbackStrength.Normal;
             switch (breakReason) {
             case IceBlockBreakReason.HitWall:
             case IceBlockBreakReason.Other:
-            other:
                 // Weak knockback, i-frames.
                 strength = KnockbackStrength.FireballBump;
-                damaged = mario->DoKnockback(f, entity, mario->FacingRight, 1, strength, attacker);
+                damaged = mario->DoKnockback(f, entity, hitFromRight, 1, strength, attacker);
                 mario->DamageInvincibilityFrames = Constants.DamageInvincibilityFrames;
                 break;
 
             case IceBlockBreakReason.BlockBump:
                 // Soft knockback, no i-frames.
                 strength = KnockbackStrength.Normal;
-                damaged = mario->DoKnockback(f, entity, mario->FacingRight, 1, strength, attacker);
+                damaged = mario->DoKnockback(f, entity, hitFromRight, 1, strength, attacker);
                 break;
 
             case IceBlockBreakReason.Groundpounded:
                 // Hard knockback, i-frames.
                 strength = KnockbackStrength.Groundpound;
-                damaged = mario->DoKnockback(f, entity, mario->FacingRight, 2, strength, attacker);
+                damaged = mario->DoKnockback(f, entity, hitFromRight, 2, strength, attacker);
                 mario->DamageInvincibilityFrames = Constants.DamageInvincibilityFrames;
                 break;
 
@@ -2898,7 +2900,7 @@ namespace Quantum {
                 // Damage, i-frames.
                 strength = KnockbackStrength.Groundpound;
                 if (mario->Powerdown(f, entity, false, attacker)) {
-                    mario->DoKnockback(f, entity, mario->FacingRight, 0, KnockbackStrength.FireballBump, attacker);
+                    mario->DoKnockback(f, entity, hitFromRight, 0, KnockbackStrength.FireballBump, attacker);
                 }
                 damaged = false; // No "bump" effect.
                 mario->DamageInvincibilityFrames = Constants.DamageInvincibilityFrames;
@@ -2914,15 +2916,14 @@ namespace Quantum {
                 break;
 
             default:
-                // Fall through.
-                Log.DebugWarn($"Unhandled IceBlockBreakReason {breakReason} in {nameof(OnIceBlockBroken)}!");
-                goto other;
+                Log.DebugWarn($"Unhandled IceBlockBreakReason {breakReason} in {nameof(OnIceBlockBroken)}! Defaulting to {IceBlockBreakReason.Other}");
+                goto case IceBlockBreakReason.Other;
             }
 
             if (damaged) {
                 FPVector2 particlePos = f.Unsafe.GetPointer<Transform2D>(brokenIceBlock)->Position;
                 particlePos.Y += iceBlock->Size.Y / 2;
-                f.Events.PlayKnockbackEffect(entity, brokenIceBlock, strength, particlePos);
+                f.Events.PlayKnockbackEffect(entity, brokenIceBlock, strength, particlePos, true);
             }
         }
 

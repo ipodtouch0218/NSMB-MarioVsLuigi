@@ -375,8 +375,6 @@ MonoBehaviour:
       Value: 0
     IsWaterSolid:
       Value: 0
-    BreakMegaObjects:
-      Value: 0
 --- !u!114 &583447005726554375
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -618,7 +616,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0.5
+  m_Volume: 1
   m_Pitch: 1
   Loop: 0
   Mute: 0

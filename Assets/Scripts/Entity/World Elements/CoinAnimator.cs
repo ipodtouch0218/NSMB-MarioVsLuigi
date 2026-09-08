@@ -1,4 +1,5 @@
 using NSMB.UI.Game;
+using NSMB.Utilities;
 using NSMB.Utilities.Components;
 using NSMB.Utilities.Extensions;
 using Quantum;
@@ -35,11 +36,14 @@ namespace NSMB.Entities.World {
             QuantumEvent.Subscribe<EventCoinChangedType>(this, OnCoinChangedType, onlyIfEntityViewBound: true);
             QuantumEvent.Subscribe<EventCoinChangeCollected>(this, OnCoinChangedCollected, onlyIfEntityViewBound: true);
             QuantumEvent.Subscribe<EventCoinBounced>(this, OnCoinBounced, FilterOutReplayFastForward, onlyIfEntityViewBound: true);
+            QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced, onlyIfEntityViewBound: true);
             RenderPipelineManager.beginCameraRendering += URPOnPreRender;
         }
 
         public override void OnActivate(Frame f) {
-            var coin = f.Unsafe.GetPointer<Coin>(EntityRef);
+            if (!f.Unsafe.TryGetPointer(EntityRef, out Coin* coin)) {
+                return;
+            }
 
             bool dotted = coin->IsCurrentlyDotted;
             defaultCoinAnimate.isDisplaying = !dotted;
@@ -86,8 +90,7 @@ namespace NSMB.Entities.World {
                 // Bodge: OnCoinChangedCollected doesnt work when collecting a coin at the exact same time as a level reset 
                 sRenderer.enabled = !coin->IsCollected;
             } else {
-                float despawnTimeRemaining = coin->Lifetime / 60f;
-                sRenderer.enabled = !(despawnTimeRemaining < 3 && despawnTimeRemaining % 0.3f >= 0.15f);
+                sRenderer.enabled = Utils.Blink((float) coin->Lifetime / f.UpdateRate, blinksPerSecond: 4f, blinkStartTime: 3f);
             }
         }
 
@@ -167,6 +170,10 @@ namespace NSMB.Entities.World {
             if (!dotted && !IsReplayFastForwarding) {
                 sfx.PlayOneShot(SoundEffect.World_Coin_Dotted_Spawn);
             }
+        }
+
+        private void OnGameResynced(CallbackGameResynced e) {
+            OnActivate(e.Game.Frames.Verified);
         }
     }
 }

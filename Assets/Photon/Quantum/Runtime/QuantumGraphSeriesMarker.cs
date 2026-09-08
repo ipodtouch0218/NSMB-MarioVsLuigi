@@ -1,4 +1,5 @@
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   using UnityEngine;
 
   /// <summary>
@@ -16,4 +17,5 @@ namespace Quantum.Profiling {
       }
     }
   }
+#endif
 }

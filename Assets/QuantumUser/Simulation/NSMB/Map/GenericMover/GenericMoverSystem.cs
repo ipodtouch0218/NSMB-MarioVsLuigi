@@ -1,6 +1,5 @@
 // #define MULTITHREADED
 using Photon.Deterministic;
-using Quantum.Task;
 
 namespace Quantum {
 #if MULTITHREADED

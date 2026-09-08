@@ -64,8 +64,6 @@ namespace NSMB.UI.Game.Results {
                     };
                 }
 
-                Debug.Log($"index {playerInfoIndex} playerref {player} slot {Utils.GetPlayerSlotInfo(index)}");
-
                 leftHalf.color = Utils.GetPlayerColor(f, player, s: 0.7f, considerDisqualifications: false);
                 
                 var playerData = QuantumUtils.GetPlayerData(f, player);

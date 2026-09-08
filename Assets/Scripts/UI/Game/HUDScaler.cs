@@ -1,13 +1,13 @@
+using NSMB.UI.Elements;
 using NSMB.Utilities.Extensions;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace NSMB.UI.Game {
     public class HUDScaler : MonoBehaviour {
 
         //---Serialized Variables
-        [SerializeField] private CanvasScaler scaler;
-        [SerializeField] private Vector2 baseline = new Vector2(1000f, 562.5f);
+        [SerializeField] private ScaleWithParent scaler;
+        [SerializeField] private float baseline = 1000f;
         [SerializeField] private float pxPerStep = 150;
 
         public void OnValidate() {
@@ -21,12 +21,11 @@ namespace NSMB.UI.Game {
 
         public void OnDisable() {
             Settings.OnHudScaleChanged -= OnHudScaleChanged;
+            scaler.targetWidth = baseline;
         }
 
         private void OnHudScaleChanged(float value) {
-            Vector2 newScale = baseline;
-            newScale.y += pxPerStep * (8 - value);
-            scaler.referenceResolution = newScale;
+            scaler.targetWidth = baseline + (pxPerStep * (8 - value));
         }
     }
 }

@@ -125,7 +125,6 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             ascendingToggle.isOn = false;
             searchField.SetTextWithoutNotify("");
             replayTemplate.gameObject.SetActive(false);
-            scrollRect.verticalNormalizedPosition = 1;
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
             Canvas.ForceUpdateCanvases();
 
@@ -308,7 +307,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                     var allTeams = AssetRepository<TeamAsset>.AllAssets;
                     TeamAsset team = allTeams[info.Team % allTeams.Count];
                     stringBuilder.Append("<nobr>");
-                    stringBuilder.Append("<color=#").Append(Utils.ColorToHex(team.color, false)).Append(">").Append(Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal);
+                    stringBuilder.Append("<color=#").Append(Utils.ColorToHex(team.color)).Append(">").Append(Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal);
                 } else {
                     stringBuilder.Append("<color=white>");
                     stringBuilder.Append("<nobr>- ");
@@ -476,7 +475,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
             result.Initialize(this, replay);
             result.name = replay.Header.GetDisplayName();
-            result.UpdateText();
+            //result.UpdateText();
             result.UpdateNavigation(previousEntry);
             result.transform.SetAsLastSibling();
             result.gameObject.SetActive(true);
@@ -570,7 +569,11 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
             try {
                 await Awaitable.MainThreadAsync();
+                
                 string newSearchTerm = SearchTerm;
+                
+                // TODO: cache?
+                List<ReplayFilterData> filterDatas = allReplays.Select(r => new ReplayFilterData(r)).ToList();
 
                 await Awaitable.BackgroundThreadAsync();
                 List<BinaryReplayFile> newSearchResults = new();
@@ -581,60 +584,10 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                     return;
                 }
 
-                TranslationManager tm = GlobalController.Instance.translationManager;
-                foreach (var replay in allReplays) {
-                    if (cancellationToken.IsCancellationRequested) {
-                        return;
+                foreach (var filterData in filterDatas) {
+                    if (filterData.Matches(newSearchTerm)) {
+                        newSearchResults.Add(filterData.replay);
                     }
-
-                    // Check display name
-                    if (replay.Header.GetDisplayName().Contains(newSearchTerm, StringComparison.InvariantCultureIgnoreCase)) {
-                        newSearchResults.Add(replay);
-                        continue;
-                    }
-
-                    // Check date
-                    if (tm.DateTimeToLocalizedString(DateTime.UnixEpoch.AddSeconds(replay.Header.UnixTimestamp), false, false).Contains(newSearchTerm, StringComparison.InvariantCultureIgnoreCase)) {
-                        newSearchResults.Add(replay);
-                        continue;
-                    }
-
-                    // Check stage name
-                    if (QuantumUnityDB.TryGetGlobalAsset(replay.Header.Rules.Stage, out Map map)
-                        && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
-
-                        if (tm.GetTranslation(stage.TranslationKey).Contains(newSearchTerm, StringComparison.InvariantCultureIgnoreCase)) {
-                            newSearchResults.Add(replay);
-                            continue;
-                        }
-                    }
-
-                    // Check player usernames
-                    bool found = false;
-                    foreach (var playerInfo in replay.Header.PlayerInformation) {
-                        if (playerInfo.Nickname.Contains(newSearchTerm, StringComparison.InvariantCultureIgnoreCase)) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (found) {
-                        newSearchResults.Add(replay);
-                        continue;
-                    }
-
-                    /*
-                    // Check status
-                    if (replay.warningText.text.Contains(newSearchTerm, StringComparison.InvariantCultureIgnoreCase)) {
-                        searchResultsNew.Add(replay);
-                        continue;
-                    }
-                    */
-
-                    // Did not match.
-                }
-
-                if (cancellationToken.IsCancellationRequested) {
-                    return;
                 }
 
                 searchResults = newSearchResults;
@@ -863,6 +816,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         }
 
         public void RemoveReplayByPath(string path) {
+            path = path.Replace('\\', '/');
             RemoveReplay(replayListEntries.FirstOrDefault(rle => rle.ReplayFile.FilePath == path));
         }
 
@@ -933,6 +887,67 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 .ToList();
 
             return x;
+        }
+
+        private class ReplayFilterData {
+
+            public BinaryReplayFile replay;
+            public string translatedDisplayName;
+            public string localizedDateString;
+            public string translatedStageName;
+
+            public ReplayFilterData(BinaryReplayFile replay) {
+                this.replay = replay;
+                Reload();
+            }
+
+            public void Reload() {
+                TranslationManager tm = GlobalController.Instance.translationManager;
+                translatedDisplayName = replay.Header.GetDisplayName();
+                localizedDateString = tm.DateTimeToLocalizedString(DateTime.UnixEpoch.AddSeconds(replay.Header.UnixTimestamp), false, false);
+
+
+                if (QuantumUnityDB.TryGetGlobalAsset(replay.Header.Rules.Stage, out Map map)
+                    && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
+
+                    translatedStageName = tm.GetTranslation(stage.TranslationKey);
+                }
+            }
+
+            public bool Matches(string searchTerm) {
+                // Check display name
+                if (translatedDisplayName.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase)) {
+                    return true;
+                }
+
+                // Check date
+                if (localizedDateString.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase)) {
+                    return true;
+                }
+
+                // Check stage name
+                if (translatedStageName.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase)) {
+                    return true;
+                }
+
+                // Check player usernames
+                foreach (var playerInfo in replay.Header.PlayerInformation) {
+                    if (playerInfo.Nickname.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase)) {
+                        return true;
+                    }
+                }
+
+                /*
+                // Check status
+                if (replay.warningText.text.Contains(newSearchTerm, StringComparison.InvariantCultureIgnoreCase)) {
+                    searchResultsNew.Add(replay);
+                    continue;
+                }
+                */
+
+                // Did not match.
+                return false;
+            }
         }
     }
 }

@@ -1,4 +1,3 @@
-using NSMB.Utilities.Extensions;
 using System;
 using TMPro;
 using UnityEngine;

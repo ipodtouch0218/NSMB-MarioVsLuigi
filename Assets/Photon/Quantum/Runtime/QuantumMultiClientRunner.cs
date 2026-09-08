@@ -1,10 +1,11 @@
 namespace Quantum {
-  using System;
-  using System.Collections.Generic;
-  using System.Linq;
-  using System.Threading.Tasks;
   using Photon.Deterministic;
   using Photon.Realtime;
+  using System;
+  using System.Collections.Generic;
+  using System.Diagnostics.CodeAnalysis;
+  using System.Linq;
+  using System.Threading.Tasks;
   using UnityEngine;
   using static QuantumUnityExtensions;
 
@@ -135,6 +136,7 @@ namespace Quantum {
     string _currentRoomName;
     string _appGuid;
 
+    [SuppressMessage("Domain reload", "UDR0001", Justification = "Id may keep incrementing")]
     private static int _clientIdCounter = 0;
 
     private int NewClientId {

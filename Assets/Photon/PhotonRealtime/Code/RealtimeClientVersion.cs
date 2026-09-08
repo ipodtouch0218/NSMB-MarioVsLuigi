@@ -14,6 +14,6 @@ namespace Photon.Realtime
     public partial class RealtimeClient
     {
         /// <summary>RealtimeClient / SDK version as const string.</summary>
-        public const string Version = "5.1.12";
+        public const string Version = "5.1.15";
     }
 }

@@ -1,3 +1,4 @@
+using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
 using Quantum;
 using UnityEngine;
@@ -11,7 +12,7 @@ namespace NSMB.Entities.CoinItems {
         [SerializeField] private new Renderer renderer;
         [SerializeField] private Animator childAnimator;
         [SerializeField] private Animation childAnimation;
-        [SerializeField] private float blinkingRate = 4, scaleRate = 0.1333f, scaleSize = 0.3f;
+        [SerializeField] private float scaleRate = 0.1333f, scaleSize = 0.3f;
         [SerializeField] private AudioSource sfx;
         [SerializeField] private ParticleSystem koopaSpawnParticles;
 
@@ -107,9 +108,9 @@ namespace NSMB.Entities.CoinItems {
             }
 
             HandleSpawningAnimation(f, coinItem);
-            HandleDespawningBlinking(coinItem);
+            HandleDespawningBlinking(f, coinItem);
         }
-
+        
         private void HandleSpawningAnimation(Frame f, CoinItem* coinItem) {
             if (f.Exists(coinItem->ParentMarioPlayer) && coinItem->SpawnAnimationFrames > 0) {
                 // Following player
@@ -138,10 +139,8 @@ namespace NSMB.Entities.CoinItems {
             }
         }
 
-        private void HandleDespawningBlinking(CoinItem* coinItem) {
-            if (coinItem->Lifetime <= 60) {
-                renderer.enabled = ((coinItem->Lifetime / 60f * blinkingRate) % 1) > 0.5f;
-            }
+        private void HandleDespawningBlinking(Frame f, CoinItem* coinItem) {
+            renderer.enabled = Utils.Blink((float) coinItem->Lifetime / f.UpdateRate, blinkStartTime: 3f, blinksPerSecond: 4f);
         }
 
         private void OnCoinItemBecameActive(EventCoinItemBecameActive e) {

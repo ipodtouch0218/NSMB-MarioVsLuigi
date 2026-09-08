@@ -36,6 +36,13 @@ namespace Quantum {
             if (transform->Position.Y + collider->Shape.Box.Extents.Y + collider->Shape.Centroid.Y < stage.StageWorldMin.Y) {
                 enemy->IsActive = false;
                 enemy->IsDead = true;
+
+                if (enemy->DisableRespawning && enemy->Spawnpoint == FPVector2.Zero && !f.Has<MapEntityLink>(filter.Entity)) {
+                    // Spawned via script
+                    f.Destroy(filter.Entity);
+                    return;
+                }
+                
                 if (!enemy->DisableRespawning) {
                     enemy->SetDelayedRespawn();
                 }
@@ -85,7 +92,6 @@ namespace Quantum {
                 enemy->IntangibilityFrames = 30; // 30 / 60 is .50 for .50 seconds
                 enemy->Respawn(f, filter.Entity);
                 f.Events.EnemyAfterDelayedRespawn(filter.Entity);
-                f.Signals.OnEnemyRespawned(filter.Entity);
 
             } else if (enemy->RespawnTimer == enemy->RespawnSparklesTimer && enemy->RespawnSparklesTimer != 0) {
                 filter.Transform->Teleport(f, enemy->Spawnpoint);
@@ -154,27 +160,9 @@ namespace Quantum {
         }
 
         public void OnStageReset(Frame f, QBoolean full) {
-            if (!full) {
-                // ignore non-full resets
-                return;
-            }
-
             var filter = f.Filter<Enemy, Transform2D>();
             while (filter.NextUnsafe(out EntityRef entity, out Enemy* enemy, out Transform2D* transform)) {
-                if (enemy->IsActive) {
-                    // Check for respawning blocks killing us
-                    if (!f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
-                        || physicsObject->DisableCollision) {
-                        continue;
-                    }
-                    if (!f.Unsafe.TryGetPointer(entity, out PhysicsCollider2D* collider)) {
-                        continue;
-                    }
-
-                    if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, entity: entity)) {
-                        f.Signals.OnEnemyKilledByStageReset(entity);
-                    }
-                } else {
+                if (full) {
                     // Check for respawns
                     if (enemy->DisableRespawning) {
                         continue;
@@ -188,7 +176,19 @@ namespace Quantum {
                     }
 
                     enemy->Respawn(f, entity);
-                    f.Signals.OnEnemyRespawned(entity); 
+                }
+
+                if (enemy->IsActive) {
+                    // Check for respawning blocks killing us
+                    if (!f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
+                        || physicsObject->DisableCollision
+                        || !f.Unsafe.TryGetPointer(entity, out PhysicsCollider2D* collider)) {
+                        continue;
+                    }
+
+                    if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, entity: entity)) {
+                        f.Signals.OnEnemyKilledByStageReset(entity);
+                    }
                 }
             }
         }
@@ -206,13 +206,13 @@ namespace Quantum {
         }
 
         public void OnEnemyDespawned(Frame f, EntityRef entity) {
-            if (f.Has<Enemy>(entity) && f.Unsafe.TryGetPointer(entity, out PhysicsCollider2D* collider)) {
+            if (f.Unsafe.TryGetPointer(entity, out PhysicsCollider2D* collider)) {
                 collider->Enabled = false;
             }
         }
 
         public void OnEnemyRespawned(Frame f, EntityRef entity) {
-            if (f.Has<Enemy>(entity) && f.Unsafe.TryGetPointer(entity, out PhysicsCollider2D* collider)) {
+            if (f.Unsafe.TryGetPointer(entity, out PhysicsCollider2D* collider)) {
                 collider->Enabled = true;
             }
         }

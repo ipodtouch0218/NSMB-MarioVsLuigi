@@ -72,7 +72,7 @@ namespace NSMB.UI.Options {
                 loader.OnValueChanged(this, newValue);
             }
 
-            Settings.Instance.SaveSettings();
+            StartCoroutine(WaitOneFrame(Settings.Instance.SaveSettings));
         }
     }
 }

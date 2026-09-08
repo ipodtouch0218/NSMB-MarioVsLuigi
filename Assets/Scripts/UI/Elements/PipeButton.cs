@@ -1,8 +1,8 @@
 ﻿using NSMB.Utilities.Extensions;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace NSMB.UI.Elements {
     public class PipeButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {

@@ -69,7 +69,7 @@ namespace Photon.Realtime
                         client.AuthValues = arguments.AuthValues.CopyTo(new AuthenticationValues());
                     }
 
-                    client.RealtimePeer.CrcEnabled = arguments.EnableCrc;
+                    client.CrcEnabled = arguments.EnableCrc;
                 }
 
                 await client.ConnectUsingSettingsAsync(arguments.PhotonSettings, asyncConfig);
@@ -227,7 +227,7 @@ namespace Photon.Realtime
                         client.AuthValues = arguments.AuthValues.CopyTo(new AuthenticationValues());
                     }
 
-                    client.RealtimePeer.CrcEnabled = arguments.EnableCrc;
+                    client.CrcEnabled = arguments.EnableCrc;
                     arguments.PhotonSettings.FixedRegion = arguments.ReconnectInformation.Region;
 
 
@@ -379,11 +379,16 @@ namespace Photon.Realtime
         public AppSettings PhotonSettings;
         /// <summary>
         /// Player TTL setting in seconds.
+        /// A non-zero value is required to enable rejoin (and therefore fast reconnect via <see cref="ReconnectToRoomAsync(RealtimeClient, MatchmakingArguments)"/>).
+        /// -1 keeps the user in the room for the lifetime of the room; a positive value defines the inactive window in seconds.
+        /// 0 (the default) disables rejoin entirely.
         /// Will be configured as <see cref="EnterRoomArgs.RoomOptions"/>.PlayerTtl when creating a Photon room.
         /// </summary>
         public int PlayerTtlInSeconds;
         /// <summary>
         /// Empty room TTL setting in seconds.
+        /// Only meaningful together with <see cref="PlayerTtlInSeconds"/> &gt; 0; defines how long an emptied room
+        /// persists in memory so inactive players can rejoin.
         /// Will be configured as <see cref="EnterRoomArgs.RoomOptions"/>.EmptyRoomTtl when creating a Photon room.
         /// </summary>
         public int EmptyRoomTtlInSeconds;
@@ -394,7 +399,7 @@ namespace Photon.Realtime
         public string RoomName;
         /// <summary>
         /// Max clients for the Photon room. 0 = unlimited.
-        /// Set on <see cref="JoinRandomRoomArgs.ExpectedMaxPlayers"/> and <see cref="EnterRoomArgs.RoomOptions"/>.MaxPlayers."/>
+        /// Set on <see cref="JoinRandomRoomArgs.ExpectedMaxPlayers"/> and <see cref="EnterRoomArgs.RoomOptions"/>.MaxPlayers.
         /// </summary>
         public int MaxPlayers;
         /// <summary>
@@ -433,12 +438,13 @@ namespace Photon.Realtime
         public string[] ExpectedUsers;
         /// <summary>
         /// Optional Photon Realtime lobby to use for matchmaking.
-        /// Used for <see cref="JoinRandomRoomArgs.Lobby"/> and <see cref="EnterRoomArgs.Lobby"/>."
+        /// Used for <see cref="JoinRandomRoomArgs.Lobby"/> and <see cref="EnterRoomArgs.Lobby"/>.
         /// </summary>
         public TypedLobby Lobby;
         /// <summary>
         /// Optional list of room properties that are used for lobby matchmaking.
-        /// Will be configured as <see cref="EnterRoomArgs.RoomOptions"/>.
+        /// Will be configured as <see cref="EnterRoomArgs.RoomOptions"/>.CustomRoomPropertiesForLobby
+        /// — the subset of <see cref="CustomProperties"/> that the Master Server sends to lobby clients.
         /// </summary>
         public string[] CustomLobbyProperties;
         /// <summary>
@@ -447,7 +453,7 @@ namespace Photon.Realtime
         public string SqlLobbyFilter;
         /// <summary>
         /// Optional Photon matchmaking ticket.
-        /// Used for <see cref="JoinRandomRoomArgs.Ticket"/> and <see cref="EnterRoomArgs.Ticket"/>."/>
+        /// Used for <see cref="JoinRandomRoomArgs.Ticket"/> and <see cref="EnterRoomArgs.Ticket"/>.
         /// </summary>
         public object Ticket;
         /// <summary>
@@ -470,11 +476,14 @@ namespace Photon.Realtime
         public bool? IsRoomOpen;
         /// <summary>
         /// Enable CRC for Photon networking to detect corrupted packages.
-        /// Building the checksum with <see cref="PhotonPeer.CrcEnabled"/> has a low processing overhead but increases integrity of sent and received data.
+        /// Building the checksum with <see cref="RealtimeClient.CrcEnabled"/> has a low processing overhead but increases integrity of sent and received data.
         /// </summary>
         public bool EnableCrc;
         /// <summary>
-        /// Disables fast reconnecting to the Photon server to initially run <see cref="RealtimeClient.ReconnectAndRejoin"/> when the interruption is less then 10 second.
+        /// When false (default), <see cref="ReconnectToRoomAsync(RealtimeClient, MatchmakingArguments)"/> first attempts
+        /// <see cref="RealtimeClient.ReconnectAndRejoin"/> (the fast path that reuses the existing connection state)
+        /// before falling back to a full reconnect. Set to true to always use the full path, e.g. when the prior
+        /// connection is known to be unrecoverable.
         /// </summary>
         public bool FastReconnectDisabled;
 
@@ -592,7 +601,7 @@ namespace Photon.Realtime
         /// <summary>
         /// The default timeout that is used when <see cref="Set(RealtimeClient)"/> is called.
         /// </summary>
-        public TimeSpan DefaultTimeout = TimeSpan.FromSeconds(20);
+        public int DefaultTimeout = 20;
 
         /// <summary>
         /// Set and get <see cref="TimeoutInTicks"/>.
@@ -619,7 +628,7 @@ namespace Photon.Realtime
         /// </summary>
         /// <param name="client">Photon client object.</param>
         public virtual void Set(RealtimeClient client) {
-            Set(client, DefaultTimeout);
+            Set(client, TimeSpan.FromSeconds(DefaultTimeout));
         }
 
         /// <summary>

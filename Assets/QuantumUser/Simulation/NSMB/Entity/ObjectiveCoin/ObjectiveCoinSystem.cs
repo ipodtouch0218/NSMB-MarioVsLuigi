@@ -1,5 +1,4 @@
 using Photon.Deterministic;
-using Quantum.Physics2D;
 
 namespace Quantum {
     public unsafe class ObjectiveCoinSystem : SystemMainThread, ISignalOnMarioPlayerDropObjective, ISignalOnMarioPlayerCollectedCoin,
@@ -18,6 +17,10 @@ namespace Quantum {
         }
 
         public override void Update(Frame f) {
+            if (!IsEnabledInHierarchy(f)) {
+                return;
+            }
+
             if (!f.Exists(f.Global->MainBigStar) && QuantumUtils.Decrement(ref f.Global->BigStarSpawnTimer)) {
                 VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
                 HandleSpawningNewStarCoin(f, stage);
@@ -73,7 +76,6 @@ namespace Quantum {
 
             f.Events.CoinGroupSpawned(origin, amount);
         }
-
 
         public void OnMarioPlayerDropObjective(Frame f, EntityRef entity, int amount, EntityRef attacker) {
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);

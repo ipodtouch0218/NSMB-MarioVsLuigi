@@ -16,6 +16,12 @@ namespace Quantum {
             f.SystemDisable<GoldBlockSystem>();
        }
 
+        public override void OnReturnToRoom(Frame f) {
+            f.Global->MainBigStar = EntityRef.None;
+            f.Global->BigStarSpawnTimer = 0;
+            f.Global->UsedStarSpawns.ClearAll();
+        }
+
         public override void CheckForGameEnd(Frame f) {
             // End Condition: only one team alive
             Span<int> objectiveCounts = stackalloc int[Constants.MaxPlayers];
@@ -75,7 +81,7 @@ namespace Quantum {
         public override FP GetItemSpawnWeight(Frame f, CoinItemAsset item, int ourCoins) {
             FP averageCoins = GetAverageObjectiveCount(f);
             FP avgDiff = ourCoins - averageCoins;
-            FP percentageTimeRemaining = f.Global->Timer / (f.Global->Rules.TimerMinutes * 60);
+            FP percentageTimeRemaining = f.Global->Rules.IsTimerEnabled ? (f.Global->Timer / (f.Global->Rules.TimerMinutes * 60)) : 1;
             FP whichBonus = avgDiff > 0 ? item.AboveAverageBonus : item.BelowAverageBonus;
             FP bonus = whichBonus * FPMath.Log((FPMath.Abs(avgDiff) / 40) + 1, FP.E) * 1 - (percentageTimeRemaining * percentageTimeRemaining);
 

@@ -2148,6 +2148,17 @@
             <param name="segmentEndB">End point of segment B.</param>
             <returns></returns>
         </member>
+        <member name="M:Photon.Deterministic.FPCollision.ClosestPointBetweenSegments(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3@,Photon.Deterministic.FPVector3@)">
+            <summary>
+            Computes the closes point in segment A to a segment B and the closest point in segment B to A.
+            </summary>
+            <param name="segmentStartA">Start point of segment A.</param>
+            <param name="segmentEndA">End point of segment A.</param>
+            <param name="segmentStartB">Start point of segment A.</param>
+            <param name="segmentEndB">End point of segment B.</param>
+            <param name="pointOnA">Closest point to B on segment A.</param>
+            <param name="pointOnB">Closest point to A on segment B.</param>
+        </member>
         <member name="T:Photon.Deterministic.FPHighPrecisionDivisor">
             <summary>
             Represents a high precision divisor for use with the Fixed Point math system.
@@ -4116,6 +4127,9 @@
         <member name="M:Photon.Deterministic.FPQuaternion.RotateTowards(Photon.Deterministic.FPQuaternion,Photon.Deterministic.FPQuaternion,Photon.Deterministic.FP)">
             <summary>
             Rotates a rotation <paramref name="from"/> towards <paramref name="to"/> by an angular step of <paramref name="maxDegreesDelta"/>.
+            <remarks>
+            Both <paramref name="from"/> and <paramref name="to"/> quaternions are assumed and expected to be normalized.
+            </remarks>
             </summary>
             <param name="from"></param>
             <param name="to"></param>

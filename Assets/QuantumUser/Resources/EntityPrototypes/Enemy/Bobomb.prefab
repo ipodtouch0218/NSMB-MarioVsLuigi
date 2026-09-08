@@ -458,7 +458,7 @@ MonoBehaviour:
   sfx: {fileID: -3689537593968581114}
   respawnParticle: {fileID: 5191653714546004373, guid: 82fd7a7a1d84c6e4aa4334f5ac629ebf,
     type: 3}
-  respawnColor: {r: 0.15, g: 0.15, b: 0.15, a: 1}
+  respawnColor: {r: 0.4716981, g: 0.4716981, b: 0.4716981, a: 1}
 --- !u!114 &6162738416106121865
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -610,8 +610,6 @@ MonoBehaviour:
     SlowInLiquids:
       Value: 1
     IsWaterSolid:
-      Value: 0
-    BreakMegaObjects:
       Value: 0
 --- !u!114 &5295556553734674634
 MonoBehaviour:

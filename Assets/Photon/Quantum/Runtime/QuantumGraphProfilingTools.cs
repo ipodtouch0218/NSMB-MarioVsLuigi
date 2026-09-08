@@ -1,4 +1,5 @@
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   using System.Collections.Generic;
   using Photon.Client;
   using UnityEngine;
@@ -191,4 +192,5 @@ namespace Quantum.Profiling {
       _toggleVisibility.color = _isSimulationEnabled == true ? Color.red : _defaultToggleColor;
     }
   }
+#endif
 }

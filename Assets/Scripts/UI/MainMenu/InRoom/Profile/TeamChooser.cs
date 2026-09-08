@@ -24,6 +24,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged);
             QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
             QuantumEvent.Subscribe<EventPlayerTeamChangedByHost>(this, OnPlayerTeamChangedByHost);
+            QuantumEvent.Subscribe<EventPlayerTeamRandomized>(this, OnPlayerTeamRandomized);
         }
 
         public void OnEnable() {
@@ -150,13 +151,19 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
 
         private unsafe void OnPlayerTeamChangedByHost(EventPlayerTeamChangedByHost e) {
-            if (e.Game.PlayerIsLocal(e.Player)) {
-                UpdateButtonInteractable(e.Game);
-
-                if (!e.Clear) {
-                    Close(false);
-                }
+            if (!e.Game.PlayerIsLocal(e.Player)) {
+                return;
             }
+
+            UpdateButtonInteractable(e.Game);
+            if (!e.Clear) {
+                Close(false);
+            }
+        }
+
+        private unsafe void OnPlayerTeamRandomized(EventPlayerTeamRandomized e) {
+            UpdateButtonInteractable(e.Game);
+            Close(false);
         }
 
         private unsafe void OnPlayerDataChanged(EventPlayerDataChanged e) {

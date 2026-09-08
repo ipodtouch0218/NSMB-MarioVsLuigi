@@ -1,5 +1,4 @@
 using NSMB.Replay;
-using NSMB.UI.MainMenu;
 using NSMB.UI.MainMenu.Submenus.Replays;
 using NSMB.UI.Translation;
 using NSMB.Utilities.Extensions;

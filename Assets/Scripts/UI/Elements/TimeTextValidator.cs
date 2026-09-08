@@ -1,6 +1,6 @@
 using System;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 namespace NSMB.UI.MainMenu.Elements {
     [CreateAssetMenu(fileName = "TimeTextValidator", menuName = "ScriptableObjects/Input Validators/TimeTextValidator")]

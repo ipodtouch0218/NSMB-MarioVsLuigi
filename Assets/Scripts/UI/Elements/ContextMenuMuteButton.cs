@@ -15,6 +15,7 @@ namespace NSMB.UI.Elements {
 
         public void OnEnable() {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
+            OnLanguageChanged(GlobalController.Instance.translationManager);
         }
 
         public void OnDisable() {

@@ -86,7 +86,7 @@ namespace Quantum {
     }
 
     [StaticField(StaticFieldResetMode.None)]
-    static string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
+    static readonly string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
 
     static String BytesToString(long byteCount) {
       if (byteCount == 0) {

@@ -3,6 +3,7 @@ using Quantum;
 using Quantum.Collections;
 using Quantum.Core;
 using System;
+using System.Runtime.CompilerServices;
 
 public static unsafe class QuantumUtils {
 
@@ -98,7 +99,7 @@ public static unsafe class QuantumUtils {
 
     public static IntVector2 UnityTileToRelativeTile(VersusStageData stage, IntVector2 unityTile, bool extend = true, bool wrap = true) {
         int x = unityTile.X - stage.TileOrigin.X;
-        if (wrap) {
+        if (wrap && stage.IsWrappingLevel) {
             x = Modulo(x, stage.TileDimensions.X); // Wrapping
         }
         int y = unityTile.Y - stage.TileOrigin.Y;
@@ -147,6 +148,11 @@ public static unsafe class QuantumUtils {
     }
 
     public static IntVector2 WrapRelativeTile(VersusStageData stage, IntVector2 relativeTile, out WrapDirection wrapDirection) {
+        if (!stage.IsWrappingLevel) {
+            wrapDirection = WrapDirection.NoWrap;
+            return relativeTile;
+        }
+
         if (relativeTile.X < 0) {
             relativeTile.X += stage.TileDimensions.X;
             wrapDirection = WrapDirection.Left;
@@ -167,6 +173,11 @@ public static unsafe class QuantumUtils {
     }
 
     public static FPVector2 WrapUnityTile(VersusStageData stage, FPVector2 unityTile, out WrapDirection wrapDirection) {
+        if (!stage.IsWrappingLevel) {
+            wrapDirection = WrapDirection.NoWrap;
+            return unityTile;
+        }
+
         if (unityTile.X < stage.TileOrigin.X) {
             unityTile.X += stage.TileDimensions.X;
             wrapDirection = WrapDirection.Left;
@@ -187,6 +198,11 @@ public static unsafe class QuantumUtils {
     }
 
     public static FPVector2 WrapWorld(VersusStageData stage, FPVector2 worldPos, out WrapDirection wrapDirection) {
+        if (!stage.IsWrappingLevel) {
+            wrapDirection = WrapDirection.NoWrap;
+            return worldPos;
+        }
+
         if (worldPos.X < stage.StageWorldMin.X) {
             worldPos.X += stage.TileDimensions.X / 2;
             wrapDirection = WrapDirection.Left;
@@ -284,10 +300,17 @@ public static unsafe class QuantumUtils {
         return 1 - (1 - x) * (1 - x);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ref T IndexModulo<T>(Span<T> arr, int index) {
+        return ref arr[Modulo(index, arr.Length)];
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Modulo(int x, int m) {
         return ((x % m) + m) % m;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static FP Modulo(FP x, FP m) {
         return ((x % m) + m) % m;
     }

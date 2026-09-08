@@ -6,7 +6,6 @@ using NSMB.UI.Game.Replay;
 using NSMB.UI.Game.Scoreboard;
 using NSMB.UI.Pause;
 using NSMB.UI.Translation;
-using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
 using Quantum;
 using System;

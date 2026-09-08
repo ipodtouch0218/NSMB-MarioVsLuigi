@@ -261,6 +261,7 @@ namespace NSMB {
 
         public void OnDestroy() {
             _controls.Disable();
+            _controls.Dispose();
         }
 
         public void SaveSettings() {
@@ -327,7 +328,9 @@ namespace NSMB {
 
         public void LoadSettings() {
             for (int i = 0; i < VersionUpdaters.Length; i++) {
-                VersionUpdaters[i]();
+                try {
+                    VersionUpdaters[i]();
+                } catch { }
             }
             SaveSettings();
         }

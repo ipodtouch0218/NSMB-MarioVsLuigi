@@ -1,5 +1,5 @@
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 namespace NSMB.UI.MainMenu.Submenus.Main {
     public class VersionNamer : MonoBehaviour {

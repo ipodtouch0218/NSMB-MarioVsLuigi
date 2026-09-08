@@ -1,4 +1,5 @@
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   using Unity.Profiling;
   using UnityEngine;
   using UnityEngine.UI;
@@ -93,12 +94,13 @@ namespace Quantum.Profiling {
 
       _entityCount.text = memoryStats.EntityCount.ToString();
       _entityMemory.text = (memoryStats.EntityTotalMemory / 1024).ToString();
-      _totalUsedMemory.text = _totalUsedMemoryRecorder.Valid == true ? string.Format("{0}", _totalUsedMemoryRecorder.LastValue / 1048576) : "---";
-      _gfxUsedMemory.text = _gfxUsedMemoryRecorder.Valid == true ? string.Format("{0}", _gfxUsedMemoryRecorder.LastValue / 1048576) : "---";
+      _totalUsedMemory.text = _totalUsedMemoryRecorder.Valid == true ? string.Format("{0}", (_totalUsedMemoryRecorder.LastValue / 1048576).ToString()) : "---";
+      _gfxUsedMemory.text = _gfxUsedMemoryRecorder.Valid == true ? string.Format("{0}", (_gfxUsedMemoryRecorder.LastValue / 1048576).ToString()) : "---";
       _batches.text = _batchesRecorder.Valid == true ? _batchesRecorder.LastValue.ToString() : "---";
       _drawCalls.text = _drawCallsRecorder.Valid == true ? _drawCallsRecorder.LastValue.ToString() : "---";
-      _triangles.text = _trianglesRecorder.Valid == true ? string.Format("{0}k", _trianglesRecorder.LastValue / 1000) : "---";
+      _triangles.text = _trianglesRecorder.Valid == true ? string.Format("{0}k", (_trianglesRecorder.LastValue / 1000).ToString()) : "---";
       _setPassCalls.text = _setPassCallsRecorder.Valid == true ? _setPassCallsRecorder.LastValue.ToString() : "---";
     }
   }
+#endif
 }

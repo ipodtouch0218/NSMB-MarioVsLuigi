@@ -38,7 +38,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _CapMask:
-        m_Texture: {fileID: 2800000, guid: fd6269fff4f6a1943bfabc975eccfcc8, type: 3}
+        m_Texture: {fileID: 2800000, guid: ba1beaff1a0d78a468190ca3d1b515df, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -82,7 +82,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ShirtMask:
-        m_Texture: {fileID: 2800000, guid: ba1beaff1a0d78a468190ca3d1b515df, type: 3}
+        m_Texture: {fileID: 2800000, guid: fd6269fff4f6a1943bfabc975eccfcc8, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:

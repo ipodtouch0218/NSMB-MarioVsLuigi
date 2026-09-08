@@ -226,8 +226,7 @@ namespace NSMB.UI.Pause {
         }
 
         public unsafe void ClickConfirmYes() {
-            if (isInConfirmationForQuitting)
-            {
+            if (isInConfirmationForQuitting) {
                 GlobalController.Instance.fader.FadeBehindUi = false;
                 QuantumRunner.Default.Shutdown();
 

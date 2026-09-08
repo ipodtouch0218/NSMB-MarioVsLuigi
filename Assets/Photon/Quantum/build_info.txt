@@ -1,3 +1,3 @@
-build: 3.0.11 Stable 2034
-date: 2026-04-09 08:41:48
-git: 3.0/main (19da6348f)
+build: 3.0.13 Stable 2170
+date: 2026-08-05 15:18:23
+git: 3.0/main (a0c88b21f)

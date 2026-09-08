@@ -1,6 +1,6 @@
 {
   "name": "com.photonengine.photonlibs",
-  "version": "5.1.5",
+  "version": "5.1.15",
   "displayName": "Photon Libs",
   "description": "Photon Libs - Cross-Platform Networking Engine Libraries",
   "unity": "2021.3",

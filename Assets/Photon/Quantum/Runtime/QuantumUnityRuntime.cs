@@ -509,6 +509,7 @@ namespace Quantum {
     IPrototype Convert(QuantumEntityPrototypeConverter converter);
   }
 
+  [Serializable]
   public abstract class QuantumUnityPrototypeAdapter<PrototypeType> 
 #if QUANTUM_ENABLE_MIGRATION
 #pragma warning disable CS0618
@@ -641,6 +642,11 @@ namespace Quantum {
   public abstract partial class QuantumCallback : QuantumUnityStaticDispatcherAdapter<QuantumUnityCallbackDispatcher, CallbackBase> {
     private QuantumCallback() {
       throw new NotSupportedException();
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() {
+      Clear();
     }
 
     [RuntimeInitializeOnLoadMethod]
@@ -1458,7 +1464,7 @@ namespace Quantum {
       }
     }
 
-    static Lazy<GetAddressableScenesResult>                 _addressableScenesTask = new(() => GetAddressableScenes());
+    static readonly Lazy<GetAddressableScenesResult>        _addressableScenesTask = new(() => GetAddressableScenes());
     Dictionary<string, AsyncOperationHandle<SceneInstance>> _addressableOperations = new();
 #endif
   }
@@ -1583,6 +1589,7 @@ namespace Quantum {
 
 namespace Quantum {
   using System;
+  using UnityEngine;
 
   /// <summary>
   /// Events are a fire-and-forget mechanism to transfer information from the simulation to the view.
@@ -1598,6 +1605,11 @@ namespace Quantum {
   public abstract class QuantumEvent : QuantumUnityStaticDispatcherAdapter<QuantumUnityEventDispatcher, EventBase> {
     private QuantumEvent() {
       throw new NotSupportedException();
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() {
+      Clear();
     }
   }
 
@@ -1618,13 +1630,15 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Runtime/Dispatcher/QuantumUnityStaticDispatcherAdapter.cs
 
 namespace Quantum {
-  using System;
   using Photon.Analyzer;
   using Photon.Deterministic;
+  using System;
+  using System.Diagnostics.CodeAnalysis;
   using UnityEngine;
   using Object = UnityEngine.Object;
   
   internal sealed class QuantumUnityStaticDispatcherAdapterWorker : QuantumMonoBehaviour {
+    [NonSerialized]
     public DispatcherBase Dispatcher;
 
     private void LateUpdate() {
@@ -1648,6 +1662,7 @@ namespace Quantum {
     
     [StaticField]
     // ReSharper disable once StaticMemberInGenericType
+    [SuppressMessage("Domain reload", "UDR0001", Justification = "Is reset during QuantumCallback.ResetStatics()")]
     private static QuantumUnityStaticDispatcherAdapterWorker _worker;
 
     /// <summary>
@@ -3673,6 +3688,7 @@ namespace Quantum {
     /// Invalidates the navmesh gizmos.
     /// </summary>
     [StaticFieldResetMethod]
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     public static void InvalidateGizmos() {
       _navmeshGizmoMap?.Clear();
       _meshGizmoData.Clear();
@@ -4240,9 +4256,9 @@ namespace Quantum {
 
 namespace Quantum {
 #if UNITY_EDITOR
+  using Photon.Deterministic;
   using System;
   using System.Collections.Generic;
-  using Photon.Deterministic;
   using UnityEditor;
   using UnityEngine;
 
@@ -4259,7 +4275,7 @@ namespace Quantum {
 
       FPMathUtils.LoadLookupTables();
 
-      var map = behaviour.GetAsset(false);
+      var map = behaviour.GetAsset(forEditor: true);
       if (!map) {
         return;
       }
@@ -4270,7 +4286,10 @@ namespace Quantum {
 
       foreach (var navmeshLink in map.NavMeshLinks) {
         if (navmeshLink.IsValid) {
-          navmeshList.Add(QuantumUnityDB.GetGlobalAsset(navmeshLink));
+          var navmesh = QuantumUnityDB.GetGlobalAsset(navmeshLink);
+          if (navmesh != null) {
+            navmeshList.Add(navmesh);
+          }
         }
       }
 
@@ -6298,142 +6317,142 @@ namespace Quantum {
     /// <summary>
     /// Black Gizmo color. RGBA: (0, 0, 0, 1)
     /// </summary>
-    public static Color Black = Color.black;
+    public static Color Black => Color.black;
 
     /// <summary>
     /// Yellow Gizmo color. RGBA: (1, 0.92, 0.016, 1)
     /// </summary>
-    public static Color Yellow = Color.yellow;
+    public static Color Yellow => Color.yellow;
 
     /// <summary>
     /// Magenta Gizmo color. RGBA: (1, 0, 1, 1)
     /// </summary>
-    public static Color Magenta = Color.magenta;
+    public static Color Magenta => Color.magenta;
 
     /// <summary>
     /// Blue Gizmo color. RGBA: (0, 0, 1, 1)
     /// </summary>
-    public static Color Blue = Color.blue;
+    public static Color Blue => Color.blue;
 
     /// <summary>
     /// Green Gizmo color. RGBA: (0, 1, 0, 1)
     /// </summary>
-    public static Color Green = Color.green;
+    public static Color Green => Color.green;
     
     /// <summary>
     /// White Gizmo color. RGBA: (1, 1, 1, 1)
     /// </summary>
-    public static Color White = Color.white;
+    public static Color White => Color.white;
     
     /// <summary>
     /// Red Gizmo color. RGBA: (1, 0, 0, 1)
     /// </summary>
-    public static Color Red = Color.red;
+    public static Color Red => Color.red;
     
     /// <summary>
     /// Cyan Gizmo color. RGBA: (0, 1, 1, 1)
     /// </summary>
-    public static Color Cyan = Color.cyan;
+    public static Color Cyan => Color.cyan;
     
     /// <summary>
     /// Gray Gizmo color. RGBA: (0.5, 0.5, 0.5, 1)
     /// </summary>
-    public static Color Gray = Color.gray;
+    public static Color Gray => Color.gray;
 
     /// <summary>
     /// Light Green Gizmo color. RGBA: (0.4, 1, 0.7, 1)
     /// </summary>
-    public static Color LightGreen = new Color(0.4f, 1.0f, 0.7f);
+    public static Color LightGreen => new Color(0.4f, 1.0f, 0.7f);
     
     /// <summary>
     /// Lime Green Gizmo color. RGBA: (0.4925605, 0.9176471, 0.5050631, 1)
     /// </summary>
-    public static Color LimeGreen = new Color(0.4925605f, 0.9176471f, 0.5050631f);
+    public static Color LimeGreen => new Color(0.4925605f, 0.9176471f, 0.5050631f);
     
     /// <summary>
     /// Light Blue Gizmo color. RGBA: (0, 0.75, 1, 1)
     /// </summary>
-    public static Color LightBlue = new Color(0.0f, 0.75f, 1.0f);
+    public static Color LightBlue => new Color(0.0f, 0.75f, 1.0f);
     
     /// <summary>
     /// Sky Blue Gizmo color. RGBA: (0.4705882, 0.7371198, 1, 1)
     /// </summary>
-    public static Color SkyBlue = new Color(0.4705882f, 0.7371198f, 1.0f);
+    public static Color SkyBlue => new Color(0.4705882f, 0.7371198f, 1.0f);
     
     /// <summary>
     /// Maroon Gizmo color. RGBA: (1, 0, 0.5, 0.5)
     /// </summary>
-    public static Color Maroon = new Color(1.0f, 0.0f, 0.5f, 0.5f);
+    public static Color Maroon => new Color(1.0f, 0.0f, 0.5f, 0.5f);
     
     /// <summary>
     /// Light Purple Gizmo color. RGBA: (0.5192922, 0.4622621, 0.6985294, 1)
     /// </summary>
-    public static Color LightPurple = new Color(0.5192922f, 0.4622621f, 0.6985294f);
+    public static Color LightPurple => new Color(0.5192922f, 0.4622621f, 0.6985294f);
     
     /// <summary>
     /// Transparent Magenta Gizmo color. RGBA: (1, 0, 1, 0.5)
     /// </summary>
-    public static Color TransparentMagenta = Magenta.Alpha(0.5f);
+    public static Color TransparentMagenta => Magenta.Alpha(0.5f);
     
     /// <summary>
     /// Transparent Gray Gizmo color. RGBA: (0.5, 0.5, 0.5, 0.5)
     /// </summary>
-    public static Color TransparentGray = Gray.Alpha(0.5f);
+    public static Color TransparentGray => Gray.Alpha(0.5f);
     
     /// <summary>
     /// Transparent Light Purple Gizmo color. RGBA: (0.5192922, 0.4622621, 0.6985294, 0.5)
     /// </summary>
-    public static Color TransparentLightPurple = LightPurple.Alpha(0.5f);
+    public static Color TransparentLightPurple => LightPurple.Alpha(0.5f);
     
     /// <summary>
     /// Transparent Yellow Gizmo color. RGBA: (1, 0.92, 0.016, 0.5)
     /// </summary>
-    public static Color TransparentYellow = Yellow.Alpha(0.5f);
+    public static Color TransparentYellow => Yellow.Alpha(0.5f);
     
     /// <summary>
     /// Transparent White Gizmo color. RGBA: (1, 1, 1, 0.5)
     /// </summary>
-    public static Color TransparentWhite = White.Alpha(0.5f);
+    public static Color TransparentWhite => White.Alpha(0.5f);
     
     /// <summary>
     /// Transparent Lime Green Gizmo color. RGBA: (0.4925605, 0.9176471, 0.5050631, 0.5)
     /// </summary>
-    public static Color TransparentLimeGreen = LimeGreen.Alpha(0.5f);
+    public static Color TransparentLimeGreen => LimeGreen.Alpha(0.5f);
     
     /// <summary>
     /// Transparent Green Gizmo color. RGBA: (0, 1, 0, 0.5)
     /// </summary>
-    public static Color TransparentGreen = Green.Alpha(0.5f);
+    public static Color TransparentGreen => Green.Alpha(0.5f);
     
     /// <summary>
     /// Transparent Sky Blue Gizmo color. RGBA: (0.4705882, 0.7371198, 1, 0.5)
     /// </summary>
-    public static Color TransparentSkyBlue = SkyBlue.Alpha(0.5f);
+    public static Color TransparentSkyBlue => SkyBlue.Alpha(0.5f);
     
     /// <summary>
     /// Transparent Light Blue Gizmo color. RGBA: (0, 0.75, 1, 0.5)
     /// </summary>
-    public static Color TransparentLightBlue = LightBlue.Alpha(0.5f);
+    public static Color TransparentLightBlue => LightBlue.Alpha(0.5f);
     
     /// <summary>
     /// Transparent Black Gizmo color. RGBA: (0, 0, 0, 0.5)
     /// </summary>
-    public static Color TransparentLightGreen = LightGreen.Alpha(0.5f);
+    public static Color TransparentLightGreen => LightGreen.Alpha(0.5f);
     
     /// <summary>
     /// Transparent Blue Gizmo color. RGBA: (0, 0, 1, 0.5)
     /// </summary>
-    public static Color TransparentBlue = Blue.Alpha(0.5f);
+    public static Color TransparentBlue => Blue.Alpha(0.5f);
     
     /// <summary>
     /// Transparent Maroon Gizmo color. RGBA: (1, 0, 0.5, 0.5)
     /// </summary>
-    public static Color TransparentMaroon = Maroon.Alpha(0.5f);
+    public static Color TransparentMaroon => Maroon.Alpha(0.5f);
     
     /// <summary>
     /// Transparent Red Gizmo color. RGBA: (1, 0, 0, 0.5)
     /// </summary>
-    public static Color TransparentRed = Red.Alpha(0.5f);
+    public static Color TransparentRed => Red.Alpha(0.5f);
 
     /// <summary>
     /// Get the selected version of a given color.
@@ -9109,7 +9128,7 @@ namespace Quantum {
       Debug.Assert(_rewindSnapshots != null);
       var frame = _rewindSnapshots.Find(frameNumber, DeterministicFrameSnapshotBufferFindMode.ClosestLessThanOrEqual);
       if (frame == null) {
-        throw new ArgumentOutOfRangeException(nameof(frameNumber), $"Unable to find a frame with number less or equal to {frameNumber}.");
+        throw new ArgumentOutOfRangeException(nameof(frameNumber), $"Unable to find a frame with number less or equal to {frameNumber.ToString()}.");
       }
 
       _replayRunner.Session.ResetReplay(frame);
@@ -9148,7 +9167,7 @@ namespace Quantum {
 
     private void FastForward(int frameNumber) {
       if (frameNumber < CurrentFrame) {
-        throw new ArgumentException($"Can't seek backwards to {frameNumber} from {CurrentFrame}", nameof(frameNumber));
+        throw new ArgumentException($"Can't seek backwards to {frameNumber.ToString()} from {CurrentFrame.ToString()}", nameof(frameNumber));
       } else if (frameNumber == CurrentFrame) {
         // nothing to do here
         return;
@@ -9165,16 +9184,16 @@ namespace Quantum {
 
         if (afterUpdate >= frameNumber) {
           if (afterUpdate > frameNumber) {
-            Debug.LogWarning($"Seek after the target frame {frameNumber} (from {beforeUpdate}), got to {afterUpdate}.");
+            Debug.LogWarning($"Seek after the target frame {frameNumber.ToString()} (from {beforeUpdate.ToString()}), got to {afterUpdate.ToString()}.");
           }
 
           return;
         } else {
-          Debug.LogWarning($"Failed to seek to frame {frameNumber} (from {beforeUpdate}), got to {afterUpdate}. {attemptsLeft} attempts left.");
+          Debug.LogWarning($"Failed to seek to frame {frameNumber.ToString()} (from {beforeUpdate.ToString()}), got to {afterUpdate.ToString()}. {attemptsLeft.ToString()} attempts left.");
         }
       }
 
-      throw new InvalidOperationException($"Unable to seek to frame {frameNumber}, ended up on {CurrentFrame}");
+      throw new InvalidOperationException($"Unable to seek to frame {frameNumber.ToString()}, ended up on {CurrentFrame.ToString()}");
     }
 
     private static double GetDeltaTime(int frames, int simulationRate) {
@@ -19390,13 +19409,14 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Runtime/QuantumMapDataBaker.cs
 
 namespace Quantum {
+  using Photon.Analyzer;
+  using Photon.Deterministic;
   using System;
   using System.Collections.Generic;
+  using System.Diagnostics.CodeAnalysis;
   using System.IO;
   using System.Linq;
   using System.Reflection;
-  using Photon.Analyzer;
-  using Photon.Deterministic;
   using UnityEditor;
   using UnityEngine;
   using UnityEngine.SceneManagement;
@@ -19404,6 +19424,7 @@ namespace Quantum {
 
   public class QuantumMapDataBaker {
     [StaticField(StaticFieldResetMode.None)]
+    [SuppressMessage("Domain reload", "UDR0001", Justification = "Modifications can persist")]
     public static int NavMeshSerializationBufferSize = 1024 * 1024 * 60;
 
     public enum BuildTrigger {
@@ -20045,7 +20066,7 @@ namespace Quantum {
 #endif
     }
     
-    private static Lazy<Type[]> CallbackTypes = new Lazy<Type[]>(() => {
+    private static readonly Lazy<Type[]> CallbackTypes = new Lazy<Type[]>(() => {
       List<Type> callbackTypes = new List<Type>();
 
       if (Application.isEditor) {
@@ -20066,11 +20087,22 @@ namespace Quantum {
         }
 #endif
       } else {
-        var markedAssemblies = AppDomain.CurrentDomain.GetAssemblies()
-          .Where(x => x.GetCustomAttribute<QuantumMapBakeAssemblyAttribute>()?.Ignore == false);
+        foreach (var asm in QuantumPlatform.GetLoadedAssemblies()) {
+          if (!asm.IsDefined(typeof(QuantumMapBakeAssemblyAttribute))) {
+            continue;
+          }
 
-        foreach (var asm in markedAssemblies) {
-          foreach (var t in asm.GetLoadableTypes()) {
+          Type[] types;
+          try {
+            types = asm.GetTypes();
+          } catch (ReflectionTypeLoadException ex) {
+            types = ex.Types;
+          }
+          
+          foreach (var t in types) {
+            if (t == null) {
+              continue;
+            }
             if (!t.IsSubclassOf(typeof(MapDataBakerCallback))) {
               continue;
             }
@@ -20079,6 +20111,7 @@ namespace Quantum {
           }
         }
       }
+      
       
       // remove non-instantiable types
       callbackTypes.RemoveAll(t => t.IsAbstract || t.IsGenericTypeDefinition);
@@ -20488,6 +20521,7 @@ namespace Quantum {
   using UnityEngine.Serialization;
   using Object = System.Object;
   using Plane = UnityEngine.Plane;
+  using System.Diagnostics.CodeAnalysis;
 #if QUANTUM_ENABLE_AI && !QUANTUM_DISABLE_AI
   using UnityEngine.AI;
 #endif
@@ -20549,6 +20583,7 @@ namespace Quantum {
     /// The default minimum agent radius. Will be updated during importing the Unity navmesh.
     /// </summary>
     [StaticField(StaticFieldResetMode.None)]
+    [SuppressMessage("Domain reload", "UDR0001", Justification = "Modifications can persist")]
     public static float DefaultMinAgentRadius = 0.25f;
 
     /// <summary>
@@ -23039,12 +23074,13 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Runtime/QuantumRunnerUnityFactory.cs
 
 namespace Quantum {
-  using System;
-  using System.Threading.Tasks;
   using Photon.Analyzer;
   using Photon.Deterministic;
   using Photon.Realtime;
   using Profiling;
+  using System;
+  using System.Diagnostics.CodeAnalysis;
+  using System.Threading.Tasks;
   using UnityEngine;
 
   /// <summary>
@@ -23055,6 +23091,7 @@ namespace Quantum {
     /// Statically keep one default factory around.
     /// </summary>
     [StaticField(StaticFieldResetMode.None)]
+    [SuppressMessage("Domain reload", "UDR0002", Justification = "Modifications can persist")]
     public static IRunnerFactory DefaultFactory;
 
     /// <summary>
@@ -23655,7 +23692,7 @@ namespace Quantum {
       
       var globalEntityView = QuantumUnityDB.GetGlobalAsset(guid) as EntityView;
       if (globalEntityView == null) {
-        throw new InvalidOperationException($"Unable to resolve prefab for guid {guid}");
+        throw new InvalidOperationException($"Unable to resolve prefab for guid {guid.ToString()}");
       }
     
       return globalEntityView.Prefab;
@@ -23941,6 +23978,7 @@ namespace Quantum {
   using Photon.Analyzer;
   using Photon.Deterministic;
   using Unity.Collections.LowLevel.Unsafe;
+  using UnityEngine;
   using UnityAllocator = global::Unity.Collections.Allocator;
 
 #if ENABLE_IL2CPP
@@ -24083,13 +24121,6 @@ namespace Quantum {
     public override unsafe int Compare(void* ptr1, void* ptr2, int count) {
       return UnsafeUtility.MemCmp(ptr1, ptr2, count);
     }
-
-    /// <summary>
-    /// Reset statics. Currently does nothing.
-    /// </summary>
-    [StaticFieldResetMethod]
-    public static void ResetStatics() {
-    }
   }
 }
 
@@ -24106,6 +24137,7 @@ namespace Quantum {
 namespace Quantum {
   using System;
   using System.Collections.Generic;
+  using System.Diagnostics.CodeAnalysis;
   using System.Linq;
   using System.Reflection;
   using UnityEngine;
@@ -24116,24 +24148,18 @@ namespace Quantum {
   /// are loaded is driven by usages of <see cref="QuantumGlobalScriptableObjectSourceAttribute"/> attributes. 
   /// </summary>
   public abstract class QuantumGlobalScriptableObject : QuantumScriptableObject {
-    private static IEnumerable<T> GetAssemblyAttributes<T>() where T : Attribute {
-      foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()) {
-        foreach (var attr in assembly.GetCustomAttributes<T>()) {
-          yield return attr;
-        }
-      }
-    }
-    
     internal static QuantumGlobalScriptableObjectSourceAttribute[] SourceAttributes => s_sourceAttributes.Value;
 
     private static readonly Lazy<QuantumGlobalScriptableObjectSourceAttribute[]> s_sourceAttributes = new Lazy<QuantumGlobalScriptableObjectSourceAttribute[]>(() => {
-      return GetAssemblyAttributes<QuantumGlobalScriptableObjectSourceAttribute>().OrderBy(x => x.Order).ToArray();
+      return QuantumPlatform.GetLoadedAssemblyAttributes<QuantumGlobalScriptableObjectSourceAttribute>().OrderBy(x => x.Order).ToArray();
     });
   }
   
   /// <inheritdoc cref="QuantumGlobalScriptableObject{T}"/>
   public abstract partial class QuantumGlobalScriptableObject<T> : QuantumGlobalScriptableObject where T : QuantumGlobalScriptableObject<T> {
-    private static T                                                s_instance;
+    [SuppressMessage("Domain reload", "UDR0001", Justification = "Is reset during UnloadGlobalInternal()")]
+    private static T s_instance;
+    [SuppressMessage("Domain reload", "UDR0001", Justification = "Is reset during UnloadGlobalInternal()")]
     private static QuantumGlobalScriptableObjectUnloadDelegate s_unloadHandler;
     
     /// <summary>
@@ -24192,6 +24218,7 @@ namespace Quantum {
     /// with a different name. Throws if loading an instance failed.
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
+    [SuppressMessage("Domain reload", "UDR0001", Justification = "s_instance is reset during UnloadGlobalInternal()")]
     protected static T GlobalInternal {
       get {
         var instance = GetOrLoadGlobalInstance();
@@ -26109,6 +26136,8 @@ namespace Quantum {
   /// Can be globally toggled of by using <see cref="IsEnabled"/>.
   /// </summary>
   public static class DebugDraw {
+#pragma warning disable UDR0002
+
     /// <summary>
     /// Globally toggle on/off any simulation debug shape drawing.
     /// </summary>
@@ -26127,15 +26156,15 @@ namespace Quantum {
       set => _textStyle = value;
     }
 
-    [StaticField] static Queue<Draw.DebugRay> _rays = new Queue<Draw.DebugRay>();
-    [StaticField] static Queue<Draw.DebugLine> _lines = new Queue<Draw.DebugLine>();
-    [StaticField] static Queue<Draw.DebugCircle> _circles = new Queue<Draw.DebugCircle>();
-    [StaticField] static Queue<Draw.DebugSphere> _spheres = new Queue<Draw.DebugSphere>();
-    [StaticField] static Queue<Draw.DebugRectangle> _rectangles = new Queue<Draw.DebugRectangle>();
-    [StaticField] static Queue<Draw.DebugBox> _boxes = new Queue<Draw.DebugBox>();
-    [StaticField] static Queue<Draw.DebugCapsule> _capsules = new Queue<Draw.DebugCapsule>();
-    [StaticField] static Queue<Draw.DebugText> _texts = new Queue<Draw.DebugText>();
-    [StaticField] static Dictionary<DebugMaterial, Material> _materials = new Dictionary<DebugMaterial, Material>(DebugMaterial.Comparer);
+    [StaticField] static readonly Queue<Draw.DebugRay> _rays = new Queue<Draw.DebugRay>();
+    [StaticField] static readonly Queue<Draw.DebugLine> _lines = new Queue<Draw.DebugLine>();
+    [StaticField] static readonly Queue<Draw.DebugCircle> _circles = new Queue<Draw.DebugCircle>();
+    [StaticField] static readonly Queue<Draw.DebugSphere> _spheres = new Queue<Draw.DebugSphere>();
+    [StaticField] static readonly Queue<Draw.DebugRectangle> _rectangles = new Queue<Draw.DebugRectangle>();
+    [StaticField] static readonly Queue<Draw.DebugBox> _boxes = new Queue<Draw.DebugBox>();
+    [StaticField] static readonly Queue<Draw.DebugCapsule> _capsules = new Queue<Draw.DebugCapsule>();
+    [StaticField] static readonly Queue<Draw.DebugText> _texts = new Queue<Draw.DebugText>();
+    [StaticField] static readonly Dictionary<DebugMaterial, Material> _materials = new Dictionary<DebugMaterial, Material>(DebugMaterial.Comparer);
     [StaticField] static Draw.DebugRay[] _raysArray = new Draw.DebugRay[64];
     [StaticField] static Draw.DebugLine[] _linesArray = new Draw.DebugLine[64];
     [StaticField] static Draw.DebugCircle[] _circlesArray = new Draw.DebugCircle[64];
@@ -26152,10 +26181,12 @@ namespace Quantum {
     [StaticField] static int _boxesCount;
     [StaticField] static int _capsuleCount;
     [StaticField] static int _textsCount;
-    [StaticField] static Vector3[] _circlePoints;
     [StaticField] private static readonly GUIContent _guiContent = new GUIContent();
+    [StaticField] static Vector3[] _circlePoints;
     [StaticField] private static GUIStyle _textStyle = new GUIStyle { normal = new GUIStyleState { } };
     [StaticField] private static readonly GUIStyle _bgStyle = new GUIStyle { normal = new GUIStyleState { background = Texture2D.whiteTexture } };
+
+#pragma warning restore UDR0002
 
     private static readonly int ColorProperty = Shader.PropertyToID("_Color");
     private static readonly int UseShadingProperty = Shader.PropertyToID("_UseShading");
@@ -26319,6 +26350,7 @@ namespace Quantum {
     /// Clear everything still in the queues.
     /// </summary>
     [StaticFieldResetMethod]
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     public static void Clear() {
       TakeAllFromQueueAndClearLocked(_rays, ref _raysArray);
       TakeAllFromQueueAndClearLocked(_lines, ref _linesArray);
@@ -26895,6 +26927,7 @@ namespace Quantum {
   /// </summary>
   [Obsolete("Use QuantumMeshCollection.Global instead")]
   public static class DebugMesh {
+#pragma warning disable UDR0001
     [StaticField(StaticFieldResetMode.None)]
     private static Mesh _circleMesh;
 
@@ -27016,6 +27049,7 @@ namespace Quantum {
         _debugMaterial = value;
       }
     }
+#pragma warning restore UDR0001
   }
 }
 
@@ -28526,6 +28560,7 @@ namespace Quantum {
 namespace Quantum {
   using System.Collections.Generic;
   using System.Diagnostics;
+  using System.Diagnostics.CodeAnalysis;
 #if UNITY_EDITOR
   using UnityEditor;
 #endif
@@ -28553,10 +28588,12 @@ namespace Quantum {
     /// <summary>
     /// Set to disable the Unity progress bar.
     /// </summary>
+    [SuppressMessage("Domain reload", "UDR0001", Justification = "Modifications can persist")]
     public static bool EnableProgressBar = true;
     /// <summary>
     /// Set to disable the result log.
     /// </summary>
+    [SuppressMessage("Domain reload", "UDR0001", Justification = "Modifications can persist")]
     public static bool EnableResultLog = true;
 
     private readonly List<BakeSection> _bakeSections = new List<BakeSection>();
@@ -28749,7 +28786,7 @@ namespace Quantum {
 
     private void DisplayStopwatch() {
       if (_sw != null && !string.IsNullOrEmpty(_info)) {
-        Debug.LogFormat("'{0}' took {1} ms", _info, _sw.ElapsedMilliseconds);
+        Debug.LogFormat("'{0}' took {1} ms", _info, _sw.ElapsedMilliseconds.ToString());
         _sw.Reset();
         _sw.Start();
       }
@@ -28792,6 +28829,7 @@ namespace Quantum {
 
 namespace Quantum {
   using System;
+  using System.Diagnostics.CodeAnalysis;
 
   partial class QuantumGlobalScriptableObject<T> {
     /// <summary>
@@ -28803,11 +28841,12 @@ namespace Quantum {
     /// <summary>
     /// Get or set the Global instance of the scriptable object.
     /// </summary>
+    [SuppressMessage("Domain reload", "UDR0001", Justification = "Wraps another property")]
     public static T Global {
       get => GlobalInternal;
       protected set => GlobalInternal = value;
-    } 
-    
+    }
+
     /// <summary>
     /// Try get or load the global instance.
     /// </summary>
