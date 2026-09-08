@@ -138,7 +138,7 @@ namespace Quantum {
             } else if (upDot <= -Constants.PhysicsGroundMaxAngleCos) {
                 // Bottom
                 if (iceBlock->IsSliding) {
-                    TryDamageMario();
+                    TryKBMario();
                     Destroy(f, iceBlockEntity, IceBlockBreakReason.HitWall, marioEntity);
                     return false;
                 } else if (f.Exists(holdable->Holder)) {
@@ -154,8 +154,8 @@ namespace Quantum {
                     Destroy(f, iceBlockEntity, IceBlockBreakReason.Shell, marioEntity);
                     return false;
                 } else if (iceBlock->IsSliding && iceBlock->FacingRight == rightContact) {
-                    TryDamageMario();
-                    Destroy(f, iceBlockEntity, IceBlockBreakReason.HitWall, marioEntity);
+                    TryKBMario();
+                    Destroy(f, iceBlockEntity, IceBlockBreakReason.HitPlayer, marioEntity);
                     return false;
                 }
             }
@@ -178,7 +178,7 @@ namespace Quantum {
 
             return false;
 
-            void TryDamageMario() {
+            void TryKBMario() {
                 bool dropStars = false;
                 bool allowHit = holdable->PreviousHolder != marioEntity && mario->CheckTeamAttack(f, holdable->PreviousHolder, out dropStars);
 

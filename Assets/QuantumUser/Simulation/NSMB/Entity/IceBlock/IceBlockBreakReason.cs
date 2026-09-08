@@ -4,6 +4,7 @@ public enum IceBlockBreakReason : byte {
     Groundpounded,
     BlockBump,
     HitWall,
+    HitPlayer,
     InvincibleMario,
     Shell,
     Explosion,

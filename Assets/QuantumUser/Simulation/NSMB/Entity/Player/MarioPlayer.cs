@@ -523,7 +523,7 @@ namespace Quantum {
             }
         }
 
-        public bool DoKnockback(Frame f, EntityRef entity, bool fromRight, int starsToDrop, KnockbackStrength strength, EntityRef attacker, bool bypassDamageInvincibility = false, ProjectileEffectType projectileEffectType = ProjectileEffectType.None, bool wasBlueShell = false, bool ignoreInvincibleStates = false) {
+        public bool DoKnockback(Frame f, EntityRef entity, bool fromRight, int starsToDrop, KnockbackStrength strength, EntityRef attacker, bool bypassDamageInvincibility = false, bool ignoreInvincibleStates = false, FP? xVelOverride = null, FP? yVelOverride = null, int lengthOffset = 0) {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
             if (physicsObject->IsUnderwater) {
                 strength = KnockbackStrength.Normal;
@@ -533,7 +533,6 @@ namespace Quantum {
                 return false;
             }
 
-            var freezable = f.Unsafe.GetPointer<Freezable>(entity);
             if ((!bypassDamageInvincibility && DamageInvincibilityFrames > 0) || f.Exists(CurrentPipe) || IsDead || MegaMushroomStartFrames > 0 || MegaMushroomEndFrames > 0) {
                 return false;
             }
@@ -562,9 +561,12 @@ namespace Quantum {
             FPVector2 knockbackVelocity = strength switch {
                 KnockbackStrength.Groundpound => new(Constants._8_25 / 2, Constants._3_50),
                 KnockbackStrength.FireballBump => new(Constants._3_75 / 2, 0),
-                KnockbackStrength.CollisionBump => new(Constants._2_50, Constants._3_50),
+                KnockbackStrength.CollisionBump or KnockbackStrength.CollisionBumpHard => new(Constants._2_50, Constants._3_50),
                 KnockbackStrength.Normal or _ => new(Constants._3_75 / 2, Constants._3_50),
             };
+
+            knockbackVelocity.X = xVelOverride ?? knockbackVelocity.X;
+            knockbackVelocity.Y = yVelOverride ?? knockbackVelocity.Y;
 
             knockbackVelocity.X *= fromRight ? -1 : 1;
             if (CurrentPowerupState == PowerupState.MiniMushroom) {
@@ -573,20 +575,15 @@ namespace Quantum {
                 knockbackVelocity.Y *= physics.KnockbackMiniMultiplier.Y;
             }
 
-            KnockbackTick = f.Number;
+            KnockbackTick = f.Number + lengthOffset;
 
-            bool forceWeak = false;
-            if (freezable->IsFrozen(f) && strength != KnockbackStrength.Normal && strength != KnockbackStrength.Groundpound) {
-                forceWeak = true;
-                KnockbackTick -= 25;
-            }
             if (strength == KnockbackStrength.FireballBump && !physicsObject->IsTouchingGround) {
                 // FacingRight = fromRight;
                 knockbackVelocity.X *= FP._0_75;
             }
 
             CurrentKnockback = strength;
-            IsInWeakKnockback = forceWeak || (CurrentPowerupState != PowerupState.MegaMushroom && (strength == KnockbackStrength.CollisionBump || (strength == KnockbackStrength.FireballBump && physicsObject->IsTouchingGround)));
+            IsInWeakKnockback = strength == KnockbackStrength.CollisionBump || (strength == KnockbackStrength.FireballBump && physicsObject->IsTouchingGround);
 
             physicsObject->Velocity = knockbackVelocity;
             physicsObject->IsTouchingGround = false;
@@ -614,15 +611,15 @@ namespace Quantum {
             LastAttacker = attacker;
 
             f.Signals.OnMarioPlayerDropObjective(entity, starsToDrop, attacker);
-            f.Events.MarioPlayerTookKnockback(entity, attacker, starsToDrop, oldObjectiveCount, strength, projectileEffectType, wasBlueShell);
+            //f.Events.MarioPlayerTookKnockback(entity, attacker, starsToDrop, oldObjectiveCount, strength, projectileEffectType, wasBlueShell);
             return true;
         }
 
         private static bool IsImmuneFromKnockbackStrength(KnockbackStrength currentStrength, KnockbackStrength newStrength) {
             return currentStrength == newStrength
-                || (currentStrength == KnockbackStrength.Groundpound && newStrength == KnockbackStrength.Normal)
-                || (currentStrength == KnockbackStrength.Normal && newStrength == KnockbackStrength.Groundpound)
-                || (currentStrength == KnockbackStrength.FireballBump && newStrength == KnockbackStrength.CollisionBump);
+                || (currentStrength is KnockbackStrength.Groundpound or KnockbackStrength.Normal && newStrength is KnockbackStrength.Normal or KnockbackStrength.Groundpound)
+                || (currentStrength == KnockbackStrength.FireballBump && newStrength is KnockbackStrength.CollisionBump or KnockbackStrength.CollisionBumpHard)
+                || (currentStrength is KnockbackStrength.CollisionBump or KnockbackStrength.CollisionBumpHard && newStrength is KnockbackStrength.CollisionBumpHard or KnockbackStrength.CollisionBump);
         }
 
         public void GetupKnockback(Frame f, EntityRef entity) {
