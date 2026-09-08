@@ -14025,7 +14025,7 @@ MonoBehaviour:
   isDisplaying: 1
   frame: 0
   runInEditor: 0
-  fps: 8
+  fps: 12
   frames:
   - {fileID: 4379595036460376432, guid: cebc70ca27e3a2f468d5923a9556d369, type: 3}
   - {fileID: -5515025785570758355, guid: cebc70ca27e3a2f468d5923a9556d369, type: 3}
@@ -14065,7 +14065,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: b9613c05d3fefe04bba18c8c977b4368, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -14778,7 +14778,7 @@ MonoBehaviour:
   isDisplaying: 1
   frame: 0
   runInEditor: 0
-  fps: 8
+  fps: 12
   frames:
   - {fileID: 4379595036460376432, guid: cebc70ca27e3a2f468d5923a9556d369, type: 3}
   - {fileID: -5515025785570758355, guid: cebc70ca27e3a2f468d5923a9556d369, type: 3}
@@ -14818,7 +14818,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: b9613c05d3fefe04bba18c8c977b4368, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
