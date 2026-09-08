@@ -61,11 +61,13 @@ namespace NSMB.Background {
                 GameObject obj = children[i];
                 float parallaxSpeed = 1 - Mathf.Clamp01(Mathf.Abs(-10f / obj.transform.position.z));
 
-                float difference = xDifference.AsFloat + (obj.transform.position.x - truePositions[i].x);
-
                 if (Mathf.Abs(absoluteDifference) > 2) {
-                    truePositions[i].x += ((cameraTransform.position.x > stage.StageWorldMin.X.AsFloat + (stage.TileDimensions.X * 0.25f)) ? 1 : -1) * (stage.TileDimensions.X * 0.5f);
+                    float wrapOffset = ((cameraTransform.position.x > stage.StageWorldMin.X.AsFloat + (stage.TileDimensions.X * 0.25f)) ? 1 : -1) * (stage.TileDimensions.X * 0.5f);
+                    truePositions[i].x += wrapOffset;
+                    obj.transform.position = new Vector3(obj.transform.position.x + wrapOffset, obj.transform.position.y, obj.transform.position.z);
                 }
+
+                float difference = xDifference.AsFloat + (obj.transform.position.x - truePositions[i].x);
 
                 if (parallaxSpeed > 0) {
                     Vector3 newPosition = truePositions[i] + difference * parallaxSpeed * Vector3.right;
