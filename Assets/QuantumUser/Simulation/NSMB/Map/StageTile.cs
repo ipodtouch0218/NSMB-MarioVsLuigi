@@ -10,9 +10,9 @@ namespace Quantum {
 #endif
 
         public TileCollisionData CollisionData = TileCollisionData.Default;
-        public bool IsSlipperyGround, IsSlideableGround, IsPolygon = true;
-        public SoundEffect FootstepSound = SoundEffect.Player_Walk_Grass;
-        public ParticleEffect FootstepParticle = ParticleEffect.None;
+        public bool IsPolygon = true;
+
+        public AssetRef<MvLPhysicsProperties> PhysicsProperties;
 
         [Serializable]
         public struct TileCollisionData : IEquatable<TileCollisionData> {

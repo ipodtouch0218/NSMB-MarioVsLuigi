@@ -17,5 +17,30 @@ namespace Quantum {
                 && Entity == other.Entity
                 && Frame == other.Frame;
         }
+
+        public readonly MvLPhysicsProperties GetPhysicsProperties(Frame f, VersusStageData stage = null) {
+            if (Entity != EntityRef.None) {
+                // Entity
+                if (f.Unsafe.TryGetPointer(Entity, out PhysicsCollider2D* collider)
+                    && f.TryFindAsset(collider->Material, out PhysicsMaterial physicsMaterial)
+                    && physicsMaterial is MvLPhysicsProperties properties) {
+
+                    return properties;
+                }
+            } else {
+                // Tile
+                if (stage == null) {
+                    stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+                }
+
+                if (f.TryFindAsset(stage.GetTileRelative(f, Tile).Tile, out StageTile stageTile)
+                    && f.TryFindAsset(stageTile.PhysicsProperties, out MvLPhysicsProperties properties)) {
+
+                    return properties;
+                }
+            }
+
+            return null;
+        }
     }
 }

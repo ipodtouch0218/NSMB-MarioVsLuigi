@@ -805,19 +805,13 @@ namespace NSMB.Entities.Player {
                         continue;
                     }
 
-                    if (f.Exists(contact.Entity)) {
-                        if (f.Has<Liquid>(contact.Entity) && mario->CurrentPowerupState == PowerupState.MiniMushroom && physicsObject->IsWaterSolid) {
-                            footstepSoundEffect = SoundEffect.Player_Walk_Water;
+                    MvLPhysicsProperties properties = contact.GetPhysicsProperties(f, ViewContext.Stage);
+                    if (properties != null) {
+                        if (properties.FootstepSound != SoundEffect.Player_Walk_Grass) {
+                            footstepSoundEffect = properties.FootstepSound;
                         }
-                    } else {
-                        StageTileInstance tileInstance = ViewContext.Stage.GetTileRelative(f, contact.Tile);
-                        if (f.TryFindAsset(tileInstance.Tile, out StageTile tile)) {
-                            if (tile.FootstepSound != SoundEffect.Player_Walk_Grass) {
-                                footstepSoundEffect = tile.FootstepSound;
-                            }
-                            if (tile.FootstepParticle != ParticleEffect.None) {
-                                footstepParticleEffect = tile.FootstepParticle;
-                            }
+                        if (properties.FootstepParticle != ParticleEffect.None) {
+                            footstepParticleEffect = properties.FootstepParticle;
                         }
                     }
                 }

@@ -204,8 +204,11 @@ MonoBehaviour:
   CollisionData:
     IsFullTile: 1
     Shapes: []
+  IsPolygon: 1
+  PhysicsProperties:
+    Id:
+      Value: 475304274632271490
   IsSlipperyGround: 0
   IsSlideableGround: 0
-  IsPolygon: 1
   FootstepSound: 93
   FootstepParticle: 1

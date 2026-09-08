@@ -806,13 +806,11 @@ namespace Quantum {
                         physicsObject->FloorAngle = angle;
                     }
 
-                    if (!f.Exists(contact.Entity)
-                        && f.TryFindAsset(stage.GetTileRelative(f, contact.Tile).Tile, out StageTile tile)) {
-
-                        physicsObject->IsOnSlideableGround |= tile.IsSlideableGround;
-                        physicsObject->IsOnSlipperyGround |= tile.IsSlipperyGround;
+                    MvLPhysicsProperties properties = contact.GetPhysicsProperties(f, stage);
+                    if (properties != null) {
+                        physicsObject->IsOnSlideableGround |= properties.IsSlideableGround;
+                        physicsObject->IsOnSlipperyGround |= properties.IsSlipperyGround;
                     }
-
                 } else if (verticalDot < -Constants.PhysicsGroundMaxAngleCos) {
                     physicsObject->IsTouchingCeiling = true;
                 }
