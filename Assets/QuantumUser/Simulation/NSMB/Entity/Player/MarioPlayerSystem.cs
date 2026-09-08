@@ -2871,14 +2871,22 @@ namespace Quantum {
             }
             
             bool damaged = false;
+            var hitTransform = f.Unsafe.GetPointer<Transform2D>(entity);
             KnockbackStrength strength = KnockbackStrength.Normal;
             switch (breakReason) {
             case IceBlockBreakReason.HitWall:
             case IceBlockBreakReason.Other:
-                // Weak knockback, i-frames.
                 strength = KnockbackStrength.FireballBump;
                 damaged = mario->DoKnockback(f, entity, hitFromRight, 1, strength, attacker);
-                mario->DamageInvincibilityFrames = Constants.DamageInvincibilityFrames;
+                if (damaged) {
+                    // No floor below:
+                    if (!PhysicsObjectSystem.Raycast(f, null, hitTransform->Position, FPVector2.Down, 8, out _)) {
+                        // Upwards bounce and shortened knockback.
+                        physicsObject->Velocity.Y = Constants._6_00;
+                        mario->InvincibilityFrames = Constants.DamageInvincibilityFrames;
+                        mario->KnockbackTick -= 15;
+                    }
+                }
                 break;
 
             case IceBlockBreakReason.BlockBump:
@@ -2924,6 +2932,11 @@ namespace Quantum {
                 FPVector2 particlePos = f.Unsafe.GetPointer<Transform2D>(brokenIceBlock)->Position;
                 particlePos.Y += iceBlock->Size.Y / 2;
                 f.Events.PlayKnockbackEffect(entity, brokenIceBlock, strength, particlePos, true);
+            }
+
+            var holdable = f.Unsafe.GetPointer<Holdable>(brokenIceBlock);
+            if (f.Exists(holdable->PreviousHolder)) {
+                mario->LastAttacker = holdable->PreviousHolder;
             }
         }
 
