@@ -9,6 +9,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: mat_hummer
     second: {fileID: 2100000, guid: d41ae1f85c738254abf4e60128082de5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: mat_hummer.001
+    second: {fileID: 2100000, guid: d41ae1f85c738254abf4e60128082de5, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
