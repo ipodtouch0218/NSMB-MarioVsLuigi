@@ -18,13 +18,13 @@ MonoBehaviour:
       Value: 348825844190755719
   Prefab:
     Id:
-      Value: 1349070666859566638
+      Value: 1307582256079712543
   SpawnChance:
-    RawValue: 65536
+    RawValue: 58982
   AboveAverageBonus:
-    RawValue: -65536
+    RawValue: 4096
   BelowAverageBonus:
-    RawValue: 65536
+    RawValue: 8192
   BlockSpawnSoundEffect: 69
   Flags: 23
   MaxNumberOfItems: 0

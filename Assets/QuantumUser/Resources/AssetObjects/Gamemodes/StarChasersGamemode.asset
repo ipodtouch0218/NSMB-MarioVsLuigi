@@ -33,6 +33,8 @@ MonoBehaviour:
   - Id:
       Value: 372382251364764784
   - Id:
+      Value: 348825844190755719
+  - Id:
       Value: 328877894917160747
   - Id:
       Value: 402398838204577684
@@ -71,6 +73,7 @@ MonoBehaviour:
       Value: 1
     StarFountain: 100
     CoinDeathPenalty: 0
+    CoinItemCustomSpawnWeights: []
   BigStarPrototype:
     Id:
       Value: 1295981493910502871
