@@ -140,7 +140,7 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
-    - _StarmanUsesWhiteCustomColors: 1
+    - _StarmanUsesWhiteCustomColors: 0
     - _Surface: 0
     - _WorkflowMode: 1
     - _XRMotionVectorsPass: 1
