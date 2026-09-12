@@ -65,54 +65,15 @@ namespace Quantum {
             if (asset.InheritShooterVelocity
                 && f.Unsafe.TryGetPointer(owner, out PhysicsObject* ownerPhysicsObject)
                 && FPMath.Sign(ownerPhysicsObject->Velocity.X) == 1 == FacingRight) {
-                Speed += FPMath.Abs(ownerPhysicsObject->Velocity.X * 2);
+                Speed += FPMath.Abs(ownerPhysicsObject->Velocity.X);
             }
 
             // Physics
-            BoomerangPhase = 0;
-            BoomerangFrame = 0;
             transform->Position = spawnpoint;
             physicsObject->Velocity = new(Speed * (FacingRight ? 1 : -1), 0);
         }
 
         public void UpdateBoomerang(Frame f, EntityRef thisEntity, PhysicsObject* physicsObject, VersusStageData stage) {
-            BoomerangFrame++;
-            var asset = f.FindAsset(Asset);
-
-            if (BoomerangPhase == 0) {
-                if (BoomerangFrame >= 15) {
-                    BoomerangPhase = 1;
-                    BoomerangFrame = 0;
-                }
-            } else if (BoomerangPhase == 1) {
-                Speed = asset.Speed * (15 - BoomerangFrame) / 15;
-                if (BoomerangFrame >= 15) {
-                    BoomerangPhase = 2;
-                    BoomerangFrame = 0;
-                    Speed = 0;
-                }
-            } else if (BoomerangPhase == 2) {
-                Speed = BoomerangFrame >= 15 ? asset.Speed : asset.Speed * BoomerangFrame / 15;
-
-                var transform = f.Unsafe.GetPointer<Transform2D>(thisEntity);
-                var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(thisEntity);
-                var hits = f.Physics2D.OverlapShape(transform->Position, 0, collider->Shape, f.Context.PlayerOnlyMask);
-                for (int i = 0; i < hits.Count; i++) {
-                    if (hits[i].Entity == Owner) {
-                        ProjectileSystem.Destroy(f, thisEntity, asset.DestroyParticleEffect);
-                        return;
-                    }
-                }
-
-                if (f.Unsafe.TryGetPointer(Owner, out Transform2D* ownerTransform) && f.Unsafe.TryGetPointer(Owner, out PhysicsCollider2D* ownerCollider)) {
-                    FPVector2 ownerCenter = ownerTransform->Position + ownerCollider->Shape.Centroid + new FPVector2(0, ownerCollider->Shape.Box.Extents.Y / 2);
-                    QuantumUtils.UnwrapWorldLocations(stage, transform->Position, ownerCenter, out _, out FPVector2 closestOwner);
-                    FPVector2 direction = (closestOwner - transform->Position).Normalized;
-                    physicsObject->Velocity = direction * Speed;
-                }
-
-                physicsObject->Gravity = FPVector2.Zero;
-            }
         }
     }
 }

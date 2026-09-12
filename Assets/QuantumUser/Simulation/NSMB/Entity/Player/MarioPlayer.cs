@@ -416,6 +416,7 @@ namespace Quantum {
             case PowerupState.HammerSuit:
             case PowerupState.FireFlower:
             case PowerupState.IceFlower:
+            case PowerupState.BoomerangFlower:
             case PowerupState.PropellerMushroom:
             case PowerupState.BlueShell: {
                 CurrentPowerupState = PowerupState.Mushroom;
