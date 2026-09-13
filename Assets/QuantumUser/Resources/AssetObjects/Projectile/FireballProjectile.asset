@@ -33,6 +33,10 @@ MonoBehaviour:
   InheritShooterVelocity: 0
   HasCollision: 1
   DoesntEffectBlueShell: 1
+  MaxProjectiles: 6
+  ProjectileVolleySize: 2
+  ProjectileDelayFrames: 6
+  ProjectileVolleyFrames: 75
   DestroyParticleEffect: 5
   ShootSound: 44
   SfxOverrides: []

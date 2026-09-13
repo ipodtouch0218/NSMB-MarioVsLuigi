@@ -1496,15 +1496,24 @@ namespace Quantum {
                     return;
                 }
 
+                var powerupAsset = QuantumUtils.FindPowerupAsset(f, mario->CurrentPowerupState);
+                if (powerupAsset == null) {
+                    return;
+                }
+                var projectileAsset = f.FindAsset(powerupAsset.ProjectileAsset);
+                if (projectileAsset == null) {
+                    return;
+                }
+
                 byte activeProjectiles = mario->CurrentProjectiles;
-                if (activeProjectiles >= physics.MaxProjecitles) {
+                if (activeProjectiles >= projectileAsset.MaxProjectiles) {
                     return;
                 }
 
                 if (activeProjectiles < 2) {
                     // Always allow if < 2
                     mario->CurrentVolley = (byte) (activeProjectiles + 1);
-                } else if (mario->CurrentVolley < physics.ProjectileVolleySize) {
+                } else if (mario->CurrentVolley < projectileAsset.ProjectileVolleySize) {
                     // Allow in this volley
                     mario->CurrentVolley++;
                 } else {
@@ -1513,8 +1522,8 @@ namespace Quantum {
                 }
 
                 mario->CurrentProjectiles++;
-                mario->ProjectileDelayFrames = physics.ProjectileDelayFrames;
-                mario->ProjectileVolleyFrames = physics.ProjectileVolleyFrames;
+                mario->ProjectileDelayFrames = projectileAsset.ProjectileDelayFrames;
+                mario->ProjectileVolleyFrames = projectileAsset.ProjectileVolleyFrames;
 
                 Projectile* projectile;
                 if (mario->CurrentPowerupState == PowerupState.HammerSuit) {

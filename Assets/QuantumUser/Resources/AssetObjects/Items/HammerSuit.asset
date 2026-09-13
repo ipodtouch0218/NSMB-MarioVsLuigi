@@ -28,6 +28,8 @@ MonoBehaviour:
   BlockSpawnSoundEffect: 69
   Flags: 23
   MaxNumberOfItems: 0
+  CanSpawnAfterSeconds:
+    RawValue: 0
   TranslationKey: coinitem.hammersuit
   CameraSpawnOffset:
     X:
@@ -78,4 +80,7 @@ MonoBehaviour:
   ItemPriority: 2
   EnterReserveIfOverridden: 1
   Instant: 0
+  ProjectileAsset:
+    Id:
+      Value: 395779911797546411
   SfxOverrides: []
