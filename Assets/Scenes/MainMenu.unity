@@ -49514,6 +49514,9 @@ MonoBehaviour:
   minimumValueIsOff: 1
   applyPrefixSuffixWhenOff: 1
   translationOverrides: []
+  coinRunnersGamemode:
+    Id:
+      Value: 0
 --- !u!114 &1157710605
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63632,6 +63635,9 @@ MonoBehaviour:
   minimumValueIsOff: 1
   applyPrefixSuffixWhenOff: 1
   translationOverrides: []
+  coinRunnersGamemode:
+    Id:
+      Value: 0
 --- !u!114 &1577258922
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -72687,6 +72693,9 @@ MonoBehaviour:
   minimumValueIsOff: 1
   applyPrefixSuffixWhenOff: 1
   translationOverrides: []
+  coinRunnersGamemode:
+    Id:
+      Value: 394255533064620237
 --- !u!114 &1827799602
 MonoBehaviour:
   m_ObjectHideFlags: 0
