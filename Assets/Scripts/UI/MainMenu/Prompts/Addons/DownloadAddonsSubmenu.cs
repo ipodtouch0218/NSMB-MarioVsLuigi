@@ -47,7 +47,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
 
             askText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.addons.download.request",
                 "addons", addons.Count.ToString(),
-                "filesize", Utils.BytesToString(addons.Sum(ace => ace.Size)));
+                "filesize", Utils.BytesToString(addons.Select(ace => ace.Artifacts[AddonManager.PlatformName]).Sum(ace => ace.Size)));
 
             Canvas.OpenMenu(this);
         }
@@ -64,9 +64,10 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
             UpdateProgressBars(0, 0, 0);
 
             foreach (var addonCatalogEntry in addons) {
-                Debug.Log($"[Addon] Attempting to download addon with ID {addonCatalogEntry.ReleaseGuid} from URL ({addonCatalogEntry.DownloadUrl})");
+                var artifact = addonCatalogEntry.Artifacts[AddonManager.PlatformName];
+                Debug.Log($"[Addon] Attempting to download addon with ID {addonCatalogEntry.ReleaseGuid} from URL ({artifact.Url})");
 
-                using var addonRequest = UnityWebRequest.Get(addonCatalogEntry.DownloadUrl);
+                using var addonRequest = UnityWebRequest.Get(artifact.Url);
                 addonRequest.SetRequestHeader("Accept", "*/*");
                 //addonRequest.SetRequestHeader("UserAgent", "ipodtouch0218/NSMB-MarioVsLuigi");
                 addonRequest.certificateHandler = new MvLCertificateHandler();
@@ -76,13 +77,13 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
                 addonRequest.timeout = 10;
                 _ = addonRequest.SendWebRequest();
 
-                string sizeString = Utils.BytesToString(addonCatalogEntry.Size);
+                string sizeString = Utils.BytesToString(artifact.Size);
                 do {
-                    UpdateProgressBars(addonCatalogEntry.Size, addonRequest.downloadProgress, downloadedAddons);
+                    UpdateProgressBars(artifact.Size, addonRequest.downloadProgress, downloadedAddons);
                     yield return null;
                 } while (!addonRequest.isDone && addonRequest.downloadProgress < 1);
 
-                UpdateProgressBars(addonCatalogEntry.Size, addonRequest.downloadProgress, downloadedAddons);
+                UpdateProgressBars(artifact.Size, addonRequest.downloadProgress, downloadedAddons);
 
                 if (addonRequest.responseCode != 200) {
                     Debug.Log($"[Addon] Download failed: {addonRequest.error} ({addonRequest.responseCode})");
@@ -91,7 +92,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
                 }
 
                 byte[] addonBytes = addonRequest.downloadHandler.data;
-                using MemoryStream ms = new(addonBytes);
+                MemoryStream ms = new(addonBytes);
                 var addonStreamTask = GlobalController.Instance.addonManager.LoadAddonStream(ms).GetAwaiter();
                 yield return addonStreamTask;
 
@@ -103,7 +104,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
 
                 downloadedAddons++;
 
-                UpdateProgressBars(addonCatalogEntry.Size, 1, downloadedAddons);
+                UpdateProgressBars(artifact.Size, 1, downloadedAddons);
 
                 _ = GlobalController.Instance.addonManager.SaveAddonToCache(addonCatalogEntry.ReleaseGuid, addonBytes);
             }

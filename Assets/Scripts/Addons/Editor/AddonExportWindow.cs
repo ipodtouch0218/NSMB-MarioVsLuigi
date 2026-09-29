@@ -15,13 +15,12 @@ namespace NSMB.Editor {
     public class AddonBuildWindow : EditorWindow {
 
         private static readonly Dictionary<BuildTarget, string> BuildTargets = new() {
-            [BuildTarget.StandaloneWindows64] = "Win64",
             [BuildTarget.StandaloneWindows] = "Win32",
-            //[BuildTarget.StandaloneOSX] = "MacOS",
-            //[BuildTarget.StandaloneLinux64] = "Linux",
-            //[BuildTarget.Android] = "Android",
-            //[BuildTarget.iOS] = "iOS",
-            //[BuildTarget.WebGL] = "WebGL",
+            [BuildTarget.StandaloneOSX] = "MacOS",
+            [BuildTarget.StandaloneLinux64] = "Linux",
+            [BuildTarget.Android] = "Android",
+            [BuildTarget.iOS] = "iOS",
+            [BuildTarget.WebGL] = "WebGL",
         };
 
         public class BuildableAddon {
@@ -117,10 +116,18 @@ namespace NSMB.Editor {
                     return;
                 }
 
+                List<BuildTarget> unsupportedBuildTargets = BuildTargets.Keys.Where(bt => !IsPlatformSupported(bt)).ToList();
+                if (unsupportedBuildTargets.Count > 0) {
+                    string unsupportedPlatforms = string.Join(", ", unsupportedBuildTargets.Select(bt => BuildTargets[bt]));
+                    if (!EditorUtility.DisplayDialog("Unsupported build targets", $"The following build targets are not supported on this machine:\n{unsupportedPlatforms}\n\nPlayers on these platform(s) will not be able to use your addon.\nWould you like to continue anyway?", "Continue", "Cancel")) {
+                        return;
+                    }
+                }
+
                 string savePath = $"ExportedAddons/{selectedAddon.FolderName}-{selectedAddon.BuildDefinition.ReleaseVersion}";
 
                 if (Directory.Exists(savePath)) {
-                    if (!EditorUtility.DisplayDialog("Addon exists", $"The addon build path {savePath} already exists.\nCreating an addon with the same name + version as another might be confusing.\n\nWould you like to overwrite the existing files and continue the build anyway?", "Yes", "No")) {
+                    if (!EditorUtility.DisplayDialog("Addon exists", $"The addon build path {savePath} already exists.\nCreating an addon with the same name + version as another might be confusing.\n\nWould you like to overwrite the existing files and continue the build anyway?", "Continue", "Cancel")) {
                         return;
                     }
                     Directory.Delete(savePath, true);
@@ -128,7 +135,7 @@ namespace NSMB.Editor {
                 Directory.CreateDirectory(savePath);
 
                 // Clean old addon folder
-                string buildPath = "ExportedAddons/temp";
+                string buildPath = "ExportedAddons/~~temp";
                 try {
                     Directory.Delete(buildPath, true);
                 } catch { }
@@ -190,8 +197,8 @@ namespace NSMB.Editor {
                 var oldBuildTargetGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
                 var buildMapArray = buildMap.ToArray();
                 List<BuildTarget> failedBuilds = new();
-                foreach ((var buildTarget, _) in BuildTargets) {
-                    //try {
+                foreach (var buildTarget in BuildTargets.Keys.Except(unsupportedBuildTargets).ToList()) {
+                    try {
                         EditorUtility.DisplayProgressBar("Building addon", $"Building for {buildTarget} build target...", (float) ++counter / steps);
                         string platformBuildPath = buildPath + "/" + buildTarget;
                         Directory.CreateDirectory(platformBuildPath);
@@ -204,7 +211,6 @@ namespace NSMB.Editor {
                         File.Delete($"{platformBuildPath}/{buildTarget}");
 
                         // Delete .manifests
-                        Debug.Log(platformBuildPath);
                         foreach (var manifest in Directory.EnumerateFiles(platformBuildPath, "*.manifest", new EnumerationOptions { RecurseSubdirectories = true })) {
                             File.Delete(manifest);
                         }
@@ -215,11 +221,11 @@ namespace NSMB.Editor {
                         }
 
                         Debug.Log($"Successfully built addon for platform {buildTarget}");
-                    //} catch (Exception e) {
-                    //    Debug.LogError($"Failed to export addon for platform {buildTarget}");
-                    //    Debug.LogError(e);
-                    //    failedBuilds.Add(buildTarget);
-                    //}
+                    } catch (Exception e) {
+                        Debug.LogError($"Failed to export addon for platform {buildTarget}");
+                        Debug.LogError(e);
+                        failedBuilds.Add(buildTarget);
+                    }
                 }
 
                 EditorUserBuildSettings.SwitchActiveBuildTarget(oldBuildTargetGroup, oldBuildTarget);
@@ -262,11 +268,20 @@ namespace NSMB.Editor {
                     Debug.LogError($"Addon build error: The following builds failed:\n* {string.Join("\n* ", failedBuilds)}");
                     EditorUtility.DisplayDialog("Build(s) Failed", $"The following builds failed:\n* {string.Join("\n* ", failedBuilds)}", "OK");
                 } else {
-                    EditorUtility.DisplayDialog("Build Successful", $"The addon was saved to {universalZipPath}", "OK");
+                    EditorUtility.DisplayDialog("Build Successful", $"The addon was saved to {savePath}", "OK");
                 }
 
                 Close();
             }
+        }
+
+        // https://discussions.unity.com/t/detect-if-build-target-is-installed-183801/183801
+        private static bool IsPlatformSupported(BuildTarget buildTarget) {
+            var moduleManager = System.Type.GetType("UnityEditor.Modules.ModuleManager,UnityEditor.dll");
+            var isPlatformSupportLoaded = moduleManager.GetMethod("IsPlatformSupportLoaded", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            var getTargetStringFromBuildTarget = moduleManager.GetMethod("GetTargetStringFromBuildTarget", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+
+            return (bool) isPlatformSupportLoaded.Invoke(null, new object[] { (string) getTargetStringFromBuildTarget.Invoke(null, new object[] { buildTarget }) });
         }
 
         public class AddonCreateWindow : EditorWindow {
