@@ -10,6 +10,7 @@ component Projectile {
 	[ExcludeFromPrototype] bool HasBounced;
 	[ExcludeFromPrototype] bool CheckedCollision;
 	[ExcludeFromPrototype] byte Combo;
+	[ExcludeFromPrototype] byte Frame;
 }
 
 signal OnProjectileHitEntity(EntityRef projectile, EntityRef hitEntity);

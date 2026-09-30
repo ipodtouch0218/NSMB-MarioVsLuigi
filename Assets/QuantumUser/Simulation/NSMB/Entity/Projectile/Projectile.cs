@@ -71,11 +71,67 @@ namespace Quantum {
             */
 
             // Physics
+            Combo = 0; // There are 3 phases for Boomerang: 0 = going, 1 = pausing, 2 = returning
+            Frame = 0; // Lifetime counter
             transform->Position = spawnpoint;
             physicsObject->Velocity = new(Speed * (FacingRight ? 1 : -1), 0);
         }
 
         public void UpdateBoomerang(Frame f, EntityRef thisEntity, PhysicsObject* physicsObject, VersusStageData stage) {
+            if (!f.Exists(thisEntity) || f.DestroyPending(thisEntity)) {
+                return;
+            }
+
+            Frame++;
+            var asset = f.FindAsset(Asset);
+
+            // Going phase
+            if (Combo == 0) {
+                if (Frame >= 15) {
+                    // Proceed to the next phase upon 15 frames of lifetime
+                    Combo = 1;
+                    // Reset frame counter
+                    Frame = 0;
+                }
+            // Pausing phase
+            } else if (Combo == 1) {
+                // Slowdown
+                Speed = asset.Speed * (15 - Frame) / 15;
+                if (Frame >= 15) {
+                    // Next phase
+                    Combo = 2;
+                    Frame = 0;
+                    Speed = 0;
+                }
+            // Returning phase
+            } else if (Combo == 2) {
+                // Speed up
+                Speed = Frame >= 15 ? asset.Speed : asset.Speed * Frame / 15;
+
+                if (!f.Unsafe.TryGetPointer(thisEntity, out Transform2D* transform)
+                    || !f.Unsafe.TryGetPointer(thisEntity, out PhysicsCollider2D* collider)) {
+                    return;
+                }
+
+                // Touching the owner despawns it
+                var hits = f.Physics2D.OverlapShape(transform->Position, 0, collider->Shape, f.Context.PlayerOnlyMask);
+                for (int i = 0; i < hits.Count; i++) {
+                    if (hits[i].Entity == Owner) {
+                        ProjectileSystem.Destroy(f, thisEntity, asset.DestroyParticleEffect);
+                        return;
+                    }
+                }
+
+                if (f.Unsafe.TryGetPointer(Owner, out Transform2D* ownerTransform) && f.Unsafe.TryGetPointer(Owner, out PhysicsCollider2D* ownerCollider)) {
+                    // Fix Mario's toes and fix loop points.
+                    FPVector2 ownerCenter = ownerTransform->Position + ownerCollider->Shape.Centroid + new FPVector2(0, ownerCollider->Shape.Box.Extents.Y / 2);
+                    QuantumUtils.UnwrapWorldLocations(stage, transform->Position, ownerCenter, out _, out FPVector2 closestOwner);
+                    FPVector2 direction = (closestOwner - transform->Position).Normalized;
+                    physicsObject->Velocity = direction * Speed;
+                }
+
+                physicsObject->Gravity = FPVector2.Zero;
+            }
         }
     }
 }

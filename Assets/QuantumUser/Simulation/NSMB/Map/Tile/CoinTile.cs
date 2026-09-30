@@ -23,6 +23,16 @@ public unsafe class CoinTile : BreakableBrickTile {
             allowSelfDamage = true;
         }
 
+        if (mario == null && f.Unsafe.TryGetPointer(entity, out Projectile* projectile)) {
+            var asset = f.FindAsset(projectile->Asset);
+            if (asset.CollectCoins
+                && f.Exists(projectile->Owner)
+                && f.Unsafe.TryGetPointer(projectile->Owner, out MarioPlayer* ownerMario)) {
+                mario = ownerMario;
+                entity = projectile->Owner;
+                }
+            }
+
         if (mario == null) {
             return false;
         }
