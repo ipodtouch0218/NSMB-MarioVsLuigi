@@ -81,3 +81,4 @@ crashlytics-build.properties
 /.vs1
 /ExportedAddons
 /[Aa]ssets/**/BuildInfo.Codegen.cs
+/[Aa]ddons

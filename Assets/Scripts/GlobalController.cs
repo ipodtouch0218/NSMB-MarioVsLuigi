@@ -12,7 +12,9 @@ using NSMB.Utilities.Extensions;
 using Quantum;
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
@@ -48,6 +50,41 @@ namespace NSMB {
 
         //---Private Variables
         private Coroutine totalAudioFadeRoutine;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+#if UNITY_EDITOR || UNITY_STANDALONE
+        public static void LoadAssetBundles() {
+#else
+        public static async void LoadAssetBundles() {
+#endif
+            string[] bundleNames = { "basegame-assets", "basegame-scenes" };
+
+            foreach (var bundle in bundleNames) {
+                if (AssetBundle.GetAllLoadedAssetBundles().Any(ab => ab.name == bundle)) {
+                    // Ignore if already loaded
+                    continue;
+                }
+                
+#if UNITY_EDITOR || UNITY_STANDALONE
+                var loadedBundle = AssetBundle.LoadFromFile(Application.streamingAssetsPath + "/" + bundle);
+                if (loadedBundle == null) {
+                    Debug.LogError($"[Bundles] Critical error! Failed to load bundle {bundle} from {Application.streamingAssetsPath + "/" + bundle}");
+                    continue;
+                }
+#else
+                using var loadRequest = UnityWebRequestAssetBundle.GetAssetBundle(Application.streamingAssetsPath + "/" + bundle);
+                await loadRequest.SendWebRequest();
+
+                if (loadRequest.result != UnityWebRequest.Result.Success) {
+                    Debug.LogError($"[Bundles] Critical error! Failed to load bundle {bundle} from {Application.streamingAssetsPath + "/" + bundle}");
+                    continue;
+                }
+
+                var loadedBundle = DownloadHandlerAssetBundle.GetContent(loadRequest);
+#endif
+                Debug.Log($"[Bundles] Successfully loaded {loadedBundle.name} ({(loadedBundle.isStreamedSceneAssetBundle ? loadedBundle.GetAllScenePaths().Length + " scenes" : loadedBundle.GetAllAssetNames().Length + " assets")})");
+            }
+        }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void CreateInstance() {

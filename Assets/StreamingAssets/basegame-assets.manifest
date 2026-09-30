@@ -1,0 +1,2089 @@
+ManifestFileVersion: 0
+UnityVersion: 6000.3.10f1
+CRC: 2848289700
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 2660942c6858d7ca18092e443b7203bd
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 7317f46ae6f8e16d04e78c432068b762
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: c38565e219f1844761ddb7f754e8278d
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 20
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 72
+  Script: {instanceID: 0}
+- Class: 74
+  Script: {instanceID: 0}
+- Class: 82
+  Script: {instanceID: 0}
+- Class: 83
+  Script: {instanceID: 0}
+- Class: 90
+  Script: {instanceID: 0}
+- Class: 91
+  Script: {instanceID: 0}
+- Class: 95
+  Script: {instanceID: 0}
+- Class: 111
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: a29518fadcd4a704abe29d73e5159d3f, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 5290eaf90a7a4a147a5900893d58a233, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 445236dd458722a4fb9d9111c0fd8acd, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 8da789e029dba6943bc7e24a87d12c48, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4e9c5479bb850b640b3d5d2032677f8c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 9ef72dd466a4a304fa1d61bcde88ab92, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 075af0e881e112348abe562216ddc298, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 34be77b26563ca24d9d84d064be43b5d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 6fb56a53aa9f4db4cb9a58897a414c35, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 88eb6ee564c020f48a3b1cf851277386, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 09abfd75f8de0ab47b15cc437e916a34, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 8613f23c290a968479a4aa41c11a4e0e, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 06fdb476470f99b4d8f665e3984c464a, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 71ec3ca12489981448a4f52766f2246b, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: a4d6a1cf7bbd94c4fa02ae9cb55e9240, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: aff24fad35d79d24d8d4415d4f61750b, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2a29198078841e84b99a3d4ccb1e6133, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: ee3e15f5c22e22746860121bd7f7db13, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e3da7571674e815448a99f92b1e227e5, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 696e3c9fa3fa38e428793f77ee0f16a7, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 7d7d8e5a78e377e4a84b91340258cb1b, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 8b22d938fa9712a4d8a0658557dd8fae, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 8fe74287800684740bdba87975b37f6f, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1350145080136734a8437fb56162f6c4, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: daf6a7acd9a12d949825b7c47ca4d970, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 205c3778517708b4da803049a01eb1ad, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: c4709ceb6ecd1f74a8e5aa527181775c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e2502948fa70c6c488c90819864fd036, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 6cf9d71929a202541b352e506ca0197e, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: fa882bf2642bc9a498e6745a1c915ec9, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 355ab346dbbd7cc42b7387d789f091c7, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 8c3cde99b64024641a20dee0ed9f7071, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 074d474ffe63a044fb94a38b891ce414, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 6ac4f2cfb76e05240a30775cb2032222, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2f45f722d3f9f3b46a5d7d0db116941d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2e40294c68e3fa947a5bb30addc2c56e, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 0abdd92b3163f6646a86721bc84cac7a, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 38866505948a8864aae8c12f36520e26, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: be3935f17c1a77d49a93a9700cd01d1d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 90795a33ed129444bb14668420459390, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 8a39450abc90b284791697bc1817f0ff, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: a0271833969e3f2419990a1b4ddccbdd, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 5bde109c23ab3a64f9ccec5ac787f04b, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3238feb2bf7c38c4082d6b66eb115db5, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 6e5fbc103d533164493b7c7708d7d456, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 5b73da02d946c92409564fcf9c2a6aa3, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 16be2e83a1c22ed45a8ea769016183ba, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: a9ffe477773b2ce47882a11923954e6b, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 51ef3c9f2bc66e14e9f5734f4b6354a9, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4bf0e493508cdc2428819484b6e5c099, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e3a8e2ca97a02d24789a50227980b9d0, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e2be42ddbc3897246be488598b88a5d5, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: ef0f23ab54bd3574382f41e33c4e8b7d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 6df7a72a9c9567c4fb2b2856d308cfa7, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4e5478bfbe63c3c46b392d3ca752690c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 557273f467ae31f4b8e07bbb89e73e8e, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: a6463060ee9070046859ec52f98ce0f1, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1a50e71a2792f0b42b0bebb8f5c499bb, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 8d72bc5c43dbd9a47bc609a55d77f714, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 5bc178eb0f51b354f8aaa16859fe5eb9, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 46e46a8425517b044a7157fe94384767, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 35f8d5d786e941249830d804f1db8a96, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 09ea0f1b8d822de4aa5f65f7b0bfbe2a, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 51643987916b2a148aac76fe0c744a79, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 7c00cebc36309d5489d79580c29041b1, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4847eed28ce45fa4f9c9ce7dffa2e2dd, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: f05ca792410c558478b3669c2f913e18, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 5245c252ab1a2d54a90ca6604ea21386, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: b30f2b8632bb3f341865059c5adf4d99, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 51aa41408f2d4a642a1ec9819a195586, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1075a7847f73fff4e9850c7effbec4bc, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 61f63850cf62700499c6baa35e5b2f25, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d202ace70644ea243bedea5f9b0af16e, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 77be103429cab49458a9fa9a18f8e3de, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 32074205723c0ff41924e853734b47a3, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: a80dae7c32f89e3499be935e5181c090, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 8efb8ce483e6f704bae510205eae27ae, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 33c184674be9c7f48b9912407f201faa, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 31fc75c2f2e4ff6448578c7292551017, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 37f035c060a4f684499b4799f3552f86, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 43e4ae2e77472a94abc2cf45dcf63fe6, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1d690da3f43c0bc4da2fd650a9d482b2, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 33ea7cada2913e849afa9400d347f258, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4da19227e0454d94a8d2d35c7ef75c74, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: fc10683f819b1044da70703eb51912f0, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 820b881c5e589924f85e26fc765b736d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 000aef4a865b41445a87c94cfb6560b0, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d7a08117adcb4414f91fdaf024c39ecf, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 897b89a0841ec204c9a1433d75d08ed3, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 68b0ecd5e70934142884ce7a3caf487f, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: b26211ad09d035f42b32b2cdd412679a, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 5a94ae8c7575fba45aae7e90cfc80aaf, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 816fcaa5c2c797c4da14a9d6314d38d0, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d31114cab083e0842a36e5479b1a502f, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 25d99566f313440458e1ef36d1bef3ab, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 60ff6e9ec8958cc438fd541760d75d6f, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: c1c19e01a43d64040bbf06a350f3c009, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3e603eeabd17b0d4694ac32ed6f20ecc, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: ce8b0cb6c1d54e5428273c6662ede73f, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: a77651c98eb177748a49241e377f4457, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 63caed69988a51547838713bab6e20ed, type: 3}
+- Class: 114
+  Script: {fileID: -263916522, guid: b156eeaae3f741b40af66649a4748430, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 7c8a2a7c3b3c8694a83f3b72e87ca64a, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: b537400c7ed4a2e4eb81f6d05b729ad4, type: 3}
+- Class: 114
+  Script: {fileID: -919360424, guid: b156eeaae3f741b40af66649a4748430, type: 3}
+- Class: 114
+  Script: {fileID: 206745634, guid: b156eeaae3f741b40af66649a4748430, type: 3}
+- Class: 114
+  Script: {fileID: -1722638350, guid: b156eeaae3f741b40af66649a4748430, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 7ad877d3227f699439b1f2f8bc0d7b9f, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: c8963c1eb6bcbe445abee72055f6918d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: c3c69813075aaea49a63531d19694117, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: ff3873c933753de479e19e4e9a08585b, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 8aca71bd60de8884aa6c027f7023d58f, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: c0a89e7d4b6e6a14f974e6855d1f877e, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: f5be4c53064660641b68a69324be0d29, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 7b4a0a774e0f07f488855d5548c10553, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: f8c6941d82400f344882d059ff26575d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: ecfdbd17b7573b4418a529eefff60248, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d5dad3cac885e2742959d7200c68e113, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 76c56e80143ded340882f1dd834f2abc, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 484a7ff6b8f969f4785aaf61364ef059, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 21a5b2dd50d714a40812a36b547124b4, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2dad1149df63a454bb73f554fe76ebaa, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1885d2a17ace89e469f425b39de1291c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 205ffd83cf9aea949895bb9a02f1a151, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 0c3100f103e9eb945af12ab95f0ab6d8, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: b890ace7f0d98694b8b4acf8ead43ad5, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: f09a56673702987429020c58e2d51615, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: aecdc86b0ae78874abbab53a7926cd78, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3c52a81cea4144841a636c188aa8f590, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1e8942af2beabf24ea7abef0c06bf0ae, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 58dd3b5982e56d5458968fe9360083fe, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: a114caed4f59570418ac85644139b494, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: dab5e18d9c39ba740adf6c085821a1a7, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: bb55c9faeb7d9444db037aeb19b9b790, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2c859af86f3a4dc47baab8b90f0f13f7, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 7b8cca62a36932842961091f4e9cc8cb, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2a82ec60d8a38564bbfcda7ad747802d, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: b7c21f92576528d4fa3377ad3b5c78ac, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2917d5d23fd4ea5448dd8daeae8a35f9, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: bb8b4489d4860b2429b2badcd175e5ca, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 7b914488d7bd4524ab3f00e132e115c5, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 385320c580a374c44b3da48163df570b, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: ec3ddf7c5937d6c458e33bc7e6db66c2, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: cb3c84fb01237ba439ffb83ef47d1eeb, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e64dab71434552b4cb3f460dc92213d0, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: b95cb98cdd8cb354ca04e6c18e1d4dfb, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4bfc831f01449864ea0a64f690d2fc54, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 9bb5ba24fc1efae4bab9294e76e613fc, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: b922c0839367f0543b7f38d475ba80c7, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 836dcb7e0f6259748b850a10912ce727, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 0008c51fe3af00b4da5d44f02d9b3dff, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: c533cfed317c8854c9d8c177029943ca, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 0413bd8db4f29e3488d92156dc397190, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: ba1cef2e59fba6443b0b8a032263be28, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 571ed829471dd0f4586d99a765335a82, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 6d97847a2693b724f89fe1384eaa00a4, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 367927541b1e18043a552473723f1aed, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 52c4ffc49d3be9b478562d614a7f6433, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 84a92b25f83d49b9bc132d206b370281, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 0e6aa951566f17244a0b6ee83dbefe12, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: b93d28497a61f0143858347120ac96a6, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 39fa3d8997a24136984ca6e2c99902bc, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: c46f07b5ed07e4e92aa78254188d3d10, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 6bd486065ce11414fa40e631affc4900, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 0b2db86121404754db890f4c8dfe81b2, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: cdfbdbb87d3286943a057f7791b43141, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 81180773991d8724ab7f2d216912b564, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 66f335fb1ffd8684294ad653bf1c7564, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3eb4b772797da9440885e8bd939e9560, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e021b4c809a781e468c2988c016ebbea, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: c01700fd266d6914ababb731e09af2eb, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 29fa0085f50d5e54f8144f766051a691, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: c5e1dc532bcb41949b58bc4f2abfbb7e, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 5485954d14dfb9a4c8ead8edb0ded5b1, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: ccf1aba9553839d41ae37dd52e9ebcce, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: fb60a22f311433c4c962b888d1393f88, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 06437c1ff663d574d9447842ba0a72e4, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 558a8e2b6826cf840aae193990ba9f2e, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 70afe9e12c7a7ed47911bb608a23a8ff, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 97c23e3b12dc18c42a140437e53d3951, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: bf2edee5c58d82540a51f03df9d42094, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2ec995e51a6e251468d2a3fd8a686257, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: de640fe3d0db1804a85f9fc8f5cadab6, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 899c54efeace73346a0a16faa3afe726, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 221518ef91623a7438a71fef23660601, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 13b75c95f34a00d4e8c04f76b73312e6, type: 3}
+- Class: 114
+  Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 86710e43de46f6f4bac7c8e50813a599, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 7a98125502f715b4b83cfb77b434e436, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 87a21947f7668244a99163d214ccc8c0, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 15b14052113b8414abfdb2effb52d984, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 128
+  Script: {instanceID: 0}
+- Class: 137
+  Script: {instanceID: 0}
+- Class: 198
+  Script: {instanceID: 0}
+- Class: 199
+  Script: {instanceID: 0}
+- Class: 212
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+- Class: 221
+  Script: {instanceID: 0}
+- Class: 222
+  Script: {instanceID: 0}
+- Class: 223
+  Script: {instanceID: 0}
+- Class: 224
+  Script: {instanceID: 0}
+- Class: 225
+  Script: {instanceID: 0}
+- Class: 241
+  Script: {instanceID: 0}
+- Class: 243
+  Script: {instanceID: 0}
+- Class: 245
+  Script: {instanceID: 0}
+- Class: 331
+  Script: {instanceID: 0}
+- Class: 156049354
+  Script: {instanceID: 0}
+- Class: 483693784
+  Script: {instanceID: 0}
+- Class: 687078895
+  Script: {instanceID: 0}
+- Class: 1839735485
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers:
+- AssemblyName: Assembly-CSharp
+  ClassName: NSMB.Entities.Player.PowerupVisuals
+- AssemblyName: Assembly-CSharp
+  ClassName: NSMB.Entities.Player.PowerupVisuals/MaterialTextureReplacement
+- AssemblyName: Assembly-CSharp
+  ClassName: NSMB.Particles.MiscParticles/ParticlePair
+- AssemblyName: Assembly-CSharp
+  ClassName: NSMB.Particles.SingleParticleManager/ParticlePair
+- AssemblyName: Assembly-CSharp
+  ClassName: NSMB.Quantum.InputCollector/DebugSpawnCommand
+- AssemblyName: Assembly-CSharp
+  ClassName: NSMB.UI.Game.Replay.LayersReplayUITab/ReplayRenderLayer
+- AssemblyName: Assembly-CSharp
+  ClassName: NSMB.UI.Pause.PauseMenuManager/PauseMenuOptionWrapper
+- AssemblyName: Quantum.Deterministic
+  ClassName: Photon.Deterministic.DeterministicSessionConfig
+- AssemblyName: Quantum.Deterministic
+  ClassName: Photon.Deterministic.FP
+- AssemblyName: Quantum.Deterministic
+  ClassName: Photon.Deterministic.FPVector2
+- AssemblyName: Quantum.Deterministic
+  ClassName: Photon.Deterministic.FPVector3
+- AssemblyName: Quantum.Deterministic
+  ClassName: Photon.Deterministic.IntVector2
+- AssemblyName: Quantum.Deterministic
+  ClassName: Photon.Deterministic.NullableFP
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.AssetGuid
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.AssetObjectIdentifier
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.AssetRef
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.AssetRef`1
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.CallbackFlags
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.ColorRGBA
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.ComponentPrototypeSet
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.FPAnimationCurve
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.FPAnimationCurve/Keyframe
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.InstantReplaySettings
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.PhysicsCombineFunction
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.Prototypes.PhysicsBodyInertiaMode
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.Prototypes.PhysicsCallbacks2DPrototype
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.Prototypes.PhysicsCollider2DPrototype
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.Prototypes.Transform2DPrototype
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.Prototypes.ViewPrototype
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.QBoolean
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.QEnum32`1
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.QEnum8`1
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.Shape2DConfig
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.Shape2DConfig/CompoundShapeData2D
+- AssemblyName: Quantum.Engine
+  ClassName: Quantum.Shape3DConfig
+- AssemblyName: Quantum.Simulation
+  ClassName: CharacterSpecificPalette
+- AssemblyName: Quantum.Simulation
+  ClassName: GenericMoverAsset/PathNode
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.CoinType
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.BigStarPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.BlockBumpPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.BobombPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.BooPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.BreakableObjectPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.BulletBillLauncherPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.BulletBillPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.CameraControllerPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.CoinItemPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.CoinPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.ComboKeeperPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.CullablePrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.DonutBlockPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.EnemyPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.EnterablePipePrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.FireSnakePrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.FireSnakeSegmentPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.FreezablePrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.GameRulesPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.GenericMoverPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.GoldBlockPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.GoombaPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.HoldablePrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.IceBlockPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.InteractablePrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.InteractionInitiatorPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.InvisibleBlockPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.KoopaPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.LiquidPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.MarioBrosPlatformPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.MarioPlayerPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.MovingPlatformPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.ObjectiveCoinPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.PhysicsObjectPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.PiranhaPlantPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.PowerupPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.ProjectilePrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.SpinnerPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.StageTileInstancePrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.StarCoinPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.Prototypes.WrappingObjectPrototype
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.RuntimeConfig
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.RuntimePlayer
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.SessionRunner/Arguments
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.StageChooseMode
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.StageTile/TileCollisionData
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.StageTile/TileCollisionData/TileShape
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.StageTileFlags
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.StageTileInstance
+- AssemblyName: Quantum.Simulation
+  ClassName: Quantum.TeamAttackOptions
+- AssemblyName: Quantum.Simulation
+  ClassName: SoundEffectOverride
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.Prototypes.Unity.EnterablePipePrototype
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.Prototypes.Unity.PhysicsObjectPrototype
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.Prototypes.Unity.PiranhaPlantPrototype
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.Prototypes.Unity.StarCoinPrototype
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.QuantumEntityPrototype/InitialNavMeshTargetInfo
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.QuantumEntityPrototype/NavMeshAvoidanceAgentInfo
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.QuantumEntityPrototype/NavMeshPathfinderInfo
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.QuantumEntityPrototype/NavMeshSpec
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.QuantumEntityPrototype/NavMeshSteeringAgentInfo
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.QuantumEntityPrototype/OverrideFP
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.QuantumEntityPrototype/PhysicsBodyGeneric
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.QuantumEntityPrototype/PhysicsColliderGeneric
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.QuantumEntityPrototype/SourceShapeGenericSettings
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.QuantumEntityPrototype/Transform2DVerticalInfo
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.QuantumEntityView/EntityUnityEvent
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.QuantumMapDataBakeFlags
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.QuantumRunnerLocalDebug/DynamicAssetDBSettings
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.QuantumRunnerLocalDebug/DynamicAssetDBSettings/InitialDynamicAssetsRequestedUnityEvent
+- AssemblyName: Quantum.Unity
+  ClassName: Quantum.QuantumSnapshotInterpolationTimer
+- AssemblyName: Unity.2D.Tilemap.Extras
+  ClassName: UnityEngine.RuleTile/TilingRule
+- AssemblyName: Unity.InputSystem
+  ClassName: UnityEngine.InputSystem.InputAction
+- AssemblyName: Unity.InputSystem
+  ClassName: UnityEngine.InputSystem.InputActionMap
+- AssemblyName: Unity.InputSystem
+  ClassName: UnityEngine.InputSystem.InputBinding
+- AssemblyName: Unity.InputSystem
+  ClassName: UnityEngine.InputSystem.InputControlScheme
+- AssemblyName: Unity.InputSystem
+  ClassName: UnityEngine.InputSystem.InputControlScheme/DeviceRequirement
+- AssemblyName: Unity.InputSystem
+  ClassName: UnityEngine.InputSystem.InputSettings/iOSSettings
+- AssemblyName: Unity.InputSystem
+  ClassName: UnityEngine.InputSystem.iOS.PrivacyDataUsage
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.APVLeakReductionModeParameter
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.BoolParameter
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.ClampedFloatParameter
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.ClampedIntParameter
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.ColorParameter
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.FloatParameter
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.IncludeAdditionalRPAssets
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.LightmapSamplingSettings
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.MinFloatParameter
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.NoInterpTextureParameter
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.ProbeVolumeBakingResources
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.ProbeVolumeBlendingTextureMemoryBudget
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.ProbeVolumeDebugResources
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.ProbeVolumeGlobalSettings
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.ProbeVolumeRuntimeResources
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.ProbeVolumeSHBands
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.ProbeVolumeSceneData
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.ProbeVolumeTextureMemoryBudget
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.RenderGraphGlobalSettings
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.RenderGraphModule.Util.RenderGraphUtilsResources
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.RenderPipelineGraphicsSettingsContainer
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.RenderingDebuggerRuntimeResources
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.STP/RuntimeResources
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.SerializedDictionary`2
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.ShaderStrippingSetting
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.TextureCurve
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.TextureCurveParameter
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.TextureParameter
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.Vector2Parameter
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.Vector3Parameter
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.Vector4Parameter
+- AssemblyName: Unity.RenderPipelines.Core.Runtime
+  ClassName: UnityEngine.Rendering.VrsRenderPipelineRuntimeResources
+- AssemblyName: Unity.RenderPipelines.GPUDriven.Runtime
+  ClassName: UnityEngine.Rendering.GPUResidentDrawerResources
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.URPReflectionProbeSettings
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.BloomFilterModeParameter
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.DepthOfFieldModeParameter
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.DownscaleParameter
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.FilmGrainLookupParameter
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.HDRACESPresetParameter
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.MotionBlurModeParameter
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.MotionBlurQualityParameter
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.NeutralRangeReductionModeParameter
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.OnTilePostProcessResource
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.PostProcessData/ShaderResources
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.PostProcessData/TextureResources
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.RenderGraphSettings
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.RenderObjects/CustomCameraSettings
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.RenderObjects/FilterSettings
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.RenderObjects/RenderObjectsSettings
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.Renderer2DResources
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.ScreenSpaceAmbientOcclusionDynamicResources
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.ScreenSpaceAmbientOcclusionPersistentResources
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.ScreenSpaceLensFlareResolutionParameter
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.ScriptableRendererData/DebugShaderResources
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.ScriptableRendererData/ProbeVolumeResources
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.StencilStateData
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.TemporalAA/Settings
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.TonemappingModeParameter
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.URPDefaultVolumeProfileSettings
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.URPShaderStrippingSetting
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.URPTerrainShaderSetting
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.UniversalRenderPipelineAsset/TextureResources
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.UniversalRenderPipelineDebugShaders
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.UniversalRenderPipelineEditorAssets
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.UniversalRenderPipelineEditorMaterials
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.UniversalRenderPipelineEditorShaders
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.UniversalRenderPipelineRuntimeShaders
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.UniversalRenderPipelineRuntimeTerrainShaders
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.UniversalRenderPipelineRuntimeTextures
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.UniversalRenderPipelineRuntimeXRResources
+- AssemblyName: Unity.RenderPipelines.Universal.Runtime
+  ClassName: UnityEngine.Rendering.Universal.UniversalRendererResources
+- AssemblyName: Unity.TextMeshPro
+  ClassName: TMPro.FaceInfo_Legacy
+- AssemblyName: Unity.TextMeshPro
+  ClassName: TMPro.FontAssetCreationSettings
+- AssemblyName: Unity.TextMeshPro
+  ClassName: TMPro.KerningTable
+- AssemblyName: Unity.TextMeshPro
+  ClassName: TMPro.TMP_Character
+- AssemblyName: Unity.TextMeshPro
+  ClassName: TMPro.TMP_FontFeatureTable
+- AssemblyName: Unity.TextMeshPro
+  ClassName: TMPro.TMP_FontWeightPair
+- AssemblyName: Unity.TextMeshPro
+  ClassName: TMPro.TMP_SpriteCharacter
+- AssemblyName: Unity.TextMeshPro
+  ClassName: TMPro.TMP_SpriteGlyph
+- AssemblyName: Unity.TextMeshPro
+  ClassName: TMPro.VertexGradient
+- AssemblyName: Unity.UnifiedRayTracing.Runtime
+  ClassName: UnityEngine.Rendering.UnifiedRayTracing.RayTracingRenderPipelineResources
+- AssemblyName: UnityEngine.CoreModule
+  ClassName: UnityEngine.Bounds
+- AssemblyName: UnityEngine.CoreModule
+  ClassName: UnityEngine.Events.ArgumentCache
+- AssemblyName: UnityEngine.CoreModule
+  ClassName: UnityEngine.Events.PersistentCallGroup
+- AssemblyName: UnityEngine.CoreModule
+  ClassName: UnityEngine.Events.PersistentListenerMode
+- AssemblyName: UnityEngine.CoreModule
+  ClassName: UnityEngine.Events.UnityEvent`1
+- AssemblyName: UnityEngine.CoreModule
+  ClassName: UnityEngine.RectOffset
+- AssemblyName: UnityEngine.CoreModule
+  ClassName: UnityEngine.Rendering.RenderPipelineGraphicsSettingsCollection
+- AssemblyName: UnityEngine.TextCoreFontEngineModule
+  ClassName: UnityEngine.TextCore.FaceInfo
+- AssemblyName: UnityEngine.TextCoreFontEngineModule
+  ClassName: UnityEngine.TextCore.Glyph
+- AssemblyName: UnityEngine.TextCoreFontEngineModule
+  ClassName: UnityEngine.TextCore.GlyphMetrics
+- AssemblyName: UnityEngine.TextCoreFontEngineModule
+  ClassName: UnityEngine.TextCore.GlyphRect
+- AssemblyName: UnityEngine.TextCoreFontEngineModule
+  ClassName: UnityEngine.TextCore.LowLevel.GlyphAdjustmentRecord
+- AssemblyName: UnityEngine.TextCoreFontEngineModule
+  ClassName: UnityEngine.TextCore.LowLevel.GlyphPairAdjustmentRecord
+- AssemblyName: UnityEngine.TextCoreFontEngineModule
+  ClassName: UnityEngine.TextCore.LowLevel.GlyphValueRecord
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.EventSystems.EventTrigger/Entry
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.EventSystems.EventTrigger/TriggerEvent
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.AnimationTriggers
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.Button/ButtonClickedEvent
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.ColorBlock
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.MaskableGraphic/CullStateChangedEvent
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.Navigation
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.SpriteState
+Assets:
+- Assets/Materials/2d/mat_bobomb.mat
+- Assets/Prefabs/Static/MainMenuPreviews/SkyPreview.prefab
+- Assets/Sprites/Particle/firepoof.png
+- Assets/Tilemaps/Tiles/SpecialTiles/Red/RedCoin.asset
+- Assets/Models/Players/mario_big/textures/cap/albedo/mario_tx_cap_albedo.png
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Volcano/CustomVolcanoMap_mesh.asset
+- Assets/Tilemaps/Tiles/Desert/tree/desert_84.asset
+- Assets/ScriptableObjects/PlayerSlots/Slot 5.asset
+- Assets/Models/Players/mario_big/textures/body/albedo/mario_tx_all_propellersuit_albedo.png
+- Assets/Prefabs/Static/MainMenuPreviews/!Fallback.prefab
+- Assets/QuantumUser/Assets/EntityPrototypes/World/WaterEntityPrototype.qprototype
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/11 GB.asset
+- Assets/Tilemaps/Tiles/Snow/SnowGround.asset
+- Assets/Sound/character/mario/walljump_1.ogg
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/KoopaEntityPrototype.qprototype
+- Assets/Sprites/Atlases/Entity/piranhaplant.png
+- Assets/Sound/player/walk/water_2.ogg
+- Assets/Sprites/Atlases/Entity/bobomb.png
+- Assets/Tilemaps/Tiles/Snow/17 Snow (with ice)_76.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_57.asset
+- Assets/Sound/ui/warn.ogg
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_green_vertical_right_top.asset
+- Assets/Sprites/Atlases/Terrain/castle.png
+- Assets/Sprites/Level Backgrounds/ghosthouse-fg.png
+- Assets/Models/Propeller/propeller_source.blend
+- Assets/Sound/world/star_collect_enemy.ogg
+- Assets/Tilemaps/Tiles/Bonus/clown_2.asset
+- Assets/Sprites/UI/Menu/settings.png
+- Assets/Sound/character/luigi/spinner_launch.ogg
+- Assets/QuantumUser/Assets/EntityPrototypes/World/WrappingPlatformEntityPrototype.qprototype
+- Assets/QuantumUser/Assets/AssetObjects/Teams/0 Red.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_35.asset
+- Assets/Tilemaps/Tiles/Desert/tree/desert_70.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_red_vertical_right.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/StarCoinEntityPrototype.qprototype
+- Assets/Sprites/Atlases/Terrain/snow.png
+- Assets/Tilemaps/Tiles/Desert/DesertGround.asset
+- Assets/ScriptableObjects/TextValidators/TimeTextValidator.asset
+- Assets/QuantumUser/Assets/AssetObjects/Maps/GhostHouse/CustomGhostHouseVersusStage.asset
+- Assets/Sound/world/ice_skidding.ogg
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_20.asset
+- Assets/Sprites/Atlases/Terrain/lavatexture.png
+- Assets/QuantumUser/Assets/AssetObjects/World/FortressCeilingMover.asset
+- Assets/Sprites/Atlases/Entity/koopa.png
+- Assets/QuantumUser/Assets/AssetObjects/Music/MusicMainMenu.asset
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_29.asset
+- Assets/ScriptableObjects/SoundData/WaterSkiddingSound.asset
+- Assets/Tilemaps/Tiles/Volcano/Yellow/YellowSlopeTop.asset
+- Assets/Tilemaps/Tiles/SpecialTiles/Red/RedPowerup.asset
+- Assets/Tilemaps/Tiles/Sky/sky-mushroom_23.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/World/BlockBump.prefab
+- Assets/Sprites/UI/Menu/Elements/back.png
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_yellow_vertical_right_bottom.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_32.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_blue_vertical_right_bottom.asset
+- Assets/Tilemaps/Palettes/Jungle.prefab
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_177.asset
+- Assets/Sprites/UI/ui.png
+- Assets/Models/Players/luigi_big/textures/body/masks/luigi_tx_all_propellersuit_mask_shirt.png
+- Assets/Sound/enemy/stomp.ogg
+- Assets/Models/Blue Shell/blue_shell_tx_albedo.png
+- Assets/Sprites/UI/Menu/chat.png
+- Assets/Tilemaps/Tiles/Bonus/RightRedirect.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_22.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/World/CloudPlatform.prefab
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_165.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_52.asset
+- Assets/Sprites/Particle/mega-grow.png
+- Assets/QuantumUser/Assets/AssetObjects/Music/MusicLevelVolcano.asset
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Jungle/CustomJungleStage_mesh.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Player/PlayerLuigi.prefab
+- Assets/Sprites/UI/Menu/Elements/rounded-rect-5px-dialogue-rotated.png
+- Assets/Prefabs/Misc/TemporarySoundSource.prefab
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_27.asset
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_41 1.asset
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_27.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_66.asset
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_3.asset
+- Assets/Sprites/UI/Menu/maps/stage-brick.png
+- Assets/Sound/character/mario/mega_mushroom.ogg
+- Assets/ScriptableObjects/PlayerSlots/Slot 10.asset
+- Assets/Tilemaps/Tiles/Desert/tree/desert_63.asset
+- Assets/Misc/Controls.inputactions
+- Assets/Materials/2d/LavaBackgroundBGAnimation.mat
+- Assets/Tilemaps/Tiles/Desert/tree/desert_81.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_yellow_vertical_right.asset
+- Assets/Tilemaps/Tiles/SpecialTiles/Gray/GrayCoin.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Player/PlayerLuigiEntityPrototype.qprototype
+- Assets/Sound/player/walk/grass_2.ogg
+- Assets/Sprites/Level Backgrounds/clouds.png
+- Assets/Tilemaps/Tiles/Bonus/clown_6.asset
+- Assets/Models/Hammer Models/Helmet/helmet.fbx
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_51.asset
+- Assets/Tilemaps/Tiles/Desert/desert_33.asset
+- Assets/Sprites/Atlases/Terrain/3 Underground (with ice).png
+- Assets/Sprites/UI/options/slider.png
+- Assets/Materials/3d/spinner/mat_env_s_j_top.mat
+- Assets/Sound/ui/match_win.ogg
+- Assets/Sound/ui/match_draw.ogg
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_blue_horizontal_top_left.asset
+- Assets/Prefabs/Static/MainMenuPreviews/BeachPreview.prefab
+- Assets/Models/Players/mario_big/textures/propellerhat/masks/mario_tx_propellerhat_mask_cap.png
+- Assets/Tilemaps/Tiles/Sky/sky-mushroom_48.asset
+- Assets/Materials/2d/LavaBackgroundFGAnimation.mat
+- Assets/Tilemaps/Tiles/Desert/tree/desert_72.asset
+- Assets/Materials/3d/hammer/mat_helmet.mat
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_1.asset
+- Assets/Tilemaps/Palettes/Sky.prefab
+- Assets/Tilemaps/Tiles/Desert/DesertSlopeTop.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/Mega Mushroom.prefab
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/9 SMB3.asset
+- Assets/Sprites/Particle/snow.png
+- Assets/Sprites/Level Backgrounds/volcano-bg-palette.png
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_16.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Coins/DottedCoinEntityPrototype.qprototype
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_red_horizontal_bottom_right.asset
+- Assets/Tilemaps/Tiles/Desert/desert_29.asset
+- Assets/Models/Players/luigi_big/textures/propellerhat/masks/luigi_tx_propellerhat_mask_shirt.png
+- Assets/Sound/music/bonus.ogg
+- Assets/Models/Players/luigi_big/textures/eyes/luigi_eyes_nocap.png
+- Assets/Tilemaps/Tiles/BeachBlue/beachsand_topR.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/FireSnakeSegment.prefab
+- Assets/Sprites/UI/fadeSilhouettes/respawn-luigi.png
+- Assets/Sprites/UI/bggradient.png
+- Assets/Tilemaps/Tiles/SpecialTiles/Blue/BluePowerup.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/RedKoopa.prefab
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_yellow_vertical_top_right.asset
+- Assets/Materials/2d/mat_Powerup.mat
+- Assets/Sprites/UI/Menu/pipes.png
+- Assets/Models/Gold Block/wing.png
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_16.asset
+- Assets/Sprites/UI/Menu/checkerboard.png
+- Assets/Sprites/Particle/pipe-break.png
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/14 Chibi.asset
+- Assets/Prefabs/Misc/Visualizer Block.prefab
+- Assets/Sprites/Particle/bump.png
+- Assets/Tilemaps/Tiles/Bonus/clown_3.asset
+- Assets/Tilemaps/Tiles/Snow/17 Snow (with ice)_78.asset
+- Assets/Tilemaps/Palettes/Desert.prefab
+- Assets/Sprites/UI/selected.png
+- Assets/Sound/character/mario/selected.ogg
+- Assets/Sound/character/luigi/luigi_taunt.ogg
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Pipes/DefaultPipesMap_mesh.asset
+- Assets/Sprites/Atlases/Terrain/underground.png
+- Assets/Sound/powerup/blueshell_enter.ogg
+- Assets/Materials/2d/WaterMaterial.mat
+- Assets/Sprites/Atlases/Terrain/grass.png
+- Assets/Prefabs/Static/MainMenuPreviews/GrasslandPreview.prefab
+- Assets/Materials/3d/spinner/mat_spin_j_obj4.mat
+- Assets/Models/Players/mario_big/textures/cap/albedo/mario_tx_cap_iceflower_albedo.png
+- Assets/Sound/world/star_spawn.ogg
+- Assets/Sound/music/snow-f.ogg
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_yellow_vertical_left_top.asset
+- Assets/Sound/enemy/piranhaplant_chomp.ogg
+- Assets/Models/Players/luigi_big/textures/cap/albedo/luigi_tx_cap_fireflower_albedo.png
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_180.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_36.asset
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_33.asset
+- Assets/Tilemaps/Tiles/Desert/desert_30.asset
+- Assets/Sprites/Atlases/Entity/koopa-red.png
+- Assets/Tilemaps/Tiles/Desert/tree/desert_78.asset
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_8.asset
+- Assets/Sound/world/gold_block_damage.ogg
+- Assets/Sound/powerup/fireball_shoot.ogg
+- Assets/Sound/character/mario/triplejump.ogg
+- Assets/Sprites/Atlases/Terrain/marioplatform.png
+- Assets/Tilemaps/Tiles/Desert/tree/desert_80.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_red_horizontal_top_left.asset
+- Assets/QuantumUser/Assets/AssetObjects/Music/MusicLevelSnow.asset
+- Assets/Sprites/Level Backgrounds/volcano-fg-new-lava.png
+- Assets/Tilemaps/Tiles/Basic/EmptyBlue.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Coins/EnemyCoinEntityPrototype.qprototype
+- Assets/QuantumUser/Assets/EntityPrototypes/World/CloudPlatformEntityPrototype.qprototype
+- Assets/Sprites/UI/loading-sprites.png
+- Assets/Models/Players/mario_big/textures/cap/masks/mario_tx_cap_mask_emblem.png
+- Assets/Models/Spinner/env_red.png
+- Assets/Sprites/UI/Menu/file-icons.png
+- Assets/Tilemaps/Tiles/Desert/tree/desert_82.asset
+- Assets/Sprites/Atlases/Terrain/31 Volcano (yellow).png
+- Assets/Tilemaps/Tiles/SpecialTiles/Gray/GrayBrickCoin.asset
+- Assets/Sound/player/crouch.ogg
+- Assets/Models/Players/mario_big/textures/body/albedo/mario_tx_all_albedo.png
+- Assets/Sprites/Atlases/Terrain/platforms.png
+- Assets/Sound/player/death.ogg
+- Assets/ScriptableObjects/PlayerSlots/Slot 6.asset
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_0.asset
+- Assets/Models/Players/mario_big/textures/body/masks/mario_tx_all_mask_cap.png
+- Assets/Models/Players/luigi_big/textures/cap/masks/luigi_tx_cap_mask_emblem.png
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/MushroomEntityPrototype.qprototype
+- Assets/Sprites/Level Backgrounds/desert.png
+- Assets/Tilemaps/Tiles/GhostHouse/GhostLeftSlightStairsRight.asset
+- Assets/Sound/ui/loading_alt.ogg
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/BlueKoopa.prefab
+- Assets/Models/Players/luigi_big/textures/propellerhat/luigi_tx_propellerhat_albedo_starman.png
+- Assets/Models/Spinner/spinner.fbx
+- Assets/Sprites/Particle/woosh_ring.png
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Beach/CustomBeachMap.asset
+- Assets/Sprites/UI/options/checkboxes.png
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_19.asset
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Bricks/DefaultBricksStageData.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/World/WrappingPlatform.prefab
+- Assets/Sound/player/walljump.ogg
+- Assets/Tilemaps/Tiles/Desert/tree/desert_77.asset
+- Assets/Sound/ui/player_connect.ogg
+- Assets/Sound/character/luigi/triplejump.ogg
+- Assets/Materials/3d/goldblock/mat_goldblock.mat
+- Assets/Sound/ui/quit.ogg
+- Assets/Sprites/Atlases/Entity/stars.png
+- Assets/Sound/player/collision.ogg
+- Assets/Sprites/Level Backgrounds/bonus-styles.png
+- Assets/Models/Players/mario_big/textures/body/albedo/mario_tx_all_starman_albedo.png
+- Assets/Materials/3d/starcoin/StarCoinMaterial.mat
+- Assets/Sprites/UI/uibackground.png
+- Assets/Tilemaps/Tiles/Snow/17 Snow (with ice)_25.asset
+- Assets/QuantumUser/Assets/AssetObjects/Maps/GhostHouse/CustomGhostHouseMap.asset
+- Assets/Models/Players/mario_big/source/mario_cap_source.blend
+- Assets/Sound/character/mario/doublejump_2.ogg
+- Assets/Materials/2d/particles/PoisonSplash.mat
+- Assets/Materials/3d/luigi/mat_luigi_cap.mat
+- Assets/Sprites/UI/reserve-ui.png
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_55.asset
+- Assets/Sprites/Level Backgrounds/bonus-bg.png
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_36.asset
+- Assets/Models/Players/starman-toon.png
+- Assets/Materials/3d/mario/OutlineMaterial.mat
+- Assets/Sound/enemy/bulletbill_shoot.ogg
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_156.asset
+- Assets/Tilemaps/Tiles/Sky/sky-mushroom_39.asset
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/2 Green.asset
+- Assets/Sprites/Particle/1UpText.png
+- Assets/QuantumUser/Assets/AssetObjects/Teams/4 Magenta.asset
+- Assets/Sprites/UI/options/box.png
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_54.asset
+- Assets/Models/Gold Block/gold_block_luigi.fbx
+- Assets/Tilemaps/Palettes/Cave with Ice.prefab
+- Assets/QuantumUser/Assets/AssetObjects/Music/MusicLevelJungle.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_63.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_135.asset
+- Assets/Models/Players/mario_small/source/mario_small_head_nocap_source.blend
+- Assets/Sprites/Atlases/Entity/fireball.png
+- Assets/Sprites/UI/Menu/menubg.png
+- Assets/Tilemaps/Tiles/Sky/SkyGrass.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_64.asset
+- Assets/Models/Hammer Models/Shell/shell.fbx
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Bonus/CustomBonusMap_mesh.asset
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_60.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_67.asset
+- Assets/Sound/ui/decide.ogg
+- Assets/QuantumUser/Assets/AssetObjects/PhysicsProperties/WaterProperties.asset
+- Assets/Sound/player/groundpound_landing.ogg
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/7 Anime.asset
+- Assets/Tilemaps/Tiles/Basic/EmptyRed.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_117.asset
+- Assets/Tilemaps/Tiles/Desert/Semisolid.asset
+- Assets/Models/Players/mario_small/source/mario_small_head_cap_source.blend
+- Assets/QuantumUser/Assets/EntityPrototypes/Coins/DottedCoin.prefab
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_145.asset
+- Assets/Misc/GlowRenderer.asset
+- Assets/QuantumUser/Assets/AssetObjects/Items/HammerSuit.asset
+- Assets/QuantumUser/Assets/AssetObjects/Teams/3 Yellow.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_red_vertical_left.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_53.asset
+- Assets/Tilemaps/Tiles/Sky/sky-mushroom_59.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_yellow_vertical_bottom_right.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Projectile/IceballEntityPrototype.qprototype
+- Assets/Sprites/UI/fadeSilhouettes/respawn-mario.png
+- Assets/Misc/InputSystem.inputsettings.asset
+- Assets/Sprites/Level Backgrounds/grass-sky.png
+- Assets/Sound/world/coin_collect.ogg
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/5 Waluigi.asset
+- Assets/Sound/enemy/shell_combo5.ogg
+- Assets/Models/Players/luigi_big/textures/body/albedo/luigi_tx_all_iceflower_albedo.png
+- Assets/Sprites/Atlases/Entity/boo.png
+- Assets/Materials/2d/particles/RingParticle.mat
+- Assets/Tilemaps/Tiles/Volcano/Yellow/YellowSlopeBottom.asset
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_22.asset
+- Assets/Models/Players/mario_big/textures/eyes/mario_eyes.png
+- Assets/Sprites/UI/teamflag.png
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_blue_vertical_left_bottom.asset
+- Assets/Sprites/UI/icon.png
+- Assets/Sound/ui/back.ogg
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_red_vertical_left_bottom.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_69.asset
+- Assets/Sprites/Atlases/Terrain/pipes.png
+- Assets/QuantumUser/Assets/AssetObjects/PhysicsProperties/IceProperties.asset
+- Assets/Sprites/Atlases/Terrain/sky-mushroom.png
+- Assets/Models/Players/luigi_big/textures/body/albedo/luigi_tx_all_starman_albedo.png
+- Assets/Sprites/UI/playerribbons.png
+- Assets/Materials/2d/particles/Circle.mat
+- Assets/Models/Players/luigi_big/textures/propellerhat/luigi_tx_propellerhat_albedo.png
+- Assets/Tilemaps/Tiles/Sky/BigGreen/BigMushroomGreenTopSlope.asset
+- Assets/Sound/world/star_collect.ogg
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/FireSnakeEntityPrototype.qprototype
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/StarmanEntityPrototype.qprototype
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/22 Deluxe.asset
+- Assets/Sprites/UI/fadeSilhouettes/circle.png
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_120.asset
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_26.asset
+- Assets/Models/Players/mario_big/textures/cap/masks/mario_tx_cap_mask_hat.png
+- Assets/Sprites/UI/Menu/maps/stage-bonus.png
+- Assets/Materials/2d/ui/BlurUIMat.mat
+- Assets/QuantumUser/Assets/EntityPrototypes/World/EnterablePipe.prefab
+- Assets/QuantumUser/Assets/AssetObjects/Items/PropellerMushroom.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/Mega MushroomEntityPrototype.qprototype
+- Assets/Sprites/UI/track.png
+- Assets/Sound/player/death_others.ogg
+- Assets/Models/Players/mario_big/mario_big_exported.fbx
+- Assets/Materials/2d/particles/IceBreak.mat
+- Assets/QuantumUser/Assets/EntityPrototypes/World/PoisonEntityPrototype.qprototype
+- Assets/Sound/player/wallslide.ogg
+- Assets/Sound/ui/hurry_up.ogg
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_30.asset
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_21.asset
+- Assets/QuantumUser/Assets/AssetObjects/Gamemodes/CoinRunnersGamemode.asset
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_42.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_37.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/FireSnakeSegmentEntityPrototype.qprototype
+- Assets/Models/Propeller/propeller.fbx
+- Assets/Tilemaps/Tiles/Sky/sky-mushroom_30.asset
+- Assets/Tilemaps/Tiles/SpecialTiles/BrownBrick.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_52.asset
+- Assets/Tilemaps/Palettes/Snow.prefab
+- Assets/Sprites/UI/options/pauseback.png
+- Assets/Sound/music/sky.ogg
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_red_vertical_left_top.asset
+- Assets/Models/Players/mario_big/source/mario_big_source.blend
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_blue_horizontal_bottom_left.asset
+- Assets/Tilemaps/Tiles/SpecialTiles/Red/RedBrick.asset
+- Assets/Tilemaps/Tiles/SpecialTiles/Blue/BlueBrickPowerup.asset
+- Assets/Sound/character/luigi/mega_mushroom.ogg
+- Assets/Models/Players/mario_big/textures/body/albedo/mario_tx_all_iceflower_albedo.png
+- Assets/QuantumUser/Assets/AssetObjects/Music/MusicLevelGhostHouse.asset
+- Assets/Sprites/UI/vert-scrollbar.png
+- Assets/Sound/enemy/freeze_melt.ogg
+- Assets/Tilemaps/Tiles/Desert/tree/desert_66.asset
+- Assets/Models/Gold Block/wing_block.fbx
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_48.asset
+- Assets/Models/starcoin/starcoin_transparent.png
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/Mushroom.prefab
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/GoombaEntityPrototype.qprototype
+- Assets/Models/Players/luigi_big/textures/body/masks/luigi_tx_all_propellersuit_mask_overalls.png
+- Assets/Tilemaps/Palettes/Bonus.prefab
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_1.asset
+- Assets/Sprites/UI/fadeSilhouettes/pipe-bumps.png
+- Assets/Sprites/Level Backgrounds/bonus-grid.png
+- Assets/Models/Players/mario_big/textures/body/albedo/mario_tx_all_fireflower_albedo.png
+- Assets/Sound/music/starman.ogg
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_25.asset
+- Assets/Models/Players/luigi_big/textures/body/albedo/luigi_tx_all_albedo.png
+- Assets/Sound/music/overworld-f.ogg
+- Assets/Sprites/Atlases/Terrain/30 Sewer (W2-3).png
+- Assets/Sound/powerup/fireball_break.ogg
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Sky/CustomSkyMap_mesh.asset
+- Assets/Models/Players/mario_big/textures/mario_tx_head_albedo.png
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_yellow_vertical_bottom_left.asset
+- Assets/Sound/character/luigi/doublejump_1.ogg
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/24 Yellow.asset
+- Assets/Tilemaps/Palettes/Beach.prefab
+- Assets/Tilemaps/Tiles/Sky/sky-mushroom_17.asset
+- Assets/Tilemaps/Tiles/Sky/small-mushrooms/green-mushroom-center.asset
+- Assets/QuantumUser/Assets/AssetObjects/Items/BlueShell.asset
+- Assets/Sound/music/volcano.ogg
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_12.asset
+- Assets/Models/Spinner/env_g.png
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_48.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/GoldBlockEntityPrototype.qprototype
+- Assets/Sprites/UI/Menu/Elements/marioluigi.png
+- Assets/Sound/player/slide_end.ogg
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/12 Vinesauce.asset
+- Assets/Tilemaps/Tiles/Desert/tree/desert_65.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_blue_horizontal_top.asset
+- Assets/Materials/3d/mega/mat_mega.mat
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_60.asset
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/10 Builder.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_42.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_green_vertical_right_bottom.asset
+- Assets/Tilemaps/Tiles/BeachBlue/beachsand_top.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/BlueKoopaEntityPrototype.qprototype
+- Assets/QuantumUser/Assets/EntityPrototypes/Coins/StageCoin.prefab
+- Assets/Tilemaps/Tiles/Sky/sky-mushroom_19.asset
+- Assets/Sprites/Particle/circle.png
+- Assets/Sound/powerup/iceball_shoot.ogg
+- Assets/Sound/ui/chat_keydown.wav
+- Assets/Sound/powerup/megamushroom_walk_1.ogg
+- Assets/Tilemaps/Tiles/Animated/Coin.asset
+- Assets/Tilemaps/Tiles/BeachBlue/beachsand_3.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/World/BreakablePipeEntityPrototype.qprototype
+- Assets/Models/Players/mario_big/textures/body/masks/mario_tx_all_propellersuit_mask_overalls.png
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Volcano/CustomVolcanoStageData.asset
+- Assets/Tilemaps/Palettes/Volcano.prefab
+- Assets/Tilemaps/Tiles/Sky/sky-mushroom_9.asset
+- Assets/Models/Players/mario_big/textures/propellerhat/mario_tx_propellerhat_albedo.png
+- Assets/Tilemaps/Tiles/Sky/sky-mushroom_21.asset
+- Assets/Models/Players/luigi_big/textures/propellerhat/masks/luigi_tx_propellerhat_mask_cap.png
+- Assets/Sound/enemy/freeze.ogg
+- Assets/Sprites/Atlases/Terrain/launcher.png
+- Assets/Tilemaps/Tiles/Sky/small-mushrooms/red-mushroom-side.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Projectile/HammerEntityPrototype.qprototype
+- Assets/Tilemaps/Tiles/SpecialTiles/YellowCoin.asset
+- Assets/QuantumUser/Assets/AssetObjects/Projectile/FireballProjectile.asset
+- Assets/Sprites/UI/Menu/typing.png
+- Assets/Models/Players/luigi_big/textures/eyes/luigi_eyes.png
+- Assets/Tilemaps/Tiles/BeachBlue/beachsand_1.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_green_vertical_right.asset
+- Assets/Sprites/Particle/waterparticle.png
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Ice/DefaultIceStage_mesh.asset
+- Assets/Tilemaps/Palettes/Caves.prefab
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_54.asset
+- Assets/Materials/3d/mario/mat_mario_eyes.mat
+- Assets/Materials/2d/particles/Bubble.mat
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/13 Nate.asset
+- Assets/ScriptableObjects/TextValidators/TimeMinutesSeconds.asset
+- Assets/Sprites/Atlases/Terrain/cloud.png
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Grass/DefaultGrassStageData.asset
+- Assets/Tilemaps/Palettes/Grassland.prefab
+- Assets/Sprites/UI/Menu/maps/stage-grassland.png
+- Assets/QuantumUser/Assets/EntityPrototypes/World/Water.prefab
+- Assets/QuantumUser/Assets/AssetObjects/Items/MegaMushroom.asset
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_13.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_39.asset
+- Assets/Models/Players/mario_big/textures/body/albedo/mario_tx_all_hammersuit_albedo.png
+- Assets/Sound/world/block_powerup.ogg
+- Assets/Models/Hammer Models/Shell/hammersuit_tx_shell_albedo.png
+- Assets/Tilemaps/Tiles/Desert/DesertSteepSlopeBottom.asset
+- Assets/Sound/enemy/bobomb_explode.ogg
+- Assets/Materials/2d/PoisonMaterial.mat
+- Assets/Prefabs/Static/MainMenuPreviews/FortressPreview.prefab
+- Assets/Prefabs/UI/PipeButton.prefab
+- Assets/Prefabs/Static/MainMenuPreviews/JunglePreview.prefab
+- Assets/Sprites/Atlases/Entity/bounce-mushroom.png
+- Assets/Materials/3d/mario/mat_mario_propeller.mat
+- Assets/Sound/powerup/warn.ogg
+- Assets/Sprites/UI/options/optionbox.png
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/Goomba.prefab
+- Assets/Materials/2d/mat_tiles.mat
+- Assets/Misc/PipelineAsset.asset
+- Assets/Models/Blue Shell/blue_shell_tx_mask_overalls.png
+- Assets/Sprites/Atlases/Terrain/bonus-pillars.png
+- Assets/Sound/powerup/megamushroom_break_block.ogg
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_junction_1.asset
+- Assets/Models/Players/luigi_big/textures/luigi_tx_head_albedo.png
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/PiranhaPlant.prefab
+- Assets/Tilemaps/Tiles/Sky/sky-mushroom_49.asset
+- Assets/Sprites/Atlases/Terrain/doors.png
+- Assets/QuantumUser/Assets/EntityPrototypes/World/DonutBlockEntityPrototype.qprototype
+- Assets/QuantumUser/Assets/EntityPrototypes/Coins/ObjectiveCoin.prefab
+- Assets/Sprites/Particle/dust.png
+- Assets/Sprites/UI/options/unbindbar.png
+- Assets/Sound/music/mainmenu.ogg
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_168.asset
+- Assets/Tilemaps/Tiles/Desert/desert_41.asset
+- Assets/Prefabs/Static/MainMenuPreviews/BonusPreview.prefab
+- Assets/Sprites/UI/option.png
+- Assets/QuantumUser/Assets/AssetObjects/Music/MusicMegaMushroom.asset
+- Assets/Materials/3d/starcoin/StarCoinCollectedMaterial.mat
+- Assets/Sprites/Particle/small-star.png
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Fortress/DefaultFortressMap_mesh.asset
+- Assets/QuantumUser/Assets/AssetObjects/Gamemodes/StarChasersGamemode.asset
+- Assets/Sprites/Atlases/Terrain/Atlas.spriteatlasv2
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_119.asset
+- Assets/Sprites/UI/Menu/Elements/logos.png
+- Assets/Materials/3d/blueshell/mat_blueshell.mat
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_56.asset
+- Assets/Tilemaps/Tiles/Desert/tree/desert_46.asset
+- Assets/Models/Players/luigi_big/textures/body/albedo/luigi_tx_all_fireflower_albedo.png
+- Assets/QuantumUser/Assets/AssetObjects/Characters/LuigiCharacter.asset
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Desert/CustomDesertMap.asset
+- Assets/Tilemaps/Palettes/Ghost House.prefab
+- Assets/Sprites/Level Backgrounds/pipe-bg.png
+- Assets/Sound/music/desert-f.ogg
+- Assets/Sound/music/ghost.ogg
+- Assets/Sound/player/collision_fireball.ogg
+- Assets/QuantumUser/Assets/AssetObjects/Music/MusicLevelBeach.asset
+- Assets/Sound/enemy/bobomb_fuse.ogg
+- Assets/Sprites/Particle/blue-explode.png
+- Assets/Tilemaps/Tiles/Castle/squishy_6.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/World/BlockBumpEntityPrototype.qprototype
+- Assets/Sprites/Atlases/Terrain/forest.png
+- Assets/QuantumUser/Assets/EntityPrototypes/World/Poison.prefab
+- Assets/Sprites/Level Backgrounds/ghosthouse-fog.png
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_green_horizontal_bottom_left.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_167.asset
+- Assets/Sound/world/spinner_launch.ogg
+- Assets/Sprites/Atlases/Terrain/beach-yellow.png
+- Assets/Sprites/Level Backgrounds/castle-fg.png
+- Assets/Sprites/UI/results.png
+- Assets/Sprites/Particle/spark.png
+- Assets/Tilemaps/Tiles/Sky/BigGreen/BigMushroomGreenBottomSlope.asset
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_7.asset
+- Assets/Tilemaps/Palettes/Basic Blocks.prefab
+- Assets/Sound/music/results.ogg
+- Assets/Tilemaps/Tiles/Desert/tree/desert_79.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_65.asset
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Grass/DefaultGrassStage.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/World/BreakablePipe.prefab
+- Assets/Sound/player/walk/sand_1.ogg
+- Assets/Sprites/Particle/explosion-sparks.png
+- Assets/Sound/powerup/1-up.ogg
+- Assets/Models/Gold Block/block_gold_mario.png
+- Assets/Sound/enemy/shell_combo6.ogg
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Ice/DefaultIceStage.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_51.asset
+- Assets/Sprites/UI/arrows.png
+- Assets/Sprites/UI/Menu/maps/stage-ice.png
+- Assets/Tilemaps/Tiles/Snow/17 Snow (with ice)_26.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_35.asset
+- Assets/Sprites/UI/Menu/maps/stage-bonus-2.png
+- Assets/Tilemaps/Tiles/Castle/squishy_5.asset
+- Assets/Sprites/Level Backgrounds/volcano-fg-new.png
+- Assets/Models/Players/luigi_big/textures/body/albedo/luigi_tx_all_propellersuit_albedo.png
+- Assets/Sound/player/walk/snow_2.ogg
+- Assets/Sound/world/block_break.ogg
+- Assets/Models/Players/luigi_big/source/luigi_head_nocap_source.blend
+- Assets/Sprites/Atlases/Terrain/cloud-4width.png
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_24.asset
+- Assets/Tilemaps/Tiles/Castle/squishy_3.asset
+- Assets/Tilemaps/Tiles/Invisible.asset
+- Assets/Sound/ui/match_cancel.ogg
+- Assets/Materials/3d/starcoin/StarCoinPurpleMaterial.mat
+- Assets/QuantumUser/Assets/AssetObjects/Projectile/IceballProjectile.asset
+- Assets/Sound/powerup/propellermushroom_spin.ogg
+- Assets/Sound/powerup/hammer_throw.ogg
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_14.asset
+- Assets/Sound/world/water_splash.ogg
+- Assets/Sound/character/mario/walljump_2.ogg
+- Assets/Tilemaps/Tiles/Sky/sky-mushroom_33.asset
+- Assets/Materials/3d/luigi/mat_luigi_propeller.mat
+- Assets/Materials/3d/FireSnakeEyes.mat
+- Assets/Misc/UniversalRenderPipelineGlobalSettings.asset
+- Assets/Sound/player/powerdown.ogg
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Bonus/CustomBonusStageData.asset
+- Assets/Sprites/Level Backgrounds/cave-bg.png
+- Assets/QuantumUser/Assets/AssetObjects/Music/MusicLevelSky.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/Spiny.prefab
+- Assets/Tilemaps/Tiles/Snow/17 Snow (with ice)_77.asset
+- Assets/Sprites/Particle/numbers.png
+- Assets/Sprites/UI/options/pausescrollbar.png
+- Assets/Sprites/UI/track-boos.png
+- Assets/Sound/powerup/minimushroom_jump.ogg
+- Assets/Materials/3d/mario/mat_mario_head_nocap.mat
+- Assets/Models/Players/luigi_big/textures/cap/masks/luigi_tx_cap_mask_hat.png
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/HammerSuit.prefab
+- Assets/Sprites/Atlases/Terrain/watertexture.png
+- Assets/Sprites/Particle/AccPart.png
+- Assets/Tilemaps/Tiles/BeachBlue/BeachPlatformBottom.asset
+- Assets/Prefabs/Misc/Music Visualizer.prefab
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/1-Up.prefab
+- Assets/Tilemaps/Tiles/Bonus/BigRouletteBlock.asset
+- Assets/Sound/enemy/shell_combo7.ogg
+- Assets/Tilemaps/Tiles/Sky/sky-mushroom_73.asset
+- Assets/Tilemaps/Tiles/Grass/WoodBlock.asset
+- Assets/Sound/powerup/megamushroom_walk_2.ogg
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_50.asset
+- Assets/Models/Players/mario_big/textures/eyes/mario_eyes_nocap.png
+- Assets/Models/Players/mario_small/source/mario_small_source.blend
+- Assets/Sprites/UI/Menu/maps/stage-pipes.png
+- Assets/Tilemaps/Tiles/Bonus/clown_7.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_134.asset
+- Assets/Prefabs/Static/MainMenuPreviews/VolcanoPreview.prefab
+- Assets/Materials/2d/particles/IceParticle.mat
+- Assets/ScriptableObjects/TextValidators/TextSubmitValidator.asset
+- Assets/QuantumUser/Assets/AssetObjects/Characters/MarioCharacter.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_junction_2.asset
+- Assets/Tilemaps/Tiles/Grass/BrownSemisolid.asset
+- Assets/Sound/music/megamushroom.ogg
+- Assets/QuantumUser/Assets/EntityPrototypes/World/BulletBillLauncherEntityPrototype.qprototype
+- Assets/ScriptableObjects/SoundData/SpinnerDrillData.asset
+- Assets/Sprites/UI/Menu/Title.png
+- Assets/Sprites/UI/Menu/Elements/a-prompt.png
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_55.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_56.asset
+- Assets/ScriptableObjects/PlayerSlots/Slot 3.asset
+- Assets/Tilemaps/Tiles/Sky/BigGreen/sky-mushroom_70.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_41.asset
+- Assets/Sound/enemy/shell_combo3.ogg
+- Assets/Materials/2d/particles/BlockBreak.mat
+- Assets/Sprites/UI/ministar.png
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_61.asset
+- Assets/Sound/music/starman-f.ogg
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/SpinyEntityPrototype.qprototype
+- Assets/Sprites/UI/Menu/country-flags.png
+- Assets/Tilemaps/Tiles/Basic/EmptyGray.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_58.asset
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_20.asset
+- Assets/Sound/world/starcoin_store.ogg
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_40.asset
+- Assets/Materials/2d/CloudMaterial.mat
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_yellow_vertical_left_bottom.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_green_vertical_left_top.asset
+- Assets/Sound/ui/chat_keyup.wav
+- Assets/Models/Players/mario_big/textures/body/masks/mario_tx_all_mask_overalls.png
+- Assets/Sound/player/respawn.ogg
+- Assets/QuantumUser/Assets/EntityPrototypes/World/RespawningInvisibleBlockEntityPrototype.qprototype
+- Assets/Sound/ui/pause.ogg
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_146.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_junction_3.asset
+- Assets/Tilemaps/Tiles/Sky/sky-mushroom_31.asset
+- Assets/Sprites/Atlases/Terrain/colorblind-pipe-indicators.png
+- Assets/Sprites/Level Backgrounds/castle-bg.png
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_54.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Player/PlayerMarioEntityPrototype.qprototype
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_179.asset
+- Assets/Tilemaps/Tiles/Sky/sky-mushroom_58.asset
+- Assets/Tilemaps/Tiles/Desert/tree/desert_49.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Projectile/FireballEntityPrototype.qprototype
+- Assets/Materials/3d/mario/mat_mario_eyes_nocap.mat
+- Assets/Materials/2d/mat_tracksprite.mat
+- Assets/Sound/music/desert.ogg
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_7.asset
+- Assets/Sound/music/volcano-f.ogg
+- Assets/Sprites/Atlases/Terrain/ghosthouse.png
+- Assets/Models/Players/mario_big/textures/body/masks/mario_tx_all_mask_shirt.png
+- Assets/Sprites/Level Backgrounds/snow-bg.png
+- Assets/Tilemaps/Tiles/Desert/tree/desert_35.asset
+- Assets/Tilemaps/Tiles/Sky/sky-mushroom_20.asset
+- Assets/QuantumUser/Assets/AssetObjects/World/DebugGenericMoverAsset.asset
+- Assets/Tilemaps/Tiles/Bonus/bonus_0.asset
+- Assets/Sprites/Particle/icepoof.png
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/Ice FlowerEntityPrototype.qprototype
+- Assets/Sprites/Atlases/Entity/propellermushroom.png
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Bricks/DefaultBricksStage_mesh.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/World/BulletBillLauncher.prefab
+- Assets/Tilemaps/Tiles/Castle/squishy_8.asset
+- Assets/Models/Players/luigi_small/luigi_small_exported.fbx
+- Assets/QuantumUser/Assets/EntityPrototypes/World/MarioBrosPlatformEntityPrototype.qprototype
+- Assets/ScriptableObjects/SoundData/PropellerDrillData.asset
+- Assets/Materials/3d/hammer/mat_hammer.mat
+- Assets/Sound/enemy/shell_combo4.ogg
+- Assets/Materials/2d/particles/FireParticle.mat
+- Assets/Tilemaps/Tiles/Sky/sky-mushroom_22.asset
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Bricks/DefaultBricksStage.asset
+- Assets/Sound/world/gold_block_finished.ogg
+- Assets/Sprites/Particle/poisonparticle.png
+- Assets/Sound/powerup/propellermushroom_start.ogg
+- Assets/Sound/ui/chat_send.ogg
+- Assets/Sound/ui/match_lose.ogg
+- Assets/Models/Players/luigi_big/textures/body/albedo/luigi_tx_all_hammersuit_albedo.png
+- Assets/QuantumUser/Assets/EntityPrototypes/BigStarEntityPrototype.qprototype
+- Assets/Sound/character/luigi/walljump_2.ogg
+- Assets/Sprites/Level Backgrounds/sky-bg.png
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_6.asset
+- Assets/Tilemaps/Tiles/Volcano/SemiRedSemisolid.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_green_horizontal_top_right.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_34.asset
+- Assets/QuantumUser/Assets/AssetObjects/Teams/2 Blue.asset
+- Assets/Sound/music/overworld.ogg
+- Assets/Tilemaps/Tiles/Sky/small-mushrooms/red-mushroom-center.asset
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_30.asset
+- Assets/Sound/character/luigi/mega_mushroom_collect.ogg
+- Assets/Materials/3d/luigi/mat_luigi_eyes.mat
+- Assets/Models/Players/luigi_big/textures/body/masks/luigi_tx_all_mask_cap.png
+- Assets/Sound/player/slide.ogg
+- Assets/Sound/world/coin_dotted_spawn.ogg
+- Assets/Tilemaps/Tiles/SpecialTiles/Gray/GrayBrick.asset
+- Assets/ScriptableObjects/SoundData/StarNearbyData.asset
+- Assets/Sprites/UI/options/pauseback-thin.png
+- Assets/Tilemaps/Tiles/Sky/BigGreen/BigMushroomGreenTop.asset
+- Assets/ScriptableObjects/PlayerSlots/Slot 4.asset
+- Assets/QuantumUser/Assets/AssetObjects/Items/GoldBlock.asset
+- Assets/Sound/music/ghost-f.ogg
+- Assets/Sprites/Particle/walljump.png
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_green_horizontal_top.asset
+- Assets/ScriptableObjects/SoundData/WallslideSound.asset
+- Assets/Tilemaps/Tiles/Bonus/bonus_2.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_136.asset
+- Assets/Materials/3d/mario/mat_mario_big.mat
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/20 Strawberry.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/Propeller Mushroom.prefab
+- Assets/QuantumUser/Assets/EntityPrototypes/World/EnterablePipeEntityPrototype.qprototype
+- Assets/Sprites/Atlases/Entity/bullet-bill.png
+- Assets/Tilemaps/Tiles/Volcano/Yellow/YellowVolcanoGround.asset
+- Assets/Sprites/Atlases/Entity/goomba.png
+- Assets/Sound/player/jump.ogg
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_155.asset
+- Assets/Materials/2d/particles/SnowMaterial.mat
+- Assets/Sound/world/gold_block_equip.ogg
+- Assets/Models/Blue Shell/blue_shell.fbx
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/6 Spike.asset
+- Assets/Sound/music/sky-f.ogg
+- Assets/Models/Hammer Models/Hammer/hammer.png
+- Assets/Sprites/Atlases/Terrain/dotted-coins.png
+- Assets/ScriptableObjects/SoundData/DefaultSoundEffects.asset
+- Assets/Sound/ui/cursor.ogg
+- Assets/Sound/powerup/propellermushroom_kick.ogg
+- Assets/Models/Players/luigi_big/textures/cap/albedo/luigi_tx_cap_albedo.png
+- Assets/Tilemaps/Tiles/Desert/desert_42.asset
+- Assets/Materials/3d/luigi/mat_luigi_big.mat
+- Assets/Sound/character/mario/doublejump_1.ogg
+- Assets/Sprites/Particle/NewRespawns.png
+- Assets/Tilemaps/Tiles/Basic/yellow_triangle_block.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/StarCoin.prefab
+- Assets/Models/Players/luigi_big/luigi_big_exported.fbx
+- Assets/Sound/character/mario/mario_taunt.ogg
+- Assets/Sprites/UI/Menu/maps/stage-desert.png
+- Assets/Sprites/Atlases/Terrain/beach-blue.png
+- Assets/Tilemaps/Tiles/Desert/desert_27.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_red_horizontal_top.asset
+- Assets/Tilemaps/Tiles/Desert/tree/desert_48.asset
+- Assets/Tilemaps/Tiles/Desert/tree/desert_59.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_junction_0.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/1-UpEntityPrototype.qprototype
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_yellow_vertical_right_top.asset
+- Assets/ScriptableObjects/PlayerSlots/Slot 2.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_157.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/Blue ShellEntityPrototype.qprototype
+- Assets/Sprites/Level Backgrounds/ghosthouse-bg.png
+- Assets/Models/Gold Block/goldblock.png
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/Fire Flower.prefab
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_green_vertical_left_bottom.asset
+- Assets/ScriptableObjects/SoundData/ShellslideSound.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_49.asset
+- Assets/Materials/2d/particles/WaterSplash.mat
+- Assets/Models/firesnake_eyes.fbx
+- Assets/Sound/character/mario/spinner_launch.ogg
+- Assets/Sound/ui/loading.ogg
+- Assets/Sound/world/block_bump.ogg
+- Assets/Sprites/Atlases/Terrain/squishy.png
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_red_horizontal_top_right.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_178.asset
+- Assets/QuantumUser/Assets/AssetObjects/Teams/1 Green.asset
+- Assets/Sound/music/jungle-f.ogg
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_blue_horizontal_bottom_right.asset
+- Assets/Sprites/Particle/brick-break.png
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_38.asset
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Fortress/DefaultFortressMap.asset
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/25 Magenta.asset
+- Assets/Sound/powerup/megamushroom_jump.ogg
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_blue_horizontal_top_right.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_144.asset
+- Assets/Materials/2d/particles/WaterSplash1Particle.mat
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_green_vertical_left.asset
+- Assets/Sound/player/walk/sand_2.ogg
+- Assets/Sprites/Level Backgrounds/volcano-bg-lava.png
+- Assets/Sprites/Atlases/Terrain/bonus.png
+- Assets/Tilemaps/Tiles/Bonus/bonus_1.asset
+- Assets/Sprites/Particle/poisonsplash.png
+- Assets/Sprites/UI/Menu/Elements/back-prompt.png
+- Assets/Sprites/Level Backgrounds/bonus-clouds.png
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_green_horizontal_top_left.asset
+- Assets/Sound/powerup/megamushroom_end.ogg
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_169.asset
+- Assets/Models/Players/luigi_big/textures/body/masks/luigi_tx_all_mask_shirt.png
+- Assets/QuantumUser/Assets/EntityPrototypes/World/SpinnerEntityPrototype.qprototype
+- Assets/Sound/world/coin_drop.ogg
+- Assets/Sprites/Atlases/Entity/firesnake.png
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/Boo.prefab
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_15.asset
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Fortress/DefaultFortressStageData.asset
+- Assets/QuantumUser/Assets/AssetObjects/Music/MusicLevelDesert.asset
+- Assets/Tilemaps/Tiles/Sky/BigGreen/sky-mushroom_71.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/Mini Mushroom.prefab
+- Assets/QuantumUser/Assets/EntityPrototypes/IceBlock.prefab
+- Assets/Materials/3d/luigi/mat_luigi_eyes_nocap.mat
+- Assets/Tilemaps/Tiles/BeachBlue/beachsand_slightslope_R.asset
+- Assets/Sound/ui/windowclosed.ogg
+- Assets/Tilemaps/Tiles/Bonus/bonus_19.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_118.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_yellow_vertical_left.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/World/DonutBlock.prefab
+- Assets/Sound/ui/player_disconnect.ogg
+- Assets/QuantumUser/Assets/EntityPrototypes/Coins/ObjectiveCoinEntityPrototype.qprototype
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_7.asset
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/15 Arcade.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/Mini MushroomEntityPrototype.qprototype
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_53.asset
+- Assets/Sprites/UI/options/pausemenu.png
+- Assets/Sound/world/star_nearby.ogg
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_yellow_vertical_top.asset
+- Assets/Tilemaps/Tiles/Castle/SquishyTile.asset
+- Assets/Sound/ui/backbutton_shrink.ogg
+- Assets/Materials/3d/spinner/mat_biss.mat
+- Assets/Tilemaps/Tiles/Bonus/bonus_20.asset
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_22.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_blue_horizontal_bottom.asset
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/16 SML2.asset
+- Assets/Tilemaps/Palettes/Castle.prefab
+- Assets/Sprites/UI/Menu/random-questionblocks.png
+- Assets/Prefabs/Static/MainMenuPreviews/DesertPreview.prefab
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/FireSnake.prefab
+- Assets/ScriptableObjects/PlayerSlots/Slot 1.asset
+- Assets/Tilemaps/Tiles/BeachBlue/BeachPlatforms.asset
+- Assets/Materials/2d/mat_MegaMushroom.mat
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/8 SMW.asset
+- Assets/Tilemaps/Tiles/GhostHouse/GhostLeftSlightStairsLeftFULL.asset
+- Assets/Tilemaps/Tiles/BeachBlue/BeachBlueGround.asset
+- Assets/Sprites/UI/options/progressbar.png
+- Assets/Sound/player/powerup_reserve_use.ogg
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_blue_vertical_left.asset
+- Assets/Tilemaps/Tiles/SpecialTiles/Blue/BlueBrick.asset
+- Assets/Sound/player/powerup_reserve_store.ogg
+- Assets/Tilemaps/Tiles/BeachBlue/beachsand_1R.asset
+- Assets/Tilemaps/Tiles/Snow/Ice.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/HammerSuitEntityPrototype.qprototype
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_38.asset
+- Assets/QuantumUser/Assets/AssetObjects/PhysicsProperties/SnowProperties.asset
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Sky/CustomSkyStageData.asset
+- Assets/Models/Mega Mushroom/mega_mushroom.png
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_52.asset
+- Assets/QuantumUser/Assets/AssetObjects/PhysicsProperties/SandSlopeProperties.asset
+- Assets/Sprites/Particle/respawn.png
+- Assets/Sprites/Particle/sparkles.png
+- Assets/Sprites/Atlases/Entity/Iceball.png
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_147.asset
+- Assets/Models/Players/luigi_big/textures/body/masks/luigi_tx_all_mask_overalls_emblem.png
+- Assets/Models/Players/mario_big/textures/cap/albedo/mario_tx_cap_fireflower_albedo.png
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/BulletBill.prefab
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_red_vertical_right_bottom.asset
+- Assets/Tilemaps/Tiles/SpecialTiles/YellowPowerup.asset
+- Assets/Tilemaps/Tiles/BeachBlue/beachsand_2R.asset
+- Assets/QuantumUser/Assets/AssetObjects/World/BricksPlatformMover.asset
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_18.asset
+- Assets/Sound/player/drill.ogg
+- Assets/Models/Players/luigi_big/textures/body/masks/luigi_tx_all_mask_overalls.png
+- Assets/Sprites/Level Backgrounds/beach-bg.png
+- Assets/Sprites/Particle/explosion-sparks 1.png
+- Assets/Sound/powerup/megamushroom_break_pipe.ogg
+- Assets/Models/Players/luigi_big/luigi_cap_exported.fbx
+- Assets/Tilemaps/Tiles/Basic/blue_triangle_block.asset
+- Assets/Tilemaps/Tiles/BeachBlue/beachsand_2.asset
+- Assets/Tilemaps/Tiles/Desert/tree/desert_73.asset
+- Assets/Models/Hammer Models/Hammer/Hammer.obj
+- Assets/QuantumUser/Assets/EntityPrototypes/BigStar.prefab
+- Assets/Tilemaps/Tiles/Desert/desert_53.asset
+- Assets/QuantumUser/Assets/AssetObjects/Items/1-Up.asset
+- Assets/Sprites/Atlases/Terrain/volcano.png
+- Assets/Sound/enemy/freeze_shatter.ogg
+- Assets/Sprites/Atlases/Entity/powerups.png
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_9.asset
+- Assets/Sound/ui/file_select.ogg
+- Assets/Prefabs/Static/MainMenuPreviews/BricksPreview.prefab
+- Assets/Sound/player/walk/grass_1.ogg
+- Assets/Sprites/UI/Menu/maps/stage-ghosthouse.png
+- Assets/Sound/music/jungle.ogg
+- Assets/Materials/3d/spinner/mat_env_s_j1.mat
+- Assets/Sound/music/beach-f.ogg
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_11.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/RedKoopaEntityPrototype.qprototype
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_42FULL.asset
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_31.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_47.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Projectile/Fireball.prefab
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_70.asset
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/21 OrangeGreen.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/Fire FlowerEntityPrototype.qprototype
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_175.asset
+- Assets/Models/Players/mario_big/textures/body/masks/mario_tx_all_mask_overalls_emblem.png
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Grass/DefaultGrassStage_mesh.asset
+- Assets/Sound/music/beach.ogg
+- Assets/Sprites/Particle/sparkle.png
+- Assets/Models/Players/mario_big/textures/body/masks/mario_tx_all_propellersuit_mask_shirt.png
+- Assets/Tilemaps/Tiles/Desert/tree/desert_37.asset
+- Assets/Sprites/Level Backgrounds/castle-fg-anim.png
+- Assets/Sprites/Atlases/Entity/Spiny.png
+- Assets/Tilemaps/Tiles/Desert/DesertSlopeGround.asset
+- Assets/Sound/powerup/minimushroom_groundpound.ogg
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/23 Cubby Leafy.asset
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/3 Blue.asset
+- Assets/Tilemaps/Tiles/GhostHouse/GhostLeftSlightStairsLeft.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/World/MarioBrosPlatform.prefab
+- Assets/Sprites/Particle/ice-break.png
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Volcano/CustomVolcanoMap.asset
+- Assets/Sprites/Particle/watersplash.png
+- Assets/Sound/enemy/shell_kick.ogg
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_green_horizontal_bottom.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/IceBlockEntityPrototype.qprototype
+- Assets/Sound/ui/countdown0.ogg
+- Assets/Sprites/UI/Menu/Elements/rounded-rect-5px.png
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Desert/CustomDesertMap_mesh.asset
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_9.asset
+- Assets/Tilemaps/Tiles/Desert/tree/desert_47.asset
+- Assets/Sprites/Particle/flash.png
+- Assets/Tilemaps/Tiles/Castle/FortressGround.asset
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_23.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_176.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Player/PlayerMario.prefab
+- Assets/Models/Spinner/rivet.png
+- Assets/QuantumUser/Assets/AssetObjects/Items/Starman.asset
+- Assets/QuantumUser/Assets/AssetObjects/Projectile/HammerProjectile.asset
+- Assets/ScriptableObjects/PlayerSlots/Slot 7.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_40.asset
+- Assets/Tilemaps/Tiles/Desert/DesertSteepSlopeTop.asset
+- Assets/Sprites/UI/palette.png
+- Assets/Materials/2d/particles/DustParticle.mat
+- Assets/Tilemaps/Tiles/InvisibleSemsolid.asset
+- Assets/Models/Spinner/spin_j_obj_body.png
+- Assets/Tilemaps/Tiles/Jungle/JungleGround.asset
+- Assets/QuantumUser/Assets/AssetObjects/Music/MusicStarman.asset
+- Assets/Sound/enemy/piranhaplant_death.ogg
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Jungle/CustomJungleStageData.asset
+- Assets/Tilemaps/Tiles/Desert/desert_52.asset
+- Assets/Sound/powerup/minimushroom_waterwalk.ogg
+- Assets/Tilemaps/Tiles/Volcano/Brown/Slope.asset
+- Assets/Sound/ui/countdown1.ogg
+- Assets/QuantumUser/Assets/EntityPrototypes/Projectile/Iceball.prefab
+- Assets/QuantumUser/Assets/AssetObjects/Music/MusicLevelBonus.asset
+- Assets/Materials/2d/particles/PoisonWater.mat
+- Assets/Models/starcoin/starcoin_purple.png
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_17.asset
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Pipes/DefaultPipesStageData.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/BobombEntityPrototype.qprototype
+- Assets/Tilemaps/Tiles/Bonus/LeftRedirect.asset
+- Assets/Tilemaps/Tiles/Desert/desert_32.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_33.asset
+- Assets/Sound/world/block_powerup_mega.ogg
+- Assets/Sound/character/mario/mega_mushroom_collect.ogg
+- Assets/ScriptableObjects/PlayerSlots/Slot 8.asset
+- Assets/Sprites/UI/fadeSilhouettes/bowser.png
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_green_horizontal_bottom_right.asset
+- Assets/Sprites/Level Backgrounds/ghosthouse-torches.png
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/19 GBA.asset
+- Assets/Models/Players/mario_big/textures/propellerhat/masks/mario_tx_propellerhat_mask_shirt.png
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Beach/CustomBeachMap_mesh.asset
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/4 Wario.asset
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_10.asset
+- Assets/Materials/3d/hammer/mat_shell.mat
+- Assets/Tilemaps/Tiles/BeachBlue/beachsand_slightslope_B.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_blue_vertical_left_top.asset
+- Assets/Sound/enemy/shell_combo1.ogg
+- Assets/Materials/2d/LavaMaterial.mat
+- Assets/Sprites/Atlases/Terrain/desert.png
+- Assets/Sound/ui/camera_scroll.ogg
+- Assets/Sprites/dont delete me please.png
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Desert/CustomDesertStageData.asset
+- Assets/Sprites/UI/Menu/maps/stage-unknown.png
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_2.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Coins/StageCoinEntityPrototype.qprototype
+- Assets/Materials/2d/particles/StarParticle.mat
+- Assets/Models/Players/luigi_big/source/luigi_big_source.blend
+- Assets/Sound/player/walk/snow_1.ogg
+- Assets/Sound/enemy/boo_laugh.ogg
+- Assets/Sprites/Particle/lava-splash.png
+- Assets/Tilemaps/Tiles/Desert/desert_40.asset
+- Assets/Models/Players/luigi_big/source/luigi_cap_source.blend
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_4.asset
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_8.asset
+- Assets/Sound/character/luigi/selected.ogg
+- Assets/Sound/character/mario/lava_death.ogg
+- Assets/Sprites/Level Backgrounds/jungle-bg.png
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/Koopa.prefab
+- Assets/Models/Players/luigi_big/textures/cap/albedo/luigi_tx_cap_iceflower_albedo.png
+- Assets/Sound/ui/backbutton_grow.ogg
+- Assets/Sprites/UI/Menu/logo.png
+- Assets/Models/starcoin/starcoin.fbx
+- Assets/Tilemaps/Tiles/Desert/tree/desert_71.asset
+- Assets/QuantumUser/Assets/AssetObjects/Items/MiniMushroom.asset
+- Assets/Tilemaps/Tiles/Castle/FortressGround2.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_68.asset
+- Assets/QuantumUser/Assets/AssetObjects/Items/FireFlower.asset
+- Assets/Sprites/UI/Menu/maps/stage-volcano.png
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_154.asset
+- Assets/Materials/2d/particles/WaterSplash3.mat
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_133.asset
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/18 Maroon.asset
+- Assets/Prefabs/Static/MainMenuPreviews/GhostHousePreview.prefab
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_red_horizontal_bottom.asset
+- Assets/Sound/player/powerup.ogg
+- Assets/Tilemaps/Tiles/Snow/17 Snow (with ice)_79.asset
+- Assets/Tilemaps/Tiles/Desert/tree/desert_83.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/World/Spinner.prefab
+- Assets/Materials/2d/mat_Background.mat
+- Assets/Sprites/Atlases/Terrain/poisontexture.png
+- Assets/Sound/powerup/minimushroom_collect.ogg
+- Assets/Tilemaps/Tiles/Cave/CaveGround.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_red_vertical_right_top.asset
+- Assets/Materials/3d/goldblock/mat_wingblock.mat
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Beach/CustomBeachStageData.asset
+- Assets/Tilemaps/Tiles/Desert/desert_43.asset
+- Assets/Sprites/UI/Menu/maps/stage-beach.png
+- Assets/QuantumUser/Assets/EntityPrototypes/Coins/EnemyCoin.prefab
+- Assets/Sound/music/snow.ogg
+- Assets/Tilemaps/Tiles/Volcano/Yellow/YellowHardBlock.asset
+- Assets/Tilemaps/Tiles/Volcano/Brown/SlopeUnder.asset
+- Assets/Sprites/Particle/sparkly.png
+- Assets/Sprites/UI/Menu/maps/stage-fortress.png
+- Assets/Misc/DefaultVolumeProfile.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/Propeller MushroomEntityPrototype.qprototype
+- Assets/Tilemaps/Tiles/GhostHouse/GhostLeftSlightStairsCenter.asset
+- Assets/Materials/2d/particles/WaterSplash2Particle.mat
+- Assets/Sound/player/groundpound_start.ogg
+- Assets/Tilemaps/Tiles/Desert/tree/desert_56.asset
+- Assets/Sprites/Particle/water_splash_2.png
+- Assets/Models/Players/mario_big/textures/propellerhat/mario_tx_propellerhat_albedo_starman.png
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_164.asset
+- Assets/ScriptableObjects/PlayerSlots/Slot 9.asset
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/1 Red.asset
+- Assets/Prefabs/Static/MainMenuPreviews/IcePreview.prefab
+- Assets/Sound/enemy/shell_combo2.ogg
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/BulletBillEntityPrototype.qprototype
+- Assets/Sound/character/luigi/lava_death.ogg
+- Assets/Tilemaps/Tiles/Desert/desert_45.asset
+- Assets/Tilemaps/Tiles/Desert/desert_55.asset
+- Assets/Tilemaps/Tiles/Desert/desert_44.asset
+- Assets/Sound/player/walk/water_1.ogg
+- Assets/Sprites/Particle/star.png
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_21.asset
+- Assets/Tilemaps/Tiles/Sky/small-mushrooms/green-mushroom-L.asset
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_18.asset
+- Assets/Tilemaps/Tiles/BeachBlue/beachsand_3R.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_blue_vertical_right.asset
+- Assets/Sound/powerup/megamushroom_groundpound.ogg
+- Assets/Sprites/UI/fadeSilhouettes/star.png
+- Assets/Tilemaps/Tiles/Bonus/EmptyBigBlock.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/Ice Flower.prefab
+- Assets/Models/Gold Block/gold_block_mario.fbx
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_28.asset
+- Assets/Tilemaps/Tiles/Sky/BigGreen/BigMushroomGreenBottom.asset
+- Assets/QuantumUser/Assets/AssetObjects/Items/Mushroom.asset
+- Assets/Sprites/Particle/RespawnCircle.png
+- Assets/Tilemaps/Tiles/BeachBlue/beachsand_slightslope_L.asset
+- Assets/Sound/player/swim.ogg
+- Assets/Tilemaps/Tiles/Grass/GrassGround.asset
+- Assets/QuantumUser/Assets/AssetObjects/Items/IceFlower.asset
+- Assets/Sound/powerup/hammersuit_bounce.ogg
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_49.asset
+- Assets/Tilemaps/Tiles/SpecialTiles/Blue/BlueBrickCoin.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/World/RespawningInvisibleBlock.prefab
+- Assets/Materials/3d/goldblock/mat_wing.mat
+- Assets/Tilemaps/Tiles/Desert/tree/desert_36.asset
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Jungle/CustomJungleStage.asset
+- Assets/QuantumUser/Assets/AssetObjects/Music/MusicLevelOverworld.asset
+- Assets/Sound/player/lava_hiss.ogg
+- Assets/Materials/2d/particles/bump.mat
+- Assets/Models/Hammer Models/Helmet/hammersuit_tx_helmet_albedo.png
+- Assets/Sprites/Atlases/Terrain/generic-blocks.png
+- Assets/Sprites/UI/Menu/Elements/rounded-rect-5px-dialogue.png
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_4.asset
+- Assets/Tilemaps/Tiles/Desert/desert_28.asset
+- Assets/Sprites/UI/Menu/maps/stage-sky.png
+- Assets/Tilemaps/Tiles/Castle/castle_semisolid.asset
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_5.asset
+- Assets/Prefabs/Static/PlayerElements.prefab
+- Assets/Misc/MasterListener.mixer
+- Assets/Sound/world/starcoin_collect.ogg
+- Assets/Sound/music/megamushroom-f.ogg
+- Assets/Materials/2d/particles/LavaSplash.mat
+- Assets/Models/Players/mario_big/mario_cap_exported.fbx
+- Assets/Tilemaps/Tiles/Desert/desert_51.asset
+- Assets/Sprites/UI/ReadyGradient.png
+- Assets/Models/starcoin/starcoin.png
+- Assets/Sound/character/luigi/doublejump_2.ogg
+- Assets/Tilemaps/Tiles/Sky/sky-mushroom_32.asset
+- Assets/Tilemaps/Tiles/Grass/0 Grassland_90.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_45.asset
+- Assets/Sound/powerup/propellermushroom_drill.ogg
+- Assets/Sound/ui/start_game.ogg
+- Assets/QuantumUser/Assets/AssetObjects/PhysicsProperties/SandProperties.asset
+- Assets/Sprites/Atlases/Terrain/animated-blocks.png
+- Assets/Materials/2d/particles/SparkleParticle.mat
+- Assets/QuantumUser/Assets/AssetObjects/Music/MusicResults.asset
+- Assets/Tilemaps/Tiles/Basic/EmptyYellow.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_51.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_174.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_red_horizontal_bottom_left.asset
+- Assets/Models/Players/mario_small/mario_small_exported.fbx
+- Assets/Tilemaps/Tiles/Desert/tree/desert_58.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_46.asset
+- Assets/Tilemaps/Tiles/Grass/Background/0 Grassland_166.asset
+- Assets/Tilemaps/Tiles/SpecialTiles/Blue/BlueCoin.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Projectile/Hammer.prefab
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Pipes/DefaultPipesMap.asset
+- Assets/Tilemaps/Tiles/Basic/Tileset 0 (Jyotyu)_13.asset
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_32.asset
+- Assets/Sprites/UI/Menu/Elements/rounded-rect.png
+- Assets/QuantumUser/Assets/AssetObjects/World/StationaryMover.asset
+- Assets/Tilemaps/Tiles/Desert/tree/desert_57.asset
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Ice/DefaultIceStageData.asset
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/Bobomb.prefab
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Sky/CustomSkyMap.asset
+- Assets/Prefabs/Static/MainMenuPreviews/PipesPreview.prefab
+- Assets/Sprites/Particle/woosh.png
+- Assets/Tilemaps/Tiles/Bonus/clown_17.asset
+- Assets/Tilemaps/Tiles/Desert/desert_54.asset
+- Assets/Tilemaps/Tiles/GhostHouse/GhostGround.asset
+- Assets/Sound/ui/boot.ogg
+- Assets/Tilemaps/Tiles/GhostHouse/ghosthouse_10.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_yellow_vertical_bottom.asset
+- Assets/Tilemaps/Tiles/Castle/HalfBlock.asset
+- Assets/Tilemaps/Tiles/Sky/sky-mushroom_38.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_37.asset
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_yellow_vertical_top_left.asset
+- Assets/Sound/music/bonus-f.ogg
+- Assets/Materials/3d/mario/mat_mario_cap.mat
+- Assets/Sprites/UI/Menu/maps/stage-jungle.png
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_0.asset
+- Assets/Sprites/UI/Menu/Elements/start-prompt.png
+- Assets/Tilemaps/Tiles/Desert/tree/desert_64.asset
+- Assets/Materials/3d/luigi/mat_luigi_head.mat
+- Assets/QuantumUser/Assets/AssetObjects/Characters/MarioPhysics.asset
+- Assets/Sound/ui/windowopen.ogg
+- Assets/Sound/world/water_skidding.ogg
+- Assets/Materials/2d/particles/PipeBreak.mat
+- Assets/QuantumUser/Assets/AssetObjects/Maps/Bonus/CustomBonusMap.asset
+- Assets/Models/Mega Mushroom/mega_mushroom.fbx
+- Assets/Tilemaps/Tiles/Desert/desert_31.asset
+- Assets/Sprites/UI/buttons.png
+- Assets/Sound/character/luigi/walljump_1.ogg
+- Assets/QuantumUser/Assets/AssetObjects/Maps/GhostHouse/CustomGhostHouseMap_mesh.asset
+- Assets/Sprites/UI/options/tabs.png
+- Assets/Models/Players/luigi_small/source/luigi_small_source.blend
+- Assets/Sprites/Atlases/Entity/koopa-blue.png
+- Assets/Sprites/Particle/white woosh.png
+- Assets/Tilemaps/Tiles/Basic/Tileset 0 (Jyotyu)_7.asset
+- Assets/Sprites/Atlases/Entity/frozencube.png
+- Assets/QuantumUser/Assets/AssetObjects/Palettes/17 Pink.asset
+- Assets/Misc/NoGlowRenderer.asset
+- Assets/Sprites/Particle/bubble.png
+- Assets/Sound/powerup/iceball_break.ogg
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipe_blue_vertical_right_top.asset
+- Assets/Materials/2d/MarioBrosPlatformMaterial.mat
+- Assets/Prefabs/Static/MarioVsLuigiStage.prefab
+- Assets/Sprites/UI/lobbieslist.png
+- Assets/Tilemaps/Tiles/BeachBlue/beach-blue_11.asset
+- Assets/Sprites/Level Backgrounds/volcano-fg-palette.png
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/GoldBlock.prefab
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/PiranhaPlantEntityPrototype.qprototype
+- Assets/Tilemaps/Tiles/Desert/DesertSlopeBottom.asset
+- Assets/Models/Players/luigi_small/source/luigi_small_head_nocap_source.blend
+- Assets/Sound/ui/chat_fulltype.wav
+- Assets/Sprites/Level Backgrounds/jungle-skylight.png
+- Assets/QuantumUser/Assets/EntityPrototypes/Enemy/BooEntityPrototype.qprototype
+- Assets/Tilemaps/Tiles/Desert/tree/desert_34.asset
+- Assets/Sprites/UI/icon-mac.png
+- Assets/Tilemaps/Tiles/Pipes/Unbreakable/pipes_62.asset
+- Assets/Sprites/Particle/ring.png
+- Assets/Tilemaps/Tiles/SpecialTiles/Gray/GrayPowerup.asset
+- Assets/Materials/2d/ui/RandomScrolling.mat
+- Assets/Sprites/Level Backgrounds/volcano-bg.png
+- Assets/Sprites/UI/loading.png
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/Blue Shell.prefab
+- Assets/QuantumUser/Assets/EntityPrototypes/Items/Starman.prefab
+- Assets/Sprites/Particle/water_splash_1.png
+Dependencies: []

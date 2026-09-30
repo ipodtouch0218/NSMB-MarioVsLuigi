@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
+#if !UNITY_EDITOR
+using UnityEngine.Networking;
+#endif
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -24,7 +27,6 @@ namespace NSMB.UI.Intro {
         //---Private Variables
         private SoundEffect[] possibleSfx;
         private Coroutine logoBounceRoutine;
-        //private bool doneLoadingBundles;
 
         public void Start() {
             if (GlobalController.Instance.bootedWithReplayArg) {
@@ -32,7 +34,6 @@ namespace NSMB.UI.Intro {
                 return;
             }
             
-            //StartCoroutine(LoadAssetBundles());
             StartCoroutine(IntroSequence());
             
             possibleSfx = ((SoundEffect[]) Enum.GetValues(typeof(SoundEffect)))
@@ -66,48 +67,11 @@ namespace NSMB.UI.Intro {
             logoBounceRoutine = null;
         }
 
-        /*
-        private IEnumerator LoadAssetBundles() {
-#if !UNITY_EDITOR
-            string[] bundleNames = { "basegame-assets", "basegame-scenes" };
-
-            foreach (var bundle in bundleNames) {
-                if (AssetBundle.GetAllLoadedAssetBundles().Any(ab => ab.name == bundle)) {
-                    // Ignore if already loaded
-                    continue;
-                }
-
-                using var loadRequest = UnityWebRequestAssetBundle.GetAssetBundle(Application.streamingAssetsPath + "/" + bundle);
-                yield return loadRequest.SendWebRequest();
-
-                if (loadRequest.result != UnityWebRequest.Result.Success) {
-                    // Throw error!
-                    Debug.LogError($"[Bundles] Critical error! Failed to load bundle {bundle} from {Application.streamingAssetsPath + "/" + bundle}");
-                    yield break;
-                }
-
-                var loadedBundle = DownloadHandlerAssetBundle.GetContent(loadRequest);
-                Debug.Log($"[Bundles] Successfully loaded {loadedBundle.name} ({(loadedBundle.isStreamedSceneAssetBundle ? loadedBundle.GetAllScenePaths().Length + " scenes" : loadedBundle.GetAllAssetNames().Length + " assets")})");
-            }
-#endif
-
-            Debug.Log("[Bundles] Loaded all base game content!");
-            doneLoadingBundles = true;
-            yield break;
-        }
-        */
-
         private IEnumerator IntroSequence() {
             yield return new WaitForSeconds(0.75f);
             sfx.Play();
             yield return FadeImageToValue(fullscreenImage, 0, 0.33f);
             yield return new WaitForSeconds(0.5f);
-
-            /*
-            while (!doneLoadingBundles) {
-                yield return null;
-            }
-            */
 
 #if !DISABLE_SCENE_CHANGE
             AsyncOperation sceneLoad = SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Additive);
