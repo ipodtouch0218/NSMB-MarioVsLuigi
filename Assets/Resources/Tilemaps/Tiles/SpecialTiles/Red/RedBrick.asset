@@ -26,7 +26,7 @@ MonoBehaviour:
   FootstepSound: 31
   FootstepParticle: 0
   ParticleColor: {r: 0.972549, g: 0.46666667, b: 0.1254902, a: 1}
-  BreakingRules: 508
+  BreakingRules: 1020
   BumpIfNotBroken: 1
   BumpSize:
     X:
