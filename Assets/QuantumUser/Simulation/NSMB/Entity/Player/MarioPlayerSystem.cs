@@ -2251,6 +2251,8 @@ namespace Quantum {
                     projectile->Speed *= Constants._0_85;
                     physicsObject->Gravity *= Constants._0_85;
                     physicsObject->Velocity.Y = projectile->Speed;
+
+                    f.Events.EnemyPierced(marioEntity);
                 }
             }
 
