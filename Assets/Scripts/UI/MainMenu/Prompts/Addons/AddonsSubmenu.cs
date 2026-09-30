@@ -51,9 +51,9 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
                 if (hideNonAddons) {
                     watcher.Filter = "*.mvladdon";
                 }
-                watcher.Changed += (_, _) => _ = OpenFolder(currentRelativePath);
-                watcher.Created += (_, _) => _ = OpenFolder(currentRelativePath);
-                watcher.Deleted += (_, _) => _ = OpenFolder(currentPath);
+                //watcher.Changed += (_, _) => _ = OpenFolder(currentRelativePath);
+                //watcher.Created += (_, _) => _ = OpenFolder(currentRelativePath);
+                //watcher.Deleted += (_, _) => _ = OpenFolder(currentPath);
 #endif
                 _ = OpenFolder(".");
             }

@@ -92,11 +92,13 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
                 }
 
                 byte[] addonBytes = addonRequest.downloadHandler.data;
-                MemoryStream ms = new(addonBytes);
-                var addonStreamTask = GlobalController.Instance.addonManager.LoadAddonStream(ms).GetAwaiter();
-                yield return addonStreamTask;
+                Debug.Log($"[Addon] Download complete, downloaded {Utils.BytesToString(addonBytes.LongLength)}");
 
-                var loadResult = addonStreamTask.GetResult();
+                MemoryStream ms = new(addonBytes);
+                var loadTask = GlobalController.Instance.addonManager.LoadAddonStream(ms).GetAwaiter();           
+                yield return new WaitUntil(() => loadTask.IsCompleted);
+
+                var loadResult = loadTask.GetResult();
                 if (!loadResult.Success) {
                     Error();
                     yield break;
@@ -106,7 +108,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
 
                 UpdateProgressBars(artifact.Size, 1, downloadedAddons);
 
-                _ = GlobalController.Instance.addonManager.SaveAddonToCache(addonCatalogEntry.ReleaseGuid, addonBytes);
+                _ = GlobalController.Instance.addonManager.SaveAddonToCache(Path.GetFileName(artifact.Url), addonBytes);
             }
 
             // Success!

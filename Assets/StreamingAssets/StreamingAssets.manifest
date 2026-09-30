@@ -1,0 +1,13 @@
+ManifestFileVersion: 0
+UnityVersion: 6000.3.10f1
+CRC: 2617764312
+HashAppended: 0
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: basegame-scenes
+      Dependencies:
+        Dependency_0: basegame-assets
+    Info_1:
+      Name: basegame-assets
+      Dependencies: {}
