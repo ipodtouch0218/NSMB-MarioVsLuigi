@@ -1,7 +1,10 @@
+using NSMB.Entities.Player;
 using NSMB.UI.Game;
 using NSMB.Utilities.Components;
 using NSMB.Utilities.Extensions;
 using Quantum;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -9,18 +12,56 @@ namespace NSMB.Entities.CoinItems {
     public class ProjectileAnimator : QuantumEntityViewComponent {
 
         //---Serialized Variables
+        [Header("Sprite")]
         [SerializeField] private SpriteRenderer sRenderer;
-        [SerializeField] private Animator animator;
         [SerializeField] private LegacyAnimateSpriteRenderer legacySpriteAnimator;
         [SerializeField] private Color sameTeamColor, differentTeamColor;
 
+        [Header("Model")]
+        [SerializeField] private Renderer mRenderer;
+        [SerializeField] private Animator animator;
+        [SerializeField] private Color sameTeamColor3D, differentTeamColor3D;
+        [SerializeField] private PowerupVisuals.MaterialTextureReplacement[] TextureReplacements;
+
+        //---Static Variables
+        #region Shader Properties
+        private static readonly int MainTex = Shader.PropertyToID("_MainTex");
+        private static readonly int OverallsMask = Shader.PropertyToID("_OverallsMask");
+        private static readonly int ShirtMask = Shader.PropertyToID("_ShirtMask");
+        private static readonly int CapMask = Shader.PropertyToID("_CapMask");
+        #endregion
+
         //---Private Variables
+        private CharacterSpecificPalette skin;
         private EntityRef owner;
+        private MaterialPropertyBlock materialBlock;
+        private readonly List<Renderer> renderers = new();
+        private readonly Dictionary<Material, Material> clonedMaterials = new();
 
         public void OnValidate() {
             this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
+            this.SetIfNull(ref mRenderer, UnityExtensions.GetComponentType.Children);
             this.SetIfNull(ref animator, UnityExtensions.GetComponentType.Children);
             this.SetIfNull(ref legacySpriteAnimator, UnityExtensions.GetComponentType.Children);
+        }
+
+        public void Awake() {
+            // Awake void from MarioPlayerAnimator.cs
+            renderers.AddRange(GetComponentsInChildren<MeshRenderer>(true));
+            renderers.AddRange(GetComponentsInChildren<SkinnedMeshRenderer>(true));
+            foreach (Renderer r in renderers) {
+                // Get a copy from all materials.
+                List<Material> sharedMaterials = new();
+                r.GetSharedMaterials(sharedMaterials);
+                for (int i = 0; i < sharedMaterials.Count; i++) {
+                    Material material = sharedMaterials[i];
+                    if (!clonedMaterials.TryGetValue(material, out Material clonedMaterial)) {
+                        clonedMaterials[material] = clonedMaterial = Instantiate(material);
+                    }
+                    sharedMaterials[i] = clonedMaterial;
+                }
+                r.SetSharedMaterials(sharedMaterials);
+            }
         }
 
         public override unsafe void OnActivate(Frame f) {
