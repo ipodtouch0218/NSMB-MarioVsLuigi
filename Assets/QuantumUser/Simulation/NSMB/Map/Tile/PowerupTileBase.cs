@@ -23,6 +23,16 @@ namespace Quantum {
                 allowSelfDamage = true;
             }
 
+            if (mario == null && f.Unsafe.TryGetPointer(entity, out Projectile* projectile)) {
+                var asset = f.FindAsset(projectile->Asset);
+                if (asset.Effect == ProjectileEffectType.Boomerang
+                    && f.Exists(projectile->Owner)
+                    && f.Unsafe.TryGetPointer(projectile->Owner, out MarioPlayer* ownerMario)) {
+                    mario = ownerMario;
+                    entity = projectile->Owner;
+                }
+            }
+
             if (mario == null) {
                 playBumpSound = true;
                 return false;

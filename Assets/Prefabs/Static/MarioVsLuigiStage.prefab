@@ -676,6 +676,7 @@ MonoBehaviour:
   UseFindUpdater: 0
   sfx: {fileID: 390882757022401945}
   musicPlayer: {fileID: 539312975697019843}
+  musicManager: {fileID: 0}
 --- !u!1 &8835350829400233188
 GameObject:
   m_ObjectHideFlags: 0
@@ -728,6 +729,8 @@ MonoBehaviour:
     TimeDilationPercentage: 2
     SnapshotReferenceLatencyTicks: 4
     ElasticWindowTicks: 0.5
+    CurrentFrom: 0
+    Alpha: 0
 --- !u!114 &1990024770662139057
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -747,6 +750,7 @@ MonoBehaviour:
   - {fileID: 6307920351473437675, guid: 00a2ef66a322a694c837b29404f2af49, type: 3}
   - {fileID: 6307920351473437675, guid: 8d3d3c8acd39a594c9077e49f837ec4a, type: 3}
   - {fileID: 6307920351473437675, guid: 54ff1db4c7e9f02408395af6bf74b0c4, type: 3}
+  - {fileID: 6307920351473437675, guid: 181fcee3b0b015f41ad9f138648828c0, type: 3}
   - {fileID: 1973747262660636106, guid: d6c38f51091fae64fa27d92f9415b3ab, type: 3}
   - {fileID: 5780648777663731097, guid: 72667665d438ddc4daa05bc414f27a9c, type: 3}
 --- !u!114 &599652891852148525
@@ -824,6 +828,7 @@ MonoBehaviour:
       Id:
         Value: 3654882389298375385
     IsRealGame: 0
+  UseRandomSeed: 1
   SessionConfig: {fileID: 11400000, guid: a095ff8a2ef576047bdebfec7a20e387, type: 2}
   LocalPlayers:
   - PlayerAvatar:
@@ -831,6 +836,7 @@ MonoBehaviour:
         Value: 0
     PlayerNickname: 
     UserId: 
+    IpAddressHash: 
     UseColoredNickname: 0
     NicknameColor: 
     Character:
@@ -839,18 +845,19 @@ MonoBehaviour:
     Palette:
       Id:
         Value: 0
+    IsGloballyMuted: 0
   MaxPlayerCount: 10
   SimulationSpeedMultiplier: 1
-  UseRandomSeed: 1
+  DisplaySaveAndReloadButton: 0
   PreloadAddressables: 0
   DynamicAssetDB:
     OnInitialDynamicAssetsRequested:
       m_PersistentCalls:
         m_Calls: []
     IsLegacyModeEnabled: 0
-  SnapshotFile: {fileID: 0}
-  DatabaseFile: {fileID: 0}
-  DBScopes: []
+  OnBeforeStart:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &193195408209990055
 PrefabInstance:
   m_ObjectHideFlags: 0
