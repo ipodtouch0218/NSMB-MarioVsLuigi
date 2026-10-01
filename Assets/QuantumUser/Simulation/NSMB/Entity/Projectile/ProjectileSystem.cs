@@ -76,11 +76,10 @@ namespace Quantum {
                         if (projectile->Frame < 30) {
                             // Ricochet off the wall if not in returning state
                             projectile->Combo = 2;
-                        } else {
-                            // Otherwise despawn
-                            Destroy(f, filter.Entity, asset.DestroyParticleEffect);
-                            return;
                         }
+                    } else {
+                        Destroy(f, filter.Entity, asset.DestroyParticleEffect);
+                        return;
                     }
                     return;
                 }
