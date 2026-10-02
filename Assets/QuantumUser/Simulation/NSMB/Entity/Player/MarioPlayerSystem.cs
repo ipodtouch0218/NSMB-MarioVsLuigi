@@ -2184,18 +2184,20 @@ namespace Quantum {
 
             bool dropStars = false;
 
+            var hammerXBoomerang = mario->IsCrouching && marioPhysics->IsTouchingGround && state == PowerupState.HammerSuit && asset.Effect == ProjectileEffectType.Boomerang;
+
             // Mario is "damageable" when he's...
             // not in knockback, not Mega
             // regular damageable checks (iframes is 0, not starman invincible)
             // not in a powerUP transition while mini (specifically)
             // Mario is in his Blue Shell and projectile doesn't affect blue Shell
-            // Mario is crouched and grounded with Hammer Suit and projectile is a boomerang
+            // Mario is crouched and grounded with Hammer Suit and projectile isn't a boomerang
             // Team attack allows him to get hit
             bool damageable = !mario->IsInKnockback
                 && state != PowerupState.MegaMushroom
                 && (mario->IsDamageable(f) || (mario->TryGetCurrentPowerTransition(f, out _) && state == PowerupState.MiniMushroom))
                 && !((mario->IsCrouchedInShell || mario->IsInShell) && asset.DoesntEffectBlueShell)
-                && !((mario->IsCrouching && marioPhysics->IsTouchingGround && state == PowerupState.HammerSuit) && asset.Effect == ProjectileEffectType.Boomerang)
+                && !hammerXBoomerang
                 && mario->CheckTeamAttack(f, projectile->Owner, out dropStars);
 
             if (damageable) {
@@ -2245,21 +2247,19 @@ namespace Quantum {
                     FPVector2 avgPosition = (marioPos + projectilePos) / 2;
                     f.Events.PlayKnockbackEffect(marioEntity, projectileEntity, KnockbackStrength.FireballBump, avgPosition, true);
                 }
-            } else {
-                switch (asset.Effect) {
-                case ProjectileEffectType.Boomerang:
-                    // Fly away
+            }
+
+            if (damageable || asset.DestroyOnHit || ((mario->IsCrouchedInShell || mario->IsInShell) && asset.DoesntEffectBlueShell) || hammerXBoomerang) {
+                if (hammerXBoomerang) {
+                    // Fly
                     var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(projectileEntity);
                     projectile->Speed *= Constants._0_85;
                     physicsObject->Gravity *= Constants._0_85;
                     physicsObject->Velocity.Y = projectile->Speed;
 
                     f.Events.EnemyPierced(marioEntity);
-                    break;
                 }
-            }
 
-            if (damageable || asset.DestroyOnHit || ((mario->IsCrouchedInShell || mario->IsInShell) && asset.DoesntEffectBlueShell)) {
                 f.Signals.OnProjectileHitEntity(projectileEntity, marioEntity);
             }
         }
