@@ -19,6 +19,8 @@
 #define PowerupTransitionOscillation 6
 #define PowerupTransitionMax 3
 
+#define HardCollisionThreshold 2.95
+
 input {
 	button Up;
 	button Down;
@@ -162,6 +164,7 @@ enum KnockbackStrength : Byte {
 	None,
 	FireballBump,
 	CollisionBump,
+	CollisionBumpHard,
 	Normal,
 	Groundpound,
 }
