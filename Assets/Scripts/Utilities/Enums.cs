@@ -33,7 +33,7 @@ namespace NSMB.Utilities {
             [PrefabParticleData("Particle/EnemyHardKick")] Enemy_HardKick,
             [PrefabParticleData("Particle/KillPoof")] Enemy_KillPoof,
 
-            [PrefabParticleData("Particle/CoinSparkles")] Coin_Sparkles,
+            [PrefabParticleData("Particle/BoomerangPierce")] Boomerang_Pierce,
 
             [PrefabParticleData("Particle/WalljumpParticle")] Player_WallJump,
             [PrefabParticleData("Particle/GroundpoundDust")] Player_Groundpound,
