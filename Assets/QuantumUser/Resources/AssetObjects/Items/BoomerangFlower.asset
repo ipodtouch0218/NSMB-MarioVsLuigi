@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BoomerangFlower
   m_EditorClassIdentifier: 
   Identifier:
-    Path: QuantumUser/Resources/AssetObjects/Items/BoomerangFlower
+    Path: QuantumUser/Assets/AssetObjects/Items/BoomerangFlower
     Guid:
       Value: 348825844190755719
   Prefab:
@@ -80,4 +80,7 @@ MonoBehaviour:
   ItemPriority: 2
   EnterReserveIfOverridden: 1
   Instant: 0
+  ProjectileAsset:
+    Id:
+      Value: 317398270294624352
   SfxOverrides: []

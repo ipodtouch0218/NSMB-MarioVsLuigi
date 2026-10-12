@@ -124,11 +124,6 @@ public class MarioPlayerPhysicsInfo : AssetObject {
     public byte GroundpoundStartMegaFrames = 24;
 
     // --- Powerups
-    public byte ProjectileVolleySize = 2;
-    public byte ProjectileVolleyFrames = 75;
-    public byte ProjectileDelayFrames = 6;
-    public byte MaxProjecitles = 6;
-
     public byte PropellerSpinFrames = 30;
     public FP PropellerLaunchVelocity = 6;
     public byte PropellerLaunchFrames = 60;

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BoomerangProjectile
   m_EditorClassIdentifier: 
   Identifier:
-    Path: QuantumUser/Resources/AssetObjects/Projectile/BoomerangProjectile
+    Path: QuantumUser/Assets/AssetObjects/Projectile/BoomerangProjectile
     Guid:
       Value: 317398270294624352
   Effect: 3
@@ -35,6 +35,10 @@ MonoBehaviour:
   DoesntEffectBlueShell: 0
   BreakBreakableTiles: 1
   CollectCoins: 1
+  MaxProjectiles: 1
+  ProjectileVolleySize: 1
+  ProjectileDelayFrames: 0
+  ProjectileVolleyFrames: 0
   DestroyParticleEffect: 8
   ShootSound: 122
   SfxOverrides: []
