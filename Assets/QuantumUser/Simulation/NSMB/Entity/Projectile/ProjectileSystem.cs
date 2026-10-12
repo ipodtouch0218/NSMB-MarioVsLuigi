@@ -76,9 +76,6 @@ namespace Quantum {
                         if (projectile->Frame < 30) {
                             // Ricochet effect if not in returning state
                             projectile->Combo = 2;
-                        } else if (projectile->Combo == 2) {
-                            Destroy(f, filter.Entity, asset.DestroyParticleEffect);
-                            return;
                         }
                     } else {
                         Destroy(f, filter.Entity, asset.DestroyParticleEffect);
