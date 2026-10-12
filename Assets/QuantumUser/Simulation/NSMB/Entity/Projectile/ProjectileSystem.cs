@@ -77,6 +77,7 @@ namespace Quantum {
                             // Ricochet effect if not in returning state
                             projectile->Combo = 2;
                         } else if (projectile->Combo == 2) {
+                            // Avoid getting stuck 24/7
                             Destroy(f, filter.Entity, asset.DestroyParticleEffect);
                             return;
                         }
