@@ -47,7 +47,7 @@ namespace NSMB.UI.Game {
         //private TeamManager teamManager;
         private int cachedCoins = -1, cachedTeamObjective = -1, cachedObjective = -1, cachedLives = -1, cachedTimer = -1;
         private PowerupAsset previousPowerup;
-        private bool showingEmptyReserve;
+        private bool showingEmptyReserve = true;
         private EntityRef previousTarget;
         private bool previousMarioExists;
         private bool justResynced;
