@@ -47,6 +47,7 @@ namespace NSMB.UI.Game {
         //private TeamManager teamManager;
         private int cachedCoins = -1, cachedTeamObjective = -1, cachedObjective = -1, cachedLives = -1, cachedTimer = -1;
         private PowerupAsset previousPowerup;
+        private bool showingEmptyReserve;
         private EntityRef previousTarget;
         private bool previousMarioExists;
         private bool justResynced;
@@ -200,26 +201,46 @@ namespace NSMB.UI.Game {
             }
             if (playAnimation) {
                 if (powerup) {
+                    showingEmptyReserve = false;
                     itemReserve.sprite = powerup.ReserveSprite;
                     reserveSummonCoroutine = StartCoroutine(PlayThenWait("reserve-in", () => {
                         reserveAnimation.Play("reserve-idle");
                     }));
                 } else {
                     reserveSummonCoroutine = StartCoroutine(PlayThenWait("reserve-out", () => {
-                        itemReserve.sprite = storedItemNull;
+                        showingEmptyReserve = true;
+                        itemReserve.sprite = GetEmptyReserveSprite();
                         reserveAnimation.Play("reserve-empty");
                     }));
                 }
             } else {
                 if (powerup && powerup.ReserveSprite) {
+                    showingEmptyReserve = false;
                     itemReserve.sprite = powerup.ReserveSprite;
                     reserveAnimation.Play("reserve-idle");
                 } else {
-                    itemReserve.sprite = storedItemNull;
+                    showingEmptyReserve = true;
+                    itemReserve.sprite = GetEmptyReserveSprite();
                     reserveAnimation.Play("reserve-empty");
                 }
             }
             previousPowerup = powerup;
+        }
+
+        /// <summary>
+        /// Gets the "No Item" sprite for the current language.
+        /// Localized sprites live in Resources/Data/noitem and are named after their locale (e.g. de-de.png).
+        /// Falls back to the default (English) sprite if the current language doesn't have one.
+        /// </summary>
+        private Sprite GetEmptyReserveSprite() {
+            string locale = GlobalController.Instance.translationManager.CurrentLocale;
+            if (!string.IsNullOrEmpty(locale)) {
+                Sprite localized = Resources.Load<Sprite>($"Data/noitem/{locale}");
+                if (localized) {
+                    return localized;
+                }
+            }
+            return storedItemNull;
         }
 
         private IEnumerator PlayThenWait(string clipName, Action callback) {
@@ -499,6 +520,9 @@ namespace NSMB.UI.Game {
 
         private void OnLanguageChanged(TranslationManager tm) {
             UpdatePingText();
+            if (showingEmptyReserve) {
+                itemReserve.sprite = GetEmptyReserveSprite();
+            }
         }
 
         public void OnReserveItemIconClicked() {
