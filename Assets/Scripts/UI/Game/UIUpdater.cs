@@ -227,11 +227,6 @@ namespace NSMB.UI.Game {
             previousPowerup = powerup;
         }
 
-        /// <summary>
-        /// Gets the "No Item" sprite for the current language.
-        /// Localized sprites live in Resources/Data/noitem and are named after their locale (e.g. de-de.png).
-        /// Falls back to the default (English) sprite if the current language doesn't have one.
-        /// </summary>
         private Sprite GetEmptyReserveSprite() {
             string locale = GlobalController.Instance.translationManager.CurrentLocale;
             if (!string.IsNullOrEmpty(locale)) {
