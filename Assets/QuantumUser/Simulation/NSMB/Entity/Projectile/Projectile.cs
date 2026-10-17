@@ -3,6 +3,7 @@ using Photon.Deterministic;
 namespace Quantum {
     public unsafe partial struct Projectile {
 
+#region Default
         public void Initialize(Frame f, EntityRef thisEntity, EntityRef owner, FPVector2 spawnpoint, bool right) {
             var asset = f.FindAsset(Asset);
             var transform = f.Unsafe.GetPointer<Transform2D>(thisEntity);
@@ -31,7 +32,8 @@ namespace Quantum {
             transform->Position = spawnpoint;
             physicsObject->Velocity = new(Speed * (FacingRight ? 1 : -1), -Speed);
         }
-
+#endregion
+#region Hammer
         public void InitializeHammer(Frame f, EntityRef thisEntity, EntityRef owner, FPVector2 spawnpoint, bool right, bool playerHoldingUp) {
             var asset = f.FindAsset(Asset);
             var transform = f.Unsafe.GetPointer<Transform2D>(thisEntity);
@@ -50,7 +52,8 @@ namespace Quantum {
             physicsObject->Velocity = velocity;
             physicsObject->Gravity = FPVector2.Up * (playerHoldingUp ? FP.FromString("-37.512") : FP.FromString("-28.125"));
         }
-
+#endregion
+#region Boomerang
         public void InitializeBoomerang(Frame f, EntityRef thisEntity, EntityRef owner, FPVector2 spawnpoint, bool right) {
             var asset = f.FindAsset(Asset);
             var transform = f.Unsafe.GetPointer<Transform2D>(thisEntity);
@@ -127,5 +130,6 @@ namespace Quantum {
                 physicsObject->Gravity = FPVector2.Zero;
             }
         }
+#endregion
     }
 }
