@@ -30,9 +30,9 @@ MonoBehaviour:
   DestroyOnSecondBounce: 0
   DestroyOnHit: 0
   LockTo45Degrees: 0
-  InheritShooterVelocity: 1
+  InheritShooterVelocity: 0
   HasCollision: 1
-  DoesntEffectBlueShell: 0
+  DoesntEffectBlueShell: 1
   BreakBreakableTiles: 1
   CollectCoins: 1
   MaxProjectiles: 1

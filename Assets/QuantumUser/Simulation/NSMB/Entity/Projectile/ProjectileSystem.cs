@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using System;
 
 namespace Quantum {
     public unsafe class ProjectileSystem : SystemMainThreadEntityFilter<Projectile, ProjectileSystem.Filter>, ISignalOnProjectileHitEntity {
@@ -18,38 +19,53 @@ namespace Quantum {
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             var collider = filter.PhysicsCollider;
             var transform = filter.Transform;
+            var physicsObject = filter.PhysicsObject;
+            var projectile = filter.Projectile;
+            var asset = f.FindAsset(projectile->Asset);
 
             if (filter.Transform->Position.Y + collider->Shape.Centroid.Y + collider->Shape.Box.Extents.Y < stage.StageWorldMin.Y) {
                 Destroy(f, filter.Entity, ParticleEffect.None);
                 return;
             }
 
-            var projectile = filter.Projectile;
-            var asset = f.FindAsset(projectile->Asset);
-
             if (projectile->Lifetime > 0 && QuantumUtils.Decrement(ref projectile->Lifetime)) {
                 // Despawn via timer
                 Destroy(f, filter.Entity, asset.DestroyParticleEffect);
             }
 
-            var physicsObject = filter.PhysicsObject;
-
-            // Check to instant-despawn if spawned inside a wall
+#region Terrain Interactions
+            // Normally this whole bit would check to instant-despawn if spawned inside a wall,
             if (!physicsObject->DisableCollision && !projectile->CheckedCollision) {
                 if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape)) {
-                    Destroy(f, filter.Entity, asset.DestroyParticleEffect);
-                    return;
+                    bool brokeTile = false;
+                    // but tile-breaking projectiles get an exception when spawned inside breakable tiles.
+                    if (asset.BreakBreakableTiles) {
+                        brokeTile = TryBreakTiles(f, filter.Entity, physicsObject, stage);
+                        if (!brokeTile) {
+                            Span<PhysicsObjectSystem.LocationTilePair> tiles = stackalloc PhysicsObjectSystem.LocationTilePair[64];
+                            int count = PhysicsObjectSystem.GetTilesOverlappingHitbox(f, transform->Position, collider->Shape, tiles, stage);
+                            for (int i = 0; i < count; i++) {
+                                var tilePos = tiles[i].Position;
+                                var tileInstance = tiles[i].Tile;
+                                if (f.FindAsset(tileInstance.Tile) is IInteractableTile interactable
+                                    && interactable.Interact(f, filter.Entity, InteractionDirection.Left, tilePos, tileInstance, out _)) {
+                                    brokeTile = true;
+                                }
+                            }
+                        }
+                    }
+                    if (brokeTile) {
+                        // So keep them alive!
+                        return;
+                    } else {
+                        Destroy(f, filter.Entity, asset.DestroyParticleEffect);
+                        return;
+                    }
                 }
                 projectile->CheckedCollision = true;
             }
 
             HandleTileCollision(f, ref filter, asset, stage);
-
-            physicsObject->Velocity.X = projectile->Speed * (projectile->FacingRight ? 1 : -1);
-
-            if (asset.LockTo45Degrees) {
-                physicsObject->TerminalVelocity = -projectile->Speed;
-            }
 
             if (asset.Effect == ProjectileEffectType.Boomerang) {
                 projectile->UpdateBoomerang(f, filter.Entity, physicsObject, stage);
@@ -74,10 +90,14 @@ namespace Quantum {
 
                     if (asset.Effect == ProjectileEffectType.Boomerang) {
                         if (projectile->Frame < 30) {
-                            // Ricochet effect if not in returning state
-                            projectile->Combo = 2;
+                            if (physicsObject->IsTouchingGround) {
+                                // Slope bug
+                                physicsObject->IsTouchingGround = false;
+                            } else {
+                                // "Ricochet" effect if not in returning state
+                                projectile->Combo = 2;
+                            }
                         } else if (projectile->Combo == 2) {
-                            // Avoid getting stuck 24/7
                             Destroy(f, filter.Entity, asset.DestroyParticleEffect);
                             return;
                         }
@@ -121,6 +141,7 @@ namespace Quantum {
             }
             return broke;
         }
+#endregion
 
         private void OnProjectileProjectileInteraction(Frame f, EntityRef projectileEntityA, EntityRef projectileEntityB) {
             var projectileA = f.Unsafe.GetPointer<Projectile>(projectileEntityA);
