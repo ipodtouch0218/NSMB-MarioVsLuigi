@@ -1511,8 +1511,8 @@ namespace Quantum {
                     return;
                 }
 
-                if (activeProjectiles < 2) {
-                    // Always allow if < 2
+                if (activeProjectiles < projectileAsset.ProjectileVolleySize) {
+                    // Always allow if less than Volley Size
                     mario->CurrentVolley = (byte) (activeProjectiles + 1);
                 } else if (mario->CurrentVolley < projectileAsset.ProjectileVolleySize) {
                     // Allow in this volley
@@ -2260,7 +2260,7 @@ namespace Quantum {
 
             if (damageable || asset.DestroyOnHit || ((mario->IsCrouchedInShell || mario->IsInShell) && asset.DoesntEffectBlueShell) || hammerXBoomerang) {
                 if (hammerXBoomerang) {
-                    // Fly
+                    // Fly away
                     var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(projectileEntity);
                     projectile->Speed *= Constants._0_85;
                     physicsObject->Gravity *= Constants._0_85;

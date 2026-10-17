@@ -62,11 +62,6 @@ namespace Quantum {
 
             // Speed
             Speed = asset.Speed;
-            if (asset.InheritShooterVelocity
-                && f.Unsafe.TryGetPointer(owner, out PhysicsObject* ownerPhysicsObject)
-                && FPMath.Sign(ownerPhysicsObject->Velocity.X) == 1 == FacingRight) {
-                Speed += FPMath.Abs(ownerPhysicsObject->Velocity.X / 3);
-            }
 
             // Physics
             Combo = 0; // There are 3 phases for Boomerang: 0 = going, 1 = pausing, 2 = returning
@@ -76,12 +71,13 @@ namespace Quantum {
         }
 
         public void UpdateBoomerang(Frame f, EntityRef thisEntity, PhysicsObject* physicsObject, VersusStageData stage) {
+            var asset = f.FindAsset(Asset);
+
             if (!f.Exists(thisEntity) || f.DestroyPending(thisEntity)) {
                 return;
             }
 
             Frame++;
-            var asset = f.FindAsset(Asset);
 
             // Going phase
             if (Combo == 0) {
@@ -121,7 +117,7 @@ namespace Quantum {
                 }
 
                 if (f.Unsafe.TryGetPointer(Owner, out Transform2D* ownerTransform) && f.Unsafe.TryGetPointer(Owner, out PhysicsCollider2D* ownerCollider)) {
-                    // Fix Mario's toes and fix loop points.
+                    // Fix Mario's toes and loop points.
                     FPVector2 ownerCenter = ownerTransform->Position + ownerCollider->Shape.Centroid + new FPVector2(0, ownerCollider->Shape.Box.Extents.Y / 2);
                     QuantumUtils.UnwrapWorldLocations(stage, transform->Position, ownerCenter, out _, out FPVector2 closestOwner);
                     FPVector2 direction = (closestOwner - transform->Position).Normalized;
