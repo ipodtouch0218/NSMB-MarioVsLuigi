@@ -92,7 +92,16 @@ namespace NSMB.Entities.CoinItems {
                         return false;
                     }
 
-                    return cameraMario->GetTeam(PredictedFrame) == ownerMario->GetTeam(PredictedFrame);
+                    bool sameTeam = cameraMario->GetTeam(PredictedFrame) == ownerMario->GetTeam(PredictedFrame);
+                    if (!sameTeam) {
+                        return false;
+                    }
+
+                    if (PredictedFrame.Global->Rules.TeamAttack == TeamAttackOptions.Full) {
+                        return owner == playerElement.Entity;
+                    }
+
+                    return true;
                 }
             }
             return false;
