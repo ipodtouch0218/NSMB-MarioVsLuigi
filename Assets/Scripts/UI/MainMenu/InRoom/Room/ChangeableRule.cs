@@ -130,6 +130,10 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
 
         public unsafe void IncreaseValue(bool playSound = true) {
+            if (!CanIncreaseValue) {
+                return;
+            }
+
             QuantumGame game = QuantumRunner.DefaultGame;
             PlayerRef host = game.Frames.Predicted.Global->Host;
             if (!game.PlayerIsLocal(host)) {
@@ -144,6 +148,10 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
 
         public unsafe void DecreaseValue(bool playSound = true) {
+            if (!CanDecreaseValue) {
+                return;
+            }
+
             QuantumGame game = QuantumRunner.DefaultGame;
             PlayerRef host = game.Frames.Predicted.Global->Host;
             if (!game.PlayerIsLocal(host)) {

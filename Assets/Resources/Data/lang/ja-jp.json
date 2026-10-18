@@ -112,7 +112,7 @@
   "ui.options.tab.audio": "音声",
   "ui.options.tab.controls": "操作",
   "ui.options.general.scoreboard": "スコアボードを常に表示する",
-  "ui.options.general.condensedscoreboard": "Använd den komprimerande versionen av resultattavlan i spelet",
+  "ui.options.general.condensedscoreboard": "簡易版のスコアボードを使用する",
   "ui.options.general.disablechat": "チャットを無効化する",
   "ui.options.general.filter": "チャットで不快な言葉を伏字にする",
   "ui.options.general.language": "言語",

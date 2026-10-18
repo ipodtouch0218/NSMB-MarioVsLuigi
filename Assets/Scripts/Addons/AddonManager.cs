@@ -39,8 +39,7 @@ namespace NSMB.Addons {
         public static readonly string AddonExtension = ".mvladdon";
 
         public static string LocalFolderPath;
-        private static string PlatformFolder;
-        private static string UniversalPlatformFolder = "Universal";
+        public static string PlatformName { get; private set; }
 
         //---Properties
         public List<LoadedAddon> LoadedAddons { get; private set; } = new();
@@ -56,6 +55,8 @@ namespace NSMB.Addons {
         public void Start() {
 #if UNITY_WEBGL
             LocalFolderPath = Application.persistentDataPath + "/addons";
+#elif UNITY_EDITOR
+            LocalFolderPath = Path.GetFullPath(Application.dataPath + "/../addons");
 #else
             LocalFolderPath = Application.dataPath + "/addons";
 #endif
@@ -63,7 +64,7 @@ namespace NSMB.Addons {
                 Directory.CreateDirectory(LocalFolderPath);
             }
 
-            PlatformFolder = GetFolderForPlatform();
+            PlatformName = GetPlatformName();
             _ = FindAvailableAddons();
 
 #if UNITY_STANDALONE
@@ -126,7 +127,7 @@ namespace NSMB.Addons {
 
             foreach (var addonGuid in requestedAddons) {
                 var loadAddonResult = await LoadAddon(addonGuid);
-                if (!loadAddonResult.Success) {
+                if (!loadAddonResult.Success && loadAddonResult.NeedsDownload) {
                     // Check if this is downloadable.
                     if (remoteCatalog == null) {
                         using UnityWebRequest catalogRequest = UnityWebRequest.Get(RemoteRepoCatalogUrl);
@@ -158,7 +159,7 @@ namespace NSMB.Addons {
                         }
                     }
 
-                    if (remoteCatalog.TryGetValue(addonGuid.ToString(), out var catalogEntry)) {
+                    if (remoteCatalog.TryGetValue(addonGuid.ToString(), out var catalogEntry) && catalogEntry.Artifacts.ContainsKey(PlatformName)) {
                         catalogEntry.ReleaseGuid = addonGuid;
                         tryDownloading.Add(catalogEntry);
                     } else {
@@ -245,7 +246,7 @@ namespace NSMB.Addons {
 
             try {
                 // Load bundles
-                var zippedBundles = zipFile.Entries.Where(zae => zae.FullName.StartsWith(PlatformFolder + "/") || zae.FullName.StartsWith(UniversalPlatformFolder + "/"));
+                var zippedBundles = zipFile.Entries.Where(zae => zae.FullName.StartsWith($"{PlatformName}/"));
                 foreach (var zippedBundle in zippedBundles) {
                     using Stream bundleStream = zippedBundle.Open();
                     MemoryStream memoryStream = new((int) zippedBundle.Length);
@@ -271,7 +272,7 @@ namespace NSMB.Addons {
                 }
 
                 if (loadedBundles.Count == 0) {
-                    Debug.Log($"[Addon] Failed to load addon {addonDef.FullName} ({addonDef.ReleaseGuid}): it does not support our platform ({PlatformFolder})");
+                    Debug.Log($"[Addon] Failed to load addon {addonDef.FullName} ({addonDef.ReleaseGuid}): it does not support our platform ({PlatformName})");
                     UnloadAndCleanup();
                     return new AddonLoadResult {
                         Result = AddonLoadResultEnum.IncompatbilePlatform
@@ -400,7 +401,7 @@ namespace NSMB.Addons {
                     return null;
                 }
 
-                if (!zipFile.Entries.Any(en => en.FullName.StartsWith($"{PlatformFolder}/"))) {
+                if (!zipFile.Entries.Any(en => en.FullName.StartsWith($"{PlatformName}/"))) {
                     Debug.Log($"[Addon] Incompatible addon found \"{addonDef.FullName}\" ({addonDef.ReleaseGuid}) at \"{fullPath}\"");
                     return null;
                 }
@@ -431,12 +432,15 @@ namespace NSMB.Addons {
             availableAddons.RemoveAll(af => new FileInfo(af.FilePath).FullName == fullPath);
         }
 
-        public async Awaitable SaveAddonToCache(Guid guid, byte[] data) {
+        public async Awaitable SaveAddonToCache(string filename, byte[] data) {
             try {
                 await Awaitable.BackgroundThreadAsync();
                 Directory.CreateDirectory($"{LocalFolderPath}/download");
-                string path = $"{LocalFolderPath}/download/{guid}{AddonExtension}";
+                string path = $"{LocalFolderPath}/download/{filename}";
+
+                Debug.Log($"[Addon] Saving addon to download folder: {path}");
                 await File.WriteAllBytesAsync(path, data);
+
                 var addonFile = await RegisterAddon(path);
                 if (addonFile != null) {
                     availableAddons.Add(addonFile);
@@ -448,7 +452,6 @@ namespace NSMB.Addons {
         }
 
         public static async Awaitable<AddonBuildDefinition> GetAddonBuildDefinition(ZipArchive zipFile, bool loadIcon) {
-            await Awaitable.BackgroundThreadAsync();
             try {
                 var entry = zipFile.GetEntry("addon.json");
                 if (entry == null) {
@@ -481,13 +484,19 @@ namespace NSMB.Addons {
             return memoryStream.ToArray();
         }
 
-        public static string GetFolderForPlatform() {
+        public static string GetPlatformName() {
 #if UNITY_EDITOR
-            return UnityEditor.EditorUserBuildSettings.activeBuildTarget.ToString();
+            var buildTarget = UnityEditor.EditorUserBuildSettings.activeBuildTarget;
+            if (buildTarget == UnityEditor.BuildTarget.StandaloneWindows64) {
+                // Win64 and 32 are compatible, default to 32.
+                buildTarget = UnityEditor.BuildTarget.StandaloneWindows;
+            }
+
+            return buildTarget.ToString();
 #else
             switch (Application.platform) {
             case RuntimePlatform.WindowsPlayer:
-                return IntPtr.Size == 8 ? "StandaloneWindows64" : "StandaloneWindows";
+                return "StandaloneWindows"; // Win64 and 32 are compatible, default to 32.
             case RuntimePlatform.OSXPlayer:
                 return "StandaloneOSX";
             case RuntimePlatform.LinuxPlayer:
@@ -607,12 +616,18 @@ namespace NSMB.Addons {
         public string DisplayName;
         public string Author;
         public string Version;
+        public Dictionary<string, AddonCatalogArtifactEntry> Artifacts;
+    }
+
+    public class AddonCatalogArtifactEntry {
+        public string Url;
         public long Size;
-        public string DownloadUrl;
+        public string Sha256;
     }
 
     public struct AddonLoadResult {
         public readonly bool Success => Result == AddonLoadResultEnum.Success || Result == AddonLoadResultEnum.AlreadyLoaded;
+        public readonly bool NeedsDownload => Result == AddonLoadResultEnum.UnknownGuid || Result == AddonLoadResultEnum.ReadFailure;
         public AddonLoadResultEnum Result;
         public LoadedAddon NewAddon;
         public LoadedAddon IncompatibleWith;

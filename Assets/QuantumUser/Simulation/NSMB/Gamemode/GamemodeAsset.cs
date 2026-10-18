@@ -16,6 +16,9 @@ namespace Quantum {
 
         public GameRulesPrototype DefaultRules;
 
+        // Horrible, terrible bodge.
+        public bool RequireTimer;
+
         public abstract void EnableGamemode(Frame f);
 
         public abstract void DisableGamemode(Frame f);
