@@ -71,6 +71,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Levels/Super Spleef.unity
     guid: c081d25b120c442c2b14ac09788d98db
+  - enabled: 1
+    path: Assets/Scenes/Levels/BismilTnebre.unity
+    guid: dd78a1e92ea76ce44ae587891c169bba
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 089c0b7845b45284db115d78b78a26c4,
       type: 2}
