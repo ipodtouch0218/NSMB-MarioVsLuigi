@@ -55,6 +55,8 @@ namespace NSMB.Addons {
         public void Start() {
 #if UNITY_WEBGL
             LocalFolderPath = Application.persistentDataPath + "/addons";
+#elif UNITY_EDITOR
+            LocalFolderPath = Path.GetFullPath(Application.dataPath + "/../addons");
 #else
             LocalFolderPath = Application.dataPath + "/addons";
 #endif
@@ -125,7 +127,7 @@ namespace NSMB.Addons {
 
             foreach (var addonGuid in requestedAddons) {
                 var loadAddonResult = await LoadAddon(addonGuid);
-                if (!loadAddonResult.Success) {
+                if (!loadAddonResult.Success && loadAddonResult.NeedsDownload) {
                     // Check if this is downloadable.
                     if (remoteCatalog == null) {
                         using UnityWebRequest catalogRequest = UnityWebRequest.Get(RemoteRepoCatalogUrl);
@@ -430,15 +432,15 @@ namespace NSMB.Addons {
             availableAddons.RemoveAll(af => new FileInfo(af.FilePath).FullName == fullPath);
         }
 
-        public async Awaitable SaveAddonToCache(Guid guid, byte[] data) {
+        public async Awaitable SaveAddonToCache(string filename, byte[] data) {
             try {
                 await Awaitable.BackgroundThreadAsync();
                 Directory.CreateDirectory($"{LocalFolderPath}/download");
-                string path = $"{LocalFolderPath}/download/{guid}{AddonExtension}";
-                string tempPath = path + ".tmp";
+                string path = $"{LocalFolderPath}/download/{filename}";
 
-                await File.WriteAllBytesAsync(tempPath, data);
-                File.Move(tempPath, path);
+                Debug.Log($"[Addon] Saving addon to download folder: {path}");
+                await File.WriteAllBytesAsync(path, data);
+
                 var addonFile = await RegisterAddon(path);
                 if (addonFile != null) {
                     availableAddons.Add(addonFile);
@@ -625,6 +627,7 @@ namespace NSMB.Addons {
 
     public struct AddonLoadResult {
         public readonly bool Success => Result == AddonLoadResultEnum.Success || Result == AddonLoadResultEnum.AlreadyLoaded;
+        public readonly bool NeedsDownload => Result == AddonLoadResultEnum.UnknownGuid || Result == AddonLoadResultEnum.ReadFailure;
         public AddonLoadResultEnum Result;
         public LoadedAddon NewAddon;
         public LoadedAddon IncompatibleWith;
