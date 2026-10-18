@@ -1,0 +1,81 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e603eeabd17b0d4694ac32ed6f20ecc, type: 3}
+  m_Name: 1-Up
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/AssetObjects/Items/1-Up
+    Guid:
+      Value: 421291512996345105
+  Prefab:
+    Id:
+      Value: 1365421339623582075
+  SpawnChance:
+    RawValue: 0
+  AboveAverageBonus:
+    RawValue: 0
+  BelowAverageBonus:
+    RawValue: 0
+  BlockSpawnSoundEffect: 69
+  Flags: 27
+  MaxNumberOfItems: 0
+  TranslationKey: coinitem.1up
+  CameraSpawnOffset:
+    X:
+      RawValue: 0
+    Y:
+      RawValue: 110100
+  MaxMatchingPowerStates: 0
+  MaxMatchingReserveState: 0
+  State: 0
+  SoundPlaysEverywhere: 0
+  SoundEffect: 78
+  ReserveSprite: {fileID: 0}
+  AvoidPlayers: 0
+  Speed:
+    RawValue: 0
+  BounceStrength:
+    RawValue: 0
+  TerminalVelocity:
+    RawValue: -524288
+  BumpedFromBelowVelocity:
+    RawValue: 360448
+  FollowAnimationCurve: 0
+  AnimationCurveX:
+    Samples: []
+    PreWrapMode: 0
+    PostWrapMode: 0
+    StartTime:
+      RawValue: 0
+    EndTime:
+      RawValue: 65536
+    Resolution: 32
+    OriginalPreWrapMode: 0
+    OriginalPostWrapMode: 0
+    Keys: []
+  AnimationCurveY:
+    Samples: []
+    PreWrapMode: 0
+    PostWrapMode: 0
+    StartTime:
+      RawValue: 0
+    EndTime:
+      RawValue: 65536
+    Resolution: 32
+    OriginalPreWrapMode: 0
+    OriginalPostWrapMode: 0
+    Keys: []
+  StatePriority: -1
+  ItemPriority: -1
+  EnterReserveIfOverridden: 0
+  Instant: 0
+  SfxOverrides: []

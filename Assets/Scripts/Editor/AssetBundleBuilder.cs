@@ -6,18 +6,12 @@ namespace NSMB.Editor {
     public class AssetBundleBuilder {
         static AssetBundleBuilder() {
             BuildPlayerWindow.RegisterBuildPlayerHandler(buildPlayerOptions => {
-                BuildAssetBundles(buildPlayerOptions.target, BuildAssetBundleOptions.AssetBundleStripUnityVersion | BuildAssetBundleOptions.ChunkBasedCompression);
+                BuildAssetBundles(buildPlayerOptions);
                 BuildPlayerWindow.DefaultBuildMethods.BuildPlayer(buildPlayerOptions);
             });
-
-            EditorApplication.playModeStateChanged += (state) => {
-                if (state == PlayModeStateChange.ExitingEditMode) {
-                    BuildAssetBundles(EditorUserBuildSettings.activeBuildTarget, BuildAssetBundleOptions.AssetBundleStripUnityVersion | BuildAssetBundleOptions.UncompressedAssetBundle);
-                }
-            };
         }
 
-        public static void BuildAssetBundles(BuildTarget buildTarget, BuildAssetBundleOptions options) {
+        public static void BuildAssetBundles(BuildPlayerOptions buildOptions) {
             AssetBundleBuild[] buildMap = {
                 new() {
                     assetBundleName = "basegame-assets",
@@ -29,7 +23,11 @@ namespace NSMB.Editor {
                 }
             };
             
-            BuildPipeline.BuildAssetBundles(Application.streamingAssetsPath, buildMap, options, buildTarget);
+            BuildPipeline.BuildAssetBundles(
+                Application.streamingAssetsPath,
+                buildMap,
+                /*BuildAssetBundleOptions.DisableWriteTypeTree | */ BuildAssetBundleOptions.AssetBundleStripUnityVersion | BuildAssetBundleOptions.ChunkBasedCompression,
+                buildOptions.target);
         }
     }
 }
