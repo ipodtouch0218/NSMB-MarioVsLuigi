@@ -1,14 +1,14 @@
 using NSMB.UI.Translation;
 using Quantum;
-using UnityEngine;
 
 namespace NSMB.UI.MainMenu.Submenus.InRoom {
     public unsafe class TimerChangeableRule : NumberChangeableRule {
 
-        [SerializeField] private AssetRef<GamemodeAsset> coinRunnersGamemode;
+        public override bool CanDecreaseValue
+            => base.CanDecreaseValue && ((int) value > 1 || CurrentGamemode.RequireTimer);
 
-        // Horrible, terrible bodge.
-        public override bool CanDecreaseValue => base.CanDecreaseValue && ((int) value > 1 || QuantumRunner.DefaultGame.Frames.Predicted.Global->Rules.Gamemode != coinRunnersGamemode);
+        private GamemodeAsset CurrentGamemode
+            => QuantumUnityDB.GetGlobalAsset(QuantumRunner.DefaultGame.Frames.Predicted.Global->Rules.Gamemode);
 
         protected override void UpdateLabel() {
             TranslationManager tm = GlobalController.Instance.translationManager;
