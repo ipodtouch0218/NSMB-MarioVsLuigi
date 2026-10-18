@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52c4ffc49d3be9b478562d614a7f6433, type: 3}
+  m_Name: Starman
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/AssetObjects/Items/Starman
+    Guid:
+      Value: 378514462062875007
+  Prefab:
+    Id:
+      Value: 1502268950446962426
+  SpawnChance:
+    RawValue: 16384
+  AboveAverageBonus:
+    RawValue: -8192
+  BelowAverageBonus:
+    RawValue: 163840
+  BlockSpawnSoundEffect: 69
+  Flags: 19
+  MaxNumberOfItems: 0
+  CanSpawnAfterSeconds:
+    RawValue: 1310720
+  TranslationKey: coinitem.starman
+  CameraSpawnOffset:
+    X:
+      RawValue: 0
+    Y:
+      RawValue: 110100
+  MaxMatchingPowerStates: 0
+  MaxMatchingReserveState: 0
+  State: 0
+  SoundPlaysEverywhere: 0
+  SoundEffect: 16
+  ReserveSprite: {fileID: 0}
+  AvoidPlayers: 0
+  Speed:
+    RawValue: 131072
+  BounceStrength:
+    RawValue: 393216
+  TerminalVelocity:
+    RawValue: -524288
+  BumpedFromBelowVelocity:
+    RawValue: 360448
+  FollowAnimationCurve: 0
+  AnimationCurveX:
+    Samples: []
+    PreWrapMode: 0
+    PostWrapMode: 0
+    StartTime:
+      RawValue: 0
+    EndTime:
+      RawValue: 65536
+    Resolution: 32
+    OriginalPreWrapMode: 0
+    OriginalPostWrapMode: 0
+    Keys: []
+  AnimationCurveY:
+    Samples: []
+    PreWrapMode: 0
+    PostWrapMode: 0
+    StartTime:
+      RawValue: 0
+    EndTime:
+      RawValue: 65536
+    Resolution: 32
+    OriginalPreWrapMode: 0
+    OriginalPostWrapMode: 0
+    Keys: []
+  StatePriority: -1
+  ItemPriority: -1
+  EnterReserveIfOverridden: 1
+  Instant: 1
+  SfxOverrides: []
+  StarmanDuration:
+    RawValue: 655360
