@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 075af0e881e112348abe562216ddc298, type: 3}
+  m_Name: MusicTetris
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/AssetObjects/Music/MusicTetris
+    Guid:
+      Value: 442314213223831400
+  clip: {fileID: 8300000, guid: 573f0297cd217784ba54a4bc54aff7e7, type: 3}
+  fastClip: {fileID: 8300000, guid: 573f0297cd217784ba54a4bc54aff7e7, type: 3}
+  loopStartSeconds: 0
+  loopEndSeconds: 96
+  speedupFactor: 1.25
