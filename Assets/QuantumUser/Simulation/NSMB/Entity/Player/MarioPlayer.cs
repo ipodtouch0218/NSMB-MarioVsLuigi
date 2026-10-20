@@ -358,7 +358,7 @@ namespace Quantum {
             WallslideLeft = false;
             ForceJumpTimer = 0;
             LastAttacker = EntityRef.None;
-            TauntFrames = 0;
+            TryCancelTaunt(f, entity);
             DamageInvincibilityFrames = 0;
 
             if (f.Unsafe.TryGetPointer(HeldEntity, out Holdable* holdable)) {
@@ -689,6 +689,13 @@ namespace Quantum {
             }
 
             f.Events.MarioPlayerEnteredPipe(mario, CurrentPipe, false, horizontalDirection, FPVector2.Zero);
+        }
+
+        public void TryCancelTaunt(Frame f, EntityRef entity) {
+            if (TauntFrames > 0) {
+                TauntFrames = 0;
+                f.Events.MarioPlayerTauntCancelled(entity);
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

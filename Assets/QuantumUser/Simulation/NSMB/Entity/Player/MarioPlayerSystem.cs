@@ -133,10 +133,7 @@ namespace Quantum {
                 || mario->IsWalkingOnWater(f, filter.Entity)) {
                 // Disgusting.
 
-                if (mario->TauntFrames > 0) {
-                    f.Events.MarioPlayerTauntCancelled(filter.Entity);
-                }
-                mario->TauntFrames = 0;
+                mario->TryCancelTaunt(f, filter.Entity);
                 return false;
             }
             
@@ -1940,7 +1937,7 @@ namespace Quantum {
             mario->IsPropellerFlying = false;
             mario->IsDrilling = false;
             mario->IsSpinnerFlying = false;
-            mario->TauntFrames = 0;
+            mario->TryCancelTaunt(f, filter.Entity);
             physicsObject->IsTouchingGround = false;
             physicsObject->Gravity = FPVector2.Zero;
             physicsObject->Velocity = FPVector2.Right * 2;
@@ -2992,7 +2989,7 @@ namespace Quantum {
             mario->IsGroundpounding = false;
             mario->IsGroundpoundActive = false;
             mario->IsSliding = false;
-            mario->TauntFrames = 0;
+            mario->TryCancelTaunt(f, entity);
 
             if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable)) {
                 holdable->DropWithoutThrowing(f, mario->HeldEntity);

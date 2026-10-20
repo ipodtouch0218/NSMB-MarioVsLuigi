@@ -5,7 +5,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
     public unsafe class TimerChangeableRule : NumberChangeableRule {
 
         public override bool CanDecreaseValue
-            => base.CanDecreaseValue && ((int) value > 1 || CurrentGamemode.RequireTimer);
+            => base.CanDecreaseValue && ((int) value > 1 || !CurrentGamemode.RequireTimer);
 
         private GamemodeAsset CurrentGamemode
             => QuantumUnityDB.GetGlobalAsset(QuantumRunner.DefaultGame.Frames.Predicted.Global->Rules.Gamemode);
