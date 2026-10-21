@@ -11,6 +11,7 @@ using Quantum;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -234,8 +235,64 @@ namespace NSMB.UI.Game {
                 if (localized) {
                     return localized;
                 }
+
+                localized = LoadCustomEmptyReserveSprite(locale);
+                if (localized) {
+                    return localized;
+                }
             }
             return storedItemNull;
+        }
+
+        private static readonly Dictionary<string, Sprite> customEmptyReserveSprites = new(StringComparer.OrdinalIgnoreCase);
+
+        private static Sprite LoadCustomEmptyReserveSprite(string locale) {
+#if UNITY_STANDALONE
+            if (customEmptyReserveSprites.TryGetValue(locale, out Sprite cached)) {
+                return cached;
+            }
+
+            Sprite result = null;
+            // The player's folder comes first, so custom language packs can override shipped ones.
+            string[] paths = { $"{Application.persistentDataPath}/lang/no-item", $"{Application.streamingAssetsPath}/lang/no-item" };
+
+            foreach (string folder in paths) {
+                if (!Directory.Exists(folder)) {
+                    continue;
+                }
+
+                foreach (string filePath in Directory.EnumerateFiles(folder, "*.png")) {
+                    if (!string.Equals(Path.GetFileNameWithoutExtension(filePath), locale, StringComparison.OrdinalIgnoreCase)) {
+                        continue;
+                    }
+
+                    try {
+                        Texture2D texture = new(2, 2, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp };
+                        if (texture.LoadImage(File.ReadAllBytes(filePath), true)) {
+                            result = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100f);
+                        } else {
+                            UnityEngine.Object.Destroy(texture);
+                        }
+                    } catch (Exception e) {
+                        Debug.LogWarning($"[UI] Failed to load the No Item sprite from file '{filePath}'.");
+                        Debug.LogWarning(e);
+                    }
+
+                    if (result) {
+                        break;
+                    }
+                }
+
+                if (result) {
+                    break;
+                }
+            }
+
+            customEmptyReserveSprites[locale] = result;
+            return result;
+#else
+            return null;
+#endif
         }
 
         private IEnumerator PlayThenWait(string clipName, Action callback) {
