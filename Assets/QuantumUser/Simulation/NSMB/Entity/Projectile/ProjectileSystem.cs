@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using System;
 
 namespace Quantum {
     public unsafe class ProjectileSystem : SystemMainThreadEntityFilter<Projectile, ProjectileSystem.Filter>, ISignalOnProjectileHitEntity {
@@ -12,50 +13,69 @@ namespace Quantum {
 
         public override void OnInit(Frame f) {
             f.Context.Interactions.Register<Projectile, Projectile>(f, OnProjectileProjectileInteraction);
+            f.Context.Interactions.Register<Projectile, Coin>(f, OnProjectileCoinInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             var collider = filter.PhysicsCollider;
             var transform = filter.Transform;
+            var physicsObject = filter.PhysicsObject;
+            var projectile = filter.Projectile;
+            var asset = f.FindAsset(projectile->Asset);
 
             if (filter.Transform->Position.Y + collider->Shape.Centroid.Y + collider->Shape.Box.Extents.Y < stage.StageWorldMin.Y) {
                 Destroy(f, filter.Entity, ParticleEffect.None);
                 return;
             }
 
-            var projectile = filter.Projectile;
-            var asset = f.FindAsset(projectile->Asset);
-
             if (projectile->Lifetime > 0 && QuantumUtils.Decrement(ref projectile->Lifetime)) {
                 // Despawn via timer
                 Destroy(f, filter.Entity, asset.DestroyParticleEffect);
             }
 
-            var physicsObject = filter.PhysicsObject;
-
-            // Check to instant-despawn if spawned inside a wall
+#region Terrain Interactions
+            // Normally this whole bit would check to instant-despawn if spawned inside a wall,
             if (!physicsObject->DisableCollision && !projectile->CheckedCollision) {
                 if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape)) {
-                    Destroy(f, filter.Entity, asset.DestroyParticleEffect);
-                    return;
+                    bool brokeTile = false;
+                    // but tile-breaking projectiles get an exception when spawned inside breakable tiles.
+                    if (asset.BreakBreakableTiles) {
+                        brokeTile = TryBreakTiles(f, filter.Entity, physicsObject, stage);
+                        if (!brokeTile) {
+                            Span<PhysicsObjectSystem.LocationTilePair> tiles = stackalloc PhysicsObjectSystem.LocationTilePair[64];
+                            int count = PhysicsObjectSystem.GetTilesOverlappingHitbox(f, transform->Position, collider->Shape, tiles, stage);
+                            for (int i = 0; i < count; i++) {
+                                var tilePos = tiles[i].Position;
+                                var tileInstance = tiles[i].Tile;
+                                if (f.FindAsset(tileInstance.Tile) is IInteractableTile interactable
+                                    && interactable.Interact(f, filter.Entity, InteractionDirection.Left, tilePos, tileInstance, out _)) {
+                                    brokeTile = true;
+                                }
+                            }
+                        }
+                    }
+                    if (brokeTile) {
+                        // So keep them alive!
+                        return;
+                    } else {
+                        Destroy(f, filter.Entity, asset.DestroyParticleEffect);
+                        return;
+                    }
                 }
                 projectile->CheckedCollision = true;
             }
 
-            HandleTileCollision(f, ref filter, asset);
+            HandleTileCollision(f, ref filter, asset, stage);
 
-            physicsObject->Velocity.X = projectile->Speed * (projectile->FacingRight ? 1 : -1);
-
-            if (asset.LockTo45Degrees) {
-                physicsObject->TerminalVelocity = -projectile->Speed;
+            if (asset.Effect == ProjectileEffectType.Boomerang) {
+                projectile->UpdateBoomerang(f, filter.Entity, physicsObject, stage);
             }
         }
 
-        public void HandleTileCollision(Frame f, ref Filter filter, ProjectileAsset asset) {
+        public void HandleTileCollision(Frame f, ref Filter filter, ProjectileAsset asset, VersusStageData stage) {
             var projectile = filter.Projectile;
             var physicsObject = filter.PhysicsObject;
 
-            // Despawn
             if (!physicsObject->DisableCollision) {
                 if (physicsObject->IsTouchingLeftWall
                     || physicsObject->IsTouchingRightWall
@@ -63,8 +83,28 @@ namespace Quantum {
                     || (physicsObject->IsTouchingGround && (!asset.Bounce || (projectile->HasBounced && asset.DestroyOnSecondBounce)))
                     || PhysicsObjectSystem.BoxInGround(f, filter.Transform->Position, filter.PhysicsCollider->Shape)) {
 
-                    Destroy(f, filter.Entity, asset.DestroyParticleEffect);
-                    return;
+                    // Destroy tiles
+                    if (asset.BreakBreakableTiles && TryBreakTiles(f, filter.Entity, physicsObject, stage)) {
+                        return;
+                    }
+
+                    if (asset.Effect == ProjectileEffectType.Boomerang) {
+                        if (projectile->Frame < 30) {
+                            if (physicsObject->IsTouchingGround) {
+                                // Slope bug
+                                physicsObject->IsTouchingGround = false;
+                            } else {
+                                // "Ricochet" effect if not in returning state
+                                projectile->Combo = 2;
+                            }
+                        } else if (projectile->Combo == 2) {
+                            Destroy(f, filter.Entity, asset.DestroyParticleEffect);
+                            return;
+                        }
+                    } else {
+                        Destroy(f, filter.Entity, asset.DestroyParticleEffect);
+                        return;
+                    }
                 }
             }
 
@@ -81,6 +121,28 @@ namespace Quantum {
             }
         }
 
+        private static bool TryBreakTiles(Frame f, EntityRef entity, PhysicsObject* physicsObject, VersusStageData stage) {
+            bool broke = false;
+            var contacts = f.ResolveList(physicsObject->Contacts);
+            foreach (var contact in contacts) {
+                if (f.Exists(contact.Entity)) {
+                    continue;
+                }
+                var tileInstance = stage.GetTileRelative(f, contact.Tile);
+                if (f.FindAsset(tileInstance.Tile) is not IInteractableTile tile) {
+                    continue;
+                }
+                InteractionDirection direction = contact.Normal.Y > FP._0_50 ? InteractionDirection.Down
+                    : contact.Normal.Y < -FP._0_50 ? InteractionDirection.Up
+                    : contact.Normal.X > 0 ? InteractionDirection.Left : InteractionDirection.Right;
+                if (tile.Interact(f, entity, direction, contact.Tile, tileInstance, out _)) {
+                    broke = true;
+                }
+            }
+            return broke;
+        }
+#endregion
+
         private void OnProjectileProjectileInteraction(Frame f, EntityRef projectileEntityA, EntityRef projectileEntityB) {
             var projectileA = f.Unsafe.GetPointer<Projectile>(projectileEntityA);
             var projectileB = f.Unsafe.GetPointer<Projectile>(projectileEntityB);
@@ -93,10 +155,21 @@ namespace Quantum {
             var projectileAssetB = f.FindAsset(projectileB->Asset);
 
             if ((projectileAssetA.Effect == ProjectileEffectType.Fire && projectileAssetB.Effect == ProjectileEffectType.Freeze)
-                || (projectileAssetB.Effect == ProjectileEffectType.Fire && projectileAssetA.Effect == ProjectileEffectType.Freeze)) {
-                // Fireball collided with Iceball. Destroy both.
+                || (projectileAssetB.Effect == ProjectileEffectType.Fire && projectileAssetA.Effect == ProjectileEffectType.Freeze)
+                || (projectileAssetA.Effect == ProjectileEffectType.Hammer && projectileAssetB.Effect == ProjectileEffectType.Boomerang)
+                || (projectileAssetB.Effect == ProjectileEffectType.Hammer && projectileAssetA.Effect == ProjectileEffectType.Boomerang)) {
+                // Fireball collided with Iceball, or Hammer collided with Boomerang. Destroy both.
                 Destroy(f, projectileEntityA, projectileAssetA.DestroyParticleEffect);
                 Destroy(f, projectileEntityB, projectileAssetB.DestroyParticleEffect);
+            }
+        }
+
+        private void OnProjectileCoinInteraction(Frame f, EntityRef projectileEntity, EntityRef coinEntity) {
+            var projectile = f.Unsafe.GetPointer<Projectile>(projectileEntity);
+            var projectileAsset = f.FindAsset(projectile->Asset);
+
+            if (projectileAsset.CollectCoins) {
+                CoinSystem.TryCollectCoin(f, coinEntity, projectile->Owner);
             }
         }
 
@@ -112,15 +185,19 @@ namespace Quantum {
 
             if (projectileAsset.DestroyOnHit) {
                 Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
-            } else if (projectileAsset.Bounce) {
-                var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(projectileEntity);
-                projectile->Speed *= Constants._0_85;
-                physicsObject->Gravity *= Constants._0_85;
-                physicsObject->Velocity.Y = projectile->Speed;
+            } else {
+                if (projectileAsset.Bounce) {
+                    var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(projectileEntity);
+                    projectile->Speed *= Constants._0_85;
+                    physicsObject->Gravity *= Constants._0_85;
+                    physicsObject->Velocity.Y = projectile->Speed;
 
-                f.Events.EnemyKicked(hitEntity, false);
-                if (projectile->Speed < 1) {
-                    Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
+                    f.Events.EnemyKicked(hitEntity, false);
+                    if (projectile->Speed < 1) {
+                        Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
+                    }
+                } else {
+                    f.Events.EnemyPierced(hitEntity);
                 }
             }
         }

@@ -416,10 +416,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sRenderer: {fileID: 6983710913193508245}
-  animator: {fileID: 0}
   legacySpriteAnimator: {fileID: 7118529404408818850}
   sameTeamColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
   differentTeamColor: {r: 1, g: 1, b: 1, a: 1}
+  animator: {fileID: 0}
+  sameTeamColor3D: {r: 0, g: 0, b: 0, a: 0}
+  differentTeamColor3D: {r: 0, g: 0, b: 0, a: 0}
+  textureReplacements: []
 --- !u!114 &-9097082919274512610
 MonoBehaviour:
   m_ObjectHideFlags: 0

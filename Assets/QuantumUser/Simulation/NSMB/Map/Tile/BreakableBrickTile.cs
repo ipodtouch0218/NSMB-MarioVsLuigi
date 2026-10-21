@@ -8,7 +8,7 @@ namespace Quantum {
         public UnityEngine.Color ParticleColor;
 #endif
 
-        public BreakableBy BreakingRules = BreakableBy.SmallMarioDrill | BreakableBy.LargeMario | BreakableBy.LargeMarioGroundpound | BreakableBy.LargeMarioDrill | BreakableBy.MegaMario | BreakableBy.Shells | BreakableBy.Bombs;
+        public BreakableBy BreakingRules = BreakableBy.SmallMarioDrill | BreakableBy.LargeMario | BreakableBy.LargeMarioGroundpound | BreakableBy.LargeMarioDrill | BreakableBy.MegaMario | BreakableBy.Shells | BreakableBy.Bombs | BreakableBy.Projectiles;
         public bool BumpIfNotBroken;
         public FPVector2 BumpSize = new FPVector2(FP._0_50, FP._0_50);
         public FPVector2 BumpOffset = FPVector2.Zero;
@@ -59,6 +59,12 @@ namespace Quantum {
             } else if (f.Has<Bobomb>(entity)) {
                 doBreak = BreakingRules.HasFlag(BreakableBy.Bombs);
                 doBump = false;
+            } else if (f.Unsafe.TryGetPointer(entity, out Projectile* projectile)) {
+                var projectileAsset = f.FindAsset(projectile->Asset);
+
+                if (projectileAsset.BreakBreakableTiles) {
+                    doBreak = BreakingRules.HasFlag(BreakableBy.Projectiles);
+                }
             }
 
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
@@ -120,6 +126,7 @@ namespace Quantum {
             MegaMario = 1 << 6,
             Shells = 1 << 7,
             Bombs = 1 << 8,
+            Projectiles = 1 << 9,
         }
     }
 }

@@ -28,6 +28,8 @@ MonoBehaviour:
   BlockSpawnSoundEffect: 69
   Flags: 19
   MaxNumberOfItems: 0
+  CanSpawnAfterSeconds:
+    RawValue: 0
   TranslationKey: coinitem.blueshell
   CameraSpawnOffset:
     X:
@@ -36,7 +38,7 @@ MonoBehaviour:
       RawValue: 110100
   MaxMatchingPowerStates: 0
   MaxMatchingReserveState: 0
-  State: 6
+  State: 7
   SoundPlaysEverywhere: 0
   SoundEffect: 16
   ReserveSprite: {fileID: 2664608197882872095, guid: a87d3b028baa82640b06b88398a8c4f0,
