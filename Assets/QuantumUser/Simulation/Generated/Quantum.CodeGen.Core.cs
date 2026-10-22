@@ -3908,6 +3908,14 @@ namespace Quantum {
         return result;
       }
     }
+    /// <summary>6</summary>
+    public static FP _6_00 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 393216;
+        return result;
+      }
+    }
     /// <summary>0.05</summary>
     public static FP PhysicsRaycastSkin {
       [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
@@ -4018,6 +4026,8 @@ namespace Quantum {
       public const Int64 _0_73 = 47841;
       /// <summary>2.75</summary>
       public const Int64 _2_75 = 180224;
+      /// <summary>6</summary>
+      public const Int64 _6_00 = 393216;
       /// <summary>0.05</summary>
       public const Int64 PhysicsRaycastSkin = 3277;
       /// <summary>0.005</summary>

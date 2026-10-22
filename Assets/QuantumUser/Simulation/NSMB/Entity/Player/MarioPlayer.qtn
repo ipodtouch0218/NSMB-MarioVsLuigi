@@ -12,6 +12,7 @@
 #define _3_75 3.75
 #define _0_73 0.73
 #define _2_75 2.75
+#define _6_00 6.00
 
 #define DamageInvincibilityFrames 120
 
