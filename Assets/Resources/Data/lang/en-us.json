@@ -316,6 +316,7 @@
   "ui.inroom.chat.server.ended.hostdc": "Game ended, because the host disconnected. Mid-game host migration will be added in a later update.",
   "ui.game.spectating": "Spectating {playername}",
   "ui.game.players": "Spectate players",
+  "ui.game.reserve.noitem": "No Item",
   "ui.game.ping.hosting": "Hosting",
   "ui.game.results": "RESULTS",
   "ui.game.results.savereplay": "Save replay",
