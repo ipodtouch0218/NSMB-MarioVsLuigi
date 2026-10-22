@@ -2885,6 +2885,9 @@ namespace Quantum {
                         physicsObject->Velocity.Y = Constants._6_00;
                         mario->InvincibilityFrames = Constants.DamageInvincibilityFrames;
                         mario->KnockbackTick -= 15;
+                    } else {
+                        // Normal histun duration + i-frames.
+                        mario->InvincibilityFrames = Constants.DamageInvincibilityFrames;
                     }
                 }
                 break;
