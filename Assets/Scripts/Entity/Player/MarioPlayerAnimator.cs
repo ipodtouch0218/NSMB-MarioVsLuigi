@@ -160,7 +160,7 @@ namespace NSMB.Entities.Player {
         private GameObject activeRespawnParticle;
 
         private bool previousStarmanEnabled;
-        private PowerupVisuals previousPowerupVisuals;
+        private PowerupVisuals previousPowerupVisuals, previousDisplayPowerupVisuals;
 
         public void OnValidate() {
             this.SetIfNull(ref animator);
@@ -665,7 +665,7 @@ namespace NSMB.Entities.Player {
             }
 
             bool starman = mario->IsStarmanInvincible;
-            if (previousPowerupVisuals != currentPowerupVisuals || previousPowerupVisuals != displayPowerupVisuals || previousStarmanEnabled != starman) {
+            if (previousPowerupVisuals != currentPowerupVisuals || previousDisplayPowerupVisuals != displayPowerupVisuals || previousStarmanEnabled != starman) {
                 foreach (var powerupVisual in powerupVisuals) {
                     powerupVisual.DisableProps();
                     powerupVisual.DisableModel();
@@ -681,7 +681,8 @@ namespace NSMB.Entities.Player {
                 displayPowerupVisuals?.EnableProps();
                 displayPowerupVisuals?.ApplyTextureReplacements(starman);
 
-                previousPowerupVisuals = displayPowerupVisuals;
+                previousPowerupVisuals = currentPowerupVisuals;
+                previousDisplayPowerupVisuals = displayPowerupVisuals;
                 previousStarmanEnabled = starman;
             }
 

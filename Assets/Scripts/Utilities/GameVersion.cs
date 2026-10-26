@@ -6,9 +6,11 @@ namespace NSMB.Utilities {
     [Serializable]
     public struct GameVersion : IEquatable<GameVersion>, IComparable<GameVersion> {
 
+        //---Static Variables
         private static GameVersion? _current;
         public static GameVersion Current => _current ??= Parse(Application.version);
 
+        //---Public Variables
         public byte Major, Minor, Patch, Hotfix;
 
         public GameVersion(byte major, byte minor, byte patch, byte hotfix = 0) {
@@ -63,16 +65,15 @@ namespace NSMB.Utilities {
             return $"{Major}.{Minor}.{Patch}";
         }
 
-        public readonly int GetHashCode(GameVersion obj) {
-            // https://stackoverflow.com/a/1646913/19635374
-            unchecked {
-                int hash = 17;
-                hash = hash * 31 + obj.Major.GetHashCode();
-                hash = hash * 31 + obj.Minor.GetHashCode();
-                hash = hash * 31 + obj.Patch.GetHashCode();
-                hash = hash * 31 + obj.Hotfix.GetHashCode();
-                return hash;
-            }
+        public readonly int ToPackedInt() {
+            return Major
+                   | (Minor << 8)
+                   | (Patch << 16)
+                   | (Hotfix << 24);
+        }
+
+        public override readonly int GetHashCode() {
+            return ToPackedInt();
         }
 
         public readonly void Serialize(BinaryWriter writer) {
@@ -116,6 +117,11 @@ namespace NSMB.Utilities {
                 Patch = parsed[2],
                 Hotfix = parsed[3],
             };
+        }
+
+        [RuntimeInitializeOnLoadMethod]
+        private static void ResetStatics() {
+            _current = default;
         }
     }
 }
