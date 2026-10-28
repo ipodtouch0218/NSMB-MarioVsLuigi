@@ -2189,11 +2189,13 @@ namespace Quantum {
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
             var marioPhysics = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
+            var physicsInfo = f.FindAsset(mario->PhysicsAsset);
             var state = mario->CurrentPowerupState;
 
             bool dropStars = false;
 
-            var boomerangXHammer = mario->IsCrouching && marioPhysics->IsTouchingGround && state == PowerupState.HammerSuit && asset.Effect == ProjectileEffectType.Boomerang;
+            bool boomerangXHammer = mario->IsCrouching && marioPhysics->IsTouchingGround && state == PowerupState.HammerSuit && asset.Effect == ProjectileEffectType.Boomerang;
+            bool boomerangXBlueShell = asset.Effect == ProjectileEffectType.Boomerang && !asset.DoesntEffectBlueShell && (mario->IsInShell || mario->IsCrouchedInShell);
 
             // Mario is "damageable" when he's...
             // not in knockback, not Mega
@@ -2207,6 +2209,7 @@ namespace Quantum {
                 && (mario->IsDamageable(f) || (mario->TryGetCurrentPowerTransition(f, out _) && state == PowerupState.MiniMushroom))
                 && !((mario->IsCrouchedInShell || mario->IsInShell) && asset.DoesntEffectBlueShell)
                 && !boomerangXHammer
+                && !boomerangXBlueShell
                 && mario->CheckTeamAttack(f, projectile->Owner, out dropStars);
 
             if (damageable) {
@@ -2258,14 +2261,37 @@ namespace Quantum {
                 }
             }
 
-            if (damageable || asset.DestroyOnHit || ((mario->IsCrouchedInShell || mario->IsInShell) && asset.DoesntEffectBlueShell) || boomerangXHammer) {
+            if (damageable || asset.DestroyOnHit || ((mario->IsCrouchedInShell || mario->IsInShell) && asset.DoesntEffectBlueShell) || boomerangXHammer || boomerangXBlueShell) {
                 if (boomerangXHammer) {
-                    // Fly away
+                    // Projectile asset's "Bounce" effect
                     projectile->Speed *= Constants._0_85;
                     projectilePhysics->Gravity *= Constants._0_85;
                     projectilePhysics->Velocity.Y = projectile->Speed;
-
                     f.Events.BoomerangPierced(marioEntity);
+                }
+
+                if (boomerangXBlueShell) {
+                    bool hitFromRight = projectilePhysics->Velocity.X < 0;
+
+                    // Turn both around
+                    if (projectile->Frame < 30) {
+                        projectile->Combo = 2;
+                        projectilePhysics->Velocity.X = asset.Speed * (hitFromRight ? 1 : 1);
+                    }
+
+                    if (mario->IsInShell) {
+                        if (hitFromRight) {
+                            !mario->FacingRight;
+                        } else {
+                            mario->FacingRight;
+                        }
+
+                        mario->ShellSpeedStage = physicsInfo.ShellNormalStage;
+                        f.Events.PlayBumpSound(marioEntity);
+                    } else if (mario->IsCrouchedInShell) {
+                        marioPhysics->Velocity.X = physicsInfo.WalkMaxVelocity[physicsInfo.StarSpeedStage] * (hitFromRight ? -1 : 1);
+                        f.Events.MarioPlayerBlueShellStomped(marioEntity);
+                    }
                 }
 
                 f.Signals.OnProjectileHitEntity(projectileEntity, marioEntity);
