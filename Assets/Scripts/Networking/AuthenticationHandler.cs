@@ -54,7 +54,7 @@ namespace NSMB.Networking {
                 result = result[..^1];
             }
 
-            if (webRequest.result != UnityWebRequest.Result.Success || webRequest.responseCode >= 500) {
+            if (webRequest.responseCode >= 500) {
                 // Auth server down?
                 Debug.LogError($"[Authentication] Authentication init request failed with error: {webRequest.error} | response code: {webRequest.responseCode} | response: {result}");
                 NetworkHandler.ThrowError("ui.error.authentication", false);

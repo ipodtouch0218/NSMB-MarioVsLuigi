@@ -88,17 +88,14 @@ namespace NSMB.Entities.CoinItems {
             foreach (var playerElement in PlayerElements.AllPlayerElements) {
                 if (playerElement.IsOurCamera(camera)) {
                     // This camera.
-                    if (!PredictedFrame.Unsafe.TryGetPointer(playerElement.Entity, out MarioPlayer* cameraMario)) {
-                        return false;
+                    if (owner == playerElement.Entity) {
+                        return true;
                     }
 
-                    bool sameTeam = cameraMario->GetTeam(PredictedFrame) == ownerMario->GetTeam(PredictedFrame);
-                    if (!sameTeam) {
+                    // If this fireball can damage us, we are NOT on the same team.
+                    if (ownerMario->CheckTeamAttack(PredictedFrame, playerElement.Entity, out bool dropObjectives)
+                        && dropObjectives) {
                         return false;
-                    }
-
-                    if (PredictedFrame.Global->Rules.TeamAttack == TeamAttackOptions.Full) {
-                        return owner == playerElement.Entity;
                     }
 
                     return true;

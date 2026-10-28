@@ -428,8 +428,11 @@ namespace Quantum {
             if (!physicsObject->WasTouchingGround && physicsObject->IsTouchingGround) {
                 // Landed Frame
                 mario->LandedFrame = f.Number;
-                if (mario->JumpState == JumpState.TripleJump && (!inputs.Left.IsDown && !inputs.Right.IsDown)) {
-                    physicsObject->Velocity.X = 0;
+                if (mario->JumpState == JumpState.TripleJump) {
+                    if (!inputs.Left.IsDown && !inputs.Right.IsDown) {
+                        physicsObject->Velocity.X = 0;
+                    }
+                    mario->JumpState = JumpState.None;
                 }
                 if (mario->PreviousJumpState != JumpState.None && mario->PreviousJumpState == mario->JumpState) {
                     mario->JumpState = JumpState.None;

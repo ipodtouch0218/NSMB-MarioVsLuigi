@@ -162,6 +162,11 @@ namespace NSMB.UI.MainMenu {
             }
 
             if (submenuStack.Count > 0) {
+                if (submenuStack[^1] == menu) {
+                    // Already on top.
+                    return;
+                }
+
                 submenuStack[^1].Hide(menu.IsOverlay ? SubmenuHideReason.Overlayed : SubmenuHideReason.Background);
                 if (sound.HasValue) {
                     PlaySound(sound.Value);
