@@ -2182,18 +2182,18 @@ namespace Quantum {
 
             var projectile = f.Unsafe.GetPointer<Projectile>(projectileEntity);
             var projectilePhysics = f.Unsafe.GetPointer<PhysicsObject>(projectileEntity);
+            var asset = f.FindAsset(projectile->Asset);
             if (projectile->Owner == marioEntity) {
                 return;
             }
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
             var marioPhysics = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
-            var asset = f.FindAsset(projectile->Asset);
             var state = mario->CurrentPowerupState;
 
             bool dropStars = false;
 
-            var hammerXBoomerang = mario->IsCrouching && marioPhysics->IsTouchingGround && state == PowerupState.HammerSuit && asset.Effect == ProjectileEffectType.Boomerang;
+            var boomerangXHammer = mario->IsCrouching && marioPhysics->IsTouchingGround && state == PowerupState.HammerSuit && asset.Effect == ProjectileEffectType.Boomerang;
 
             // Mario is "damageable" when he's...
             // not in knockback, not Mega
@@ -2206,7 +2206,7 @@ namespace Quantum {
                 && state != PowerupState.MegaMushroom
                 && (mario->IsDamageable(f) || (mario->TryGetCurrentPowerTransition(f, out _) && state == PowerupState.MiniMushroom))
                 && !((mario->IsCrouchedInShell || mario->IsInShell) && asset.DoesntEffectBlueShell)
-                && !hammerXBoomerang
+                && !boomerangXHammer
                 && mario->CheckTeamAttack(f, projectile->Owner, out dropStars);
 
             if (damageable) {
@@ -2258,15 +2258,14 @@ namespace Quantum {
                 }
             }
 
-            if (damageable || asset.DestroyOnHit || ((mario->IsCrouchedInShell || mario->IsInShell) && asset.DoesntEffectBlueShell) || hammerXBoomerang) {
-                if (hammerXBoomerang) {
+            if (damageable || asset.DestroyOnHit || ((mario->IsCrouchedInShell || mario->IsInShell) && asset.DoesntEffectBlueShell) || boomerangXHammer) {
+                if (boomerangXHammer) {
                     // Fly away
-                    var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(projectileEntity);
                     projectile->Speed *= Constants._0_85;
-                    physicsObject->Gravity *= Constants._0_85;
-                    physicsObject->Velocity.Y = projectile->Speed;
+                    projectilePhysics->Gravity *= Constants._0_85;
+                    projectilePhysics->Velocity.Y = projectile->Speed;
 
-                    f.Events.EnemyPierced(marioEntity);
+                    f.Events.BoomerangPierced(marioEntity);
                 }
 
                 f.Signals.OnProjectileHitEntity(projectileEntity, marioEntity);

@@ -52,10 +52,6 @@ event EnemyKicked {
 	bool Groundpounded;
 }
 
-event EnemyPierced {
-	EntityRef Entity;
-}
-
 event EnemyDespawnedOffscreen {
 	EntityRef Entity;
 	nothashed FPVector2 Position;

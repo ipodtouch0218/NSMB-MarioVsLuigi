@@ -13,18 +13,18 @@ MonoBehaviour:
   m_Name: BoomerangFlower
   m_EditorClassIdentifier: 
   Identifier:
-    Path: QuantumUser/Assets/AssetObjects/Items/BoomerangFlower
+    Path: QuantumUser/Resources/AssetObjects/Items/BoomerangFlower
     Guid:
       Value: 348825844190755719
   Prefab:
     Id:
       Value: 1307582256079712543
   SpawnChance:
-    RawValue: 58982
+    RawValue: 57344
   AboveAverageBonus:
-    RawValue: 4096
+    RawValue: -131072
   BelowAverageBonus:
-    RawValue: 8192
+    RawValue: 65536
   BlockSpawnSoundEffect: 69
   Flags: 23
   MaxNumberOfItems: 0
