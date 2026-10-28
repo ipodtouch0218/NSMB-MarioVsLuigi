@@ -2279,15 +2279,9 @@ namespace Quantum {
                         projectilePhysics->Velocity.X = asset.Speed * (hitFromRight ? 1 : 1);
                     }
 
-                    if (mario->IsInShell) {
-                        if (hitFromRight) {
-                            !mario->FacingRight;
-                        } else {
-                            mario->FacingRight;
-                        }
-
-                        mario->ShellSpeedStage = physicsInfo.ShellNormalStage;
-                        f.Events.PlayBumpSound(marioEntity);
+                    mario->FacingRight = hitFromRight;
+                    mario->ShellSpeedStage = physicsInfo.ShellNormalStage;
+                    f.Events.PlayBumpSound(marioEntity);
                     } else if (mario->IsCrouchedInShell) {
                         marioPhysics->Velocity.X = physicsInfo.WalkMaxVelocity[physicsInfo.StarSpeedStage] * (hitFromRight ? -1 : 1);
                         f.Events.MarioPlayerBlueShellStomped(marioEntity);
