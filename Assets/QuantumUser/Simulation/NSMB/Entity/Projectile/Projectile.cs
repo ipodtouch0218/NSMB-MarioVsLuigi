@@ -65,6 +65,13 @@ namespace Quantum {
 
             // Speed
             Speed = asset.Speed;
+            if (asset.InheritShooterVelocity
+                && f.Unsafe.TryGetPointer(owner, out PhysicsObject* ownerPhysicsObject)
+                // Moving in same direction
+                && FPMath.Sign(ownerPhysicsObject->Velocity.X) == 1 == FacingRight) { 
+
+                Speed += FPMath.Abs(ownerPhysicsObject->Velocity.X / 3);
+            }
 
             // Physics
             Combo = 0; // There are 3 phases for Boomerang: 0 = going, 1 = pausing, 2 = returning
