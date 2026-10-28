@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BoomerangProjectile
   m_EditorClassIdentifier: 
   Identifier:
-    Path: QuantumUser/Assets/AssetObjects/Projectile/BoomerangProjectile
+    Path: QuantumUser/Resources/AssetObjects/Projectile/BoomerangProjectile
     Guid:
       Value: 317398270294624352
   Effect: 3

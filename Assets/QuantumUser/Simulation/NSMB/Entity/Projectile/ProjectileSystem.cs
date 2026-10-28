@@ -67,6 +67,12 @@ namespace Quantum {
 
             HandleTileCollision(f, ref filter, asset, stage);
 
+            physicsObject->Velocity.X = projectile->Speed * (projectile->FacingRight ? 1 : -1);
+
+            if (asset.LockTo45Degrees) {
+                physicsObject->TerminalVelocity = -projectile->Speed;
+            }
+
             if (asset.Effect == ProjectileEffectType.Boomerang) {
                 projectile->UpdateBoomerang(f, filter.Entity, physicsObject, stage);
             }
@@ -197,7 +203,7 @@ namespace Quantum {
                         Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
                     }
                 } else {
-                    f.Events.EnemyPierced(hitEntity);
+                    f.Events.BoomerangPierced(hitEntity);
                 }
             }
         }
