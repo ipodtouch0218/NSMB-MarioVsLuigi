@@ -2180,8 +2180,11 @@ namespace Quantum {
                 return;
             }
 
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+
             var projectile = f.Unsafe.GetPointer<Projectile>(projectileEntity);
             var projectilePhysics = f.Unsafe.GetPointer<PhysicsObject>(projectileEntity);
+            var projectileTransform = f.Unsafe.GetPointer<Transform2D>(projectileEntity);
             var asset = f.FindAsset(projectile->Asset);
             if (projectile->Owner == marioEntity) {
                 return;
@@ -2190,6 +2193,7 @@ namespace Quantum {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
             var marioPhysics = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
             var physicsInfo = f.FindAsset(mario->PhysicsAsset);
+            var marioTransform = f.Unsafe.GetPointer<Transform2D>(marioEntity);
             var state = mario->CurrentPowerupState;
 
             bool dropStars = false;
@@ -2267,22 +2271,27 @@ namespace Quantum {
                     projectile->Speed *= Constants._0_85;
                     projectilePhysics->Gravity *= Constants._0_85;
                     projectilePhysics->Velocity.Y = projectile->Speed;
-                    f.Events.BoomerangPierced(marioEntity);
                 }
 
                 if (boomerangXBlueShell) {
-                    bool hitFromRight = projectilePhysics->Velocity.X < 0;
+                    QuantumUtils.UnwrapWorldLocations(f, marioTransform->Position, projectileTransform->Position, out FPVector2 marioPos, out FPVector2 projectilePos);
+                    bool hitFromRight = marioPos.X < projectilePos.X;
 
-                    // Turn both around
-                    if (projectile->Frame < 30) {
+                    if (projectile->Combo < 2) {
                         projectile->Combo = 2;
-                        projectilePhysics->Velocity.X = asset.Speed * (hitFromRight ? 1 : 1);
+                        projectile->Frame = 0;
+                        projectilePhysics->Velocity.X = asset.Speed * (hitFromRight ? 1 : -1);
+                    } else if (projectile->Combo == 2) {
+                        projectile->Combo = 0;
+                        projectile->Frame = 0;
+                        projectilePhysics->Velocity.X = asset.Speed * (hitFromRight ? 1 : -1);
                     }
 
-                    mario->FacingRight = hitFromRight;
-                    mario->ShellSpeedStage = physicsInfo.ShellNormalStage;
-                    f.Events.PlayBumpSound(marioEntity);
+                    if (mario->IsInShell) {
+                        mario->FacingRight = !hitFromRight;
+                        f.Events.PlayBumpSound(marioEntity);
                     } else if (mario->IsCrouchedInShell) {
+                        mario->IsGroundpounding = false;
                         marioPhysics->Velocity.X = physicsInfo.WalkMaxVelocity[physicsInfo.StarSpeedStage] * (hitFromRight ? -1 : 1);
                         f.Events.MarioPlayerBlueShellStomped(marioEntity);
                     }
