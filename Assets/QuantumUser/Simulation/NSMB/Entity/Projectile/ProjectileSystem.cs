@@ -95,7 +95,7 @@ namespace Quantum {
                     }
 
                     if (asset.Effect == ProjectileEffectType.Boomerang) {
-                        if (projectile->Frame < 30) {
+                        if (projectile->Combo < 2) {
                             if (physicsObject->IsTouchingGround) {
                                 // Slope bug
                                 physicsObject->IsTouchingGround = false;
