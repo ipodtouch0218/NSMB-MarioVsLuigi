@@ -15,6 +15,13 @@ public class ProjectileAsset : AssetObject, ISoundOverrideProvider {
     public bool InheritShooterVelocity;
     public bool HasCollision = true;
     public bool DoesntEffectBlueShell = true;
+    public bool BreakBreakableTiles = false;
+    public bool CollectCoins = false;
+
+    public byte MaxProjectiles = 6;
+    public byte ProjectileVolleySize = 2;
+    public byte ProjectileDelayFrames = 6;
+    public byte ProjectileVolleyFrames = 75;
 
     public ParticleEffect DestroyParticleEffect = ParticleEffect.None;
     public SoundEffect ShootSound = SoundEffect.Powerup_Fireball_Shoot;
@@ -40,7 +47,8 @@ public class ProjectileAsset : AssetObject, ISoundOverrideProvider {
 public enum ProjectileEffectType : byte {
     Fire,
     Freeze,
-    KillEnemiesAndSoftKnockbackPlayers,
+    Hammer,
+    Boomerang,
 
     None = 0xff,
 }

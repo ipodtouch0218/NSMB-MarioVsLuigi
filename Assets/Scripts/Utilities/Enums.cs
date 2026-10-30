@@ -28,10 +28,13 @@ namespace NSMB.Utilities {
             [PrefabParticleData("Particle/RedPipe-D")] Pipe_Break_Red_Broken,
 
             [PrefabParticleData("Particle/BulletBillLauncher")] BulletBillLauncher_Break,
+            [PrefabParticleData("Particle/BulletBillShoot")] Enemy_BulletBill_Shoot,
 
             [PrefabParticleData("Particle/Puff")] Enemy_Puff,
             [PrefabParticleData("Particle/EnemyHardKick")] Enemy_HardKick,
             [PrefabParticleData("Particle/KillPoof")] Enemy_KillPoof,
+
+            [PrefabParticleData("Particle/BoomerangPierce")] Boomerang_Pierce,
 
             [PrefabParticleData("Particle/WalljumpParticle")] Player_WallJump,
             [PrefabParticleData("Particle/GroundpoundDust")] Player_Groundpound,
