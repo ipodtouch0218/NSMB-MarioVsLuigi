@@ -1,6 +1,8 @@
 using NSMB.UI.Translation;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -11,6 +13,9 @@ namespace NSMB.UI.Options {
 
         //---Static Variables
         private static readonly WaitForSecondsRealtime WaitForOneSecond = new(1f);
+
+        //---Events
+        public event Action<bool> OnDeleteModeChanged;
 
         //---Serialized Variables
         [SerializeField] private PauseOptionMenuManager manager;
@@ -35,15 +40,26 @@ namespace NSMB.UI.Options {
         [Header("Settings")]
         [SerializeField] private int timeoutTime = 6;
 
+        [Header("Organization")]
+        [SerializeField] private List<PerSectionOptions> perSectionOptions = new();
+
         //---Private Variables
         private RebindPauseOptionButton currentRebindingButton;
         private RebindingOperation currentRebinding;
         private int currentRebindingIndex;
         private Coroutine countdown;
         private bool initialized;
+        private bool _deleteMode;
 
         //---Properties
         public InputActionAsset Controls => Settings.Controls.asset;
+        public bool DeleteMode {
+            get => _deleteMode;
+            set {
+                _deleteMode = value;
+                OnDeleteModeChanged?.Invoke(value);
+            }
+        }
         private bool IsCompositeRebind => rebindCompositePrompt.gameObject.activeSelf;
 
         public override void Selected() {
@@ -53,6 +69,7 @@ namespace NSMB.UI.Options {
                 initialized = true;
             }
 
+            DeleteMode = false;
             base.Selected();
         }
 
@@ -63,11 +80,12 @@ namespace NSMB.UI.Options {
                 initialized = true;
             }
 
+            DeleteMode = false;
             base.Deselected();
         }
 
         private void CreateActions() {
-
+            List<PauseOption> originalOptions = new(options);
             List<PauseOption> newOptions = new();
 
             for (int i = 0; i < Controls.actionMaps.Count; i++) {
@@ -94,6 +112,7 @@ namespace NSMB.UI.Options {
                     }
 
                     RebindPauseOption newOption = Instantiate(controlTemplate);
+                    newOption.parent = this;
                     newOption.name = "ControlsButton (" + map.name + ", " + action.name + ")";
                     newOption.transform.SetParent(scrollPaneContent, false);
                     newOption.action = action;
@@ -102,11 +121,12 @@ namespace NSMB.UI.Options {
                     newOptions.Add(newOption);
                 }
 
-                if (i == 0) {
-                    // Move the default existing settings to be below me.
-                    foreach (PauseOption option in options) {
+                var thisSectionOptions = perSectionOptions.FirstOrDefault(pso => pso.Map == map.name);
+                if (thisSectionOptions != null) {
+                    foreach (PauseOption option in thisSectionOptions.Options) {
                         option.transform.SetAsLastSibling();
                         newOptions.Add(option);
+                        originalOptions.Remove(option);
                     }
                 }
 
@@ -120,6 +140,11 @@ namespace NSMB.UI.Options {
                 }
             }
 
+            foreach (PauseOption option in originalOptions) {
+                option.transform.SetAsLastSibling();
+                newOptions.Add(option);
+            }
+                
             options.Clear();
             options.AddRange(newOptions);
         }
@@ -129,20 +154,11 @@ namespace NSMB.UI.Options {
         }
 
         public void StartRebind(RebindPauseOptionButton option, int index = -1) {
-
             if (currentRebinding != null) {
                 DisposeRebind(currentRebinding);
             }
-            
-            manager.SetCurrentOption(option.parent);
-            GlobalController.Instance.PlaySound(SoundEffect.UI_Cursor);
 
-            //if (manager.IsUnbinding) {
-            //    targetAction.ApplyBindingOverride(index, path: "");
-            //    UpdateText();
-            //    //manager.ToggleUnbinding();
-            //    return;
-            //}
+            manager.SetCurrentOption(option.parent);
 
             InputAction targetAction = option.action;
             InputBinding targetBinding = option.Binding;
@@ -150,6 +166,7 @@ namespace NSMB.UI.Options {
             if (targetBinding.isComposite) {
                 if (index == -1) {
                     // Open composite prompt.
+                    GlobalController.Instance.PlaySound(SoundEffect.UI_Cursor);
                     rebindCompositePrompt.Open(this, option);
                     currentRebindingButton = option;
                     return;
@@ -160,6 +177,17 @@ namespace NSMB.UI.Options {
             } else if (index == -1) {
                 index = option.bindingIndex;
             }
+
+            if (DeleteMode) {
+                targetAction.ApplyBindingOverride(index, "");
+                Settings.Instance.SaveSettings();
+
+                option.UpdateLabel();
+                GlobalController.Instance.PlaySound(SoundEffect.UI_Decide);
+                return;
+            }
+
+            GlobalController.Instance.PlaySound(SoundEffect.UI_Cursor);
 
             currentRebindingButton = option;
             currentRebindingIndex = index;
@@ -213,7 +241,6 @@ namespace NSMB.UI.Options {
         }
 
         private void DisposeRebind(RebindingOperation operation) {
-
             currentRebindingButton.action.actionMap.Enable();
             operation.Dispose();
             currentRebinding = null;
@@ -285,12 +312,24 @@ namespace NSMB.UI.Options {
         }
 
         public override bool OnCancel() {
-            if (!IsCompositeRebind) {
-                return false;
+            if (IsCompositeRebind) {
+                rebindCompositePrompt.OnCancel();
+                return true;
             }
 
-            rebindCompositePrompt.OnCancel();
-            return true;
+            if (DeleteMode) {
+                DeleteMode = false;
+                GlobalController.Instance.PlaySound(SoundEffect.UI_Cursor);
+                return true;
+            }
+
+            return false;
+        }
+
+        [Serializable]
+        public class PerSectionOptions {
+            public string Map;
+            public List<PauseOption> Options;
         }
     }
 }

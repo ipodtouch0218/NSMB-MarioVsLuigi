@@ -12,6 +12,10 @@ namespace NSMB.UI.Options {
 
         //---Public Variables
         [HideInInspector] public InputAction action;
+        [HideInInspector] public PauseOptionControlsTab parent;
+
+        //---Properties
+        public RebindPauseOptionButton[] Children => buttons;
 
         //---Serialized Variables
         [SerializeField] private RebindPauseOptionButton[] buttons;
@@ -28,8 +32,9 @@ namespace NSMB.UI.Options {
             for (int i = 0; i < buttons.Length; i++) {
                 buttons[i].action = action;
 
-                while (action.bindings[indexCounter].isPartOfComposite)
+                while (action.bindings[indexCounter].isPartOfComposite) {
                     indexCounter++;
+                }
 
                 buttons[i].bindingIndex = indexCounter++;
             }
