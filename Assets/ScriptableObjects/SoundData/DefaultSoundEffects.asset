@@ -13,6 +13,11 @@ MonoBehaviour:
   m_Name: DefaultSoundEffects
   m_EditorClassIdentifier: 
   SfxOverrides:
+  - SoundEffect: 122
+    Mode: 0
+    Priority: 0
+    PlayGlobally: 0
+    AudioClips: []
   - SoundEffect: 0
     Mode: 0
     Priority: 0
@@ -751,3 +756,9 @@ MonoBehaviour:
     PlayGlobally: 0
     AudioClips:
     - {fileID: 8300000, guid: 7fc9a814923a54d49af74669b64dd2f3, type: 3}
+  - SoundEffect: 121
+    Mode: 0
+    Priority: 0
+    PlayGlobally: 0
+    AudioClips:
+    - {fileID: 8300000, guid: c69eed39a26e9b54b96f655f21d88489, type: 3}
