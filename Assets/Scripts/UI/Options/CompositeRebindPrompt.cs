@@ -11,6 +11,7 @@ namespace NSMB.UI.Options {
         [SerializeField] private RebindCompositeOption optionTemplate;
         [SerializeField] private TMP_Text header, backText;
         [SerializeField] private Transform content;
+        [SerializeField] private PauseOptionControlsTab tab;
 
         //---Properties
         private int MaxIndex => options.Count;
@@ -75,6 +76,12 @@ namespace NSMB.UI.Options {
         }
 
         public void OnCancel() {
+            if (tab.DeleteMode) {
+                tab.DeleteMode = false;
+                GlobalController.Instance.PlaySound(SoundEffect.UI_Cursor);
+                return;
+            }
+
             if (selectedIndex >= MaxIndex) {
                 Close();
                 return;

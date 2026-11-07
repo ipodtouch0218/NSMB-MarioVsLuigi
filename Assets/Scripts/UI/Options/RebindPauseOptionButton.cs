@@ -66,11 +66,15 @@ namespace NSMB.UI.Options {
                             targetBinding.effectivePath,
                             InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames);
 
+                    if (string.IsNullOrEmpty(addition)) {
+                        addition = "\x01"; // "invalid" symbol
+                    }
                     combined += addition + ",";
                 }
                 combined = combined.Replace("Up Arrow", "↑").Replace("Down Arrow", "↓").Replace("Left Arrow", "←").Replace("Right Arrow", "→");
+
                 if (combined.Length > 11) {
-                    combined = "...";
+                    label.text = "...";
                 } else {
                     label.text = combined[..^1];
                 }

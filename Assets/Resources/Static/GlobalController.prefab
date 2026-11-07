@@ -29302,6 +29302,7 @@ MonoBehaviour:
   header: {fileID: 5343328489416306754}
   backText: {fileID: 412976368393474945}
   content: {fileID: 158582664653387315}
+  tab: {fileID: 4769946290432467271}
 --- !u!114 &4197582489323326024
 MonoBehaviour:
   m_ObjectHideFlags: 0

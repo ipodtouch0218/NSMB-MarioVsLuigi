@@ -21,10 +21,13 @@ namespace NSMB.UI.Options {
 
         public void OnEnable() {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
+            tab.OnDeleteModeChanged += OnDeleteModeChanged;
+            OnDeleteModeChanged(tab.DeleteMode);
         }
 
         public void OnDisable() {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+            tab.OnDeleteModeChanged -= OnDeleteModeChanged;
         }
 
         public void Selected() {
@@ -84,6 +87,10 @@ namespace NSMB.UI.Options {
                     label.text = "» " + label.text;
                 }
             }
+        }
+
+        private void OnDeleteModeChanged(bool deleteMode) {
+            image.color = deleteMode ? Color.red : Color.white;
         }
     }
 }

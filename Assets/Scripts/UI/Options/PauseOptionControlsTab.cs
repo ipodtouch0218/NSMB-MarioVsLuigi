@@ -212,7 +212,7 @@ namespace NSMB.UI.Options {
                 .PerformInteractiveRebinding()
                 .WithControlsExcluding("Mouse")
                 .WithControlsHavingToMatchPath($"<{targetBinding.groups}>")
-                // .WithCancelingThrough()
+                .WithCancelingThrough("")
                 .WithAction(targetAction)
                 .WithTargetBinding(index)
                 .WithTimeout(timeoutTime)
