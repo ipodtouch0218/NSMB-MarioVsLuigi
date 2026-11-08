@@ -20,14 +20,16 @@ MonoBehaviour:
     Id:
       Value: 1524544283524633813
   SpawnChance:
-    RawValue: 65536
+    RawValue: 81920
   AboveAverageBonus:
-    RawValue: -65536
+    RawValue: -98304
   BelowAverageBonus:
     RawValue: 65536
   BlockSpawnSoundEffect: 69
   Flags: 23
   MaxNumberOfItems: 0
+  CanSpawnAfterSeconds:
+    RawValue: 0
   TranslationKey: coinitem.iceflower
   CameraSpawnOffset:
     X:
