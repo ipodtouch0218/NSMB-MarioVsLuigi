@@ -720,7 +720,11 @@ namespace Quantum {
                 return;
             }
 
-            if (mario->IsWallsliding || physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
+            bool canWallslide = !mario->IsInShell && !mario->IsGroundpounding && !physicsObject->IsTouchingGround 
+                && !f.Exists(mario->HeldEntity) && mario->CurrentPowerupState != PowerupState.MegaMushroom && !mario->IsSpinnerFlying 
+                && !mario->IsDrilling && !mario->IsCrouching && !mario->IsSliding && !mario->IsInKnockback && mario->PropellerLaunchFrames == 0;
+
+            if (mario->IsWallsliding || (canWallslide && (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall))) {
                 if (mario->JumpBufferFrames > 0 && mario->WalljumpFrames == 0 /* && !BounceJump */) {
                     bool faceRight = (!mario->FacingRight || mario->WallslideLeft) && !mario->WallslideRight;
                     // Perform walljump
@@ -746,8 +750,11 @@ namespace Quantum {
                 mario->FacingRight = mario->WallslideLeft;
             } else if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
                 // Walljump starting check
-                bool canWallslide = !mario->IsInShell && physicsObject->Velocity.Y < -FP._0_10 && !mario->IsGroundpounding && !physicsObject->IsTouchingGround && !mario->HeldEntity.IsValid && mario->CurrentPowerupState != PowerupState.MegaMushroom && !mario->IsSpinnerFlying && !mario->IsDrilling && !mario->IsCrouching && !mario->IsSliding && !mario->IsInKnockback && mario->PropellerLaunchFrames == 0;
                 if (!canWallslide) {
+                    return;
+                }
+
+                if (physicsObject->Velocity.Y > -FP._0_10) {
                     return;
                 }
 
@@ -2892,20 +2899,20 @@ namespace Quantum {
                 case IceBlockBreakReason.Other:
                     // Weak knockback, i-frames.
                     strength = KnockbackStrength.FireballBump;
-                    damaged = mario->DoKnockback(f, entity, hitFromRight, dropObjectives ? 0 : 1, strength, attacker);
+                    damaged = mario->DoKnockback(f, entity, hitFromRight, dropObjectives ? 1 : 0, strength, attacker);
                     mario->DamageInvincibilityFrames = Constants.DamageInvincibilityFrames;
                     break;
 
                 case IceBlockBreakReason.BlockBump:
                     // Soft knockback, no i-frames.
                     strength = KnockbackStrength.Normal;
-                    damaged = mario->DoKnockback(f, entity, hitFromRight, dropObjectives ? 0 : 1, strength, attacker);
+                    damaged = mario->DoKnockback(f, entity, hitFromRight, dropObjectives ? 1 : 0, strength, attacker);
                     break;
 
                 case IceBlockBreakReason.Groundpounded:
                     // Hard knockback, i-frames.
                     strength = KnockbackStrength.Groundpound;
-                    damaged = mario->DoKnockback(f, entity, hitFromRight, dropObjectives ? 0 : 2, strength, attacker);
+                    damaged = mario->DoKnockback(f, entity, hitFromRight, dropObjectives ? 2 : 0, strength, attacker);
                     mario->DamageInvincibilityFrames = Constants.DamageInvincibilityFrames;
                     break;
 
