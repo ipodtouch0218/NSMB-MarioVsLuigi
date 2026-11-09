@@ -15,10 +15,6 @@ component Projectile {
 
 signal OnProjectileHitEntity(EntityRef projectile, EntityRef hitEntity);
 
-event BoomerangPierced {
-	EntityRef Entity;
-}
-
 event ProjectileDestroyed {
 	EntityRef Entity;
 	ParticleEffect Particle;

@@ -2203,8 +2203,7 @@ namespace Quantum {
 
             bool dropStars = false;
 
-            bool boomerangXHammer = mario->IsCrouching && marioPhysics->IsTouchingGround && state == PowerupState.HammerSuit && asset.Effect == ProjectileEffectType.Boomerang;
-            bool boomerangXBlueShell = asset.Effect == ProjectileEffectType.Boomerang && !asset.DoesntEffectBlueShell && (mario->IsInShell || mario->IsCrouchedInShell);
+            var boomerangXHammer = mario->IsCrouching && marioPhysics->IsTouchingGround && state == PowerupState.HammerSuit && asset.Effect == ProjectileEffectType.Boomerang;
 
             // Mario is "damageable" when he's...
             // not in knockback, not Mega
@@ -2218,7 +2217,6 @@ namespace Quantum {
                 && (mario->IsDamageable(f) || (mario->TryGetCurrentPowerTransition(f, out _) && state == PowerupState.MiniMushroom))
                 && !((mario->IsCrouchedInShell || mario->IsInShell) && asset.DoesntEffectBlueShell)
                 && !boomerangXHammer
-                && !boomerangXBlueShell
                 && mario->CheckTeamAttack(f, projectile->Owner, out dropStars);
 
             if (damageable) {
@@ -2270,36 +2268,12 @@ namespace Quantum {
                 }
             }
 
-            if (damageable || asset.DestroyOnHit || ((mario->IsCrouchedInShell || mario->IsInShell) && asset.DoesntEffectBlueShell) || boomerangXHammer || boomerangXBlueShell) {
+            if (damageable || asset.DestroyOnHit || ((mario->IsCrouchedInShell || mario->IsInShell) && asset.DoesntEffectBlueShell) || boomerangXHammer) {
                 if (boomerangXHammer) {
                     // Projectile asset's "Bounce" effect
                     projectile->Speed *= Constants._0_85;
                     projectilePhysics->Gravity *= Constants._0_85;
                     projectilePhysics->Velocity.Y = projectile->Speed;
-                }
-
-                if (boomerangXBlueShell) {
-                    QuantumUtils.UnwrapWorldLocations(f, marioTransform->Position, projectileTransform->Position, out FPVector2 marioPos, out FPVector2 projectilePos);
-                    bool hitFromRight = marioPos.X < projectilePos.X;
-
-                    if (projectile->Combo < 2) {
-                        projectile->Combo = 2;
-                        projectile->Frame = 0;
-                        projectilePhysics->Velocity.X = asset.Speed * (hitFromRight ? 1 : -1);
-                    } else if (projectile->Combo == 2) {
-                        projectile->Combo = 0;
-                        projectile->Frame = 0;
-                        projectilePhysics->Velocity.X = asset.Speed * (hitFromRight ? 1 : -1);
-                    }
-
-                    if (mario->IsInShell) {
-                        mario->FacingRight = !hitFromRight;
-                        f.Events.PlayBumpSound(marioEntity);
-                    } else if (mario->IsCrouchedInShell) {
-                        mario->IsGroundpounding = false;
-                        marioPhysics->Velocity.X = physicsInfo.WalkMaxVelocity[physicsInfo.StarSpeedStage] * (hitFromRight ? -1 : 1);
-                        f.Events.MarioPlayerBlueShellStomped(marioEntity);
-                    }
                 }
 
                 f.Signals.OnProjectileHitEntity(projectileEntity, marioEntity);

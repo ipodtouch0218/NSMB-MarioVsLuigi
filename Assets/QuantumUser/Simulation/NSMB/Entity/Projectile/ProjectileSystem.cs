@@ -89,12 +89,7 @@ namespace Quantum {
                     || (physicsObject->IsTouchingGround && (!asset.Bounce || (projectile->HasBounced && asset.DestroyOnSecondBounce)))
                     || PhysicsObjectSystem.BoxInGround(f, filter.Transform->Position, filter.PhysicsCollider->Shape)) {
 
-                    // Destroy tiles
-                    if (asset.BreakBreakableTiles && TryBreakTiles(f, filter.Entity, physicsObject, stage)) {
-                        return;
-                    }
-
-                    if (asset.Effect == ProjectileEffectType.Boomerang) {
+                    if (asset.Effect == ProjectileEffectType.Boomerang && asset.BreakBreakableTiles && TryBreakTiles(f, filter.Entity, physicsObject, stage)) {
                         if (projectile->Combo < 2) {
                             if (physicsObject->IsTouchingGround) {
                                 // Slope bug
@@ -202,8 +197,6 @@ namespace Quantum {
                     if (projectile->Speed < 1) {
                         Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
                     }
-                } else {
-                    f.Events.BoomerangPierced(hitEntity);
                 }
             }
         }
