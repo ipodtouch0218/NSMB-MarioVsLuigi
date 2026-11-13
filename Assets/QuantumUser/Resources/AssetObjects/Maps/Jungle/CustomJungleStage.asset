@@ -1946,7 +1946,7 @@ MonoBehaviour:
         IsTrigger: 1
         PhysicsMaterial:
           Id:
-            Value: 0
+            Value: 440371393295426011
     - rid: 8114452787875545090
       type: {class: PhysicsCallbacks2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:

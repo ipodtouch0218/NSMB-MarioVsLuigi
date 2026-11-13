@@ -63,8 +63,7 @@ MonoBehaviour:
           RawValue: 32768
         Y:
           RawValue: 32768
-  IsSlipperyGround: 0
-  IsSlideableGround: 1
   IsPolygon: 0
-  FootstepSound: 31
-  FootstepParticle: 0
+  PhysicsProperties:
+    Id:
+      Value: 276964127141388719

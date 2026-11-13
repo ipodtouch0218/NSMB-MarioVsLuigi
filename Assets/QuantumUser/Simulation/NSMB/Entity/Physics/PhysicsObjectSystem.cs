@@ -186,8 +186,11 @@ namespace Quantum {
                     }
                 }
 
-                effectiveVelocity -= physicsObject->ParentVelocity;
-                physicsObject->Velocity = effectiveVelocity;
+                FPVector2 newVelocity = effectiveVelocity;
+                newVelocity.X /= velocityModifier.X;
+                newVelocity.Y /= velocityModifier.Y;
+                newVelocity -= physicsObject->ParentVelocity;
+                physicsObject->Velocity = newVelocity;
 
                 HandleCeilingCrushers(f, ref filter, contacts);
 

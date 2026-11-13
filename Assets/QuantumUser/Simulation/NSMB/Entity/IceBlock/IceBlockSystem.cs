@@ -71,7 +71,7 @@ namespace Quantum {
                     physicsObject->Velocity.X *= Constants._0_85;
                     physicsObject->Velocity.Y = FPMath.Max(-FP._0_50, physicsObject->Velocity.Y);
                 } else {
-                    FP newVelocity = physicsObject->Velocity.Y;
+                    FP newVelocity = physicsObject->IsTouchingGround ? 0 : physicsObject->Velocity.Y;
                     if (newVelocity < 0) {
                         newVelocity *= Constants._0_90;
                     }
@@ -80,6 +80,12 @@ namespace Quantum {
 
                     physicsObject->Velocity.X *= Constants._0_85;
                     physicsObject->Velocity.Y = newVelocity;
+
+                    if (newVelocity >= 0) {
+                        // Stops ground snap from preventing floating
+                        physicsObject->WasTouchingGround = false;
+                        physicsObject->IsTouchingGround = false;
+                    }
                 }
             }
 

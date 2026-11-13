@@ -153,7 +153,7 @@ namespace NSMB.Utilities {
         };
 
         private static StringBuilder symbolStringBuilder = new();
-        public static string GetSymbolString(ReadOnlySpan<char> str, Dictionary<char, string> dict = null, int padUpToNLength = 0, bool tint = true) {
+        public static string GetSymbolString(ReadOnlySpan<char> str, Dictionary<char, string> dict = null, int padUpToNLength = 0, bool tint = false) {
             dict ??= uiSymbols;
 
             symbolStringBuilder.Clear();

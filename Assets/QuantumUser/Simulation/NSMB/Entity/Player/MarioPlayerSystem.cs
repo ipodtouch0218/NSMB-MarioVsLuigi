@@ -741,13 +741,13 @@ namespace Quantum {
                     mario->WallslideEndFrames = 0;
                     mario->JumpBufferFrames = 0;
                     mario->FacingRight = faceRight;
+                    mario->IsPropellerFlying = false;
                 }
             }
 
             if (mario->IsWallsliding) {
-                // Walljump check
-                //physicsObject->Velocity.X = FPMath.Clamp(physicsObject->Velocity.X, -FP._0_25, FP._0_25);
                 mario->FacingRight = mario->WallslideLeft;
+
             } else if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
                 // Walljump starting check
                 if (!canWallslide) {
