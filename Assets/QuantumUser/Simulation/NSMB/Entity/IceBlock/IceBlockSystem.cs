@@ -16,6 +16,19 @@ namespace Quantum {
         public override void OnInit(Frame f) {
             f.Context.Interactions.Register<MarioPlayer, IceBlock>(f, OnIceBlockMarioInteraction);
             f.Context.Interactions.Register<Coin, IceBlock>(f, OnIceBlockCoinInteraction);
+            f.Context.RegisterPreContactCallback(f, OnPreContactCallback);
+        }
+
+        private void OnPreContactCallback(Frame f, VersusStageData stage, EntityRef entity, PhysicsContact contact, ref bool keepContacts) {
+            if (f.Has<IceBlock>(entity)
+                && f.Has<IceBlock>(contact.Entity)
+                && f.Unsafe.TryGetPointer(contact.Entity, out Holdable* holdable)
+                && f.Exists(holdable->Holder)
+                && FPVector2.Dot(contact.Normal, FPVector2.Up) < Constants.PhysicsGroundMaxAngleCos) {
+
+                Destroy(f, contact.Entity, IceBlockBreakReason.HitWall, holdable->Holder);
+                keepContacts = false;
+            }
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
