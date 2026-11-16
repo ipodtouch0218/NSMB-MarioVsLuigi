@@ -1746,7 +1746,6 @@ namespace Quantum {
                 return;
             }
 
-            /*
             if (mario->IsSliding && mario->CurrentPowerupState == PowerupState.MiniMushroom && physicsObject->IsTouchingGround) {
                 var contacts = f.ResolveList(physicsObject->Contacts);
                 foreach (var contact in contacts) {
@@ -1756,7 +1755,6 @@ namespace Quantum {
                     }
                 }
             }
-            */
 
             if (physicsObject->IsTouchingGround && validFloorAngle) {
                 // Slide down slopes
