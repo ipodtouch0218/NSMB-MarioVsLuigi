@@ -49,6 +49,12 @@ namespace NSMB.UI.MainMenu {
             Settings.Controls.UI.Cancel.performed -= OnCancel;
         }
 
+        public void OnDestroy() {
+            // Can still be open when the scene unloads
+            Settings.Controls.UI.Navigate.performed -= OnNavigate;
+            Settings.Controls.UI.Navigate.canceled -= OnNavigate;
+        }
+
         public void Update() {
             if (!IsOpen) {
                 return;
