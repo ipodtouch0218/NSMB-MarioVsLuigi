@@ -575,13 +575,18 @@ namespace Quantum {
 
             KnockbackTick = f.Number;
 
+            bool forceWeak = false;
+            if (freezable->IsFrozen(f) && strength == KnockbackStrength.FireballBump) {
+                forceWeak = true;
+            }
+
             if (strength == KnockbackStrength.FireballBump && !physicsObject->IsTouchingGround) {
                 // FacingRight = fromRight;
                 knockbackVelocity.X *= FP._0_75;
             }
 
             CurrentKnockback = strength;
-            IsInWeakKnockback = CurrentPowerupState != PowerupState.MegaMushroom && (strength == KnockbackStrength.CollisionBump || (strength == KnockbackStrength.FireballBump && physicsObject->IsTouchingGround));
+            IsInWeakKnockback = forceWeak || (CurrentPowerupState != PowerupState.MegaMushroom && (strength == KnockbackStrength.CollisionBump || (strength == KnockbackStrength.FireballBump && physicsObject->IsTouchingGround)));
 
             physicsObject->Velocity = knockbackVelocity;
             physicsObject->IsTouchingGround = false;
