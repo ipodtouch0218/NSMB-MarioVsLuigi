@@ -576,10 +576,10 @@ namespace Quantum {
             KnockbackTick = f.Number;
 
             bool forceWeak = false;
-            if (freezable->IsFrozen(f) && strength != KnockbackStrength.Normal && strength != KnockbackStrength.Groundpound) {
+            if (freezable->IsFrozen(f) && strength == KnockbackStrength.FireballBump) {
                 forceWeak = true;
-                KnockbackTick -= 25;
             }
+
             if (strength == KnockbackStrength.FireballBump && !physicsObject->IsTouchingGround) {
                 // FacingRight = fromRight;
                 knockbackVelocity.X *= FP._0_75;
