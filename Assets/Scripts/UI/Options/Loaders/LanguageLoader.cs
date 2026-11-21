@@ -26,7 +26,8 @@ namespace NSMB.UI.Options.Loaders {
                 }
             }));
 
-            int currentIndex = locales.IndexOf(tm.CurrentLocale);
+            // Case-insensitive IndexOf
+            int currentIndex = locales.FindIndex(0, (locale) => locale.Equals(tm.CurrentLocale, System.StringComparison.InvariantCultureIgnoreCase));
             spo.SetValue(currentIndex);
         }
 

@@ -346,7 +346,7 @@ namespace NSMB.UI.Game.Replay {
             } else {
                 QuantumRunner.Default.IsSessionUpdateDisabled = false;
                 Time.captureDeltaTime = 0;
-                Time.timeScale = 1;
+                Time.timeScale = replaySpeed;
             }
         }
 
