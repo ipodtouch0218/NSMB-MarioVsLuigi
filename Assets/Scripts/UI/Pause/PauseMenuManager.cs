@@ -69,6 +69,12 @@ namespace NSMB.UI.Pause {
 
         public void OnDestroy() {
             Settings.Controls.UI.Pause.performed -= OnPause;
+            // Destroyed while paused: drop what Pause() subscribed
+            Settings.Controls.UI.Navigate.performed -= OnNavigate;
+            Settings.Controls.UI.Navigate.canceled -= OnNavigate;
+            Settings.Controls.UI.Submit.performed -= OnSubmit;
+            Settings.Controls.UI.Cancel.performed -= OnCancel;
+            TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
         private unsafe void OnPause(InputAction.CallbackContext context) {
